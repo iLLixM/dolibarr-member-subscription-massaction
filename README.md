@@ -49,7 +49,13 @@ Code is GPL-3.0-or-later; see COPYING. No KSeF or FacturX code is included.
 
 Dolibarr **22.0.5**, PHP **8.2** locally. PHP 7.4 is the provisional syntax minimum;
 CI covers the scaffold contracts and preview regressions using pinned V22 calendar helpers on 7.4 and 8.2. This is not a complete
-runtime compatibility claim. V23–V25 compatibility will be tested in later phases.
+runtime compatibility claim. C2.1 adds a common codebase with exact policies for
+V22.0.5 and V24.0.3: version-correct R16 and PDF fallbacks, explicit rejection of
+positive V24 membership VAT IDs for invoices, and both Core mail-hook account keys.
+Other versions fail closed at booking until their semantics are reviewed.
+[The C2.1 evidence](docs/phase4-implementation-validation.md#c21-compatibility-corrections-2026-11-13)
+is synthetic T1/T2 on PHP 8.2 only; real V24 runtime and production remain
+**NOT QUALIFIED**. V23, other V24 patches and V25 have no qualification.
 
 Module ID **584620 is temporary**, checked against local descriptors and the
 [official ID rules](https://wiki.dolibarr.org/index.php?title=List_of_modules_id&oldid=68837).

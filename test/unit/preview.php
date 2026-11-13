@@ -3,11 +3,18 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
-// Real V22 calendar helpers, synthetic data only; never bootstrap main/master/conf.
+// Real pinned Core calendar helpers, synthetic data only; never bootstrap main/master/conf.
 $core = getenv('DOLIBARR_TEST_ROOT');
-if (!$core || !is_file($core.'/htdocs/core/lib/functions.lib.php')) { fwrite(STDERR, "Set DOLIBARR_TEST_ROOT to a V22.0.5 source checkout.\n"); exit(1); }
+if (!$core || !is_file($core.'/htdocs/core/lib/functions.lib.php')) { fwrite(STDERR, "Set DOLIBARR_TEST_ROOT to a V22.0.5 or V24.0.3 source checkout.\n"); exit(1); }
 define('DOL_DOCUMENT_ROOT', $core.'/htdocs');
 define('DOL_URL_ROOT', '');
+if (is_file(DOL_DOCUMENT_ROOT.'/version.inc.php')) {
+	require DOL_DOCUMENT_ROOT.'/version.inc.php';
+} else {
+	preg_match("/define\('DOL_VERSION', '([^']+)'\)/", file_get_contents(DOL_DOCUMENT_ROOT.'/filefunc.inc.php'), $coreVersion);
+	if (empty($coreVersion[1])) { throw new RuntimeException('Cannot read Core version'); }
+	define('DOL_VERSION', $coreVersion[1]);
+}
 define('MAIN_DB_PREFIX', 'test_');
 require DOL_DOCUMENT_ROOT.'/core/lib/functions.lib.php';
 require DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
@@ -274,4 +281,4 @@ verify(isset($m[0]) && strpos($m[0], ' disabled') === false, 'invoice renderer a
 verify(!MsmPreviewService::canCreateSubscriptionWithOptions($user, true, true), 'advanced permission denies combined invoice mail while invoice control remains available');
 $conf->global = $previousGlobals; $user->denied = $previousDenied;
 $conf->modules['societe'] = 1;
-echo $passed." assertions passed (V22 calendar APIs, synthetic business data; no database connection).\n";
+echo $passed." assertions passed (Core ".DOL_VERSION." calendar APIs, synthetic business data; no database connection).\n";

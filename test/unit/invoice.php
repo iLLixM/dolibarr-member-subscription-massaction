@@ -133,4 +133,39 @@ verify($blocked['status'] === 'failed' && $blocked['message'] === 'MSMTransactio
 list($db, $service, $row) = invoiceBookingFixture(); $user->denied = array('facture.creer');
 verify($service->book(1, $row, $opts, $user, false)['status'] === 'failed' && !$db->calls && !$db->events, 'invoice permission checked before writes');
 $user->denied = array();
+// C1-02: re-resolve the real tax/profile snapshot before any synthetic business API.
+class TaxPreflightProfile extends MsmInvoiceProfile
+{
+	protected function paymentTerm() { return 1; }
+	protected function paymentTermLabel($id) { return 'Synthetic term'; }
+}
+class TaxPreflightPreview extends PreviewFixtureService
+{
+	protected function invoiceProfile() { return new TaxPreflightProfile($this->db); }
+}
+$conf->global = new stdClass(); $mysoc = (object) array('country_id' => 1);
+list($db, $service, $unusedRow) = invoiceBookingFixture(true);
+$sourceMember = new PreviewMember();
+$service->reader = new TaxPreflightPreview($db, $sourceMember);
+$service->reader->type = (object) array('duration' => '1y', 'label' => 'Synthetic type', 'amount' => '12', 'status' => 1, 'subscription' => 1);
+// Only the preview period reads are delegated to the existing in-memory reader.
+$service->reader->db = new PreviewDatabase();
+$opts = array('invoice' => true, 'autocreate' => true, 'sendmail' => false, 'description' => 'Synthetic fee');
+$conf->global->ADHERENT_VAT_FOR_SUBSCRIPTIONS = '0';
+$confirmed = $service->reader->previewSubscriptionWithOptions($user, stamp('2030-01-01'), true, false, null, true, $opts['description']);
+verify(!$confirmed['errors'], 'VAT confirmed invoice profile');
+foreach (array('7', '7foo', ' 7bad', '0foo', '-1', 'garbage') as $setting) {
+	$conf->global->ADHERENT_VAT_FOR_SUBSCRIPTIONS = $setting;
+	$fresh = $service->reader->previewSubscriptionWithOptions($user, $confirmed['start'], true, false, $confirmed['end'], true, $opts['description']);
+	verify(in_array('MSMInvoiceVatIdUnsupported', $fresh['errors'], true) === (DOL_VERSION === '24.0.3'), 'PR6 real preflight rejects unsupported VAT '.DOL_VERSION.' '.$setting);
+	$result = $service->book(1, $confirmed, $opts, $user, false);
+	verify($result['status'] === 'skipped' && $result['message'] === 'MSMChangedConfirmation', 'VAT changed confirmation rejects booking '.DOL_VERSION.' '.$setting);
+	verify(!in_array('subscription', $db->events, true) && !$db->calls && $result['rollback'] === 'confirmed', 'VAT change causes no business API call');
+}
+// Fresh subscription-only consent remains usable even with the same tax setting.
+$opts['invoice'] = false; $opts['autocreate'] = false;
+$confirmed = $service->reader->previewSubscriptionWithOptions($user, stamp('2030-01-01'), false, false, null, false, $opts['description']);
+verify(!$confirmed['errors'] && !isset($confirmed['invoice']), 'VAT subscription-only confirmation valid');
+$result = $service->book(1, $confirmed, $opts, $user, false);
+verify($result['status'] === 'success' && !$db->calls, 'VAT ID does not block subscription-only booking');
 echo ($passed - $beforeInvoice)." invoice transaction assertions passed (synthetic Core API doubles; no database).\n";

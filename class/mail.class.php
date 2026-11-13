@@ -83,7 +83,7 @@ class MsmSubscriptionMail
 		try {
 			$object = clone $member; $action = 'subscription';
 			$hookmanager = $this->hooks();
-			$parameters = array('datesubscription' => $row['start'], 'amount' => $row['amount'], 'ccountid' => 0, 'operation' => '', 'label' => $row['description'], 'num_chq' => '', 'emetteur_nom' => '', 'emetteur_banque' => '', 'datesubend' => $row['end'], 'invoice' => $invoice);
+			$parameters = array('datesubscription' => $row['start'], 'amount' => $row['amount'], 'accountid' => 0, 'ccountid' => 0, 'operation' => '', 'label' => $row['description'], 'num_chq' => '', 'emetteur_nom' => '', 'emetteur_banque' => '', 'datesubend' => $row['end'], 'invoice' => $invoice);
 			$result = $hookmanager->executeHooks('sendMail', $parameters, $object, $action);
 			if ($result < 0) { return 'failed'; }
 			if ($result > 0) { return 'hook'; }

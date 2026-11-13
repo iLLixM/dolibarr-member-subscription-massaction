@@ -269,7 +269,7 @@ class MsmPreviewService
 		}
 		if ($invoice && !$row['errors']) {
 			try { $row['invoice'] = $this->invoiceProfile()->resolve($this->member, $user, $row['autocreate'], $sendmail); }
-			catch (Throwable $e) { $row['errors'][] = in_array($e->getMessage(), array('NotEnoughPermissions', 'MSMProductUnavailable', 'SubscriptionBulkThirdPartyMissing'), true) ? $e->getMessage() : 'MSMInvoiceProfileUnsupported'; }
+			catch (Throwable $e) { $row['errors'][] = in_array($e->getMessage(), array('NotEnoughPermissions', 'MSMProductUnavailable', 'SubscriptionBulkThirdPartyMissing', 'MSMInvoiceVatIdUnsupported', 'MSMCoreVersionUnsupported'), true) ? $e->getMessage() : 'MSMInvoiceProfileUnsupported'; }
 		}
 		if ($sendmail && !isValidEmail((string) $this->member->email)) {
 			$row['warnings'][] = 'SubscriptionBulkEmailMissing';

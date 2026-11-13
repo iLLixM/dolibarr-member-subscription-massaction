@@ -3,6 +3,14 @@
 Status: **PHASE 4A FINALIZED – OWNER DECISIONS INCORPORATED – READY FOR PHASE 4B PLANNING**
 Owner decisions incorporated: 2026-11-10, following architecture commit `b28e5f9`. Design only; implementation and operational authorization remain separate.
 
+Subsequent C2.1 owner decisions (2026-11-13) are recorded in
+[implementation validation](phase4-implementation-validation.md#c21-compatibility-corrections-2026-11-13).
+For the exact V24.0.3 target, E1 changes R16 to the latest end across contributions;
+V22.0.5 retains the historical latest-start rule. E2 rejects positive V24 VAT
+record IDs for invoices. E3/E4 limit the target and evidence to pinned-version
+T1/T2 checks pending real qualification. O1–O7 and historical Phase 4A evidence
+below are preserved; generic V24 references below mean the earlier V24.0.0 source review.
+
 ## 1. Baseline, evidence and scope
 
 The module baseline is `5c511b7a2c6dee6d810ffc0c1469d1539d7e5a1c`, the merged Phase 3B development baseline, not a production release. The clean worktree is `/home/marcel/dolibarr-member-subscription-massaction-phase4`, branch `feature/phase4-invoice-architecture`. The annotated tag `baseline/phase3b-dolibarr-22.0.5`, module main, Phase 3B checkout and the test installation's existing Phase 3B symlink are preserved.
