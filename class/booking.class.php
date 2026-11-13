@@ -18,8 +18,8 @@ class MsmBookingService
 	protected function currentUser($user)
 	{
 		$current = new User($this->db);
-		if ($current->fetch($user->id) <= 0 || empty($current->statut)) { throw new RuntimeException('NotEnoughPermissions'); }
-		$current->getrights('', 1);
+		if ($current->fetch($user->id) <= 0 || empty($current->status)) { throw new RuntimeException('NotEnoughPermissions'); }
+		$current->loadRights('', 1);
 		return $current;
 	}
 	protected function preview($member) { return new MsmPreviewService($this->db, $member); }

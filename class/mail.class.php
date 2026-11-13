@@ -10,15 +10,15 @@ class MsmSubscriptionMail
 	protected function permitted($user)
 	{
 		$current = new User($this->db);
-		if ($current->fetch($user->id) <= 0 || empty($current->statut)) { return false; }
-		$current->getrights('', 1);
+		if ($current->fetch($user->id) <= 0 || empty($current->status)) { return false; }
+		$current->loadRights('', 1);
 		return MsmPreviewService::canCreateSubscriptionWithOptions($current);
 	}
 	protected function invoicePermitted($user)
 	{
 		$current = new User($this->db);
-		if ($current->fetch($user->id) <= 0 || empty($current->statut)) { return false; }
-		$current->getrights('', 1);
+		if ($current->fetch($user->id) <= 0 || empty($current->status)) { return false; }
+		$current->loadRights('', 1);
 		return MsmPreviewService::canCreateSubscriptionWithOptions($current, true, true);
 	}
 	protected function pdf() { require_once __DIR__.'/invoicepdf.class.php'; return new MsmInvoicePdfService($this->db); }
