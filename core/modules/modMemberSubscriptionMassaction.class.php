@@ -8,7 +8,7 @@
 
 require_once DOL_DOCUMENT_ROOT.'/core/modules/DolibarrModules.class.php';
 
-/** Technical scaffold; no subscription or invoice processing. */
+/** Bulk member subscriptions with optional Core invoicing, PDF and confirmation mail. */
 class modMemberSubscriptionMassaction extends DolibarrModules
 {
 	/** @param DoliDB $db Database handler */
@@ -37,7 +37,7 @@ class modMemberSubscriptionMassaction extends DolibarrModules
 		$this->dirs = array();
 		$this->config_page_url = array();
 		$this->const = array();
-		// Existing member permissions are mandatory; no redundant module grant in phase 2.
+		// Reuse existing member and optional invoice permissions; no redundant module grant.
 		$this->rights = array();
 		$this->menu = array();
 		$this->hidden = false;

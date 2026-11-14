@@ -1,5 +1,18 @@
 # Phase 4 — Optional invoice integration architecture
 
+## Current implementation context — 2026-11-14
+
+Phase 4 is implemented. The historical bounded V22 G2/G3/G4 approvals and the
+completed real V24.0.3 C3 campaign are recorded in
+[implementation validation](phase4-implementation-validation.md#c3-v2403-integration-campaign-2026-11-14).
+The final independent V24 review is pending; production/public release and other
+versions/profiles are not approved. O1–O7 remain binding. The Phase 4A design and
+V24.0.0 source observations below are historical, not current execution status.
+C2.1 E1–E4 and its reviewed corrections are retained; later real tests had separate
+owner authorization and did not widen the original C2.1 execution grant.
+
+## Historical Phase 4A design — 2026-11-10
+
 Status: **PHASE 4A FINALIZED – OWNER DECISIONS INCORPORATED – READY FOR PHASE 4B PLANNING**
 Owner decisions incorporated: 2026-11-10, following architecture commit `b28e5f9`. Design only; implementation and operational authorization remain separate.
 
@@ -230,6 +243,9 @@ Purpose: determine what is known after a stopped/unknown run without creating, r
 The later implementation should make available bounded sanitized evidence: run ID, owner/entity/member, confirmed value/config fingerprint and relevant comparison fields, stage timestamps, before-state identifiers, returned contribution/customer/invoice IDs, transaction-depth/server-state and commit/rollback results, persisted postconditions/R16, PDF identity/status and standard/hook/mail outcome. No credentials, tokens, full private records or raw SQL exceptions. Use the approved protected persistent test-results location for authorized test evidence and normal session checkpoints; this is not a new module journal/table or a guarantee of production crash recovery. Missing evidence remains missing. Define concrete file names, retention, access and read-only queries during 4C, and review this procedure against actual implementation **before authorizing real 4C integration tests**. No reconciliation script or schema is created here.
 
 ## 8. V22 versus V24: source findings, not compatibility approval
+
+Historical V24.0.0 source assessment. Its NOT EXECUTED statements describe that
+architecture task only; the later exact V24.0.3 C3 profile is documented above.
 
 | Area | Observed difference / stable contract | Architecture consequence |
 | --- | --- | --- |

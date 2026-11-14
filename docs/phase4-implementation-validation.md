@@ -1,13 +1,13 @@
 # Phase 4 implementation validation
 
-## Current gate status — 2026-11-13
+## Current gate status — 2026-11-14
 
 | Gate | Current status / provenance | Scope / next step |
 | --- | --- | --- |
 | G2 | **FINAL APPROVED – PASS WITH DOCUMENTED LIMITATIONS** | Completed for the bounded Dolibarr V22.0.5 profile below |
 | G3 | **APPROVED – PASS WITH DOCUMENTED LIMITATIONS** | Completed for the controlled V22 PDF/mail profile below; SMTP status uncertainty retained |
 | G4 | **PASS – OWNER ACCEPTED** | Owner-reported manual acceptance on 2026-11-12; subsequent targeted UI regressions passed |
-| V24 | **NOT QUALIFIED** | V24.0.3 C2.1 T1/T2 synthetic regressions PASS; real runtime qualification NOT EXECUTED |
+| V24.0.3 | **REAL C3 CAMPAIGN COMPLETE — LIMITED PROFILE** | C3.2/C3.3 PASS as scoped below; final independent V24 acceptance pending |
 | Production | **NOT QUALIFIED** | No release or production approval |
 
 The completed Phase 4 implementation baseline is merge commit
@@ -27,10 +27,118 @@ The historical UI-cleanup implementation baseline is
 `89b40b39337b66f7263ea1b629ee83ac667dd7a4`; the historical G2/G3 runtime-corrected
 baseline is `efb59b071a51373bf7e208de4043b1291beb7ad5`.
 The sections below retain historical development/test evidence;
-the current gate table and the G2/G3/G4 closure sections supersede earlier pending-gate
-statements only within their expressly tested scopes.
+the current gate table, the C3 section and the G2/G3/G4 closure sections supersede
+earlier pending-gate statements only within their expressly tested scopes.
+PR6-01–PR6-03 are closed by independent follow-up, as reported by the owner;
+that is not a final independent V24 approval or a formal GitHub review assertion.
+
+## C3 V24.0.3 integration campaign (2026-11-14)
+
+**C3.2 and C3.3 complete — PASS in the stated profile; ready for final independent
+V24 review, not merge, release or production approval.** C3.1 supplied planning and
+readiness boundaries; this update only reconciles existing evidence and runs no
+business, browser, PDF, fault or SMTP tests.
+
+### Exact targets, profile and provenance
+
+- **D24:** Dolibarr V24.0.3 Core `5c6c7ff6a5112413b1c27221c8d11750afad56f8`.
+- **M24:** campaign module HEAD `5a31d4c8d9cfe6733f59efaef430799df60e1902`.
+  All rows below use **D24 / M24**. The present documentation/comment-only commit
+  does not replace this tested runtime reference. Some original per-case logs do
+  not embed both SHAs: attribution uses the pinned campaign baseline, existing
+  preparation/continuity records and the retained unchanged implementation, not
+  a fabricated retrospective per-run source digest.
+- Real runtime: PHP 8.2.35, MariaDB 10.11.19, mysqli/InnoDB, entity 1, synthetic
+  members; standard EUR invoices, quantity 1, VAT setting `0`, no configured
+  product/service, `invoiceonly`, Mercure numbering, Sponge PDF. No payment created.
+- Automated browser evidence: Chromium 158.0.8127.18 and Playwright Firefox 159.0.
+  The later true result view uses the original authenticated session, not a fixture.
+- C2.1 C1-01–C1-05 and PR6-01–PR6-03 corrections are complete. All three jobs on
+  campaign HEAD M24 passed in [PR run 43506801577](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/43506801577):
+  PHP 7.4/V22.0.5, PHP 8.2/V22.0.5 and PHP 8.2/V24.0.3. CI remains synthetic;
+  it does not itself reproduce the real C3 cases.
+
+### Existing evidence index
+
+The named bundles below are **private local evidence**, not repository downloads.
+Only sanitized results/technical test identifiers are published here; no credentials,
+recipient addresses, sessions, document contents or raw dumps are imported.
+The requirement matrix remains the sole authoritative requirement-to-test mapping.
+
+| Bundle | Existing artifact location (bundle-relative) |
+| --- | --- |
+| AB | `dolibarr-c32-ab-evidence-20261113/`: `completion-20261114.json`, `access-denial-followup.json`, `C32-03-completion.json`, `C32-04-05-06-completion.json`, `C32-05-06-completion.json`; corresponding original result/reconciliation files retained |
+| TX | `dolibarr-c32-d-20261114/completion.json`; saved `c32-d-20261114/C32-08-result.json` and `C32-09-result.json` |
+| PC | `AB/c33-20261114/C33-final.json`, initial `20261114T172218Z/final.json`, separate `20261114T172541Z/final.json`; `c33-20261114/A-adapter-interim-20261114171712.json` |
+| R1 | `AB/c33-b-r1-20261114/C33-B-R1-final.json`, `result.json`, `completion-read-only.json`, real masked Chromium/Firefox result screenshots; `c33-b-r1-files-20261114.json` |
+| MAIL | `AB/c33-d-20261114/C33-D-final.json`, `owner-delivery-confirmation.json`, `independent-read-only.json`; saved `c33-d-20261114/result.json` |
+
+`AB/...` abbreviates the AB bundle root. Saved adapter/transaction/filesystem outputs
+outside AB use the existing shared test-result directory, not a public artifact URL.
+
+| Test / result | Operation / relevant requirement aspect | Core / module | Mode / existing evidence | Essential limit |
+| --- | --- | --- | --- | --- |
+| C3.1 COMPLETE (owner-reported planning) | Test planning/readiness; not a business PASS | D24 / M24 campaign references | Readiness carried into AB `completion-20261114.json` | Standalone original C3.1 plan artifact was not located in the inspected campaign bundles; no reconstructed raw plan or execution claimed |
+| C32-01 PASS | Member-list action, selection, preview; C01-01/C07-01 | D24 / M24 | Authenticated Chromium, AB `access.json` plus completion | Normal entry only, not malformed/maximum-size selection proof |
+| C32-07 PASS | Role filtering/direct wizard access; C01-06/C07-01 | D24 / M24 | Separate restricted sessions, AB `access-denial-followup.json` | HTTP 200 contains localized denial; no negative final booking POST or full advanced-permission matrix |
+| C32-02 PASS | Subscription-only Core booking/end; C04-01/02/09 | D24 / M24 | Real HTTP/SQL; AB `completion-20261114.json` | One-day case, 21-table comparison; no invoice or independent filesystem inventory |
+| C32-03 PASS | Existing customer, validated invoice/link/PDF; C05-02/03/07/08/09 | D24 / M24 | Real HTTP/SQL/PDF; AB `C32-03-completion.json` | Original result anchor not separately captured; target card verified; R1 later closes the actual-result-link gap |
+| C32-04 PASS | Explicit new-customer consent and invoice; C05-03/04 | D24 / M24 | Real HTTP/SQL/PDF; AB `C32-04-05-06-completion.json` | Missing-customer negative preview only; no new contact, shared entity or classification matrix |
+| C32-05 PASS | Zero-EUR invoice/line/link/PDF; C02-02/C05-05/10 | D24 / M24 | Real HTTP/SQL/PDF; AB `C32-05-06-completion.json` | Standard unpaid zero invoice in this profile only |
+| C32-06 PASS | Consented overlap and maximum member end (R16); C02-13/C04-01 | D24 / M24 | Positive real HTTP/SQL; same AB completion | Missing-consent rejection is a separate isolated production-function check, not a negative booking POST; no competing writers |
+| C32-08 PASS | Owned rollback after real invoice validation; C04-03/07/08/C05-11 | D24 / M24 | Real CLI/DB, process-local injected fault; TX | 22-table/observer/file comparison; no PDF/mail call; one controlled fault point, not all external effects |
+| C32-09 PASS | Ambiguous acknowledgement and batch stop; C04-04/08/C06-06 | D24 / M24 | Real CLI COMMIT, adapter withholds success; TX | Contribution persisted, original module result remains `unknown`; next row skipped, no PDF/mail; **no physical network outage** |
+| C3.3-A PASS | Canonical PDF/ECM/attachment identity; disabled mail; C05-09/C06-01/05 | D24 / M24 | Actual PDF/mail adapters, authenticated downloads and anonymous denial; PC | Wrong-invoice descriptor rejected; selected mail disabled with/without invoice; downstream hooks/transport NOT EXECUTED here |
+| C3.3-B-R1 PASS | Exact consumed authenticated POST replay; C03-09/10 | D24 / M24 | One real invoice booking, one byte-identical replay in same session; R1 | Original token/revision reused; 22 tables and physical PDFs unchanged on replay; **mail was not selected**; no crash/session-loss or mail-enabled replay claim |
+| C3.3-C PASS within profile | Preview/options/overlap/confirmation/revision/access/results; C03/C07 named portions in matrix | D24 / M24 | Real Chromium/Firefox read-only flows, PC; actual completed result/link in both browsers, R1 | Initial unavailable-result fixtures remain synthetic; R1 supplies new real evidence, not retroactive reclassification; no new V24 manual BFCache/keyboard acceptance |
+| C3.3-D PASS | Standard mail adapter/dispatcher/SMTPS and PDF receipt; C06-02/03/04/05/07 | D24 / M24 | Existing contribution/invoice, exactly one actual send, MAIL; receipt/hash/content **owner-reported** | No new booking. Core SMTP `250`, no application errors. Real dispatch with **zero additional hook handlers**, not a third-party hook test. No agent mailbox/raw received-MIME audit |
+
+### Integrity, historical stops and retained limits
+
+Later business/mail/replay comparisons covered 22 business tables and the known
+PDF inventory; C32-02 retained its own 21-table scope. C3.3-D left the completed
+dataset unchanged: 36 contributions, 10 invoices, 7 customers, 10 ECM rows, no
+payments and the preexisting one bank row unchanged. This is a historical test
+snapshot, not an assertion about every future local database state.
+
+C3.3-D found mail unexpectedly enabled before preparation, secured it, then opened
+an owner-forced-only test window for six seconds. It restored the required safe
+`MAIN_DISABLE_ALL_MAILS=1` and the previously absent `MAIN_MAIL_FORCE_SENDTO`;
+independent SELECT checks confirmed both. The actual generic configured message
+has no period/amount tokens; those values were owner-verified in the matching PDF,
+not invented as text fields. No template change or new template-development task.
+V22 G3's diagnostic 121 remains historical uncertainty despite confirmed receipt;
+the single V24 C3.3-D send had `transport`, SMTP `250` and no error codes.
+
+Original NO-GO/selector/localization/Core-normalization and cleanup failures remain
+in the local history. Later separately named, read-only reconciliations resolve
+only their stated points: no hidden automatic rebooking/resend. The initial C3.3-B
+could not reuse its closed session; it remains NOT EXECUTED in its original report.
+R1 independently closes that gap through one newly authorized positive operation
+and its exact consumed replay. Its post-test Playwright cleanup error occurred
+after six persisted PASS checks; separate read-only reconciliation confirmed the
+unchanged completed state. No successful transport is relabeled failed because of
+a later harness issue. The missing standalone C3.1 raw plan and absent per-case
+source digests remain evidence limitations, not newly generated artifacts.
+
+**Still NOT EXECUTED / NOT QUALIFIED:** physical connection loss, exhaustive
+crash/session-loss recovery, non-cooperating external writers or real V24 lock
+contention, foreign outer transactions, arbitrary custom hook takeover/failure,
+live PDF/SMTP failure injection, full advanced-permission/expiry/selection-bound
+matrices, Multicompany/shared entities, additional currencies/taxes/products,
+packaging/stock, alternative PDF/invoice profiles and other Core versions/patches.
+No mail-enabled consumed-run replay was performed: R1 is mail-off and D is a
+separate one-call transport test. No Exactly-once, durable journal, broad
+crash-recovery or production guarantee. V24 final independent acceptance is
+**PENDING**; production/public release remain **NOT APPROVED**. Temporary ID
+`584620`, version `0.1.0-dev`, minimum Core version and all release gates are unchanged.
 
 ## C2.1 compatibility corrections (2026-11-13)
+
+**Historical C2.1 execution snapshot.** Pending-review and NOT EXECUTED statements
+in this section describe that stage; the current C3 status above/below supersedes
+them only for the subsequently tested profile. E4 remains the original C2.1 grant,
+not authorization for the later separately approved real tests.
 
 Implementation and exact tested commit: `553fa75aba5d7b710a4b2363d087898c2213bfb4`,
 based on module `b946c8142355030532068e07166731541ceea69e`, on
@@ -122,6 +230,9 @@ remain. G3-W02 remains template configuration only, not a module finding.
 Next: independent C2.1 review, then separately authorized bounded V24 T3/T4 tests.
 
 ## PR 6 follow-up: PR6-01 to PR6-03
+
+Historical correction/CI report; the owner subsequently reported all three findings
+closed by independent follow-up. Final independent V24 acceptance remains separate.
 
 Subsequent review corrections, 2026-11-13, implementation commit
 `c67b5cd0bc2ef34a23012e870928dad3bbaa730b`:

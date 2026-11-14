@@ -4,7 +4,7 @@
  */
 
 require_once __DIR__.'/period.class.php';
-/** Composition over the V22 member object; all database operations are reads. */
+/** Read-only preview composed over the supported Dolibarr member APIs. */
 class MsmPreviewService
 {
 	public $db;
