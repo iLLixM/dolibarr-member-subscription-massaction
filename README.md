@@ -1,12 +1,16 @@
 # Member Subscription Massaction for Dolibarr
 
-**P2 development status — 2026-11-15:** admission now starts at Dolibarr 21.0.0,
+**Cross-version development status — 2026-11-15:** admission now starts at Dolibarr 21.0.0,
 with no upper version or exact-patch allowlist. V21 and future releases remain
 unqualified. P1 analyzed all 15 tags V22.0.0–22.0.5, V23.0.0–23.0.4 and
 V24.0.0–24.0.3. Local PHP 8.2 synthetic runners passed against all 15 pinned
 sources; the configured CI matrix has 21 PHP/Core combinations (PHP 8.2 on all
-15, PHP 7.4 additionally on all six V22 tags). P3 qualification/review remains a
-separate task; admission and source analysis are not real integration evidence.
+15, PHP 7.4 additionally on all six V22 tags). P3 is formally Owner-accepted with
+documented limitations. Independent overall code review remains outstanding;
+admission and source analysis are not real integration evidence.
+
+See the [P3 qualification and evidence guide](docs/p3-qualification-summary.md) for
+the closed qualification, pinned matrix, supplemental-source correction and limits.
 
 R16 is written only by Core and checked through an observed Core end value plus
 independent known-contract postconditions (boundary V24.0.2). Unsupported callable,

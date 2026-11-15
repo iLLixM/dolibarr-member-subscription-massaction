@@ -1,5 +1,26 @@
 # Phase 4 implementation validation
 
+## P3 formal closure and P3-DOC01 — 2026-11-15
+
+Owner decision: **P3 SYNTHETIC CROSS-VERSION QUALIFICATION – ACCEPTED WITH
+DOCUMENTED LIMITATIONS**. P3 is closed on implementation HEAD
+`a1843e14c71c89f7148aa2e8f6c5352409bca7b1`; all 21 CI pairs passed in
+[run 43731843114](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/43731843114).
+No confirmed implementation defect or real P4 test need was found for the agreed
+synthetic scope. Independent overall code review and merge decision remain pending.
+
+The [public qualification guide](p3-qualification-summary.md) records all 15 Core
+pins, regular CI test links, precise supplemental P3 program/result identifiers
+and the PHP-8.2-only supplemental scope. P3-DOC01 is corrected in a separate
+private addendum with its own checksums; the original completed P3 package and
+78 checksums remain unchanged. No private evidence is imported into the repository.
+
+This follow-up is documentation-only and must have its own CI attributed to its
+new HEAD. It does not change or rerun the P3-qualified implementation. The earlier
+P2/P2-F01 "P3 pending" entries below are historical intermediate statuses superseded
+by this closure, not erased. Existing real baselines, 71 requirements, risk limits,
+module metadata and production/release restrictions remain unchanged.
+
 ## P2-F01 R16 evidence boundary — 2026-11-15
 
 The numeric interval used in the initial P2 implementation also classified

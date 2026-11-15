@@ -22,7 +22,8 @@
   checks (24.0.2 boundary). Qualification is evidence, not admission.
 - D-P1-01 accepts only empty/unset, `0` and `defaultforfoundationcountry` VAT
   configuration on every Core; no V22 silent-zero fallback for other values.
-  Preserve subscription-only behavior. P3 qualification remains separate.
+  Preserve subscription-only behavior. P3 is Owner-accepted with documented
+  limitations; independent overall review and merge decisions remain separate.
 
 - Dolibarr V22.0.5 is the primary implementation reference with historical bounded acceptance.
 - V24.0.3 completed the real C3 campaign in the exact profile documented in

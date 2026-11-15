@@ -139,7 +139,7 @@ Version `0.1.0-dev`, temporary ID `584620` and exact profile limits remain;
 production/public release remain **NOT QUALIFIED / NOT APPROVED**. Other profiles
 are not generally qualified. No new test execution or expanded PASS is implied.
 
-## P2 cross-version evidence (2026-11-15; P3 pending)
+## Historical P2 cross-version evidence (2026-11-15; P3 was pending)
 
 Admission >=21.0.0 is independent of qualification. P1 source analysis covers 15 tags;
 P2 local PHP 8.2 runs six existing runners against every target. The workflow includes
@@ -161,3 +161,8 @@ No requirement matrix fields changed: 71 IDs, historical evidence and 18 dedicat
 scenarios remain. Existing real V22/V24 evidence is not retroactively assigned to
 other tags or the P2 implementation. See the P2 section in the central validation
 for limitations; production and public release remain unqualified.
+
+P3 subsequently closed with Owner acceptance and documented limitations; see the
+[P3 qualification guide](p3-qualification-summary.md) for the 21-job CI evidence,
+PHP-8.2-only supplemental scope and separate P3-DOC01 reference addendum.
+Independent overall code review and merge decisions remain separate.
