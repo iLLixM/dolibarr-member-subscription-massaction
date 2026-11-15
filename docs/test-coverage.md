@@ -81,4 +81,46 @@ are retained; current profile limits supersede obsolete blanket Phase 4 deferral
 FS4-01 classification warnings use the confirmed customer/configuration snapshot.
 The profile setting is re-resolved in the existing fingerprint path before booking.
 The client 0/1/2/3 × setting 0/1 × invoice off/on matrix is synthetic, not a new
-live classification write. V24 and production remain NOT QUALIFIED.
+live classification write. That V22 evidence does not qualify the V24 classification
+matrix; the later bounded C3 profile is recorded below. Production is NOT QUALIFIED.
+
+## V24.0.3 C3 references (2026-11-14)
+
+Use the [consolidated C3 evidence index](phase4-implementation-validation.md#c3-v2403-integration-campaign-2026-11-14)
+for exact Core/module SHAs, private artifact references, chronology and profile.
+These IDs are integration evidence, not additional unit-runner assertion counts:
+
+- `C32-01` / `C32-07`: real list/action/preview and separate-role direct wizard
+  denial; no negative final booking POST or full rights matrix.
+- `C32-02`–`C32-06`: real subscription-only, existing-customer invoice,
+  new-customer consent, zero invoice and positive R16 overlap respectively.
+  C32-06's missing-consent negative check is **isolated synthetic** production
+  function evidence beside a real unchecked checkbox, not a second HTTP write.
+- `C32-08`: real Core invoice validation followed by a controlled pre-COMMIT fault
+  and observed rollback; `C32-09`: a real COMMIT succeeds, then its acknowledgement
+  is withheld by the adapter. Original result stays unknown and batch stops.
+  Neither is a physical network interruption or complete failure-point matrix.
+- `C3.3-A`: actual canonical PDF/ECM/attachment checks, authenticated PDF download,
+  anonymous denial and selected=true disabled-mail adapter; downstream mail hooks
+  and transport were not executed by A.
+- `C3.3-B-R1`: actual consumed byte-identical POST, original token/revision and
+  authenticated session, one authorized preceding invoice booking, no duplicate
+  effects. Mail was off. This supersedes the **gap**, not the original NOT EXECUTED
+  history, and does not establish mail-enabled replay or crash durability.
+- `C3.3-C`: automated real Chromium/Firefox preview/options/confirmation,
+  overlap notice, stale revision/CSRF/invalid-key and role boundaries. The actual
+  successful result and invoice link come from B-R1 in both engines. Earlier
+  unavailable-outcome fixtures remain synthetic. No V24 manual BFCache, keyboard
+  or exhaustive layout/selection/permission acceptance is implied.
+- `C3.3-D`: existing invoice, one real production-adapter/SMTPS send, real
+  sendMail/sendMailAfter dispatch without registered extra handlers, safe recipient
+  and restore checks. PDF receipt/hash/content and delivery are **owner-reported**;
+  no agent mailbox access. Generic template contains no amount/period text tokens;
+  corresponding invoice data were checked in the attachment.
+
+Append these references only to the actually observed requirement aspect. Real
+positive cases do not establish their unexecuted negative variants. Existing V22,
+synthetic, owner and risk evidence stays separate. C3.1 planning has no separately
+located raw plan artifact; no inferred runtime PASS is assigned to it. C3 completes
+the stated real campaign; final independent V24 acceptance, other profiles and
+production/public release remain open.

@@ -2,6 +2,7 @@
 /* Copyright (C) 2026 iLLixM <iLLixM@proton.me>
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
+require_once __DIR__.'/corecompatibility.class.php';
 /** Read-only invoice plan. Only server-derived values may enter confirmation. */
 class MsmInvoiceProfile
 {
@@ -56,6 +57,10 @@ class MsmInvoiceProfile
 	{
 		global $conf, $mysoc;
 		if (!MsmPreviewService::canCreateSubscriptionWithOptions($user, true, $sendmail)) { throw new RuntimeException('NotEnoughPermissions'); }
+		$policy = MsmCoreCompatibility::current();
+		$vatSetting = getDolGlobalString('ADHERENT_VAT_FOR_SUBSCRIPTIONS');
+		// E2 / PR6-01: accept only supported literals, never coerce malformed IDs to zero.
+		if (DOL_VERSION === '24.0.3' && !in_array($vatSetting, array('', '0', 'defaultforfoundationcountry'), true)) { throw new RuntimeException('MSMInvoiceVatIdUnsupported'); }
 		if ((int) $member->entity !== (int) $conf->entity || empty($conf->currency)) { throw new RuntimeException('MSMInvoiceProfileUnsupported'); }
 		$customer = $member->thirdparty ?? null;
 		if (!$customer && (!$autocreate || !empty($member->socid) || !$user->hasRight('societe', 'creer'))) { throw new RuntimeException('SubscriptionBulkThirdPartyMissing'); }
@@ -76,7 +81,7 @@ class MsmInvoiceProfile
 		$number = getDolGlobalString('FACTURE_ADDON', 'mod_facture_terre');
 		$pdf = getDolGlobalString('FACTURE_ADDON_PDF_0');
 		if ($pdf === '') { $pdf = getDolGlobalString('FACTURE_ADDON_PDF'); }
-		if ($pdf === '') { $pdf = 'crabe'; }
+		if ($pdf === '') { $pdf = $policy['pdf']; }
 		$this->models($number, $pdf);
 		$settings = array();
 		foreach (array('ADHERENT_BANK_USE', 'ADHERENT_VAT_FOR_SUBSCRIPTIONS', 'ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS', 'FACTURE_ADDON', 'FACTURE_ADDON_PDF_0', 'FACTURE_ADDON_PDF', 'FACTURE_ADDON_PDF_STANDARD', 'FACTURE_RIB_NUMBER', 'SOCIETE_CODECLIENT_ADDON', 'THIRDPARTY_DEFAULT_CREATE_CONTACT', 'THIRDPARTY_CUSTOMERCODE_EQUALS_MEMBERREF', 'SOCIETE_USEPREFIX', 'SOCIETE_DISABLE_PROSPECTSCUSTOMERS', 'MAIN_USE_ADVANCED_PERMS', 'MAIN_ROUNDOFTOTAL_NOT_TOTALOFROUND', 'MAIN_MAX_DECIMALS_TOT', 'MAIN_MAX_DECIMALS_UNIT', 'MAIN_MAX_DECIMALS_SHOWN', 'MAIN_DISABLE_ALL_MAILS') as $name) { $settings[$name] = getDolGlobalString($name); }

@@ -1,13 +1,13 @@
 # Phase 4 implementation validation
 
-## Current gate status — 2026-11-13
+## Current gate status — 2026-11-15
 
 | Gate | Current status / provenance | Scope / next step |
 | --- | --- | --- |
 | G2 | **FINAL APPROVED – PASS WITH DOCUMENTED LIMITATIONS** | Completed for the bounded Dolibarr V22.0.5 profile below |
 | G3 | **APPROVED – PASS WITH DOCUMENTED LIMITATIONS** | Completed for the controlled V22 PDF/mail profile below; SMTP status uncertainty retained |
 | G4 | **PASS – OWNER ACCEPTED** | Owner-reported manual acceptance on 2026-11-12; subsequent targeted UI regressions passed |
-| V24 | **NOT QUALIFIED** | Source comparison only; separate runtime qualification required |
+| V24.0.3 | **REAL C3 CAMPAIGN COMPLETE — LIMITED PROFILE** | External review APPROVED FOR MERGE WITH EXPLICIT CONDITIONS; OD-PR6-01/02 accepted for development merge only; actual merge pending |
 | Production | **NOT QUALIFIED** | No release or production approval |
 
 The completed Phase 4 implementation baseline is merge commit
@@ -27,8 +27,344 @@ The historical UI-cleanup implementation baseline is
 `89b40b39337b66f7263ea1b629ee83ac667dd7a4`; the historical G2/G3 runtime-corrected
 baseline is `efb59b071a51373bf7e208de4043b1291beb7ad5`.
 The sections below retain historical development/test evidence;
-the current gate table and the G2/G3/G4 closure sections supersede earlier pending-gate
-statements only within their expressly tested scopes.
+the current gate table, the C3 section and the G2/G3/G4 closure sections supersede
+earlier pending-gate statements only within their expressly tested scopes.
+PR6-01–PR6-03 are closed by independent follow-up, as reported by the owner;
+that earlier follow-up is distinct from the final conditional external review below
+and is not a formal GitHub review assertion.
+
+## PR #6 final external review and owner decisions — 2026-11-15
+
+The owner reports the independent external verdict **APPROVED FOR MERGE WITH
+EXPLICIT CONDITIONS** on `eb87e181e0c83fc3e9b8a24139c441e8e62528e3`.
+No confirmed blocking implementation defect was identified. This is an external
+review reported by the owner, not a formal GitHub approval. **PR6-FINAL-01,
+PR6-FINAL-02, PR6-FINAL-03 and PR6-FINAL-04** are the final review finding references;
+the conditional documentation disposition is recorded through OD-PR6-01/02 below.
+No additional per-finding technical conclusions or new test results are inferred.
+
+### OD-PR6-01 — ACCEPTED (owner decision, 2026-11-15)
+
+For a bounded development merge to `main`, the owner accepts the documented
+C3.1 plan deviations using existing V22 evidence, synthetic regressions and real
+V24 partial evidence. In particular:
+
+- C32-08 covers the member-19 rollback only; the planned successful member-10
+  row and mixed V24 success/failure batch were **NOT EXECUTED**.
+- C32-07 lacks final negative booking POSTs and the live unvalidated-member-9
+  case. Role filtering/direct access checks do not become those missing tests.
+- Missing-overlap-consent rejection remains an isolated guard check, not a
+  negative final HTTP booking POST. The original replay was unavailable; B-R1
+  later used member 18/customer 3, a 2036 period and invoice/PDF instead of the
+  planned member-20 subscription-only 2034 case, with mail off.
+- The V24 browser matrix is limited: 1440/1024 geometry and retained live flows
+  do not establish the planned 768/390, complete DE/EN, no-JS, keyboard/reset or
+  manual BFCache acceptance. Real success views and synthetic error views remain
+  distinct. V22 owner acceptance is not transferred to V24.
+- Separate C3.3-D proves one invoice-mail transport with owner-confirmed receipt;
+  the without-invoice SMTP variant and full language/handler matrix remain untested.
+
+The authoritative matrix is unchanged: **53 bounded V24 partial evidence rows**,
+**18 dedicated live scenarios NOT EXECUTED**, all 71 IDs and historical fields
+retained. No original PASS is expanded and no missing scenario becomes executed.
+
+### OD-PR6-02 — ACCEPTED (owner decision, 2026-11-15)
+
+For the same bounded development merge, the owner accepts:
+
+- **G02:** contextual Core/module attribution without original digests for every run.
+- **G05:** actual SMTP transport evidence plus **owner-confirmed** receipt and PDF;
+  no independent agent mailbox or received-MIME inspection is asserted.
+- **G06:** retained PDF/HTTP/ECM/hash records without independent access to all
+  confidential original PDF binaries.
+
+Acceptance does not supply missing originals retrospectively. Remaining
+provenance limits and original records stay visible.
+
+### Recovered planning and private review package
+
+G01 is **FOUND_AS_CONTEMPORANEOUS_CHAT_ATTACHMENT**: the owner supplied the complete
+C3.1 chat planning attachment identified as contemporaneous 2026-11-13. The private
+`c31_testplan.md` archive is byte-identical to that attachment. Exact original
+transmission time is unavailable; the filename and local download times do not
+prove it. A standalone original local-development plan file remains unestablished.
+
+The private **`PR6-C3-Review-Evidence-v2.zip`** contains sanitized evidence,
+provenance, checksums and the 17-case `plan-vs-actual.md`/CSV/JSON comparison. Its
+manifest, ZIP structure and all 166 checksum entries were independently validated.
+It and confidential originals are **not published in this repository**; V1 remains
+unchanged. Planning is not executed business evidence or new test authorization.
+
+### Documentation delta and remaining gates
+
+This subsequent documentation-only closure follows reviewed HEAD `eb87e181`.
+The external reviewer has **not** been represented as having reviewed this new
+commit. Its separate CI must pass PHP 7.4/V22.0.5, PHP 8.2/V22.0.5 and
+PHP 8.2/V24.0.3 before PR #6 is moved to Ready for review.
+
+Both owner decisions apply **only to consideration of a development merge into
+main**. The actual merge decision remains outstanding. No merge, production,
+release, public distribution or general version/profile approval is granted.
+Temporary module ID, development version, all unexecuted infrastructure/business
+scenarios and existing release restrictions remain unchanged. No new business,
+browser, PDF, SMTP or fault-injection test accompanies this documentation update.
+
+## C3 V24.0.3 integration campaign (2026-11-14)
+
+**Historical campaign snapshot (2026-11-14).** Pending-review and missing-plan
+statements in this retained section describe that date. The 2026-11-15 closure
+above supersedes their current status, without changing historical results.
+
+
+**C3.2 and C3.3 complete — PASS in the stated profile; ready for final independent
+V24 review, not merge, release or production approval.** C3.1 supplied planning and
+readiness boundaries; this update only reconciles existing evidence and runs no
+business, browser, PDF, fault or SMTP tests.
+
+### Exact targets, profile and provenance
+
+- **D24:** Dolibarr V24.0.3 Core `5c6c7ff6a5112413b1c27221c8d11750afad56f8`.
+- **M24:** campaign module HEAD `5a31d4c8d9cfe6733f59efaef430799df60e1902`.
+  All rows below use **D24 / M24**. The present documentation/comment-only commit
+  does not replace this tested runtime reference. Some original per-case logs do
+  not embed both SHAs: attribution uses the pinned campaign baseline, existing
+  preparation/continuity records and the retained unchanged implementation, not
+  a fabricated retrospective per-run source digest.
+- Real runtime: PHP 8.2.35, MariaDB 10.11.19, mysqli/InnoDB, entity 1, synthetic
+  members; standard EUR invoices, quantity 1, VAT setting `0`, no configured
+  product/service, `invoiceonly`, Mercure numbering, Sponge PDF. No payment created.
+- Automated browser evidence: Chromium 158.0.8127.18 and Playwright Firefox 159.0.
+  The later true result view uses the original authenticated session, not a fixture.
+- C2.1 C1-01–C1-05 and PR6-01–PR6-03 corrections are complete. All three jobs on
+  campaign HEAD M24 passed in [PR run 43506801577](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/43506801577):
+  PHP 7.4/V22.0.5, PHP 8.2/V22.0.5 and PHP 8.2/V24.0.3. CI remains synthetic;
+  it does not itself reproduce the real C3 cases.
+
+### Existing evidence index
+
+The named bundles below are **private local evidence**, not repository downloads.
+Only sanitized results/technical test identifiers are published here; no credentials,
+recipient addresses, sessions, document contents or raw dumps are imported.
+The requirement matrix remains the sole authoritative requirement-to-test mapping.
+
+| Bundle | Existing artifact location (bundle-relative) |
+| --- | --- |
+| AB | `dolibarr-c32-ab-evidence-20261113/`: `completion-20261114.json`, `access-denial-followup.json`, `C32-03-completion.json`, `C32-04-05-06-completion.json`, `C32-05-06-completion.json`; corresponding original result/reconciliation files retained |
+| TX | `dolibarr-c32-d-20261114/completion.json`; saved `c32-d-20261114/C32-08-result.json` and `C32-09-result.json` |
+| PC | `AB/c33-20261114/C33-final.json`, initial `20261114T172218Z/final.json`, separate `20261114T172541Z/final.json`; `c33-20261114/A-adapter-interim-20261114171712.json` |
+| R1 | `AB/c33-b-r1-20261114/C33-B-R1-final.json`, `result.json`, `completion-read-only.json`, real masked Chromium/Firefox result screenshots; `c33-b-r1-files-20261114.json` |
+| MAIL | `AB/c33-d-20261114/C33-D-final.json`, `owner-delivery-confirmation.json`, `independent-read-only.json`; saved `c33-d-20261114/result.json` |
+
+`AB/...` abbreviates the AB bundle root. Saved adapter/transaction/filesystem outputs
+outside AB use the existing shared test-result directory, not a public artifact URL.
+
+| Test / result | Operation / relevant requirement aspect | Core / module | Mode / existing evidence | Essential limit |
+| --- | --- | --- | --- | --- |
+| C3.1 COMPLETE (owner-reported planning) | Test planning/readiness; not a business PASS | D24 / M24 campaign references | Readiness carried into AB `completion-20261114.json` | Standalone original C3.1 plan artifact was not located in the inspected campaign bundles; no reconstructed raw plan or execution claimed |
+| C32-01 PASS | Member-list action, selection, preview; C01-01/C07-01 | D24 / M24 | Authenticated Chromium, AB `access.json` plus completion | Normal entry only, not malformed/maximum-size selection proof |
+| C32-07 PASS | Role filtering/direct wizard access; C01-06/C07-01 | D24 / M24 | Separate restricted sessions, AB `access-denial-followup.json` | HTTP 200 contains localized denial; no negative final booking POST or full advanced-permission matrix |
+| C32-02 PASS | Subscription-only Core booking/end; C04-01/02/09 | D24 / M24 | Real HTTP/SQL; AB `completion-20261114.json` | One-day case, 21-table comparison; no invoice or independent filesystem inventory |
+| C32-03 PASS | Existing customer, validated invoice/link/PDF; C05-02/03/07/08/09 | D24 / M24 | Real HTTP/SQL/PDF; AB `C32-03-completion.json` | Original result anchor not separately captured; target card verified; R1 later closes the actual-result-link gap |
+| C32-04 PASS | Explicit new-customer consent and invoice; C05-03/04 | D24 / M24 | Real HTTP/SQL/PDF; AB `C32-04-05-06-completion.json` | Missing-customer negative preview only; no new contact, shared entity or classification matrix |
+| C32-05 PASS | Zero-EUR invoice/line/link/PDF; C02-02/C05-05/10 | D24 / M24 | Real HTTP/SQL/PDF; AB `C32-05-06-completion.json` | Standard unpaid zero invoice in this profile only |
+| C32-06 PASS | Consented overlap and maximum member end (R16); C02-13/C04-01 | D24 / M24 | Positive real HTTP/SQL; same AB completion | Missing-consent rejection is a separate isolated production-function check, not a negative booking POST; no competing writers |
+| C32-08 PASS | Owned rollback after real invoice validation; C04-03/07/08/C05-11 | D24 / M24 | Real CLI/DB, process-local injected fault; TX | 22-table/observer/file comparison; no PDF/mail call; one controlled fault point, not all external effects |
+| C32-09 PASS | Ambiguous acknowledgement and batch stop; C04-04/08/C06-06 | D24 / M24 | Real CLI COMMIT, adapter withholds success; TX | Contribution persisted, original module result remains `unknown`; next row skipped, no PDF/mail; **no physical network outage** |
+| C3.3-A PASS | Canonical PDF/ECM/attachment identity; disabled mail; C05-09/C06-01/05 | D24 / M24 | Actual PDF/mail adapters, authenticated downloads and anonymous denial; PC | Wrong-invoice descriptor rejected; selected mail disabled with/without invoice; downstream hooks/transport NOT EXECUTED here |
+| C3.3-B-R1 PASS | Exact consumed authenticated POST replay; C03-09/10 | D24 / M24 | One real invoice booking, one byte-identical replay in same session; R1 | Original token/revision reused; 22 tables and physical PDFs unchanged on replay; **mail was not selected**; no crash/session-loss or mail-enabled replay claim |
+| C3.3-C PASS within profile | Preview/options/overlap/confirmation/revision/access/results; C03/C07 named portions in matrix | D24 / M24 | Real Chromium/Firefox read-only flows, PC; actual completed result/link in both browsers, R1 | Initial unavailable-result fixtures remain synthetic; R1 supplies new real evidence, not retroactive reclassification; no new V24 manual BFCache/keyboard acceptance |
+| C3.3-D PASS | Standard mail adapter/dispatcher/SMTPS and PDF receipt; C06-02/03/04/05/07 | D24 / M24 | Existing contribution/invoice, exactly one actual send, MAIL; receipt/hash/content **owner-reported** | No new booking. Core SMTP `250`, no application errors. Real dispatch with **zero additional hook handlers**, not a third-party hook test. No agent mailbox/raw received-MIME audit |
+
+### Integrity, historical stops and retained limits
+
+Later business/mail/replay comparisons covered 22 business tables and the known
+PDF inventory; C32-02 retained its own 21-table scope. C3.3-D left the completed
+dataset unchanged: 36 contributions, 10 invoices, 7 customers, 10 ECM rows, no
+payments and the preexisting one bank row unchanged. This is a historical test
+snapshot, not an assertion about every future local database state.
+
+C3.3-D found mail unexpectedly enabled before preparation, secured it, then opened
+an owner-forced-only test window for six seconds. It restored the required safe
+`MAIN_DISABLE_ALL_MAILS=1` and the previously absent `MAIN_MAIL_FORCE_SENDTO`;
+independent SELECT checks confirmed both. The actual generic configured message
+has no period/amount tokens; those values were owner-verified in the matching PDF,
+not invented as text fields. No template change or new template-development task.
+V22 G3's diagnostic 121 remains historical uncertainty despite confirmed receipt;
+the single V24 C3.3-D send had `transport`, SMTP `250` and no error codes.
+
+Original NO-GO/selector/localization/Core-normalization and cleanup failures remain
+in the local history. Later separately named, read-only reconciliations resolve
+only their stated points: no hidden automatic rebooking/resend. The initial C3.3-B
+could not reuse its closed session; it remains NOT EXECUTED in its original report.
+R1 independently closes that gap through one newly authorized positive operation
+and its exact consumed replay. Its post-test Playwright cleanup error occurred
+after six persisted PASS checks; separate read-only reconciliation confirmed the
+unchanged completed state. No successful transport is relabeled failed because of
+a later harness issue. The missing standalone C3.1 raw plan and absent per-case
+source digests remain evidence limitations, not newly generated artifacts.
+
+**Still NOT EXECUTED / NOT QUALIFIED:** physical connection loss, exhaustive
+crash/session-loss recovery, non-cooperating external writers or real V24 lock
+contention, foreign outer transactions, arbitrary custom hook takeover/failure,
+live PDF/SMTP failure injection, full advanced-permission/expiry/selection-bound
+matrices, Multicompany/shared entities, additional currencies/taxes/products,
+packaging/stock, alternative PDF/invoice profiles and other Core versions/patches.
+No mail-enabled consumed-run replay was performed: R1 is mail-off and D is a
+separate one-call transport test. No Exactly-once, durable journal, broad
+crash-recovery or production guarantee. V24 final independent acceptance is
+**PENDING**; production/public release remain **NOT APPROVED**. Temporary ID
+`584620`, version `0.1.0-dev`, minimum Core version and all release gates are unchanged.
+
+## C2.1 compatibility corrections (2026-11-13)
+
+**Historical C2.1 execution snapshot.** Pending-review and NOT EXECUTED statements
+in this section describe that stage; the current C3 status above/below supersedes
+them only for the subsequently tested profile. E4 remains the original C2.1 grant,
+not authorization for the later separately approved real tests.
+
+Implementation and exact tested commit: `553fa75aba5d7b710a4b2363d087898c2213bfb4`,
+based on module `b946c8142355030532068e07166731541ceea69e`, on
+`feature/v24-compatibility`. This subsequent documentation update changes no tested code.
+C1-01–C1-05 are implemented locally; independent follow-up review remains pending.
+The earlier V22 G2/G3/G4 evidence and owner decisions O1–O7 remain scoped as recorded.
+
+**Binding C2.1 owner decisions E1–E4:**
+
+- **E1 / R16:** V22.0.5 retains the end of the contribution with the latest start.
+  V24.0.3 requires the maximum contribution end, matching its actual
+  `Adherent::update_end_date()` (Core change `f63662b4a5f`). The module keeps the
+  observed update return and persisted-value checks; it never repairs `datefin`.
+  `MsmCoreCompatibility` selects exact pins, not a blanket `>=24` branch.
+  Unknown versions stop booking before database access. Historical V22-only
+  statements requiring latest-start rather than MAX remain correct for V22.
+- **E2 / VAT:** V24.0.3 positive numeric `ADHERENT_VAT_FOR_SUBSCRIPTIONS` values
+  identify dictionary records, not rates. Invoice preflight rejects them with a
+  DE/EN message; no `c_tva` ID resolver or silent zero-rate fallback is introduced.
+  `0` and `defaultforfoundationcountry` retain their existing Core delegation;
+  V22 behavior remains unchanged. Subscription-only operation remains possible.
+  Changed tax settings invalidate the confirmed fingerprint before business APIs.
+- **E3 / scope:** only Core V22.0.5 `88ad132763be45e9620128c1830e41493e1cdd05`
+  and V24.0.3 `5c6c7ff6a5112413b1c27221c8d11750afad56f8` are policy targets.
+  These policies and synthetic PASS results do not qualify V24 installations,
+  other patches, Multicompany, additional tax profiles or production.
+- **E4 / execution:** T1/T2 only. No application bootstrap, real DB connection,
+  business operation, live PDF generation, SMTP or installation change was used.
+  Real T3/T4 operations require separate owner authorization.
+
+C1-03 uses `crabe` on V22 and `sponge` on V24 only when model configuration is
+empty. Explicit type/general models retain priority; invalid paths or unavailable
+files remain errors. C1-04 supplies both `accountid=0` and legacy `ccountid=0`,
+without changing hook outcomes, attachments or post-commit transport guards.
+C1-05 adds the optional trailing `ref_ext` to the booking double, preserving the
+ten existing parameters. PHP 7.4-compatible syntax is retained.
+
+### Executed T1/T2 evidence
+
+Local PHP **8.2.35**. Set `DOLIBARR_TEST_ROOT` to the pinned Core checkout and run
+`php test/unit/<runner>.php`. V22 used `/home/marcel/dolibarr-bulk-test`; V24 used
+`/home/marcel/dolibarr-v24`. The final sequence per Core was `invoice`,
+`invoiceprofile`, `maildelivery`, `invoicepdf`, `postcommit`.
+`invoice` includes `booking`, which includes `preview`; these were not also run
+standalone in the final sequence. Counts below are per component, not summed
+again when included by another runner.
+
+| Runner / assertions | V22.0.5 | V24.0.3 | Evidence boundary |
+| --- | --- | --- | --- |
+| `preview.php` / 388 | PASS | PASS | Pinned Core calendar APIs; synthetic input/history |
+| `booking.php` / 208 additional | PASS | PASS | API signature, R16, transaction/replay, hook/renderer contracts |
+| `invoiceprofile.php` / 40 additional | PASS | PASS | Tax preflight and configuration changes; real model-file readability checks |
+| `invoice.php` / 60 additional | PASS | PASS | Synthetic Core business adapters, rollback, VAT changes before booking |
+| `maildelivery.php` / 17 | PASS | PASS | Same fixture-only runner under both environments; not a real Core transport test |
+| `invoicepdf.php` / 16 additional | PASS | PASS | Isolated temporary synthetic files; no Dolibarr Documents or Core PDF rendering |
+| `postcommit.php` / 13 additional | PASS | PASS | Synthetic checkpoint/PDF/mail ordering |
+
+Version-independent `php test/unit/run.php`: **98 PASS**, including language-key
+parity, exact-version policy and rejection before DB access.
+`node test/unit/loading.js`: **6 PASS**, synthetic DOM only.
+PHP lint: **30 files PASS**. `git diff --check` and committed whitespace check: PASS.
+At the historical C2.1 local-only stage, the PHP 7.4/8.2 CI workflow was unchanged;
+PHP 7.4 execution and new GitHub CI were **NOT EXECUTED** at that time (no push
+was then authorized). The subsequent C2.2/C2.3 and PR #6 evidence below supersedes
+that missing-CI status, without changing the original local test results.
+
+R16 tests execute each pinned Core's real end-update method using an in-memory DB
+adapter. The identical older-longer overlap yields 2030-06-30 on V22 and 2030-12-31
+on V24. Newer-longer, tied starts in either modeled result order, failed Core
+update and corrupted stored end are covered. V22 Core does not define an SQL tie
+order; these tests do not promise deterministic real-DB ordering for tied starts.
+V24 uses the maximum end independently of that ordering. The VAT tests also expose
+Core's V24-only VAT hook: synthetic non-VAT seller returns zero on V22 and the
+explicit synthetic hook's rate on V24; the module preserves each Core result.
+Initial fixture-only failures (missing country cache / VAT hook contract) were
+resolved by matching the actual Core APIs; existing regression assertions remain.
+
+Sanitized command output, exits, exact Core/implementation SHAs and PHP file hashes
+are retained locally in `/home/marcel/dolibarr-c21-validation-20261113/results.json`.
+No private runtime data or original V22 evidence was copied into this document.
+The authoritative matrix retains all 71 IDs, 18 columns and its first ten
+historical fields; only directly affected current traceability fields are extended.
+
+**NOT EXECUTED / NOT QUALIFIED:** real V24 booking/invoice rollback, PDF/ECM,
+SMTP/delivery, authenticated HTTP/browser, external-writer/concurrency,
+connection/COMMIT loss, Multicompany and additional tax/product profiles.
+Temporary module ID, release limits, SMTP diagnostic 121 and prior risk boundaries
+remain. G3-W02 remains template configuration only, not a module finding.
+Next: independent C2.1 review, then separately authorized bounded V24 T3/T4 tests.
+
+## PR 6 follow-up: PR6-01 to PR6-03
+
+Historical correction/CI report; the owner subsequently reported all three findings
+closed by independent follow-up. Final independent V24 acceptance remains separate.
+
+Subsequent review corrections, 2026-11-13, implementation commit
+`c67b5cd0bc2ef34a23012e870928dad3bbaa730b`:
+
+- **PR6-01:** V24.0.3 invoice preflight now accepts only the exact supported
+  settings: unset/empty, `0`, `defaultforfoundationcountry`. All other values
+  reject with the existing DE/EN key and clarified setting-level message.
+  Tests cover positive IDs, `7foo`, ` 7bad`, `+7bad`, decimals/exponents,
+  negative values, alternate zero representations, whitespace and unknown text.
+  The real profile/preview rejection is exercised; changed confirmation is
+  rejected before any synthetic business API call. V22's previous behavior and
+  subscription-only booking remain covered. This tightens E2, without adding a
+  tax dictionary resolver or changing E1–E4/O1–O7.
+- **PR6-02:** PR CI checks `git diff HEAD^1 HEAD --check`, comparing the test
+  merge with its first parent. Push CI retains the initial-commit check and adds
+  `-m` for merge parents: `git diff-tree --check --root -m -r HEAD`.
+  An isolated temporary Git repository reproduced a two-parent test merge with
+  trailing whitespace: the previous command exited 0; the new PR and push
+  commands exited nonzero and detected the error. No project history was merged
+  or rewritten. CI matrix and all runner commands remain intact.
+- **PR6-03:** The previous local-only CI limitation is now explicitly historical.
+  The initial expanded CI on `1c7903d71fbae08b631c85cb48c375bdb2a92536` passed
+  [push run 43501212921](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/43501212921)
+  and [PR run 43501309268](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/43501309268).
+  The corrected implementation `c67b5cd` also passed all three jobs in
+  [push run 43506166580](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/43506166580)
+  and [PR run 43506174704](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/43506174704).
+
+| PHP | Pinned Dolibarr Core | Initial expanded CI | Corrected implementation CI |
+| --- | --- | --- | --- |
+| 7.4 | V22.0.5 / `88ad132763be45e9620128c1830e41493e1cdd05` | PASS | PASS |
+| 8.2 | V22.0.5 / `88ad132763be45e9620128c1830e41493e1cdd05` | PASS | PASS |
+| 8.2 | V24.0.3 / `5c6c7ff6a5112413b1c27221c8d11750afad56f8` | PASS | PASS |
+
+Local PHP 8.2 regression on the corrected implementation: 388 preview,
+208 additional booking/mail, **59 profile**, **76 invoice**, 17 mail adapter,
+16 PDF adapter and 13 post-commit assertions per Core. Included assertions are
+not summed again. Standalone contracts/language parity: 98 PASS; synthetic
+JavaScript: 6 PASS; PHP lint and full PR diff whitespace: PASS.
+Commands remain those in the C2.1 section; `invoice` includes booking/preview.
+Sanitized local command/negative-test evidence is retained outside the repository
+in `/home/marcel/dolibarr-c21-validation-20261113/pr6-followup-local.json`.
+The synthetic Git fixture was temporary; its construction and command results
+are recorded in that evidence. No real database connection, business write,
+Core PDF or SMTP was exercised.
+
+This is implementation and CI evidence for targeted independent follow-up review,
+not independent acceptance or merge approval. PR #6 remains Draft.
+**Real V24 integration and production remain NOT QUALIFIED.** Existing V22
+qualification limits, temporary module ID and all documented risks remain.
 
 ## Scope and provenance
 

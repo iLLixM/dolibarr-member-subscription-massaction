@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Align exact V22.0.5/V24.0.3 R16 policies with each Core end-date rule (C1-01).
+- Reject unsupported V24 membership VAT settings during invoice preflight (C1-02 / PR6-01).
+- Use version-correct PDF defaults only when configuration is empty (C1-03).
+- Supply both Core subscription-mail hook account keys (C1-04).
+- Match the optional trailing Core `ref_ext` in the synthetic booking double (C1-05).
+- Complete the bounded V24.0.3 C3 integration campaign: Core booking/invoices,
+  customer creation, zero fee, R16, controlled transaction faults, PDF/ECM,
+  authenticated replay, Chromium/Firefox and one owner-confirmed SMTP delivery.
+  Final independent V24 review remains pending; no production/public release approval.
+
 - Add optional, transactionally linked and validated member-subscription invoices.
 - Add explicit missing-third-party creation consent and deterministic invoice preflight.
 - Generate and verify invoice PDFs after commit and require them for standard invoice email.

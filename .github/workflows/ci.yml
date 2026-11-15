@@ -6,10 +6,20 @@ permissions:
   contents: read
 jobs:
   checks:
+    name: PHP ${{ matrix.php }} / Dolibarr ${{ matrix.core }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php: ['7.4', '8.2']
+        include:
+          - php: '7.4'
+            core: '22.0.5'
+            core-ref: 88ad132763be45e9620128c1830e41493e1cdd05
+          - php: '8.2'
+            core: '22.0.5'
+            core-ref: 88ad132763be45e9620128c1830e41493e1cdd05
+          - php: '8.2'
+            core: '24.0.3'
+            core-ref: 5c6c7ff6a5112413b1c27221c8d11750afad56f8
     steps:
       - uses: actions/checkout@v4
         with:
@@ -20,8 +30,13 @@ jobs:
           coverage: none
       - name: PHP syntax
         run: find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
-      - name: Whitespace (including the initial commit)
-        run: git diff-tree --check --root -r HEAD
+      - name: Whitespace (PR merge diff or pushed commit)
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            git diff HEAD^1 HEAD --check
+          else
+            git diff-tree --check --root -m -r HEAD
+          fi
       - name: Unit contracts and structure
         run: |
           php test/unit/run.php
@@ -29,10 +44,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: Dolibarr/dolibarr
-          ref: 88ad132763be45e9620128c1830e41493e1cdd05
+          ref: ${{ matrix.core-ref }}
           path: .test-core
           persist-credentials: false
-      - name: Preview, booking and mail contracts against V22 APIs
+      - name: Synthetic contracts against Dolibarr ${{ matrix.core }} APIs
         env:
           DOLIBARR_TEST_ROOT: ${{ github.workspace }}/.test-core
         run: |

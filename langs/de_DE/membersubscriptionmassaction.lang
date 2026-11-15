@@ -118,3 +118,5 @@ MSMDiagnosticStage=Letzte Diagnosestufe
 MSMUnconfirmedIdentifier=unbestätigte Kennung
 MSMProcessingNotice=Beitrag, Rechnung und Dokumente werden verarbeitet. Lassen Sie diese Seite geöffnet.
 MSMCustomerClassificationMayChange=Die Validierung dieser Rechnung kann die Kunden-/Interessentenklassifizierung des verknüpften Geschäftspartners gemäß den Dolibarr-Einstellungen ändern.
+MSMCoreVersionUnsupported=Für diese Dolibarr-Version ist keine geprüfte Kompatibilitätsregel im Modul vorhanden. Die Buchung ist gesperrt.
+MSMInvoiceVatIdUnsupported=Die konfigurierte Umsatzsteuer-Einstellung für Mitgliedsbeiträge wird vom Modul für die Rechnungserstellung nicht unterstützt.

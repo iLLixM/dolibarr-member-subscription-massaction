@@ -161,4 +161,20 @@ foreach (array('en_US', 'de_DE') as $locale) {
 	sort($keys); $translations[] = $keys;
 }
 check($translations[0] === $translations[1], 'language key parity');
+require_once __DIR__.'/../../class/corecompatibility.class.php';
+check(MsmCoreCompatibility::profile('22.0.5') === array('latest_end' => false, 'pdf' => 'crabe'), 'exact V22 compatibility policy');
+check(MsmCoreCompatibility::profile('24.0.3') === array('latest_end' => true, 'pdf' => 'sponge'), 'exact V24 compatibility policy');
+foreach (array('', '22.0.4', '24.0.0', '24.0.1', '24.0.2', '24.0.4', '25.0.0-alpha') as $version) {
+	rejects(static function () use ($version) { MsmCoreCompatibility::profile($version); }, 'unreviewed Core version rejected '.$version);
+}
+// Unknown patch semantics must stop before database or business access.
+define('DOL_VERSION', '24.0.2');
+require_once __DIR__.'/../../class/booking.class.php';
+$untouched = new class {
+	public $transaction_opened = 0; public $calls = 0;
+	public function query($sql) { $this->calls++; throw new LogicException('Unexpected database access'); }
+};
+$result = (new MsmBookingService($untouched))->book(1, array(), array('invoice' => false), $user, false);
+check($result['status'] === 'failed' && $result['message'] === 'MSMCoreVersionUnsupported', 'unknown Core booking rejected');
+check($untouched->calls === 0, 'unknown Core performs no database access');
 echo $passed." assertions passed (synthetic contracts; no Dolibarr runtime).\n";

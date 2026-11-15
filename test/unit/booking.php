@@ -26,7 +26,7 @@ class BookingDatabase extends PreviewDatabase
 		elseif (strpos($sql, 'SELECT ENGINE AS engine') === 0) { $row = (object) array('engine' => $this->engine); }
 		elseif (strpos($sql, 'FOR UPDATE') !== false) { if ($this->lockFail) { return false; } $this->events[] = 'lock'; $row = (object) array('rowid' => 1, 'fk_adherent_type' => 1); }
 		elseif (strpos($sql, 'SELECT fk_adherent, fk_type') === 0) { $row = $this->saved; }
-		elseif (strpos($sql, 'SELECT datef FROM') === 0) { $row = (object) array('datef' => $this->datefin); }
+		elseif (strpos($sql, 'SELECT datef FROM') === 0 || strpos($sql, 'SELECT MAX(datef) AS datef FROM') === 0) { $row = (object) array('datef' => $this->datefin); }
 		elseif (strpos($sql, 'SELECT datefin FROM') === 0) { $row = (object) array('datefin' => $this->datefin); }
 		else { throw new LogicException('Unexpected booking query '.$sql); }
 		return (object) array('rows' => $row ? array($row) : array());
@@ -35,7 +35,7 @@ class BookingDatabase extends PreviewDatabase
 class BookingMemberDouble extends Adherent
 {
 	public $msmEndUpdate = 1; public $mode = ''; public $arguments;
-	public function subscription($date, $amount, $accountid = 0, $operation = '', $label = '', $num_chq = '', $emetteur_nom = '', $emetteur_banque = '', $datesubend = 0, $fk_type = null)
+	public function subscription($date, $amount, $accountid = 0, $operation = '', $label = '', $num_chq = '', $emetteur_nom = '', $emetteur_banque = '', $datesubend = 0, $fk_type = null, $ref_ext = '')
 	{
 		$this->arguments = func_get_args(); $this->db->events[] = 'subscription';
 		$this->db->begin(); $this->db->begin(); $this->db->commit(); $this->db->begin(); $this->db->commit(); $this->db->commit();
@@ -119,10 +119,11 @@ $bad = $post; $bad['overlap'] = array(999 => '1'); fails(static function () use 
 // Mail hooks use the production dispatcher, but never a transport or real hook loader.
 class MailHooksDouble
 {
-	public $code = 0; public $replace = false; public $changeEmail = false; public $seen;
+	public $throws = false; public $code = 0; public $replace = false; public $changeEmail = false; public $seen;
 	public function executeHooks($name, $parameters, &$object, &$action)
 	{
 		$this->seen = array($name, $parameters, $action); if ($this->replace) { $object = clone $object; $action = 'replaced'; }
+		if ($this->throws) { throw new RuntimeException('Synthetic hook uncertainty'); }
 		if ($this->changeEmail) { $object->email = 'different@example.invalid'; }
 		return $this->code;
 	}
@@ -135,18 +136,22 @@ class MailDouble extends MsmSubscriptionMail
 	protected function deliver($member, array $row, $user) { $this->delivered++; return $this->outcome; }
 }
 $hookmanager = (object) array('old' => true); $oldHook = $hookmanager; $oldLangs = $langs;
-foreach (array('off', 'transport', 'negative', 'positive', 'replace', 'redirect', 'missing', 'disabled', 'failed') as $case) {
+foreach (array('off', 'transport', 'negative', 'positive', 'exception', 'replace', 'redirect', 'missing', 'disabled', 'failed') as $case) {
 	list($db, $service, $row) = bookingFixture(); $mail = new MailDouble($db); $mail->manager = new MailHooksDouble();
 	$expected = 'transport'; $selected = true;
 	if ($case === 'off') { $selected = false; $expected = 'not_selected'; }
 	if ($case === 'negative') { $mail->manager->code = -1; $expected = 'failed'; }
 	if ($case === 'positive') { $mail->manager->code = 1; $expected = 'hook'; }
+	if ($case === 'exception') { $mail->manager->throws = true; $expected = 'unknown'; }
 	if ($case === 'replace') { $mail->manager->replace = true; }
 	if ($case === 'redirect') { $mail->manager->changeEmail = true; $expected = 'failed'; }
 	if ($case === 'missing') { $service->object->email = ''; $expected = 'missing'; }
 	if ($case === 'disabled') { $conf->global->MAIN_DISABLE_ALL_MAILS = 1; $expected = 'disabled'; }
 	if ($case === 'failed') { $mail->outcome = 'failed'; $expected = 'failed'; }
 	verify($mail->send($service->object, $row, $user, $selected) === $expected, 'mail '.$case);
+	if ($mail->manager->seen) {
+		verify($mail->manager->seen[1] === array('datesubscription' => $row['start'], 'amount' => $row['amount'], 'accountid' => 0, 'ccountid' => 0, 'operation' => '', 'label' => $row['description'], 'num_chq' => '', 'emetteur_nom' => '', 'emetteur_banque' => '', 'datesubend' => $row['end'], 'invoice' => null), 'complete Core mail hook contract '.$case);
+	}
 	verify($hookmanager === $oldHook && $langs === $oldLangs, 'mail context restored '.$case);
 	if (!in_array($case, array('transport', 'replace', 'failed'), true)) { verify($mail->delivered === 0, 'no standard transport '.$case); }
 	$conf->global = new stdClass();
@@ -193,6 +198,78 @@ class EndUpdateFailureDatabase extends BookingDatabase
 }
 $observerDb = new EndUpdateFailureDatabase(); $observer = new MsmBookingMember($observerDb); $observer->id = 1;
 verify($observer->update_end_date($user) === -1 && $observer->msmEndUpdate === -1, 'R16 actual V22 failed update observed');
+// C1-01: execute the selected real Core update_end_date(), not a rewritten policy.
+// SQL is interpreted only in memory; no connection or application bootstrap exists.
+class CoreEndDatabase extends BookingDatabase
+{
+	public $prior = array();
+	public function jdate($value) { return $value === null ? null : strtotime($value); }
+	private function periodsByStart()
+	{
+		$rows = $this->prior;
+		if ($this->saved) { $rows[] = array('dateadh' => $this->saved->dateadh, 'datef' => $this->saved->datef); }
+		foreach ($rows as $i => &$r) { $r['position'] = $i; } unset($r);
+		// The Core SQL has no tie-breaker: model either possible returned tie order.
+		usort($rows, static function ($a, $b) { return strcmp($b['dateadh'], $a['dateadh']) ?: $a['position'] <=> $b['position']; });
+		return $rows;
+	}
+	public function query($sql)
+	{
+		if (strpos($sql, 'SELECT rowid, datec as dateop') === 0) {
+			return (object) array('rows' => array_map(static function ($r) {
+				return (object) array('rowid' => $r['position'] + 1, 'dateop' => $r['dateadh'], 'datedeb' => $r['dateadh'], 'datefin' => $r['datef']);
+			}, $this->periodsByStart()));
+		}
+		if (preg_match("/^UPDATE test_adherent SET datefin='([^']+)' WHERE rowid = 1$/D", $sql, $match)) {
+			$this->datefin = $match[1]; return true;
+		}
+		if (strpos($sql, 'SELECT MAX(datef) AS datef FROM') === 0 || strpos($sql, 'SELECT datef FROM') === 0) {
+			$rows = $this->periodsByStart();
+			$end = strpos($sql, 'MAX(datef)') !== false ? max(array_column($rows, 'datef')) : $rows[0]['datef'];
+			$this->queries[] = $sql;
+			return (object) array('rows' => array((object) array('datef' => $end)));
+		}
+		return parent::query($sql);
+	}
+}
+class CoreEndMemberDouble extends BookingMemberDouble
+{
+	public $corruptEnd = false;
+	public function subscription($date, $amount, $accountid = 0, $operation = '', $label = '', $num_chq = '', $emetteur_nom = '', $emetteur_banque = '', $datesubend = 0, $fk_type = null, $ref_ext = '')
+	{
+		$id = parent::subscription($date, $amount, $accountid, $operation, $label, $num_chq, $emetteur_nom, $emetteur_banque, $datesubend, $fk_type, $ref_ext);
+		$observer = new MsmBookingMember($this->db); $observer->id = $this->id;
+		$this->msmEndUpdate = $observer->update_end_date($GLOBALS['user']);
+		if ($this->corruptEnd) { $this->db->datefin = '2040-01-01 00:00:00'; }
+		return $id;
+	}
+}
+foreach (array('older-longer', 'newer-longer', 'equal-start-long-first', 'equal-start-short-first', 'wrong-stored-end') as $case) {
+	list($unused, $service, $row) = bookingFixture();
+	$db = new CoreEndDatabase(); $service = new BookingServiceDouble($db);
+	$service->object = new CoreEndMemberDouble($db); $service->object->id = 1; $service->object->typeid = 1;
+	$service->object->corruptEnd = $case === 'wrong-stored-end';
+	$row['start'] = stamp('2030-06-01'); $row['end'] = stamp('2030-06-30');
+	$row['overlaps'] = array(array('id' => 2));
+	$db->prior = array(array('dateadh' => '2030-01-01 00:00:00', 'datef' => '2030-12-31 00:00:00'));
+	$expectedEnd = DOL_VERSION === '24.0.3' ? '2030-12-31' : '2030-06-30';
+	if ($case === 'newer-longer') { $row['end'] = stamp('2031-05-31'); $expectedEnd = '2031-05-31'; }
+	if (strpos($case, 'equal-start') === 0) {
+		$db->prior[0]['dateadh'] = '2030-06-01 00:00:00';
+		$db->prior[] = array('dateadh' => '2030-06-01 00:00:00', 'datef' => '2030-08-31 00:00:00');
+		if ($case === 'equal-start-short-first') { $db->prior = array_reverse($db->prior); }
+		$expectedEnd = DOL_VERSION === '24.0.3' || $case === 'equal-start-long-first' ? '2030-12-31' : '2030-08-31';
+	}
+	$service->reader = new BookingPreviewDouble(); $service->reader->row = $row;
+	$outcome = $service->book(1, $row, $options, $user, true);
+	if ($case === 'wrong-stored-end') {
+		verify($outcome['message'] === 'MSMConsistencyError' && $outcome['rollback'] === 'confirmed' && $db->saved === null, 'R16 corrupt stored end rolls back');
+	} else {
+		verify($outcome['status'] === 'success' && $db->datefin === $expectedEnd.' 00:00:00', 'R16 actual Core '.DOL_VERSION.' '.$case);
+		verify($db->transaction_opened === 0 && !$db->active && !in_array('rollback', $db->events, true), 'R16 owned commit '.$case);
+	}
+}
+
 // Model two independent module connections contending on the same member lock.
 class ContendedDatabase extends BookingDatabase
 {

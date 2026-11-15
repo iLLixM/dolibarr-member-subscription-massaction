@@ -1,12 +1,13 @@
 # Member Subscription Massaction for Dolibarr
 
-**Unreleased Phase 4: optional invoice, post-commit PDF and attached confirmation
-email paths are implemented for the tested Dolibarr V22.0.5 profile.
-G2: FINAL APPROVED – PASS WITH DOCUMENTED LIMITATIONS.
-G3: APPROVED – PASS WITH DOCUMENTED LIMITATIONS.
-G4: PASS – OWNER ACCEPTED (owner-reported acceptance dated 2026-11-12).
-Dolibarr V24 and production: NOT QUALIFIED. The merge does not constitute a release
-or production approval.**
+**Current status — 2026-11-15: unreleased development module for the exact
+Dolibarr V22.0.5 and V24.0.3 targets. Historical bounded V22 G2/G3/G4 approvals
+remain valid. The real V24.0.3 C3 campaign is complete for its tested PHP 8.2,
+entity-1 profile, including owner-confirmed mail receipt. The owner reports final
+external review APPROVED FOR MERGE WITH EXPLICIT CONDITIONS
+on `eb87e181`; OD-PR6-01/02 are ACCEPTED for a bounded development merge only.
+The actual merge decision remains outstanding. Other versions/profiles are not generally qualified;
+production and public module release remain NOT QUALIFIED / NOT APPROVED.**
 
 See [Phase 4 implementation validation](docs/phase4-implementation-validation.md)
 for the accepted scope, separate owner/automated evidence and retained limitations.
@@ -22,8 +23,8 @@ G4-LAYOUT-01 and G4-UX-01 are closed, and subsequent UI cleanups passed targeted
 regressions. The Phase 3B
 acceptance below is historical and does not replace final Phase 4 acceptance.
 
-Real booking/database integration and authenticated HTTP replay tests have been
-performed; manual browser acceptance passed 9/9. The owner confirmed receipt of the
+Historical V22 Phase 3B booking/database integration and authenticated HTTP replay
+tests were performed; manual browser acceptance passed 9/9. The owner confirmed receipt of the
 ten original emails. The historical Phase 3B independent final review concluded
 **APPROVED WITH CONDITIONS**; its documentation and mail-comment findings were
 addressed by the subsequent follow-up. This historical acceptance is not
@@ -34,7 +35,11 @@ the owner's scoped residual-risk acceptance.
 The module adds an authenticated member-list preview, an explicit confirmation and
 per-member booking results. It can optionally create a linked third party, a validated
 standard invoice and its PDF through Dolibarr Core APIs. It never creates payments or
-bank entries. Invoice qualification is limited to the tested V22.0.5 profile documented above.
+bank entries. Invoice evidence is limited to the historical V22.0.5 profile and the separately
+tested V24.0.3 C3 profile: standard EUR invoices, quantity 1, VAT 0, no configured
+product, Mercure numbering and Sponge PDF. See the
+[C3 evidence and limits](docs/phase4-implementation-validation.md#c3-v2403-integration-campaign-2026-11-14);
+the external conditional review and owner decisions below do not broaden the tested profile.
 
 ## Origin and scope
 
@@ -47,9 +52,22 @@ Code is GPL-3.0-or-later; see COPYING. No KSeF or FacturX code is included.
 
 ## Development baseline
 
-Dolibarr **22.0.5**, PHP **8.2** locally. PHP 7.4 is the provisional syntax minimum;
-CI covers the scaffold contracts and preview regressions using pinned V22 calendar helpers on 7.4 and 8.2. This is not a complete
-runtime compatibility claim. V23–V25 compatibility will be tested in later phases.
+Dolibarr **22.0.5** remains the primary implementation reference; **24.0.3** is the
+separately tested compatibility target. Local real integration used PHP **8.2**.
+PHP 7.4 remains the syntax minimum; synthetic CI runs PHP 7.4/V22.0.5,
+PHP 8.2/V22.0.5 and PHP 8.2/V24.0.3. This is not a general runtime/PHP matrix claim.
+C2.1 adds a common codebase with exact policies for
+V22.0.5 and V24.0.3: version-correct R16 and PDF fallbacks, explicit rejection of
+positive V24 membership VAT IDs for invoices, and both Core mail-hook account keys.
+Other versions fail closed at booking until their semantics are reviewed.
+[C2.1 and its follow-up](docs/phase4-implementation-validation.md#c21-compatibility-corrections-2026-11-13)
+retain the original synthetic evidence; PR6-01–PR6-03 were subsequently closed by
+independent follow-up (owner-reported). The later real C3 campaign covers booking,
+invoice/customer creation, zero fees, R16, controlled rollback/COMMIT acknowledgement
+loss, PDF/ECM, authenticated replay, Chromium/Firefox and one real SMTP delivery.
+V23, other V24 patches, V25 and additional profiles have no blanket qualification.
+Production remains NOT QUALIFIED. External conditional review is complete; owner
+acceptance permits consideration of a development merge, not release or distribution.
 
 Module ID **584620 is temporary**, checked against local descriptors and the
 [official ID rules](https://wiki.dolibarr.org/index.php?title=List_of_modules_id&oldid=68837).
@@ -59,7 +77,7 @@ availability does not imply a released, installable production module.
 
 ## Development installation
 
-1. Use an explicitly approved Dolibarr 22.0.5 test installation. Do not point older
+1. Use an explicitly approved, version-matched Dolibarr 22.0.5 or 24.0.3 test installation. Do not point older
    core code at an upgraded database. Activation writes module configuration.
 2. Clone this repository separately. Its root is the module root (no `htdocs` layer).
 3. Link or copy that root to `htdocs/custom/membersubscriptionmassaction`.
@@ -89,8 +107,10 @@ second confirmation form into the core list. It appends an option with return 0.
 Recommended desktop screen resolution: **1440 × 900 pixels or higher**.
 The targeted minimum browser viewport for regular desktop use is **1024 × 768 pixels**, qualified
 by focused headless Chromium/Firefox layout checks on Dolibarr V22.0.5.
-The owner reports completed visual/UX acceptance for the tested profile; this is
-separate evidence from the automated viewport measurements.
+V24.0.3 C3.3-C also checked the normal confirmation at 1440/1024 px; C3.3-B-R1
+adds actual result/invoice navigation in both engines. These are automated,
+profile-limited observations, not a new V24 manual BFCache or complete UX acceptance.
+The owner's completed V22 visual/UX acceptance remains separate evidence.
 
 These are module-specific conditions, not official Dolibarr minimum requirements.
 The usable browser viewport can be smaller than the screen resolution. Wide member
@@ -113,8 +133,9 @@ replacement for authentication or CSRF. POST actions validate the session token;
 redirect destinations are fixed internal paths. No untrusted return URL is used.
 
 GET never books. Confirmation is consumed and saved before processing. Member rows
-are locked and revalidated within independent InnoDB transactions; the V22 end-date
-update return and actual saved values are checked before commit. Only confirmed
+are locked and revalidated within independent InnoDB transactions; the version-specific end-date
+update return and actual saved values are checked before commit (V22 latest-start
+contribution end; V24.0.3 maximum contribution end). Only confirmed
 commits can proceed to PDF generation and mail. Results survive reload within the session; uncertain
 outcomes require manual database inspection, never an automatic retry.
 
@@ -137,7 +158,8 @@ Run `php test/unit/run.php` and
 `php test/unit/maildelivery.php`, `php test/unit/invoiceprofile.php`,
 `php test/unit/invoice.php`, `php test/unit/invoicepdf.php`,
 `php test/unit/postcommit.php` and `node test/unit/loading.js` (no dependencies
-or database bootstrap). The booking runner includes the existing preview runner and requires a V22.0.5 checkout.
+or database bootstrap). The booking runner includes the preview runner and accepts either pinned Core
+source checkout; it does not bootstrap the application/database.
 See [Phase 4 implementation validation](docs/phase4-implementation-validation.md) for current acceptance and limitations;
 [Phase 3B validation](docs/phase3b-validation.md) retains historical subscription-only evidence;
 [Phase 3A validation](docs/phase3a-validation.md) preserves historical evidence.
@@ -147,7 +169,9 @@ UI-01–UI-09 acceptance is recorded in Phase 3B validation. For future checks, 
 [test/integration/smoke.md](test/integration/smoke.md) on an approved installation.
 The complete phase-1 requirements and open risks are retained in
 [docs/porting-plan.md](docs/porting-plan.md) and [docs/requirements.csv](docs/requirements.csv).
-Do not publish a release until a permanent ID and real runtime checks are complete.
+Do not publish a release until a permanent ID, final independent acceptance and
+all required operational/release decisions are complete. The bounded C3 PASS is
+not a public release or production authorization.
 
 Future changes follow [the test strategy](docs/test-strategy.md). Precise coverage
 references remain in [the requirement matrix](docs/requirements.csv); see

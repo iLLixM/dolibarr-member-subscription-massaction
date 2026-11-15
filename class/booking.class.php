@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 require_once __DIR__.'/preview.class.php';
+require_once __DIR__.'/corecompatibility.class.php';
 /** One owned transaction per member. Invoice operations share the owned transaction. */
 class MsmBookingService
 {
@@ -50,7 +51,9 @@ class MsmBookingService
 	protected function verifyStored($id, $subscription, $member, array $row)
 	{
 		$saved = $this->one('SELECT fk_adherent, fk_type, subscription, dateadh, datef, note FROM '.$this->db->prefix().'subscription WHERE rowid = '.((int) $subscription));
-		$latest = $this->one('SELECT datef FROM '.$this->db->prefix().'subscription WHERE fk_adherent = '.((int) $id).' ORDER BY dateadh DESC'.$this->db->plimit(1));
+		// E1: preserve the actual pinned Core policy; never repair Core data here.
+		$policy = MsmCoreCompatibility::current();
+		$latest = $this->one('SELECT '.($policy['latest_end'] ? 'MAX(datef) AS datef' : 'datef').' FROM '.$this->db->prefix().'subscription WHERE fk_adherent = '.((int) $id).($policy['latest_end'] ? '' : ' ORDER BY dateadh DESC'.$this->db->plimit(1)));
 		$stored = $this->one('SELECT datefin FROM '.$this->db->prefix().'adherent WHERE rowid = '.((int) $id));
 		if ($member->msmEndUpdate <= 0 || !$saved || !$latest || !$stored
 			|| (int) $saved->fk_adherent !== (int) $id || (int) $saved->fk_type !== (int) $member->typeid
@@ -76,6 +79,7 @@ class MsmBookingService
 		$owned = false; $committing = false; $invoice = null;
 		$diagnostic = array('stage' => 'preflight', 'subscription_id' => 0, 'invoice_id' => 0, 'customer_id' => 0);
 		try {
+			MsmCoreCompatibility::current(); // Reject unknown semantics before any transaction/write.
 			if ($this->transactionActive()) { $result['status'] = 'unknown'; $result['stop'] = true; return $result; }
 			if (!$this->db->begin()) { throw new RuntimeException('SubscriptionBulkDatabaseError'); }
 			$owned = true;
@@ -109,7 +113,7 @@ class MsmBookingService
 			if (!$owned) { $result['stop'] = true; }
 			if ($owned && !$committing) { try { $safe = $this->rollbackOwned(); } catch (Throwable $ignored) {} }
 			if ($committing || ($owned && !$safe)) { $result['status'] = 'unknown'; $result['stop'] = true; $result['message'] = 'MSMTransactionUnknown'; }
-			else { $result['message'] = in_array($e->getMessage(), array('MSMChangedConfirmation', 'MSMConsistencyError', 'MSMTransactionUnsupported', 'NotEnoughPermissions', 'MSMInvoiceFailed'), true) ? $e->getMessage() : 'MSMBookingFailed'; }
+			else { $result['message'] = in_array($e->getMessage(), array('MSMCoreVersionUnsupported', 'MSMChangedConfirmation', 'MSMConsistencyError', 'MSMTransactionUnsupported', 'NotEnoughPermissions', 'MSMInvoiceFailed'), true) ? $e->getMessage() : 'MSMBookingFailed'; }
 		}
 		if ($result['status'] !== 'success') { $result['diagnostic'] = $diagnostic; $result['rollback'] = $owned && !$committing && !empty($safe) ? 'confirmed' : 'unconfirmed'; }
 		return $result;
