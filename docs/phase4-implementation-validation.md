@@ -1,5 +1,137 @@
 # Phase 4 implementation validation
 
+## Post-P3 PR11 review correction addendum — 2026-11-15
+
+P3 remains formally closed: **ACCEPTED WITH DOCUMENTED LIMITATIONS**, originally
+qualified at `a1843e14c71c89f7148aa2e8f6c5352409bca7b1` and documented at
+`17d9b10156538921b2b707cbfef849edc66d24b1`. The later independent PR11 review
+identified PR11-F01 (merge-blocking nullable R16 observation) and PR11-F02
+(incomplete abstract inheritance checks). Earlier statements about no confirmed
+implementation defect describe the then-current P3 assessment, not this later review.
+
+- **PR11-F01:** retain the positive Core call result independently of the nullable
+  observed end. Normalize only SQL/Core `NULL` and `''` to the absent-end state;
+  compare observer, timestamp object and stored end. Missing/failed calls and
+  contradictions still fail with confirmed rollback. All 15 exact historical SQL
+  postconditions remain; only Core calculates/writes the end (E2, D-P1-02).
+- **PR11-F02:** before declaring an extension, enumerate abstract obligations and
+  require a module implementation with compatible checked shape. The hook adapter
+  supplies its constructor and both hook methods. Implementable abstract bases
+  remain allowed; extra obligations disable the hook or reject the member adapter
+  before PHP can raise a declaration fatal. Admission policy remains unchanged.
+- **PR11-DOC01:** VAT policy comment now references D-P1-01; no VAT logic change.
+
+Added existing-runner regressions execute the actual pinned Core member-end method
+with nullable in-memory histories: latest-start NULL, MAX with mixed/all-empty ends,
+NULL/empty equivalence, missing/failed observations, contradictory object/observer/
+storage and confirmed rollback. They also execute under the existing unknown-label
+subprocesses. Isolated declaration subprocesses test supported abstract hooks and
+unsupported extra hook/member obligations. Existing positive R16 cases remain.
+
+Follow-up evidence is separate from the immutable P1/P2/P3 packages. The correction
+commit and its automatic 21-pair CI results are recorded in PR #11 and the separate
+private `dolibarr-pr11-followup-20261115` evidence set, after CI completion. This is
+post-P3 correction regression evidence, not a retroactive rewrite or new general P3
+qualification. Original 78 P3 checksums and logs remain unchanged.
+
+Real DB/business/PDF/SMTP/browser tests: **NOT EXECUTED** in this correction task.
+V21/future Cores, broader installed profiles, production and public release remain
+unqualified. Existing risk limits and historical real evidence remain unchanged.
+PR #11 precedes PR #10 by Owner decision; independent follow-up review and any merge
+approval remain pending.
+
+## P3 formal closure and P3-DOC01 — 2026-11-15
+
+Owner decision: **P3 SYNTHETIC CROSS-VERSION QUALIFICATION – ACCEPTED WITH
+DOCUMENTED LIMITATIONS**. P3 is closed on implementation HEAD
+`a1843e14c71c89f7148aa2e8f6c5352409bca7b1`; all 21 CI pairs passed in
+[run 43731843114](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/43731843114).
+No confirmed implementation defect or real P4 test need was found for the agreed
+synthetic scope. Independent overall code review and merge decision remain pending.
+
+The [public qualification guide](p3-qualification-summary.md) records all 15 Core
+pins, regular CI test links, precise supplemental P3 program/result identifiers
+and the PHP-8.2-only supplemental scope. P3-DOC01 is corrected in a separate
+private addendum with its own checksums; the original completed P3 package and
+78 checksums remain unchanged. No private evidence is imported into the repository.
+
+This follow-up is documentation-only and must have its own CI attributed to its
+new HEAD. It does not change or rerun the P3-qualified implementation. The earlier
+P2/P2-F01 "P3 pending" entries below are historical intermediate statuses superseded
+by this closure, not erased. Existing real baselines, 71 requirements, risk limits,
+module metadata and production/release restrictions remain unchanged.
+
+## P2-F01 R16 evidence boundary — 2026-11-15
+
+The numeric interval used in the initial P2 implementation also classified
+unexamined releases (22.0.6, 23.0.5, 23.1.0) as historical R16 contracts. P2-F01
+replaces that inference with a frozen catalog of the 15 P1-source-verified releases.
+The catalog selects independent historical SQL postconditions, never admission.
+No future patch/minor/major needs to be added: every other admitted label uses
+actual Core return/object/stored-end consistency, without an inferred old policy.
+Admission >=21.0.0 and its lack of an upper bound remain unchanged. Actual Core
+remains the only end-date writer; no transaction/rollback/unknown-stop code changed.
+
+Regression coverage: all 15 historical property selections, 24.0.1/24.0.2 boundary,
+and unknown 22.0.6/23.0.5/23.1.0/24.0.4/25.0.0 labels. Separate booking processes
+reuse pinned Core methods and in-memory transaction fixtures. A clearly synthetic
+novel Core policy whose observer/object/storage agree commits for unknown labels;
+the same deviation still fails independent SQL checks for the 15 historical labels.
+Stored-end disagreement still fails and rolls back in both modes. These are not
+integration tests of unreleased or unexamined Cores. CI retains all 21 pinned pairs;
+P3 evaluation, arbitrary future algorithm correctness and historical real-evidence
+limits remain unchanged. No new real tests, qualification or merge approval.
+
+## P2 cross-version implementation — 2026-11-15 (P3 qualification pending)
+
+Baseline main `5b2ce06124cd2d839a0b0005f1edc582cccbb39b`; work is isolated on
+`feature/cross-version-compatibility`. Owner E1–E5 and D-P1-01/02/03 supersede the
+historical exact-patch admission policy for this change, not historical results.
+
+- **Admitted:** >=21.0.0, no upper bound/exact patch/SHA allowlist. Capability
+  failures are explicit; unsupported hook inheritance disables the adapter safely
+  before class declaration. V21 and future Cores are not thereby qualified.
+- **Source analyzed:** all 15 official V22.0.0–22.0.5, V23.0.0–23.0.4,
+  V24.0.0–24.0.3 pins from private P1 reports. Independent R16 SQL checks remain
+  only for the 15 explicitly source-verified releases, with the 24.0.2 switch; all successful operations
+  also require actual parent update success and observer/object/stored-end equality.
+  Beyond analyzed versions, only the actual Core observation/invariants are used;
+  unknown numbers do not cause rejection or imply verified future semantics.
+- **Locally synthetic tested:** PHP 8.2 against all 15pinned Core sources, six existing
+  runners per target (90 runner invocations, overlapping included assertions are
+  not summed). Actual Core calendar/update_end_date/VAT/price functions execute
+  with inert in-memory adapters; invoice/PDF/mail services use existing isolated
+  doubles. No real DB/config/bootstrap, PDF generation or SMTP was executed.
+  `run.php`:115 contracts/language parity; Node loading:6 assertions; PHP lint and
+  whitespace passed. The future-label 99.0.0 booking subprocess on real V24 methods
+  passes and remains synthetic/unqualified. Typed/final inheritance failures,
+  missing methods/PDF files and changed stored invoice VAT/amount fail safely.
+- **CI configured:** 21 unique pinned pairs, PHP 8.2 on all 15 tags plus PHP 7.4 on
+  six V22 tags. Each actual GitHub result must be reported by commit/job; this
+  configuration statement is not a CI-pass claim. P3 independent evaluation is open.
+- **Real integration:** only the historical bounded V22.0.5/V24.0.3 campaigns below.
+  No P2 live tests. The 71 requirements, 53 partial V24 rows/18 dedicated live gaps and
+  private V2 artifacts remain unchanged; no blanket 15-version runtime PASS.
+
+Uniform VAT policy is the literal set empty/unset, `0`, `defaultforfoundationcountry`;
+actual Core determines the foundation-country rate. Unsupported values are rejected
+on V22 as well as V23/V24, intentionally removing prior silent-zero behavior.
+Subscription-only booking, existing strict invoice profile, transaction ownership,
+rollback/unknown-stop, CSRF/permission/entity/revision guards and post-COMMIT
+PDF/mail orchestration remain. Explicit PDF models are never replaced; empty
+configuration selects available crabe then sponge or fails on missing capability.
+
+Residual risks: unreviewed future contracts cannot be universally proven by
+reflection/observer checks; arbitrary third-party handlers, external writers,
+physical connection loss and general crash recovery remain outside qualification.
+P3 must evaluate all 21 CI combinations and decide from concrete failures whether
+any separately authorized P4 real boundary check is needed. No new live test is
+requested solely because a tag number differs. Module 0.1.0-dev/temporary ID 584620
+and production/public release **NOT QUALIFIED / NOT APPROVED** remain unchanged.
+
+The remaining document is the retained historical PR4/PR6 baseline. Its exact-target
+and tested-commit statements describe those campaigns and do not qualify P2.
+
 ## Current gate status — 2026-11-15
 
 | Gate | Current status / provenance | Scope / next step |

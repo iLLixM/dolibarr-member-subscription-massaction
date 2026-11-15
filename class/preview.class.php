@@ -4,6 +4,7 @@
  */
 
 require_once __DIR__.'/period.class.php';
+require_once __DIR__.'/corecompatibility.class.php';
 /** Read-only preview composed over the supported Dolibarr member APIs. */
 class MsmPreviewService
 {
@@ -21,6 +22,8 @@ class MsmPreviewService
 	 */
 	public static function canCreateSubscriptionWithOptions($user, $invoice = false, $sendmail = false)
 	{
+		try { MsmCoreCompatibility::methods($user, array('hasRight' => 3)); }
+		catch (RuntimeException $e) { return false; }
 		if (!empty($user->socid) || !isModEnabled('member') || !$user->hasRight('adherent', 'lire') || !$user->hasRight('adherent', 'cotisation', 'creer')) {
 			return false;
 		}
@@ -205,6 +208,8 @@ class MsmPreviewService
 			$row['notices'] = $row['errors'];
 			return $row;
 		}
+		try { MsmCoreCompatibility::current(); }
+		catch (RuntimeException $e) { $row['errors'][] = $e->getMessage(); $row['notices'] = $row['errors']; return $row; }
 		try {
 			$type = $this->subscriptionTypeForBatch($user);
 			$row['member'] = $this->member->getFullName($langs);
@@ -269,7 +274,7 @@ class MsmPreviewService
 		}
 		if ($invoice && !$row['errors']) {
 			try { $row['invoice'] = $this->invoiceProfile()->resolve($this->member, $user, $row['autocreate'], $sendmail); }
-			catch (Throwable $e) { $row['errors'][] = in_array($e->getMessage(), array('NotEnoughPermissions', 'MSMProductUnavailable', 'SubscriptionBulkThirdPartyMissing', 'MSMInvoiceVatIdUnsupported', 'MSMCoreVersionUnsupported'), true) ? $e->getMessage() : 'MSMInvoiceProfileUnsupported'; }
+			catch (Throwable $e) { $row['errors'][] = in_array($e->getMessage(), array('NotEnoughPermissions', 'MSMProductUnavailable', 'SubscriptionBulkThirdPartyMissing', 'MSMInvoiceVatIdUnsupported', 'MSMCoreVersionUnsupported', 'MSMCoreContractUnsupported'), true) ? $e->getMessage() : 'MSMInvoiceProfileUnsupported'; }
 		}
 		if ($sendmail && !isValidEmail((string) $this->member->email)) {
 			$row['warnings'][] = 'SubscriptionBulkEmailMissing';

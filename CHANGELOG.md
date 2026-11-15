@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- P2: admit Dolibarr >=21.0.0 without upper bound; separate objective Core
+  capability checks from source expectations and qualification. Observe the actual
+  Core R16 end while retaining independent known-contract checks at the 24.0.2 boundary.
+- Apply the same invoice VAT literal policy on every version; remove V22 silent-zero
+  fallback for unsupported settings. Keep subscription-only booking unchanged.
+- Resolve empty PDF defaults by available Core models; preserve explicit settings.
+- Add negative inheritance/observer, actual VAT/price-hook and stored-state tests;
+  configure 21 pinned PHP/Core jobs. No new real integration or production approval.
+
 - Merge PR #6 on 2026-11-15 as `96f870e789eb26b6eb8a6b8eeb0c79812018b0ab`,
   completing bounded V22.0.5/V24.0.3 compatibility development. Final independent
   review: APPROVED FOR MERGE – ALL CONDITIONS FULFILLED; OD-PR6-01/02 fulfilled.

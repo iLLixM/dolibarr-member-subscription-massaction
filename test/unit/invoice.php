@@ -54,6 +54,8 @@ class InvoiceObjectDouble
 		if ($this->db->mode === 'validate') { return -1; }
 		if ($this->db->mode === 'link') { $this->db->link = false; }
 		if ($this->db->mode === 'amount') { $this->db->invoice->total_ttc++; }
+		if ($this->db->mode === 'vat') { $this->db->invoiceLine->vat++; }
+		if ($this->db->mode === 'price_hook') { $this->db->invoiceLine->total++; }
 		if ($this->db->mode === 'depth') { $this->db->transaction_opened = 0; $this->db->active = false; }
 		$this->db->invoice->fk_statut = 1;
 		return 1;
@@ -94,7 +96,7 @@ function invoiceBookingFixture($create = false)
 }
 $conf->global = new stdClass(); $conf->modules = array('member' => 1, 'invoice' => 1, 'societe' => 1);
 $user = new PreviewUser(); $opts = array('invoice' => true, 'autocreate' => false, 'sendmail' => false, 'description' => 'Synthetic fee');
-foreach (array('', 'create', 'line', 'validate', 'link', 'amount', 'depth') as $mode) {
+foreach (array('', 'create', 'line', 'validate', 'link', 'amount', 'vat', 'price_hook', 'depth') as $mode) {
 	list($db, $service, $row) = invoiceBookingFixture(); $db->mode = $mode;
 	$r = $service->book(1, $row, $opts, $user, false);
 	verify($r['status'] === ($mode === '' ? 'success' : ($mode === 'depth' ? 'unknown' : 'failed')), 'transactional invoice '.$mode);
@@ -157,7 +159,7 @@ verify(!$confirmed['errors'], 'VAT confirmed invoice profile');
 foreach (array('7', '7foo', ' 7bad', '0foo', '-1', 'garbage') as $setting) {
 	$conf->global->ADHERENT_VAT_FOR_SUBSCRIPTIONS = $setting;
 	$fresh = $service->reader->previewSubscriptionWithOptions($user, $confirmed['start'], true, false, $confirmed['end'], true, $opts['description']);
-	verify(in_array('MSMInvoiceVatIdUnsupported', $fresh['errors'], true) === (DOL_VERSION === '24.0.3'), 'PR6 real preflight rejects unsupported VAT '.DOL_VERSION.' '.$setting);
+	verify(in_array('MSMInvoiceVatIdUnsupported', $fresh['errors'], true) === true, 'PR6 real preflight rejects unsupported VAT '.DOL_VERSION.' '.$setting);
 	$result = $service->book(1, $confirmed, $opts, $user, false);
 	verify($result['status'] === 'skipped' && $result['message'] === 'MSMChangedConfirmation', 'VAT changed confirmation rejects booking '.DOL_VERSION.' '.$setting);
 	verify(!in_array('subscription', $db->events, true) && !$db->calls && $result['rollback'] === 'confirmed', 'VAT change causes no business API call');

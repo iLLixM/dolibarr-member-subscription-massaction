@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+require_once __DIR__.'/../class/corecompatibility.class.php';
+
 /**
  * Check the module and existing core permissions; external users are excluded.
  * @param User $user Current user
@@ -10,7 +12,9 @@
  */
 function msmCanUse($user)
 {
-	return !empty($user->id) && empty($user->socid)
+	try { MsmCoreCompatibility::current(); MsmCoreCompatibility::methods($user, array('hasRight' => 3)); } catch (RuntimeException $e) { return false; }
+	if (!function_exists('isModEnabled') || !function_exists('getEntity') || !function_exists('restrictedArea')) { return false; }
+	return is_callable(array($user, 'hasRight')) && !empty($user->id) && empty($user->socid)
 		&& isModEnabled('membersubscriptionmassaction') && isModEnabled('member')
 		&& $user->hasRight('adherent', 'lire') && $user->hasRight('adherent', 'cotisation', 'creer');
 }
@@ -68,7 +72,7 @@ function msmCheckAccess(array $ids, callable $canAccess)
  */
 function msmCheckMembers($db, $user, array $ids)
 {
-	require_once DOL_DOCUMENT_ROOT.'/adherents/class/adherent.class.php';
+	MsmCoreCompatibility::load('adherents/class/adherent.class.php', 'Adherent', array('fetch' => 6));
 	$entities = array_map('intval', explode(',', getEntity('adherent')));
 	msmCheckAccess($ids, static function ($id) use ($db, $user, $entities) {
 		$member = new Adherent($db);

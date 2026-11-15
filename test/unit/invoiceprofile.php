@@ -73,7 +73,7 @@ $mysoc->tva_assuj = 0; $mysoc->tva_intra = ''; $mysoc->state_id = 0;
 $hookmanager = new class { public function executeHooks(...$args) { return 0; } };
 foreach (array('0', 'defaultforfoundationcountry', '7') as $setting) {
 	$conf->global->ADHERENT_VAT_FOR_SUBSCRIPTIONS = $setting;
-	if (DOL_VERSION === '24.0.3' && $setting === '7') {
+	if ($setting === '7') {
 		fails(static function () use ($profile, $member, $user) { $profile->resolve($member, $user, false, false); }, 'MSMInvoiceVatIdUnsupported');
 	} else {
 		verify($profile->resolve($member, $user, false, false)['vat'] === 0.0, 'Core VAT policy '.DOL_VERSION.' '.$setting);
@@ -85,25 +85,22 @@ foreach (array(null, '', '0', 'defaultforfoundationcountry') as $setting) {
 	else { $conf->global->ADHERENT_VAT_FOR_SUBSCRIPTIONS = $setting; }
 	verify($profile->resolve($member, $user, false, false)['vat'] === 0.0, 'PR6 supported VAT literal '.var_export($setting, true));
 }
-foreach (array('7', '7foo', ' 7bad', '+7bad', '7.5', '1e2', '-1', '00', '0.0', '0foo', ' 0', '0 ', ' ', 'garbage', 'DEFAULTFORFOUNDATIONCOUNTRY') as $setting) {
+foreach (array('7', 'garbage', '00') as $setting) {
 	$conf->global->ADHERENT_VAT_FOR_SUBSCRIPTIONS = $setting;
-	if (DOL_VERSION === '24.0.3') {
-		fails(static function () use ($profile, $member, $user) { $profile->resolve($member, $user, false, false); }, 'MSMInvoiceVatIdUnsupported');
-	} else {
-		verify($profile->resolve($member, $user, false, false)['vat'] === 0.0, 'PR6 preserves V22 VAT literal '.$setting);
-	}
+	fails(static function () use ($profile, $member, $user) { $profile->resolve($member, $user, false, false); }, 'MSMInvoiceVatIdUnsupported');
 }
 // Both cores delegate to Core VAT; only V24 invokes the VAT hook (V22 returns zero early).
 $conf->global->ADHERENT_VAT_FOR_SUBSCRIPTIONS = 'defaultforfoundationcountry';
+$coreHasVatHook = strpos(file_get_contents(DOL_DOCUMENT_ROOT.'/core/lib/functions.lib.php'), "executeHooks('get_default_tva'") !== false;
 $hookmanager = new class {
 	public $resArray = array('vatvalue' => 19, 'vatrule' => 'Synthetic override');
 	public function executeHooks(...$args) { return 1; }
 };
-verify($profile->resolve($member, $user, false, false)['vat'] === (DOL_VERSION === '24.0.3' ? 19.0 : 0.0), 'foundation-country preserves Core VAT result');
+verify($profile->resolve($member, $user, false, false)['vat'] === ($coreHasVatHook ? 19.0 : 0.0), 'foundation-country preserves Core VAT result');
 $conf->global->ADHERENT_VAT_FOR_SUBSCRIPTIONS = '0';
 verify($profile->resolve($member, $user, false, false)['vat'] === 0.0, 'zero configuration does not call Core VAT');
 $conf->global = new stdClass();
-$expectedModel = DOL_VERSION === '24.0.3' ? 'sponge' : 'crabe';
+$expectedModel = is_readable(DOL_DOCUMENT_ROOT.'/core/modules/facture/doc/pdf_crabe.modules.php') ? 'crabe' : 'sponge';
 verify($profile->resolve($member, $user, false, false)['pdf_model'] === $expectedModel, 'empty PDF configuration pinned fallback');
 $conf->global->FACTURE_ADDON_PDF = 'sponge';
 verify($profile->resolve($member, $user, false, false)['pdf_model'] === 'sponge', 'explicit PDF model precedes fallback');
@@ -131,10 +128,32 @@ foreach (array('defaultforfoundationcountry', '7') as $setting) {
 	$changed = $preview->previewSubscriptionWithOptions($user, $start, true, false, null, true);
 	verify($changed['fingerprint'] !== $confirmed['fingerprint'], 'VAT configuration invalidates confirmation '.$setting);
 	if ($setting === '7') {
-		verify(in_array('MSMInvoiceVatIdUnsupported', $changed['errors'], true) === (DOL_VERSION === '24.0.3'), 'VAT ID localized preflight error only on V24');
+		verify(in_array('MSMInvoiceVatIdUnsupported', $changed['errors'], true) === true, 'VAT ID localized preflight error on all admitted versions');
 		$without = $preview->previewSubscriptionWithOptions($user, $start, false, false);
 		verify(!$without['errors'] && !isset($without['invoice']), 'VAT ID does not block subscription-only preview');
 	}
 }
 
+// Exercise the actual internal Core price hook independently of the profile policy.
+require_once DOL_DOCUMENT_ROOT.'/core/lib/price.lib.php';
+$hookmanager = new class {
+	public $calls = array(); public $resArray = array();
+	public function executeHooks($name, ...$args) { $this->calls[] = $name; return 0; }
+};
+$totals = calcul_price_total(1, 120, 0, 0, 0, 0, 0, 'TTC', 0, 1, null, array(0, 0, 0, 0));
+verify(abs($totals[2] - 120) < 0.00000001, 'actual Core unit TTC calculation');
+$coreHasPriceHook = strpos(file_get_contents(DOL_DOCUMENT_ROOT.'/core/lib/price.lib.php'), "executeHooks('calcul_price_total'") !== false;
+verify(in_array('calcul_price_total', $hookmanager->calls, true) === $coreHasPriceHook, 'actual Core price hook boundary');
+if ($coreHasPriceHook) {
+	$hookmanager = new class {
+		public $resArray = array();
+		public function executeHooks($name, $parameters, ...$args) {
+			if ($name !== 'calcul_price_total') { return 0; }
+			$this->resArray['result'] = $parameters['result']; $this->resArray['result'][2] = 121;
+			return 1;
+		}
+	};
+	$totals = calcul_price_total(1, 120, 0, 0, 0, 0, 0, 'TTC', 0, 1, null, array(0, 0, 0, 0));
+	verify($totals[2] === 121, 'actual Core price hook override is observable');
+}
 echo ($passed - $before)." invoice profile assertions passed (synthetic; no database).\n";

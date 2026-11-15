@@ -2,6 +2,8 @@
 /* Copyright (C) 2026 iLLixM <iLLixM@proton.me>
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
+// Version labels below exercise unknown contracts on pinned source, not real releases.
+if (($argv[1] ?? '') === '--r16-version') { define('DOL_VERSION', $argv[2]); }
 // Reuse the real V22 API bootstrap and synthetic preview fixtures, never main/conf/DB.
 require __DIR__.'/preview.php';
 require __DIR__.'/../../class/booking.class.php';
@@ -34,7 +36,7 @@ class BookingDatabase extends PreviewDatabase
 }
 class BookingMemberDouble extends Adherent
 {
-	public $msmEndUpdate = 1; public $mode = ''; public $arguments;
+	public $msmEndUpdate = 1; public $msmCoreEnd; public $mode = ''; public $arguments;
 	public function subscription($date, $amount, $accountid = 0, $operation = '', $label = '', $num_chq = '', $emetteur_nom = '', $emetteur_banque = '', $datesubend = 0, $fk_type = null, $ref_ext = '')
 	{
 		$this->arguments = func_get_args(); $this->db->events[] = 'subscription';
@@ -44,6 +46,8 @@ class BookingMemberDouble extends Adherent
 		if ($this->mode === 'r16') { $this->msmEndUpdate = -1; }
 		if ($this->mode === 'wrong_amount') { $this->db->saved->subscription++; }
 		if ($this->mode === 'historical') { $this->db->datefin = '2030-12-31 00:00:00'; }
+		$this->msmCoreEnd = $this->db->datefin; $this->datefin = strtotime($this->msmCoreEnd);
+		if ($this->mode === 'wrong_observed') { $this->msmCoreEnd = '2041-01-01 00:00:00'; }
 		if ($this->mode === 'depth') { $this->db->transaction_opened = 0; $this->db->active = false; }
 		if ($this->mode === 'fail') { return -1; }
 		return 9;
@@ -71,7 +75,7 @@ function bookingFixture()
 }
 $options = array('invoice' => false, 'autocreate' => false, 'sendmail' => false, 'description' => 'Synthetic fee');
 $user = new PreviewUser(); $conf->modules['member'] = 1; $conf->global = new stdClass();
-foreach (array('', 'historical', 'r16', 'wrong_amount', 'depth', 'fail') as $mode) {
+foreach (array('', 'historical', 'r16', 'wrong_amount', 'wrong_observed', 'depth', 'fail') as $mode) {
 	list($db, $service, $row) = bookingFixture(); $service->object->mode = $mode;
 	$result = $service->book(1, $row, $options, $user, false);
 	verify($result['status'] === (in_array($mode, array('', 'historical'), true) ? 'success' : ($mode === 'depth' ? 'unknown' : 'failed')), 'booking mode '.$mode);
@@ -203,7 +207,8 @@ verify($observer->update_end_date($user) === -1 && $observer->msmEndUpdate === -
 class CoreEndDatabase extends BookingDatabase
 {
 	public $prior = array();
-	public function jdate($value) { return $value === null ? null : strtotime($value); }
+	// Match Core empty-date conventions without converting NULL to epoch.
+	public function jdate($value) { return ($value === null || $value === '') ? $value : strtotime($value); }
 	private function periodsByStart()
 	{
 		$rows = $this->prior;
@@ -220,6 +225,7 @@ class CoreEndDatabase extends BookingDatabase
 				return (object) array('rowid' => $r['position'] + 1, 'dateop' => $r['dateadh'], 'datedeb' => $r['dateadh'], 'datefin' => $r['datef']);
 			}, $this->periodsByStart()));
 		}
+		if ($sql === 'UPDATE test_adherent SET datefin=null WHERE rowid = 1') { $this->datefin = null; return true; }
 		if (preg_match("/^UPDATE test_adherent SET datefin='([^']+)' WHERE rowid = 1$/D", $sql, $match)) {
 			$this->datefin = $match[1]; return true;
 		}
@@ -234,40 +240,86 @@ class CoreEndDatabase extends BookingDatabase
 }
 class CoreEndMemberDouble extends BookingMemberDouble
 {
-	public $corruptEnd = false;
+	public $corruptEnd = false; public $corruptObserver = false; public $observerMode = '';
 	public function subscription($date, $amount, $accountid = 0, $operation = '', $label = '', $num_chq = '', $emetteur_nom = '', $emetteur_banque = '', $datesubend = 0, $fk_type = null, $ref_ext = '')
 	{
 		$id = parent::subscription($date, $amount, $accountid, $operation, $label, $num_chq, $emetteur_nom, $emetteur_banque, $datesubend, $fk_type, $ref_ext);
 		$observer = new MsmBookingMember($this->db); $observer->id = $this->id;
 		$this->msmEndUpdate = $observer->update_end_date($GLOBALS['user']);
+		$this->msmCoreEnd = $observer->msmCoreEnd; $this->datefin = $observer->datefin;
+		if ($this->observerMode === 'missing') { $this->msmEndUpdate = null; $this->msmCoreEnd = null; }
+		if ($this->observerMode === 'failed') { $this->msmEndUpdate = -1; }
+		if ($this->observerMode === 'object') { $this->datefin = stamp('2042-01-01'); }
+		if ($this->observerMode === 'observed') { $this->msmCoreEnd = '2042-01-01 00:00:00'; }
+		if ($this->observerMode === 'empty-object') { $this->datefin = ''; }
+		if ($this->observerMode === 'empty-storage') { $this->db->datefin = ''; }
 		if ($this->corruptEnd) { $this->db->datefin = '2040-01-01 00:00:00'; }
+		if ($this->corruptObserver) {
+			// Synthetic alternative Core policy: observer/object/storage agree, while
+			// neither historical SQL contract would select this end. No real Core changed.
+			$this->db->datefin = $this->msmCoreEnd = '2040-01-01 00:00:00';
+			$this->datefin = strtotime($this->msmCoreEnd);
+		}
 		return $id;
 	}
 }
-foreach (array('older-longer', 'newer-longer', 'equal-start-long-first', 'equal-start-short-first', 'wrong-stored-end') as $case) {
+$coreUsesMaxEnd = strpos(file_get_contents(DOL_DOCUMENT_ROOT.'/adherents/class/adherent.class.php'), '$dateendmember') !== false;
+foreach (array('older-longer', 'newer-longer', 'equal-start-long-first', 'equal-start-short-first', 'wrong-stored-end', 'different-core-policy') as $case) {
 	list($unused, $service, $row) = bookingFixture();
 	$db = new CoreEndDatabase(); $service = new BookingServiceDouble($db);
 	$service->object = new CoreEndMemberDouble($db); $service->object->id = 1; $service->object->typeid = 1;
 	$service->object->corruptEnd = $case === 'wrong-stored-end';
+	$service->object->corruptObserver = $case === 'different-core-policy';
 	$row['start'] = stamp('2030-06-01'); $row['end'] = stamp('2030-06-30');
 	$row['overlaps'] = array(array('id' => 2));
 	$db->prior = array(array('dateadh' => '2030-01-01 00:00:00', 'datef' => '2030-12-31 00:00:00'));
-	$expectedEnd = DOL_VERSION === '24.0.3' ? '2030-12-31' : '2030-06-30';
+	$expectedEnd = $coreUsesMaxEnd ? '2030-12-31' : '2030-06-30';
 	if ($case === 'newer-longer') { $row['end'] = stamp('2031-05-31'); $expectedEnd = '2031-05-31'; }
 	if (strpos($case, 'equal-start') === 0) {
 		$db->prior[0]['dateadh'] = '2030-06-01 00:00:00';
 		$db->prior[] = array('dateadh' => '2030-06-01 00:00:00', 'datef' => '2030-08-31 00:00:00');
 		if ($case === 'equal-start-short-first') { $db->prior = array_reverse($db->prior); }
-		$expectedEnd = DOL_VERSION === '24.0.3' || $case === 'equal-start-long-first' ? '2030-12-31' : '2030-08-31';
+		$expectedEnd = $coreUsesMaxEnd || $case === 'equal-start-long-first' ? '2030-12-31' : '2030-08-31';
 	}
 	$service->reader = new BookingPreviewDouble(); $service->reader->row = $row;
 	$outcome = $service->book(1, $row, $options, $user, true);
-	if ($case === 'wrong-stored-end') {
+	if ($case === 'different-core-policy' && MsmCoreCompatibility::current()['latest_end'] === null) {
+		verify($outcome['status'] === 'success' && $db->datefin === '2040-01-01 00:00:00', 'unverified consistent novel Core end commits');
+		verify($db->transaction_opened === 0 && !$db->active && !in_array('rollback', $db->events, true), 'unverified novel Core owned commit');
+	} elseif ($case === 'wrong-stored-end' || $case === 'different-core-policy') {
 		verify($outcome['message'] === 'MSMConsistencyError' && $outcome['rollback'] === 'confirmed' && $db->saved === null, 'R16 corrupt stored end rolls back');
 	} else {
 		verify($outcome['status'] === 'success' && $db->datefin === $expectedEnd.' 00:00:00', 'R16 actual Core '.DOL_VERSION.' '.$case);
 		verify($db->transaction_opened === 0 && !$db->active && !in_array('rollback', $db->events, true), 'R16 owned commit '.$case);
 	}
+}
+
+// PR11-F01: latest-start Core can legitimately select a later NULL history row.
+// MAX-end Core ignores that NULL and keeps the booked positive end. The actual
+// pinned update_end_date() executes through MsmBookingMember in both cases.
+foreach (array('', 'empty-object', 'empty-storage', 'missing', 'failed', 'object', 'observed', 'storage') as $mode) {
+	list($unused, $service, $row) = bookingFixture();
+	$db = new CoreEndDatabase(); $service = new BookingServiceDouble($db);
+	$service->object = new CoreEndMemberDouble($db); $service->object->id = 1; $service->object->typeid = 1;
+	$service->object->observerMode = $mode;
+	$service->object->corruptEnd = $mode === 'storage';
+	$db->prior = array(array('dateadh' => '2032-01-01 00:00:00', 'datef' => null));
+	$service->reader = new BookingPreviewDouble(); $service->reader->row = $row;
+	$outcome = $service->book(1, $row, $options, $user, true);
+	$valid = $mode === '' || (!$coreUsesMaxEnd && in_array($mode, array('empty-object', 'empty-storage'), true));
+	verify($outcome['status'] === ($valid ? 'success' : 'failed'), 'PR11 nullable actual Core '.DOL_VERSION.' '.$mode);
+	if ($valid) {
+		verify($db->datefin === ($coreUsesMaxEnd ? $db->idate($row['end']) : ($mode === 'empty-storage' ? '' : null)), 'PR11 nullable Core policy preserved '.$mode);
+	} else {
+		verify($outcome['message'] === 'MSMConsistencyError' && $outcome['rollback'] === 'confirmed' && $db->saved === null, 'PR11 nullable inconsistency rollback '.$mode);
+	}
+}
+// All-NULL histories exercise successful empty observations even on MAX-end Core.
+foreach (array(null, '') as $emptyEnd) {
+	$db = new CoreEndDatabase(); $db->prior = array(array('dateadh' => '2032-01-01', 'datef' => $emptyEnd));
+	$observer = new MsmBookingMember($db); $observer->id = 1;
+	verify($observer->msmEndUpdate === null, 'PR11 fresh observer not called');
+	verify($observer->update_end_date($user) > 0 && $observer->msmEndUpdate > 0 && $observer->msmCoreEnd === null && $db->datefin === null, 'PR11 successful empty observation');
 }
 
 // Model two independent module connections contending on the same member lock.
@@ -429,3 +481,14 @@ foreach (array('preview', 'confirm') as $phase) {
 $langs->tab_translate['MSMCustomerClassificationMayChange'] = $savedWarning;
 $langs = $renderLangs;
 echo ($passed - $baseline)." booking/mail assertions passed (synthetic transactions and transports only).\n";
+
+// Once per standalone booking invocation, re-label pinned Core source in separate
+// processes. Existing actual Core and transaction fixtures still run in each child.
+if (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') === __FILE__ && ($argv[1] ?? '') !== '--r16-version') {
+	foreach (array('22.0.6', '23.0.5', '23.1.0', '24.0.4', '25.0.0') as $label) {
+		$lines = array();
+		exec(escapeshellarg(PHP_BINARY).' '.escapeshellarg(__FILE__).' --r16-version '.escapeshellarg($label).' 2>&1', $lines, $exit);
+		verify($exit === 0, 'unverified-label novel policy and contradictory-storage rollback '.$label.' '.($exit ? implode("\n", $lines) : ''));
+	}
+	echo "5 unverified-version subprocesses passed (synthetic relabeling, not qualification).\n";
+}

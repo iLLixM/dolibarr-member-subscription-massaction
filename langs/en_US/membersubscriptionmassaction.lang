@@ -118,5 +118,7 @@ MSMDiagnosticStage=Last diagnostic stage
 MSMUnconfirmedIdentifier=unconfirmed identifier
 MSMProcessingNotice=Booking, invoice and document processing is in progress. Keep this page open.
 MSMCustomerClassificationMayChange=Validating this invoice may change the linked third party's customer/prospect classification according to Dolibarr settings.
-MSMCoreVersionUnsupported=This Dolibarr version has no verified module compatibility policy. Booking is blocked.
+MSMCoreVersionUnsupported=Dolibarr 21.0.0 or later and a valid version identifier are required.
 MSMInvoiceVatIdUnsupported=The configured membership VAT setting is not supported for invoicing by this module.
+
+MSMCoreContractUnsupported=The required Dolibarr Core interface is unavailable or incompatible.
