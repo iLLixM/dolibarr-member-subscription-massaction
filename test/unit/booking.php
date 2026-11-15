@@ -2,6 +2,8 @@
 /* Copyright (C) 2026 iLLixM <iLLixM@proton.me>
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
+// Version labels below exercise unknown contracts on pinned source, not real releases.
+if (($argv[1] ?? '') === '--r16-version') { define('DOL_VERSION', $argv[2]); }
 // Reuse the real V22 API bootstrap and synthetic preview fixtures, never main/conf/DB.
 require __DIR__.'/preview.php';
 require __DIR__.'/../../class/booking.class.php';
@@ -236,7 +238,7 @@ class CoreEndDatabase extends BookingDatabase
 }
 class CoreEndMemberDouble extends BookingMemberDouble
 {
-	public $corruptEnd = false;
+	public $corruptEnd = false; public $corruptObserver = false;
 	public function subscription($date, $amount, $accountid = 0, $operation = '', $label = '', $num_chq = '', $emetteur_nom = '', $emetteur_banque = '', $datesubend = 0, $fk_type = null, $ref_ext = '')
 	{
 		$id = parent::subscription($date, $amount, $accountid, $operation, $label, $num_chq, $emetteur_nom, $emetteur_banque, $datesubend, $fk_type, $ref_ext);
@@ -244,15 +246,22 @@ class CoreEndMemberDouble extends BookingMemberDouble
 		$this->msmEndUpdate = $observer->update_end_date($GLOBALS['user']);
 		$this->msmCoreEnd = $observer->msmCoreEnd; $this->datefin = $observer->datefin;
 		if ($this->corruptEnd) { $this->db->datefin = '2040-01-01 00:00:00'; }
+		if ($this->corruptObserver) {
+			// Synthetic alternative Core policy: observer/object/storage agree, while
+			// neither historical SQL contract would select this end. No real Core changed.
+			$this->db->datefin = $this->msmCoreEnd = '2040-01-01 00:00:00';
+			$this->datefin = strtotime($this->msmCoreEnd);
+		}
 		return $id;
 	}
 }
 $coreUsesMaxEnd = strpos(file_get_contents(DOL_DOCUMENT_ROOT.'/adherents/class/adherent.class.php'), '$dateendmember') !== false;
-foreach (array('older-longer', 'newer-longer', 'equal-start-long-first', 'equal-start-short-first', 'wrong-stored-end') as $case) {
+foreach (array('older-longer', 'newer-longer', 'equal-start-long-first', 'equal-start-short-first', 'wrong-stored-end', 'different-core-policy') as $case) {
 	list($unused, $service, $row) = bookingFixture();
 	$db = new CoreEndDatabase(); $service = new BookingServiceDouble($db);
 	$service->object = new CoreEndMemberDouble($db); $service->object->id = 1; $service->object->typeid = 1;
 	$service->object->corruptEnd = $case === 'wrong-stored-end';
+	$service->object->corruptObserver = $case === 'different-core-policy';
 	$row['start'] = stamp('2030-06-01'); $row['end'] = stamp('2030-06-30');
 	$row['overlaps'] = array(array('id' => 2));
 	$db->prior = array(array('dateadh' => '2030-01-01 00:00:00', 'datef' => '2030-12-31 00:00:00'));
@@ -266,7 +275,10 @@ foreach (array('older-longer', 'newer-longer', 'equal-start-long-first', 'equal-
 	}
 	$service->reader = new BookingPreviewDouble(); $service->reader->row = $row;
 	$outcome = $service->book(1, $row, $options, $user, true);
-	if ($case === 'wrong-stored-end') {
+	if ($case === 'different-core-policy' && MsmCoreCompatibility::current()['latest_end'] === null) {
+		verify($outcome['status'] === 'success' && $db->datefin === '2040-01-01 00:00:00', 'unverified consistent novel Core end commits');
+		verify($db->transaction_opened === 0 && !$db->active && !in_array('rollback', $db->events, true), 'unverified novel Core owned commit');
+	} elseif ($case === 'wrong-stored-end' || $case === 'different-core-policy') {
 		verify($outcome['message'] === 'MSMConsistencyError' && $outcome['rollback'] === 'confirmed' && $db->saved === null, 'R16 corrupt stored end rolls back');
 	} else {
 		verify($outcome['status'] === 'success' && $db->datefin === $expectedEnd.' 00:00:00', 'R16 actual Core '.DOL_VERSION.' '.$case);
@@ -433,3 +445,14 @@ foreach (array('preview', 'confirm') as $phase) {
 $langs->tab_translate['MSMCustomerClassificationMayChange'] = $savedWarning;
 $langs = $renderLangs;
 echo ($passed - $baseline)." booking/mail assertions passed (synthetic transactions and transports only).\n";
+
+// Once per standalone booking invocation, re-label pinned Core source in separate
+// processes. Existing actual Core and transaction fixtures still run in each child.
+if (realpath($_SERVER['SCRIPT_FILENAME'] ?? '') === __FILE__ && ($argv[1] ?? '') !== '--r16-version') {
+	foreach (array('22.0.6', '23.0.5', '23.1.0', '24.0.4', '25.0.0') as $label) {
+		$lines = array();
+		exec(escapeshellarg(PHP_BINARY).' '.escapeshellarg(__FILE__).' --r16-version '.escapeshellarg($label).' 2>&1', $lines, $exit);
+		verify($exit === 0, 'unverified-label novel policy and contradictory-storage rollback '.$label.' '.($exit ? implode("\n", $lines) : ''));
+	}
+	echo "5 unverified-version subprocesses passed (synthetic relabeling, not qualification).\n";
+}

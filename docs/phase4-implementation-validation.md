@@ -1,5 +1,26 @@
 # Phase 4 implementation validation
 
+## P2-F01 R16 evidence boundary — 2026-11-15
+
+The numeric interval used in the initial P2 implementation also classified
+unexamined releases (22.0.6, 23.0.5, 23.1.0) as historical R16 contracts. P2-F01
+replaces that inference with a frozen catalog of the 15 P1-source-verified releases.
+The catalog selects independent historical SQL postconditions, never admission.
+No future patch/minor/major needs to be added: every other admitted label uses
+actual Core return/object/stored-end consistency, without an inferred old policy.
+Admission >=21.0.0 and its lack of an upper bound remain unchanged. Actual Core
+remains the only end-date writer; no transaction/rollback/unknown-stop code changed.
+
+Regression coverage: all 15 historical property selections, 24.0.1/24.0.2 boundary,
+and unknown 22.0.6/23.0.5/23.1.0/24.0.4/25.0.0 labels. Separate booking processes
+reuse pinned Core methods and in-memory transaction fixtures. A clearly synthetic
+novel Core policy whose observer/object/storage agree commits for unknown labels;
+the same deviation still fails independent SQL checks for the 15 historical labels.
+Stored-end disagreement still fails and rolls back in both modes. These are not
+integration tests of unreleased or unexamined Cores. CI retains all 21 pinned pairs;
+P3 evaluation, arbitrary future algorithm correctness and historical real-evidence
+limits remain unchanged. No new real tests, qualification or merge approval.
+
 ## P2 cross-version implementation — 2026-11-15 (P3 qualification pending)
 
 Baseline main `5b2ce06124cd2d839a0b0005f1edc582cccbb39b`; work is isolated on
@@ -9,9 +30,9 @@ historical exact-patch admission policy for this change, not historical results.
 - **Admitted:** >=21.0.0, no upper bound/exact patch/SHA allowlist. Capability
   failures are explicit; unsupported hook inheritance disables the adapter safely
   before class declaration. V21 and future Cores are not thereby qualified.
-- **Source analyzed:** all 15official V22.0.0–22.0.5, V23.0.0–23.0.4,
+- **Source analyzed:** all 15 official V22.0.0–22.0.5, V23.0.0–23.0.4,
   V24.0.0–24.0.3 pins from private P1 reports. Independent R16 SQL checks remain
-  through the analyzed interval, with the 24.0.2 switch; all successful operations
+  only for the 15 explicitly source-verified releases, with the 24.0.2 switch; all successful operations
   also require actual parent update success and observer/object/stored-end equality.
   Beyond analyzed versions, only the actual Core observation/invariants are used;
   unknown numbers do not cause rejection or imply verified future semantics.

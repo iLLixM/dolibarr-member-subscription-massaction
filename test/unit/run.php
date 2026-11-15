@@ -166,6 +166,15 @@ require_once __DIR__.'/../../class/corecompatibility.class.php';
 foreach (array('21.0.0', '22.0.0', '22.0.5', '23.0.4', '24.0.0', '24.0.1', '24.0.2', '24.0.3', '24.0.99', '25.0.0-alpha', '99.0.0') as $version) {
 	check(is_array(MsmCoreCompatibility::profile($version)), 'open admission '.$version);
 }
+foreach (array(22 => 5, 23 => 4, 24 => 3) as $major => $lastPatch) {
+	for ($patch = 0; $patch <= $lastPatch; $patch++) {
+		$version = $major.'.0.'.$patch;
+		check(MsmCoreCompatibility::profile($version)['latest_end'] === ($major === 24 && $patch >= 2), 'P1 historical R16 contract '.$version);
+	}
+}
+foreach (array('21.0.0', '22.0.6', '23.0.5', '23.1.0', '24.0.4', '25.0.0', '99.0.0', '24.0.2-rc1') as $version) {
+	check(MsmCoreCompatibility::profile($version)['latest_end'] === null, 'unverified R16 uses observer '.$version);
+}
 check(MsmCoreCompatibility::profile('24.0.1')['latest_end'] === false, 'pre-boundary Core expectation');
 check(MsmCoreCompatibility::profile('24.0.2')['latest_end'] === true, 'R16 boundary');
 check(MsmCoreCompatibility::profile('99.0.0')['latest_end'] === null, 'future uses observer, not guessed semantics');

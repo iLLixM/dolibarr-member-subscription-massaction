@@ -9,10 +9,16 @@ class MsmCoreCompatibility
 	{
 		if (!is_string($version) || !preg_match('/^[0-9]+\.[0-9]+\.[0-9]+(?:[-+][a-zA-Z0-9.-]+)?$/D', $version)
 			|| version_compare($version, '21.0.0', '<')) { throw new RuntimeException('MSMCoreVersionUnsupported'); }
-		// Source-derived expectations only. Outside the analyzed interval use the
-		// actual Core observer; this interval is never an admission allowlist.
-		$known = version_compare($version, '22.0.0', '>=') && version_compare($version, '24.0.3', '<=');
-		return array('latest_end' => $known ? version_compare($version, '24.0.2', '>=') : null);
+		// Frozen P1 evidence catalog, NOT an admission allowlist. New releases use
+		// the observer automatically; this catalog needs no release-by-release updates.
+		$verified = array(
+			'22.0.0' => false, '22.0.1' => false, '22.0.2' => false,
+			'22.0.3' => false, '22.0.4' => false, '22.0.5' => false,
+			'23.0.0' => false, '23.0.1' => false, '23.0.2' => false,
+			'23.0.3' => false, '23.0.4' => false,
+			'24.0.0' => false, '24.0.1' => false, '24.0.2' => true, '24.0.3' => true,
+		);
+		return array('latest_end' => $verified[$version] ?? null);
 	}
 	public static function current()
 	{
