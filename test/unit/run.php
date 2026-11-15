@@ -209,6 +209,25 @@ $probe = 'define("DOL_DOCUMENT_ROOT", '.var_export(DOL_DOCUMENT_ROOT, true).');'
 	.'exit($hook->doMassActions(array("massaction" => "memberSubscriptionMassactionStart"), $o, $a) === -1 ? 0 : 1);';
 exec(escapeshellarg(PHP_BINARY).' -r '.escapeshellarg($probe), $probeOutput, $probeExit);
 check($probeExit === 0, 'incompatible Core hook controlled without inheritance fatal');
+// PR11-F02: declarations run in isolated processes, so a fatal cannot hide a
+// successful rejection. Abstract bases with implemented obligations remain valid.
+foreach (array(false, true) as $extra) {
+	$probe = 'define("DOL_DOCUMENT_ROOT", '.var_export(DOL_DOCUMENT_ROOT, true).');'
+		.'abstract class CommonHookActions { abstract public function addMoreMassActions($p, &$o, &$a, $h = null);'
+		.'abstract public function doMassActions($p, &$o, &$a, $h = null);'
+		.($extra ? 'abstract public function futureRequired();' : '').'}'
+		.'require '.var_export(realpath(__DIR__.'/../../class/actions_membersubscriptionmassaction.class.php'), true).';'
+		.'$h = new ActionsMemberSubscriptionMassaction(null);'
+		.'exit(is_subclass_of($h, "CommonHookActions") === '.($extra ? 'false' : 'true').' ? 0 : 1);';
+	$probeOutput = array(); exec(escapeshellarg(PHP_BINARY).' -r '.escapeshellarg($probe).' 2>&1', $probeOutput, $probeExit);
+	check($probeExit === 0, 'PR11 abstract hook obligations '.(int) $extra.' '.implode(' ', $probeOutput));
+}
+$probe = 'define("DOL_DOCUMENT_ROOT", '.var_export(DOL_DOCUMENT_ROOT, true).');'
+	.'abstract class Adherent { public function update_end_date($u) {} abstract public function futureRequired(); }'
+	.'try { require '.var_export(realpath(__DIR__.'/../../class/bookingmember.class.php'), true).'; }'
+	.'catch (RuntimeException $e) { exit($e->getMessage() === "MSMCoreContractUnsupported" ? 0 : 2); } exit(1);';
+$probeOutput = array(); exec(escapeshellarg(PHP_BINARY).' -r '.escapeshellarg($probe).' 2>&1', $probeOutput, $probeExit);
+check($probeExit === 0, 'PR11 abstract member rejected before declaration '.implode(' ', $probeOutput));
 require_once __DIR__.'/../../class/booking.class.php';
 $untouched = new class {
 	public $transaction_opened = 0; public $calls = 0;

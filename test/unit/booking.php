@@ -207,7 +207,8 @@ verify($observer->update_end_date($user) === -1 && $observer->msmEndUpdate === -
 class CoreEndDatabase extends BookingDatabase
 {
 	public $prior = array();
-	public function jdate($value) { return $value === null ? null : strtotime($value); }
+	// Match Core empty-date conventions without converting NULL to epoch.
+	public function jdate($value) { return ($value === null || $value === '') ? $value : strtotime($value); }
 	private function periodsByStart()
 	{
 		$rows = $this->prior;
@@ -224,6 +225,7 @@ class CoreEndDatabase extends BookingDatabase
 				return (object) array('rowid' => $r['position'] + 1, 'dateop' => $r['dateadh'], 'datedeb' => $r['dateadh'], 'datefin' => $r['datef']);
 			}, $this->periodsByStart()));
 		}
+		if ($sql === 'UPDATE test_adherent SET datefin=null WHERE rowid = 1') { $this->datefin = null; return true; }
 		if (preg_match("/^UPDATE test_adherent SET datefin='([^']+)' WHERE rowid = 1$/D", $sql, $match)) {
 			$this->datefin = $match[1]; return true;
 		}
@@ -238,13 +240,19 @@ class CoreEndDatabase extends BookingDatabase
 }
 class CoreEndMemberDouble extends BookingMemberDouble
 {
-	public $corruptEnd = false; public $corruptObserver = false;
+	public $corruptEnd = false; public $corruptObserver = false; public $observerMode = '';
 	public function subscription($date, $amount, $accountid = 0, $operation = '', $label = '', $num_chq = '', $emetteur_nom = '', $emetteur_banque = '', $datesubend = 0, $fk_type = null, $ref_ext = '')
 	{
 		$id = parent::subscription($date, $amount, $accountid, $operation, $label, $num_chq, $emetteur_nom, $emetteur_banque, $datesubend, $fk_type, $ref_ext);
 		$observer = new MsmBookingMember($this->db); $observer->id = $this->id;
 		$this->msmEndUpdate = $observer->update_end_date($GLOBALS['user']);
 		$this->msmCoreEnd = $observer->msmCoreEnd; $this->datefin = $observer->datefin;
+		if ($this->observerMode === 'missing') { $this->msmEndUpdate = null; $this->msmCoreEnd = null; }
+		if ($this->observerMode === 'failed') { $this->msmEndUpdate = -1; }
+		if ($this->observerMode === 'object') { $this->datefin = stamp('2042-01-01'); }
+		if ($this->observerMode === 'observed') { $this->msmCoreEnd = '2042-01-01 00:00:00'; }
+		if ($this->observerMode === 'empty-object') { $this->datefin = ''; }
+		if ($this->observerMode === 'empty-storage') { $this->db->datefin = ''; }
 		if ($this->corruptEnd) { $this->db->datefin = '2040-01-01 00:00:00'; }
 		if ($this->corruptObserver) {
 			// Synthetic alternative Core policy: observer/object/storage agree, while
@@ -284,6 +292,34 @@ foreach (array('older-longer', 'newer-longer', 'equal-start-long-first', 'equal-
 		verify($outcome['status'] === 'success' && $db->datefin === $expectedEnd.' 00:00:00', 'R16 actual Core '.DOL_VERSION.' '.$case);
 		verify($db->transaction_opened === 0 && !$db->active && !in_array('rollback', $db->events, true), 'R16 owned commit '.$case);
 	}
+}
+
+// PR11-F01: latest-start Core can legitimately select a later NULL history row.
+// MAX-end Core ignores that NULL and keeps the booked positive end. The actual
+// pinned update_end_date() executes through MsmBookingMember in both cases.
+foreach (array('', 'empty-object', 'empty-storage', 'missing', 'failed', 'object', 'observed', 'storage') as $mode) {
+	list($unused, $service, $row) = bookingFixture();
+	$db = new CoreEndDatabase(); $service = new BookingServiceDouble($db);
+	$service->object = new CoreEndMemberDouble($db); $service->object->id = 1; $service->object->typeid = 1;
+	$service->object->observerMode = $mode;
+	$service->object->corruptEnd = $mode === 'storage';
+	$db->prior = array(array('dateadh' => '2032-01-01 00:00:00', 'datef' => null));
+	$service->reader = new BookingPreviewDouble(); $service->reader->row = $row;
+	$outcome = $service->book(1, $row, $options, $user, true);
+	$valid = $mode === '' || (!$coreUsesMaxEnd && in_array($mode, array('empty-object', 'empty-storage'), true));
+	verify($outcome['status'] === ($valid ? 'success' : 'failed'), 'PR11 nullable actual Core '.DOL_VERSION.' '.$mode);
+	if ($valid) {
+		verify($db->datefin === ($coreUsesMaxEnd ? $db->idate($row['end']) : ($mode === 'empty-storage' ? '' : null)), 'PR11 nullable Core policy preserved '.$mode);
+	} else {
+		verify($outcome['message'] === 'MSMConsistencyError' && $outcome['rollback'] === 'confirmed' && $db->saved === null, 'PR11 nullable inconsistency rollback '.$mode);
+	}
+}
+// All-NULL histories exercise successful empty observations even on MAX-end Core.
+foreach (array(null, '') as $emptyEnd) {
+	$db = new CoreEndDatabase(); $db->prior = array(array('dateadh' => '2032-01-01', 'datef' => $emptyEnd));
+	$observer = new MsmBookingMember($db); $observer->id = 1;
+	verify($observer->msmEndUpdate === null, 'PR11 fresh observer not called');
+	verify($observer->update_end_date($user) > 0 && $observer->msmEndUpdate > 0 && $observer->msmCoreEnd === null && $db->datefin === null, 'PR11 successful empty observation');
 }
 
 // Model two independent module connections contending on the same member lock.

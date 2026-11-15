@@ -3,7 +3,9 @@
 Owner decision, 2026-11-15: **P3 SYNTHETIC CROSS-VERSION QUALIFICATION – ACCEPTED
 WITH DOCUMENTED LIMITATIONS**. P3 is formally closed. No confirmed implementation
 defect or additional real P4 test need was identified for the bounded synthetic scope.
-The independent overall code review is still outstanding; this is not merge approval.
+The later independent PR11 review required targeted corrections; see the
+[post-P3 correction addendum](phase4-implementation-validation.md#post-p3-pr11-review-correction-addendum--2026-11-15).
+P3 acceptance remains historical and closed; follow-up review/merge approval is pending.
 
 Qualified implementation: `a1843e14c71c89f7148aa2e8f6c5352409bca7b1`.
 [Run 43731843114](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/43731843114)

@@ -1,5 +1,45 @@
 # Phase 4 implementation validation
 
+## Post-P3 PR11 review correction addendum — 2026-11-15
+
+P3 remains formally closed: **ACCEPTED WITH DOCUMENTED LIMITATIONS**, originally
+qualified at `a1843e14c71c89f7148aa2e8f6c5352409bca7b1` and documented at
+`17d9b10156538921b2b707cbfef849edc66d24b1`. The later independent PR11 review
+identified PR11-F01 (merge-blocking nullable R16 observation) and PR11-F02
+(incomplete abstract inheritance checks). Earlier statements about no confirmed
+implementation defect describe the then-current P3 assessment, not this later review.
+
+- **PR11-F01:** retain the positive Core call result independently of the nullable
+  observed end. Normalize only SQL/Core `NULL` and `''` to the absent-end state;
+  compare observer, timestamp object and stored end. Missing/failed calls and
+  contradictions still fail with confirmed rollback. All 15 exact historical SQL
+  postconditions remain; only Core calculates/writes the end (E2, D-P1-02).
+- **PR11-F02:** before declaring an extension, enumerate abstract obligations and
+  require a module implementation with compatible checked shape. The hook adapter
+  supplies its constructor and both hook methods. Implementable abstract bases
+  remain allowed; extra obligations disable the hook or reject the member adapter
+  before PHP can raise a declaration fatal. Admission policy remains unchanged.
+- **PR11-DOC01:** VAT policy comment now references D-P1-01; no VAT logic change.
+
+Added existing-runner regressions execute the actual pinned Core member-end method
+with nullable in-memory histories: latest-start NULL, MAX with mixed/all-empty ends,
+NULL/empty equivalence, missing/failed observations, contradictory object/observer/
+storage and confirmed rollback. They also execute under the existing unknown-label
+subprocesses. Isolated declaration subprocesses test supported abstract hooks and
+unsupported extra hook/member obligations. Existing positive R16 cases remain.
+
+Follow-up evidence is separate from the immutable P1/P2/P3 packages. The correction
+commit and its automatic 21-pair CI results are recorded in PR #11 and the separate
+private `dolibarr-pr11-followup-20261115` evidence set, after CI completion. This is
+post-P3 correction regression evidence, not a retroactive rewrite or new general P3
+qualification. Original 78 P3 checksums and logs remain unchanged.
+
+Real DB/business/PDF/SMTP/browser tests: **NOT EXECUTED** in this correction task.
+V21/future Cores, broader installed profiles, production and public release remain
+unqualified. Existing risk limits and historical real evidence remain unchanged.
+PR #11 precedes PR #10 by Owner decision; independent follow-up review and any merge
+approval remain pending.
+
 ## P3 formal closure and P3-DOC01 — 2026-11-15
 
 Owner decision: **P3 SYNTHETIC CROSS-VERSION QUALIFICATION – ACCEPTED WITH

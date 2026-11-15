@@ -52,10 +52,20 @@ class MsmCoreCompatibility
 		self::methods($class, $calls);
 	}
 	/** Reject incompatible inheritance before PHP declares the extension class. */
-	public static function extension($class, $method, $arguments, array $references = array())
+	public static function extension($class, $method, $arguments, array $references = array(), array $implemented = array())
 	{
 		$c = new ReflectionClass($class);
 		if ($c->isFinal()) { throw new RuntimeException('MSMCoreContractUnsupported'); }
+		$implemented[$method] = array($arguments, $references);
+		foreach ($c->getMethods(ReflectionMethod::IS_ABSTRACT) as $required) {
+			if (!isset($implemented[$required->getName()])) { throw new RuntimeException('MSMCoreContractUnsupported'); }
+		}
+		foreach ($implemented as $name => $contract) {
+			self::extensionMethod($c, $name, $contract[0], $contract[1]);
+		}
+	}
+	private static function extensionMethod($c, $method, $arguments, array $references)
+	{
 		if (!$c->hasMethod($method)) { return; }
 		$m = $c->getMethod($method);
 		if ($m->isFinal() || $m->isStatic() || $m->hasReturnType() || $m->returnsReference()

@@ -15,7 +15,9 @@ class MsmBookingMember extends Adherent
 	{
 		$this->msmEndUpdate = null; $this->msmCoreEnd = null;
 		$this->msmEndUpdate = parent::update_end_date($user);
-		if ($this->msmEndUpdate > 0 && !empty($this->datefin)) { $this->msmCoreEnd = $this->db->idate($this->datefin); }
+		// A successful Core call may deliberately clear the end; the return value
+		// distinguishes that observation from a missing or failed call.
+		if ($this->msmEndUpdate > 0) { $this->msmCoreEnd = ($this->datefin === null || $this->datefin === '') ? null : $this->db->idate($this->datefin); }
 		return $this->msmEndUpdate;
 	}
 }

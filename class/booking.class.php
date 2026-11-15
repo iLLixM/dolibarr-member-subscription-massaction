@@ -55,14 +55,18 @@ class MsmBookingService
 		$policy = MsmCoreCompatibility::current();
 		$latest = $policy['latest_end'] === null ? null : $this->one('SELECT '.($policy['latest_end'] ? 'MAX(datef) AS datef' : 'datef').' FROM '.$this->db->prefix().'subscription WHERE fk_adherent = '.((int) $id).($policy['latest_end'] ? '' : ' ORDER BY dateadh DESC'.$this->db->plimit(1)));
 		$stored = $this->one('SELECT datefin FROM '.$this->db->prefix().'adherent WHERE rowid = '.((int) $id));
+		// SQL NULL and Core's empty timestamp represent the same absent end.
+		$objectEnd = ($member->datefin === null || $member->datefin === '') ? null : $this->db->idate($member->datefin);
+		$storedEnd = $stored && $stored->datefin !== '' ? $stored->datefin : null;
+		$latestEnd = $latest && $latest->datef !== '' ? $latest->datef : null;
 		if ($member->msmEndUpdate <= 0 || !$saved || !$stored
 			|| (int) $saved->fk_adherent !== (int) $id || (int) $saved->fk_type !== (int) $member->typeid
 			|| abs((float) $saved->subscription - $row['amount']) > 0.00000001
 			|| $saved->dateadh !== $this->db->idate($row['start']) || $saved->datef !== $this->db->idate($row['end'])
-			|| (string) $saved->note !== $row['description'] || empty($member->msmCoreEnd)
-			|| $stored->datefin !== $member->msmCoreEnd
-			|| $this->db->idate($member->datefin) !== $member->msmCoreEnd
-			|| ($policy['latest_end'] !== null && (!$latest || $stored->datefin !== $latest->datef))) {
+			|| (string) $saved->note !== $row['description']
+			|| $storedEnd !== $member->msmCoreEnd
+			|| $objectEnd !== $member->msmCoreEnd
+			|| ($policy['latest_end'] !== null && (!$latest || $storedEnd !== $latestEnd))) {
 			throw new RuntimeException('MSMConsistencyError');
 		}
 	}
