@@ -18,7 +18,9 @@
 
 - Dolibarr V22.0.5 is the primary implementation reference with historical bounded acceptance.
 - V24.0.3 completed the real C3 campaign in the exact profile documented in
-  `docs/phase4-implementation-validation.md`; final independent V24 acceptance is pending.
+  `docs/phase4-implementation-validation.md`; external conditional review is complete,
+  with OD-PR6-01/02 accepted for a bounded development merge only. Actual merge
+  remains a separate owner decision.
   Other versions/profiles and production/public release are not generally qualified.
 - Preserve PHP 7.4 compatibility and established Dolibarr V22 coding conventions.
 - Reuse Dolibarr object APIs, hooks, translations, authenticated bootstrap, CSRF checks, output escaping, and object/entity access checks.

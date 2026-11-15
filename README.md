@@ -1,10 +1,12 @@
 # Member Subscription Massaction for Dolibarr
 
-**Current status — 2026-11-14: unreleased development module for the exact
+**Current status — 2026-11-15: unreleased development module for the exact
 Dolibarr V22.0.5 and V24.0.3 targets. Historical bounded V22 G2/G3/G4 approvals
 remain valid. The real V24.0.3 C3 campaign is complete for its tested PHP 8.2,
-entity-1 profile, including owner-confirmed mail receipt. Final independent V24
-review is still pending. Other versions/profiles are not generally qualified;
+entity-1 profile, including owner-confirmed mail receipt. The owner reports final
+external review APPROVED FOR MERGE WITH EXPLICIT CONDITIONS
+on `eb87e181`; OD-PR6-01/02 are ACCEPTED for a bounded development merge only.
+The actual merge decision remains outstanding. Other versions/profiles are not generally qualified;
 production and public module release remain NOT QUALIFIED / NOT APPROVED.**
 
 See [Phase 4 implementation validation](docs/phase4-implementation-validation.md)
@@ -37,7 +39,7 @@ bank entries. Invoice evidence is limited to the historical V22.0.5 profile and 
 tested V24.0.3 C3 profile: standard EUR invoices, quantity 1, VAT 0, no configured
 product, Mercure numbering and Sponge PDF. See the
 [C3 evidence and limits](docs/phase4-implementation-validation.md#c3-v2403-integration-campaign-2026-11-14);
-this completed campaign does not replace final independent acceptance.
+the external conditional review and owner decisions below do not broaden the tested profile.
 
 ## Origin and scope
 
@@ -64,7 +66,8 @@ independent follow-up (owner-reported). The later real C3 campaign covers bookin
 invoice/customer creation, zero fees, R16, controlled rollback/COMMIT acknowledgement
 loss, PDF/ECM, authenticated replay, Chromium/Firefox and one real SMTP delivery.
 V23, other V24 patches, V25 and additional profiles have no blanket qualification.
-Production remains NOT QUALIFIED; final independent V24 review is pending.
+Production remains NOT QUALIFIED. External conditional review is complete; owner
+acceptance permits consideration of a development merge, not release or distribution.
 
 Module ID **584620 is temporary**, checked against local descriptors and the
 [official ID rules](https://wiki.dolibarr.org/index.php?title=List_of_modules_id&oldid=68837).

@@ -1,13 +1,13 @@
 # Phase 4 implementation validation
 
-## Current gate status — 2026-11-14
+## Current gate status — 2026-11-15
 
 | Gate | Current status / provenance | Scope / next step |
 | --- | --- | --- |
 | G2 | **FINAL APPROVED – PASS WITH DOCUMENTED LIMITATIONS** | Completed for the bounded Dolibarr V22.0.5 profile below |
 | G3 | **APPROVED – PASS WITH DOCUMENTED LIMITATIONS** | Completed for the controlled V22 PDF/mail profile below; SMTP status uncertainty retained |
 | G4 | **PASS – OWNER ACCEPTED** | Owner-reported manual acceptance on 2026-11-12; subsequent targeted UI regressions passed |
-| V24.0.3 | **REAL C3 CAMPAIGN COMPLETE — LIMITED PROFILE** | C3.2/C3.3 PASS as scoped below; final independent V24 acceptance pending |
+| V24.0.3 | **REAL C3 CAMPAIGN COMPLETE — LIMITED PROFILE** | External review APPROVED FOR MERGE WITH EXPLICIT CONDITIONS; OD-PR6-01/02 accepted for development merge only; actual merge pending |
 | Production | **NOT QUALIFIED** | No release or production approval |
 
 The completed Phase 4 implementation baseline is merge commit
@@ -30,9 +30,91 @@ The sections below retain historical development/test evidence;
 the current gate table, the C3 section and the G2/G3/G4 closure sections supersede
 earlier pending-gate statements only within their expressly tested scopes.
 PR6-01–PR6-03 are closed by independent follow-up, as reported by the owner;
-that is not a final independent V24 approval or a formal GitHub review assertion.
+that earlier follow-up is distinct from the final conditional external review below
+and is not a formal GitHub review assertion.
+
+## PR #6 final external review and owner decisions — 2026-11-15
+
+The owner reports the independent external verdict **APPROVED FOR MERGE WITH
+EXPLICIT CONDITIONS** on `eb87e181e0c83fc3e9b8a24139c441e8e62528e3`.
+No confirmed blocking implementation defect was identified. This is an external
+review reported by the owner, not a formal GitHub approval. **PR6-FINAL-01,
+PR6-FINAL-02, PR6-FINAL-03 and PR6-FINAL-04** are the final review finding references;
+the conditional documentation disposition is recorded through OD-PR6-01/02 below.
+No additional per-finding technical conclusions or new test results are inferred.
+
+### OD-PR6-01 — ACCEPTED (owner decision, 2026-11-15)
+
+For a bounded development merge to `main`, the owner accepts the documented
+C3.1 plan deviations using existing V22 evidence, synthetic regressions and real
+V24 partial evidence. In particular:
+
+- C32-08 covers the member-19 rollback only; the planned successful member-10
+  row and mixed V24 success/failure batch were **NOT EXECUTED**.
+- C32-07 lacks final negative booking POSTs and the live unvalidated-member-9
+  case. Role filtering/direct access checks do not become those missing tests.
+- Missing-overlap-consent rejection remains an isolated guard check, not a
+  negative final HTTP booking POST. The original replay was unavailable; B-R1
+  later used member 18/customer 3, a 2036 period and invoice/PDF instead of the
+  planned member-20 subscription-only 2034 case, with mail off.
+- The V24 browser matrix is limited: 1440/1024 geometry and retained live flows
+  do not establish the planned 768/390, complete DE/EN, no-JS, keyboard/reset or
+  manual BFCache acceptance. Real success views and synthetic error views remain
+  distinct. V22 owner acceptance is not transferred to V24.
+- Separate C3.3-D proves one invoice-mail transport with owner-confirmed receipt;
+  the without-invoice SMTP variant and full language/handler matrix remain untested.
+
+The authoritative matrix is unchanged: **53 bounded V24 partial evidence rows**,
+**18 dedicated live scenarios NOT EXECUTED**, all 71 IDs and historical fields
+retained. No original PASS is expanded and no missing scenario becomes executed.
+
+### OD-PR6-02 — ACCEPTED (owner decision, 2026-11-15)
+
+For the same bounded development merge, the owner accepts:
+
+- **G02:** contextual Core/module attribution without original digests for every run.
+- **G05:** actual SMTP transport evidence plus **owner-confirmed** receipt and PDF;
+  no independent agent mailbox or received-MIME inspection is asserted.
+- **G06:** retained PDF/HTTP/ECM/hash records without independent access to all
+  confidential original PDF binaries.
+
+Acceptance does not supply missing originals retrospectively. Remaining
+provenance limits and original records stay visible.
+
+### Recovered planning and private review package
+
+G01 is **FOUND_AS_CONTEMPORANEOUS_CHAT_ATTACHMENT**: the owner supplied the complete
+C3.1 chat planning attachment identified as contemporaneous 2026-11-13. The private
+`c31_testplan.md` archive is byte-identical to that attachment. Exact original
+transmission time is unavailable; the filename and local download times do not
+prove it. A standalone original local-development plan file remains unestablished.
+
+The private **`PR6-C3-Review-Evidence-v2.zip`** contains sanitized evidence,
+provenance, checksums and the 17-case `plan-vs-actual.md`/CSV/JSON comparison. Its
+manifest, ZIP structure and all 166 checksum entries were independently validated.
+It and confidential originals are **not published in this repository**; V1 remains
+unchanged. Planning is not executed business evidence or new test authorization.
+
+### Documentation delta and remaining gates
+
+This subsequent documentation-only closure follows reviewed HEAD `eb87e181`.
+The external reviewer has **not** been represented as having reviewed this new
+commit. Its separate CI must pass PHP 7.4/V22.0.5, PHP 8.2/V22.0.5 and
+PHP 8.2/V24.0.3 before PR #6 is moved to Ready for review.
+
+Both owner decisions apply **only to consideration of a development merge into
+main**. The actual merge decision remains outstanding. No merge, production,
+release, public distribution or general version/profile approval is granted.
+Temporary module ID, development version, all unexecuted infrastructure/business
+scenarios and existing release restrictions remain unchanged. No new business,
+browser, PDF, SMTP or fault-injection test accompanies this documentation update.
 
 ## C3 V24.0.3 integration campaign (2026-11-14)
+
+**Historical campaign snapshot (2026-11-14).** Pending-review and missing-plan
+statements in this retained section describe that date. The 2026-11-15 closure
+above supersedes their current status, without changing historical results.
+
 
 **C3.2 and C3.3 complete — PASS in the stated profile; ready for final independent
 V24 review, not merge, release or production approval.** C3.1 supplied planning and
