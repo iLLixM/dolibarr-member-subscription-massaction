@@ -7,7 +7,7 @@
 | G2 | **FINAL APPROVED – PASS WITH DOCUMENTED LIMITATIONS** | Completed for the bounded Dolibarr V22.0.5 profile below |
 | G3 | **APPROVED – PASS WITH DOCUMENTED LIMITATIONS** | Completed for the controlled V22 PDF/mail profile below; SMTP status uncertainty retained |
 | G4 | **PASS – OWNER ACCEPTED** | Owner-reported manual acceptance on 2026-11-12; subsequent targeted UI regressions passed |
-| V24.0.3 | **REAL C3 CAMPAIGN COMPLETE — LIMITED PROFILE** | External review APPROVED FOR MERGE WITH EXPLICIT CONDITIONS; OD-PR6-01/02 accepted for development merge only; actual merge pending |
+| V24.0.3 | **REAL C3 CAMPAIGN COMPLETE — LIMITED PROFILE** | Development merge COMPLETE (`96f870e`); final review APPROVED FOR MERGE – ALL CONDITIONS FULFILLED; OD-PR6-01/02 fulfilled; bounded profiles only |
 | Production | **NOT QUALIFIED** | No release or production approval |
 
 The completed Phase 4 implementation baseline is merge commit
@@ -33,7 +33,42 @@ PR6-01–PR6-03 are closed by independent follow-up, as reported by the owner;
 that earlier follow-up is distinct from the final conditional external review below
 and is not a formal GitHub review assertion.
 
+## PR #6 post-merge development closure — 2026-11-15
+
+[PR #6](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/6)
+merged on **2026-11-15**, merge commit
+**`96f870e789eb26b6eb8a6b8eeb0c79812018b0ab`**. This is the completed
+V22.0.5/V24.0.3 compatibility development baseline for further work on `main`.
+The final independent external follow-up reviewed documentation closure
+`9897c91a36631c3066ad93c4d3a29b86232b8d0e` and concluded
+**APPROVED FOR MERGE – ALL CONDITIONS FULFILLED**, as reported by the owner.
+**OD-PR6-01 and OD-PR6-02 are fulfilled and closed** for this bounded development
+merge. No confirmed blocking implementation finding remained. This external
+review is not represented as a formal GitHub approval.
+
+Post-merge [CI run 43660371617](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/43660371617)
+passed all three jobs on that merge: **PHP 7.4/V22.0.5**, **PHP 8.2/V22.0.5** and
+**PHP 8.2/V24.0.3**. These are synthetic CI checks, not repeated real integration.
+
+Historical real V24 runtime reference remains
+`5a31d4c8d9cfe6733f59efaef430799df60e1902`, distinct from the merge and this later
+documentation-only update. The private `PR6-C3-Review-Evidence-v2.zip`, recovered
+C3.1 chat plan and their provenance remain separately referenced below, not
+published or modified. The **71 requirements, 53 bounded V24 partial-evidence
+rows and 18 dedicated live scenarios NOT EXECUTED** remain unchanged. Accepted
+plan deviations, missing originals, residual risks and all profile limits remain.
+
+The development compatibility work is complete only for the documented exact
+V22.0.5/V24.0.3 profiles. Version **0.1.0-dev**, temporary module ID **584620**,
+release gates and **production/public release NOT QUALIFIED / NOT APPROVED**
+remain unchanged. No tag, release, new business test or general version approval
+is implied by this merge or its documentation closure.
+
 ## PR #6 final external review and owner decisions — 2026-11-15
+
+**Historical pre-merge decision record.** The pending-merge/review-transition
+statements in this section describe that intermediate stage and are superseded
+by the post-merge closure above; original decisions and evidence limits remain.
 
 The owner reports the independent external verdict **APPROVED FOR MERGE WITH
 EXPLICIT CONDITIONS** on `eb87e181e0c83fc3e9b8a24139c441e8e62528e3`.

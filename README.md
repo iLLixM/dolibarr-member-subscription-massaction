@@ -3,10 +3,13 @@
 **Current status — 2026-11-15: unreleased development module for the exact
 Dolibarr V22.0.5 and V24.0.3 targets. Historical bounded V22 G2/G3/G4 approvals
 remain valid. The real V24.0.3 C3 campaign is complete for its tested PHP 8.2,
-entity-1 profile, including owner-confirmed mail receipt. The owner reports final
-external review APPROVED FOR MERGE WITH EXPLICIT CONDITIONS
-on `eb87e181`; OD-PR6-01/02 are ACCEPTED for a bounded development merge only.
-The actual merge decision remains outstanding. Other versions/profiles are not generally qualified;
+entity-1 profile, including owner-confirmed mail receipt. PR #6 merged on
+2026-11-15 as `96f870e789eb26b6eb8a6b8eeb0c79812018b0ab`, the completed
+V22.0.5/V24.0.3 compatibility development baseline. Final independent review:
+APPROVED FOR MERGE – ALL CONDITIONS FULFILLED; OD-PR6-01/02 fulfilled.
+Post-merge CI passed PHP 7.4/V22.0.5, PHP 8.2/V22.0.5 and PHP 8.2/V24.0.3
+([run 43660371617](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/43660371617)).
+Other versions/profiles are not generally qualified;
 production and public module release remain NOT QUALIFIED / NOT APPROVED.**
 
 See [Phase 4 implementation validation](docs/phase4-implementation-validation.md)
@@ -39,7 +42,7 @@ bank entries. Invoice evidence is limited to the historical V22.0.5 profile and 
 tested V24.0.3 C3 profile: standard EUR invoices, quantity 1, VAT 0, no configured
 product, Mercure numbering and Sponge PDF. See the
 [C3 evidence and limits](docs/phase4-implementation-validation.md#c3-v2403-integration-campaign-2026-11-14);
-the external conditional review and owner decisions below do not broaden the tested profile.
+the completed development merge and fulfilled owner decisions do not broaden the tested profile.
 
 ## Origin and scope
 
@@ -66,8 +69,8 @@ independent follow-up (owner-reported). The later real C3 campaign covers bookin
 invoice/customer creation, zero fees, R16, controlled rollback/COMMIT acknowledgement
 loss, PDF/ECM, authenticated replay, Chromium/Firefox and one real SMTP delivery.
 V23, other V24 patches, V25 and additional profiles have no blanket qualification.
-Production remains NOT QUALIFIED. External conditional review is complete; owner
-acceptance permits consideration of a development merge, not release or distribution.
+Production remains NOT QUALIFIED. The development merge is complete; its approval
+does not authorize release or public distribution.
 
 Module ID **584620 is temporary**, checked against local descriptors and the
 [official ID rules](https://wiki.dolibarr.org/index.php?title=List_of_modules_id&oldid=68837).

@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Merge PR #6 on 2026-11-15 as `96f870e789eb26b6eb8a6b8eeb0c79812018b0ab`,
+  completing bounded V22.0.5/V24.0.3 compatibility development. Final independent
+  review: APPROVED FOR MERGE – ALL CONDITIONS FULFILLED; OD-PR6-01/02 fulfilled.
+  Post-merge CI run 43660371617 passed PHP 7.4/V22.0.5, PHP 8.2/V22.0.5 and
+  PHP 8.2/V24.0.3. Retain `0.1.0-dev`, temporary ID `584620`, unexecuted scenarios
+  and residual risks; production/public release remain NOT QUALIFIED / NOT APPROVED.
+
 - Align exact V22.0.5/V24.0.3 R16 policies with each Core end-date rule (C1-01).
 - Reject unsupported V24 membership VAT settings during invoice preflight (C1-02 / PR6-01).
 - Use version-correct PDF defaults only when configuration is empty (C1-03).
@@ -10,7 +17,8 @@
 - Complete the bounded V24.0.3 C3 integration campaign: Core booking/invoices,
   customer creation, zero fee, R16, controlled transaction faults, PDF/ECM,
   authenticated replay, Chromium/Firefox and one owner-confirmed SMTP delivery.
-  Final independent V24 review remains pending; no production/public release approval.
+  Final independent review and development merge are complete as recorded above;
+  no production/public release approval.
 
 - Add optional, transactionally linked and validated member-subscription invoices.
 - Add explicit missing-third-party creation consent and deterministic invoice preflight.

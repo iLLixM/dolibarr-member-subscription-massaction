@@ -120,7 +120,21 @@ These IDs are integration evidence, not additional unit-runner assertion counts:
 
 Append these references only to the actually observed requirement aspect. Real
 positive cases do not establish their unexecuted negative variants. Existing V22,
-synthetic, owner and risk evidence stays separate. C3.1 planning has no separately
-located raw plan artifact; no inferred runtime PASS is assigned to it. C3 completes
-the stated real campaign; final independent V24 acceptance, other profiles and
-production/public release remain open.
+synthetic, owner and risk evidence stays separate. G01 planning was recovered as a
+contemporaneous owner-supplied chat attachment (2026-11-13), not a standalone
+original local-development file or runtime PASS. Exact original transmission time
+is unestablished; the private V2 package retains the 17-case plan/evidence comparison.
+
+PR #6 merged on **2026-11-15** as
+`96f870e789eb26b6eb8a6b8eeb0c79812018b0ab`, completing bounded compatibility
+development. Final external review: **APPROVED FOR MERGE – ALL CONDITIONS
+FULFILLED**; **OD-PR6-01/02 fulfilled**. Post-merge CI
+[run 43660371617](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/43660371617)
+passed PHP 7.4/V22.0.5, PHP 8.2/V22.0.5 and PHP 8.2/V24.0.3.
+The real runtime reference remains `5a31d4c8d9cfe6733f59efaef430799df60e1902`;
+the merge is a development baseline, not a replacement execution reference.
+All 71 requirement mappings (53 bounded V24 partial-evidence rows and 18 dedicated
+live scenarios NOT EXECUTED) and accepted evidence/risk limits are unchanged.
+Version `0.1.0-dev`, temporary ID `584620` and exact profile limits remain;
+production/public release remain **NOT QUALIFIED / NOT APPROVED**. Other profiles
+are not generally qualified. No new test execution or expanded PASS is implied.
