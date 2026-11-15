@@ -16,6 +16,7 @@ set_error_handler(static function ($severity, $message, $file, $line) {
 });
 define('DOL_DOCUMENT_ROOT', __DIR__.'/../fixtures');
 define('DOL_URL_ROOT', '/erp');
+define('DOL_VERSION', '99.0.0');
 require_once __DIR__.'/../../lib/membersubscriptionmassaction.lib.php';
 require_once __DIR__.'/../../class/actions_membersubscriptionmassaction.class.php';
 require_once __DIR__.'/../../core/modules/modMemberSubscriptionMassaction.class.php';
@@ -140,7 +141,7 @@ $descriptor = new modMemberSubscriptionMassaction(null);
 check($descriptor->name === 'MemberSubscriptionMassaction', 'descriptor name');
 check($descriptor->numero === 584620, 'temporary development ID');
 check($descriptor->module_parts['hooks'] === array('memberlist'), 'narrow hook registration');
-check($descriptor->need_dolibarr_version === array(22, 0, 5), 'primary version');
+check($descriptor->need_dolibarr_version === array(21, 0, 0), 'primary version');
 check($descriptor->depends === array('modAdherent'), 'member dependency');
 check($descriptor->rights_class === 'membersubscriptionmassaction', 'rights namespace');
 check($descriptor->init() === 1 && $descriptor->remove() === 1, 'no custom lifecycle SQL');
@@ -162,19 +163,49 @@ foreach (array('en_US', 'de_DE') as $locale) {
 }
 check($translations[0] === $translations[1], 'language key parity');
 require_once __DIR__.'/../../class/corecompatibility.class.php';
-check(MsmCoreCompatibility::profile('22.0.5') === array('latest_end' => false, 'pdf' => 'crabe'), 'exact V22 compatibility policy');
-check(MsmCoreCompatibility::profile('24.0.3') === array('latest_end' => true, 'pdf' => 'sponge'), 'exact V24 compatibility policy');
-foreach (array('', '22.0.4', '24.0.0', '24.0.1', '24.0.2', '24.0.4', '25.0.0-alpha') as $version) {
-	rejects(static function () use ($version) { MsmCoreCompatibility::profile($version); }, 'unreviewed Core version rejected '.$version);
+foreach (array('21.0.0', '22.0.0', '22.0.5', '23.0.4', '24.0.0', '24.0.1', '24.0.2', '24.0.3', '24.0.99', '25.0.0-alpha', '99.0.0') as $version) {
+	check(is_array(MsmCoreCompatibility::profile($version)), 'open admission '.$version);
 }
-// Unknown patch semantics must stop before database or business access.
-define('DOL_VERSION', '24.0.2');
+check(MsmCoreCompatibility::profile('24.0.1')['latest_end'] === false, 'pre-boundary Core expectation');
+check(MsmCoreCompatibility::profile('24.0.2')['latest_end'] === true, 'R16 boundary');
+check(MsmCoreCompatibility::profile('99.0.0')['latest_end'] === null, 'future uses observer, not guessed semantics');
+foreach (array('', '20.9.9', 'garbage') as $version) {
+	rejects(static function () use ($version) { MsmCoreCompatibility::profile($version); }, 'invalid/below-minimum version '.$version);
+}
+$modelsRoot = sys_get_temp_dir().'/msm-model-capability-'.bin2hex(random_bytes(8));
+mkdir($modelsRoot.'/core/modules/facture/doc', 0700, true);
+try {
+	rejects(static function () use ($modelsRoot) { MsmCoreCompatibility::defaultPdf($modelsRoot); }, 'missing Core PDF models rejected');
+	file_put_contents($modelsRoot.'/core/modules/facture/doc/pdf_sponge.modules.php', '<?php');
+	check(MsmCoreCompatibility::defaultPdf($modelsRoot) === 'sponge', 'available sponge fallback without version restriction');
+	file_put_contents($modelsRoot.'/core/modules/facture/doc/pdf_crabe.modules.php', '<?php');
+	check(MsmCoreCompatibility::defaultPdf($modelsRoot) === 'crabe', 'available historical fallback preserved');
+} finally {
+	foreach (array('crabe', 'sponge') as $model) { $path = $modelsRoot.'/core/modules/facture/doc/pdf_'.$model.'.modules.php'; if (is_file($path)) { unlink($path); } }
+	foreach (array('/core/modules/facture/doc', '/core/modules/facture', '/core/modules', '/core', '') as $dir) { rmdir($modelsRoot.$dir); }
+}
+class UnsupportedCoreContract { private function hidden() {} public function required($a, $b) {} }
+foreach (array(array('missing' => 0), array('hidden' => 0), array('required' => 1)) as $calls) {
+	rejects(static function () use ($calls) { MsmCoreCompatibility::methods(new UnsupportedCoreContract(), $calls); }, 'objective callable mismatch');
+}
+class FinalEndContract { final public function update_end_date($user) {} }
+class TypedEndContract { public function update_end_date($user): int { return 1; } }
+foreach (array('FinalEndContract', 'TypedEndContract') as $class) {
+	rejects(static function () use ($class) { MsmCoreCompatibility::extension($class, 'update_end_date', 1); }, 'incompatible observer rejected before declaration');
+}
+$probe = 'define("DOL_DOCUMENT_ROOT", '.var_export(DOL_DOCUMENT_ROOT, true).');'
+	.'class CommonHookActions { final public function doMassActions($parameters, &$object, &$action, $hookmanager = null) {} }'
+	.'require '.var_export(realpath(__DIR__.'/../../class/actions_membersubscriptionmassaction.class.php'), true).';'
+	.'$hook = new ActionsMemberSubscriptionMassaction(null); $o = null; $a = "";'
+	.'exit($hook->doMassActions(array("massaction" => "memberSubscriptionMassactionStart"), $o, $a) === -1 ? 0 : 1);';
+exec(escapeshellarg(PHP_BINARY).' -r '.escapeshellarg($probe), $probeOutput, $probeExit);
+check($probeExit === 0, 'incompatible Core hook controlled without inheritance fatal');
 require_once __DIR__.'/../../class/booking.class.php';
 $untouched = new class {
 	public $transaction_opened = 0; public $calls = 0;
 	public function query($sql) { $this->calls++; throw new LogicException('Unexpected database access'); }
 };
 $result = (new MsmBookingService($untouched))->book(1, array(), array('invoice' => false), $user, false);
-check($result['status'] === 'failed' && $result['message'] === 'MSMCoreVersionUnsupported', 'unknown Core booking rejected');
-check($untouched->calls === 0, 'unknown Core performs no database access');
+check($result['status'] === 'failed' && $result['message'] === 'MSMCoreContractUnsupported', 'future Core missing DB contract rejected');
+check($untouched->calls === 0, 'capability check performs no database access');
 echo $passed." assertions passed (synthetic contracts; no Dolibarr runtime).\n";

@@ -34,7 +34,7 @@ class BookingDatabase extends PreviewDatabase
 }
 class BookingMemberDouble extends Adherent
 {
-	public $msmEndUpdate = 1; public $mode = ''; public $arguments;
+	public $msmEndUpdate = 1; public $msmCoreEnd; public $mode = ''; public $arguments;
 	public function subscription($date, $amount, $accountid = 0, $operation = '', $label = '', $num_chq = '', $emetteur_nom = '', $emetteur_banque = '', $datesubend = 0, $fk_type = null, $ref_ext = '')
 	{
 		$this->arguments = func_get_args(); $this->db->events[] = 'subscription';
@@ -44,6 +44,8 @@ class BookingMemberDouble extends Adherent
 		if ($this->mode === 'r16') { $this->msmEndUpdate = -1; }
 		if ($this->mode === 'wrong_amount') { $this->db->saved->subscription++; }
 		if ($this->mode === 'historical') { $this->db->datefin = '2030-12-31 00:00:00'; }
+		$this->msmCoreEnd = $this->db->datefin; $this->datefin = strtotime($this->msmCoreEnd);
+		if ($this->mode === 'wrong_observed') { $this->msmCoreEnd = '2041-01-01 00:00:00'; }
 		if ($this->mode === 'depth') { $this->db->transaction_opened = 0; $this->db->active = false; }
 		if ($this->mode === 'fail') { return -1; }
 		return 9;
@@ -71,7 +73,7 @@ function bookingFixture()
 }
 $options = array('invoice' => false, 'autocreate' => false, 'sendmail' => false, 'description' => 'Synthetic fee');
 $user = new PreviewUser(); $conf->modules['member'] = 1; $conf->global = new stdClass();
-foreach (array('', 'historical', 'r16', 'wrong_amount', 'depth', 'fail') as $mode) {
+foreach (array('', 'historical', 'r16', 'wrong_amount', 'wrong_observed', 'depth', 'fail') as $mode) {
 	list($db, $service, $row) = bookingFixture(); $service->object->mode = $mode;
 	$result = $service->book(1, $row, $options, $user, false);
 	verify($result['status'] === (in_array($mode, array('', 'historical'), true) ? 'success' : ($mode === 'depth' ? 'unknown' : 'failed')), 'booking mode '.$mode);
@@ -240,10 +242,12 @@ class CoreEndMemberDouble extends BookingMemberDouble
 		$id = parent::subscription($date, $amount, $accountid, $operation, $label, $num_chq, $emetteur_nom, $emetteur_banque, $datesubend, $fk_type, $ref_ext);
 		$observer = new MsmBookingMember($this->db); $observer->id = $this->id;
 		$this->msmEndUpdate = $observer->update_end_date($GLOBALS['user']);
+		$this->msmCoreEnd = $observer->msmCoreEnd; $this->datefin = $observer->datefin;
 		if ($this->corruptEnd) { $this->db->datefin = '2040-01-01 00:00:00'; }
 		return $id;
 	}
 }
+$coreUsesMaxEnd = strpos(file_get_contents(DOL_DOCUMENT_ROOT.'/adherents/class/adherent.class.php'), '$dateendmember') !== false;
 foreach (array('older-longer', 'newer-longer', 'equal-start-long-first', 'equal-start-short-first', 'wrong-stored-end') as $case) {
 	list($unused, $service, $row) = bookingFixture();
 	$db = new CoreEndDatabase(); $service = new BookingServiceDouble($db);
@@ -252,13 +256,13 @@ foreach (array('older-longer', 'newer-longer', 'equal-start-long-first', 'equal-
 	$row['start'] = stamp('2030-06-01'); $row['end'] = stamp('2030-06-30');
 	$row['overlaps'] = array(array('id' => 2));
 	$db->prior = array(array('dateadh' => '2030-01-01 00:00:00', 'datef' => '2030-12-31 00:00:00'));
-	$expectedEnd = DOL_VERSION === '24.0.3' ? '2030-12-31' : '2030-06-30';
+	$expectedEnd = $coreUsesMaxEnd ? '2030-12-31' : '2030-06-30';
 	if ($case === 'newer-longer') { $row['end'] = stamp('2031-05-31'); $expectedEnd = '2031-05-31'; }
 	if (strpos($case, 'equal-start') === 0) {
 		$db->prior[0]['dateadh'] = '2030-06-01 00:00:00';
 		$db->prior[] = array('dateadh' => '2030-06-01 00:00:00', 'datef' => '2030-08-31 00:00:00');
 		if ($case === 'equal-start-short-first') { $db->prior = array_reverse($db->prior); }
-		$expectedEnd = DOL_VERSION === '24.0.3' || $case === 'equal-start-long-first' ? '2030-12-31' : '2030-08-31';
+		$expectedEnd = $coreUsesMaxEnd || $case === 'equal-start-long-first' ? '2030-12-31' : '2030-08-31';
 	}
 	$service->reader = new BookingPreviewDouble(); $service->reader->row = $row;
 	$outcome = $service->book(1, $row, $options, $user, true);
