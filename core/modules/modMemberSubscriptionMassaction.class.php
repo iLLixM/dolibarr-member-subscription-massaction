@@ -33,7 +33,7 @@ class modMemberSubscriptionMassaction extends DolibarrModules
 		$this->conflictwith = array();
 		$this->langfiles = array('membersubscriptionmassaction@membersubscriptionmassaction');
 		$this->phpmin = array(7, 4);
-		$this->need_dolibarr_version = array(22, 0, 5);
+		$this->need_dolibarr_version = array(21, 0, 0);
 		$this->dirs = array();
 		$this->config_page_url = array();
 		$this->const = array();

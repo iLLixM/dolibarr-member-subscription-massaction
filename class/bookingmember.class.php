@@ -2,14 +2,21 @@
 /* Copyright (C) 2026 iLLixM <iLLixM@proton.me>
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
-require_once DOL_DOCUMENT_ROOT.'/adherents/class/adherent.class.php';
+require_once __DIR__.'/corecompatibility.class.php';
+MsmCoreCompatibility::load('adherents/class/adherent.class.php', 'Adherent', array('update_end_date' => 1));
+MsmCoreCompatibility::extension('Adherent', 'update_end_date', 1);
 /** Observe R16 without changing the core API or bypassing its triggers. */
+if (!class_exists('MsmBookingMember', false)) {
 class MsmBookingMember extends Adherent
 {
 	public $msmEndUpdate = null;
+	public $msmCoreEnd = null;
 	public function update_end_date($user)
 	{
+		$this->msmEndUpdate = null; $this->msmCoreEnd = null;
 		$this->msmEndUpdate = parent::update_end_date($user);
+		if ($this->msmEndUpdate > 0 && !empty($this->datefin)) { $this->msmCoreEnd = $this->db->idate($this->datefin); }
 		return $this->msmEndUpdate;
 	}
+}
 }

@@ -2,18 +2,78 @@
 /* Copyright (C) 2026 iLLixM <iLLixM@proton.me>
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
-/** Source-verified policies, not runtime qualification of an installation. */
+/** Admission and capability contracts are not runtime qualification. */
 class MsmCoreCompatibility
 {
 	public static function profile($version)
 	{
-		// Exact pins: the member-end change is not shared by every V24 patch.
-		if ($version === '22.0.5') { return array('latest_end' => false, 'pdf' => 'crabe'); }
-		if ($version === '24.0.3') { return array('latest_end' => true, 'pdf' => 'sponge'); }
-		throw new RuntimeException('MSMCoreVersionUnsupported');
+		if (!is_string($version) || !preg_match('/^[0-9]+\.[0-9]+\.[0-9]+(?:[-+][a-zA-Z0-9.-]+)?$/D', $version)
+			|| version_compare($version, '21.0.0', '<')) { throw new RuntimeException('MSMCoreVersionUnsupported'); }
+		// Source-derived expectations only. Outside the analyzed interval use the
+		// actual Core observer; this interval is never an admission allowlist.
+		$known = version_compare($version, '22.0.0', '>=') && version_compare($version, '24.0.3', '<=');
+		return array('latest_end' => $known ? version_compare($version, '24.0.2', '>=') : null);
 	}
 	public static function current()
 	{
 		return self::profile(defined('DOL_VERSION') ? DOL_VERSION : '');
+	}
+	public static function defaultPdf($root = null)
+	{
+		$root = $root ?? DOL_DOCUMENT_ROOT;
+		foreach (array('crabe', 'sponge') as $model) {
+			if (is_readable($root.'/core/modules/facture/doc/pdf_'.$model.'.modules.php')) { return $model; }
+		}
+		throw new RuntimeException('MSMCoreContractUnsupported');
+	}
+	/** Check call shape without invoking a Core business operation. */
+	public static function methods($object, array $calls)
+	{
+		foreach ($calls as $name => $arguments) {
+			if (!method_exists($object, $name)) { throw new RuntimeException('MSMCoreContractUnsupported'); }
+			$m = new ReflectionMethod($object, $name);
+			if (!$m->isPublic() || $m->isStatic() || $m->isAbstract() || $m->getNumberOfRequiredParameters() > $arguments
+				|| (!$m->isVariadic() && $m->getNumberOfParameters() < $arguments)) { throw new RuntimeException('MSMCoreContractUnsupported'); }
+		}
+	}
+	public static function load($file, $class, array $calls)
+	{
+		if (!class_exists($class, false)) {
+			if (!is_readable(DOL_DOCUMENT_ROOT.'/'.$file)) { throw new RuntimeException('MSMCoreContractUnsupported'); }
+			require_once DOL_DOCUMENT_ROOT.'/'.$file;
+		}
+		if (!class_exists($class, false)) { throw new RuntimeException('MSMCoreContractUnsupported'); }
+		self::methods($class, $calls);
+	}
+	/** Reject incompatible inheritance before PHP declares the extension class. */
+	public static function extension($class, $method, $arguments, array $references = array())
+	{
+		$c = new ReflectionClass($class);
+		if ($c->isFinal()) { throw new RuntimeException('MSMCoreContractUnsupported'); }
+		if (!$c->hasMethod($method)) { return; }
+		$m = $c->getMethod($method);
+		if ($m->isFinal() || $m->isStatic() || $m->hasReturnType() || $m->returnsReference()
+			|| $m->getNumberOfRequiredParameters() > $arguments || $m->getNumberOfParameters() > $arguments || $m->isVariadic()) {
+			throw new RuntimeException('MSMCoreContractUnsupported');
+		}
+		foreach ($m->getParameters() as $i => $parameter) {
+			if ($parameter->isPassedByReference() !== in_array($i, $references, true)) { throw new RuntimeException('MSMCoreContractUnsupported'); }
+		}
+	}
+	public static function booking($db)
+	{
+		self::current();
+		self::methods($db, array('begin' => 0, 'commit' => 0, 'rollback' => 0, 'query' => 1, 'prefix' => 0,
+			'escape' => 1, 'idate' => 1, 'plimit' => 1, 'fetch_object' => 1, 'free' => 1));
+		self::load('adherents/class/adherent.class.php', 'Adherent', array('subscription' => 10, 'fetch' => 6, 'update_end_date' => 1));
+		self::extension('Adherent', 'update_end_date', 1);
+	}
+	public static function invoice()
+	{
+		self::current();
+		self::load('compta/facture/class/facture.class.php', 'Facture', array('create' => 1, 'addline' => 16, 'validate' => 1, 'fetch' => 1, 'generateDocument' => 2));
+		self::load('societe/class/societe.class.php', 'Societe', array('create_from_member' => 3, 'fetch' => 1));
+		self::load('compta/facture/class/paymentterm.class.php', 'PaymentTerm', array('getDefaultId' => 0, 'fetch' => 1));
+		if (!function_exists('get_default_tva')) { throw new RuntimeException('MSMCoreContractUnsupported'); }
 	}
 }

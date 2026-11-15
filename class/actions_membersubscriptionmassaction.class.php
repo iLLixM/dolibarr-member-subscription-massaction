@@ -3,10 +3,17 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-require_once DOL_DOCUMENT_ROOT.'/core/class/commonhookactions.class.php';
+require_once __DIR__.'/corecompatibility.class.php';
+$msmHookCompatible = true;
+try {
+	MsmCoreCompatibility::load('core/class/commonhookactions.class.php', 'CommonHookActions', array());
+	MsmCoreCompatibility::extension('CommonHookActions', 'addMoreMassActions', 4, array(1, 2));
+	MsmCoreCompatibility::extension('CommonHookActions', 'doMassActions', 4, array(1, 2));
+} catch (Throwable $e) { $msmHookCompatible = false; }
 require_once __DIR__.'/../lib/membersubscriptionmassaction.lib.php';
 
 /** Member-list entry point for the technical selection assistant. */
+if ($msmHookCompatible) {
 class ActionsMemberSubscriptionMassaction extends CommonHookActions
 {
 	const ACTION = 'memberSubscriptionMassactionStart';
@@ -74,3 +81,20 @@ class ActionsMemberSubscriptionMassaction extends CommonHookActions
 		exit;
 	}
 }
+}
+else {
+	/** Disabled adapter: no inheritance or business effects on incompatible Cores. */
+	class ActionsMemberSubscriptionMassaction
+	{
+		public $resprints = '';
+		public $error = 'MSMCoreContractUnsupported';
+		public $errors = array('MSMCoreContractUnsupported');
+		public function __construct($db) {}
+		public function addMoreMassActions($parameters, &$object, &$action, $hookmanager = null) { return 0; }
+		public function doMassActions($parameters, &$object, &$action, $hookmanager = null)
+		{
+			return ($parameters['massaction'] ?? '') === 'memberSubscriptionMassactionStart' ? -1 : 0;
+		}
+	}
+}
+unset($msmHookCompatible);

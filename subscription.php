@@ -28,6 +28,8 @@ if (!$loaded) {
 header('Cache-Control: no-store');
 require_once __DIR__.'/lib/membersubscriptionmassaction.lib.php';
 $langs->load('membersubscriptionmassaction@membersubscriptionmassaction');
+try { MsmCoreCompatibility::booking($db); }
+catch (Throwable $e) { accessforbidden($langs->trans('MSMCoreContractUnsupported')); }
 if (!msmCanUse($user)) {
 	accessforbidden();
 }
