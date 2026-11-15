@@ -16,6 +16,14 @@
 
 ## Architecture and compatibility
 
+- P2 admission is >=21.0.0 with no upper bound or exact patch/SHA allowlist.
+  P1 source-analyzed 15 V22/V23/V24 tags; V21/future versions remain unqualified.
+  Keep capability checks, actual Core R16 observation and independent known-contract
+  checks (24.0.2 boundary). Qualification is evidence, not admission.
+- D-P1-01 accepts only empty/unset, `0` and `defaultforfoundationcountry` VAT
+  configuration on every Core; no V22 silent-zero fallback for other values.
+  Preserve subscription-only behavior. P3 qualification remains separate.
+
 - Dolibarr V22.0.5 is the primary implementation reference with historical bounded acceptance.
 - V24.0.3 completed the real C3 campaign in the exact profile documented in
   `docs/phase4-implementation-validation.md`; PR #6 merged on 2026-11-15 as

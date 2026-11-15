@@ -138,3 +138,26 @@ live scenarios NOT EXECUTED) and accepted evidence/risk limits are unchanged.
 Version `0.1.0-dev`, temporary ID `584620` and exact profile limits remain;
 production/public release remain **NOT QUALIFIED / NOT APPROVED**. Other profiles
 are not generally qualified. No new test execution or expanded PASS is implied.
+
+## P2 cross-version evidence (2026-11-15; P3 pending)
+
+Admission >=21.0.0 is independent of qualification. P1 source analysis covers 15 tags;
+P2 local PHP 8.2 runs six existing runners against every target. The workflow includes
+21 pinned pairs (15 with 8.2, six V22 additionally 7.4); CI results require their actual
+commit/job evidence. None are real integration tests.
+
+New literal assertions in existing runners cover: `open admission`, `R16 boundary`,
+`future uses observer, not guessed semantics`, `objective callable mismatch`,
+`incompatible observer rejected before declaration`, `incompatible Core hook controlled
+without inheritance fatal`, PDF availability/missing-model checks (`run.php`);
+`wrong_observed` and existing actual Core R16 equality/overlap/failure fixtures
+(`booking.php`); uniform rejected VAT literals, actual Core VAT hook and
+`actual Core price hook override is observable` (`invoiceprofile.php`); stored VAT/
+price mutation rejection and subscription-only invalid-VAT independence (`invoice.php`).
+A separate 99.0.0 label subprocess reuses actual V24 Core methods and existing booking
+assertions; it is future-admission evidence, not proof of an actual future Core.
+
+No requirement matrix fields changed: 71 IDs, historical evidence and 18 dedicated live
+scenarios remain. Existing real V22/V24 evidence is not retroactively assigned to
+other tags or the P2 implementation. See the P2 section in the central validation
+for limitations; production and public release remain unqualified.

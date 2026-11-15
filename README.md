@@ -1,6 +1,28 @@
 # Member Subscription Massaction for Dolibarr
 
-**Current status — 2026-11-15: unreleased development module for the exact
+**P2 development status — 2026-11-15:** admission now starts at Dolibarr 21.0.0,
+with no upper version or exact-patch allowlist. V21 and future releases remain
+unqualified. P1 analyzed all 15 tags V22.0.0–22.0.5, V23.0.0–23.0.4 and
+V24.0.0–24.0.3. Local PHP 8.2 synthetic runners passed against all 15 pinned
+sources; the configured CI matrix has 21 PHP/Core combinations (PHP 8.2 on all
+15, PHP 7.4 additionally on all six V22 tags). P3 qualification/review remains a
+separate task; admission and source analysis are not real integration evidence.
+
+R16 is written only by Core and checked through an observed Core end value plus
+independent known-contract postconditions (boundary V24.0.2). Unsupported callable,
+inheritance, transaction or configuration contracts are rejected by capability,
+not an unknown version number. PDF fallback chooses an available `crabe`, then
+`sponge`; an explicitly invalid configured model is never silently replaced.
+
+**Invoice configuration change:** all versions accept only unset/empty, `0` and
+`defaultforfoundationcountry` for `ADHERENT_VAT_FOR_SUBSCRIPTIONS`. The latter
+continues to call the actual Core VAT function, including its V23+ hooks. Other
+values now fail invoice preflight even on V22; its former silent VAT-0 fallback
+is intentionally removed. Subscription-only booking is unaffected. Existing
+invoice/tax/profile restrictions, version `0.1.0-dev`, temporary ID `584620`,
+production/public-release restrictions and historical evidence remain unchanged.
+
+**Historical PR #6 baseline — 2026-11-15: unreleased development module for the exact
 Dolibarr V22.0.5 and V24.0.3 targets. Historical bounded V22 G2/G3/G4 approvals
 remain valid. The real V24.0.3 C3 campaign is complete for its tested PHP 8.2,
 entity-1 profile, including owner-confirmed mail receipt. PR #6 merged on
@@ -57,12 +79,13 @@ Code is GPL-3.0-or-later; see COPYING. No KSeF or FacturX code is included.
 
 Dolibarr **22.0.5** remains the primary implementation reference; **24.0.3** is the
 separately tested compatibility target. Local real integration used PHP **8.2**.
-PHP 7.4 remains the syntax minimum; synthetic CI runs PHP 7.4/V22.0.5,
-PHP 8.2/V22.0.5 and PHP 8.2/V24.0.3. This is not a general runtime/PHP matrix claim.
-C2.1 adds a common codebase with exact policies for
+PHP 7.4 remains the module syntax minimum. The P2 CI matrix covers the explicit
+21 PHP/Core pairs above; it is not a general runtime/PHP qualification claim.
+Historically, C2.1 introduced a common codebase with exact policies for
 V22.0.5 and V24.0.3: version-correct R16 and PDF fallbacks, explicit rejection of
 positive V24 membership VAT IDs for invoices, and both Core mail-hook account keys.
-Other versions fail closed at booking until their semantics are reviewed.
+P2 replaces that historical admission restriction with the capability/observer
+contract above; unknown version numbers alone no longer reject booking.
 [C2.1 and its follow-up](docs/phase4-implementation-validation.md#c21-compatibility-corrections-2026-11-13)
 retain the original synthetic evidence; PR6-01–PR6-03 were subsequently closed by
 independent follow-up (owner-reported). The later real C3 campaign covers booking,

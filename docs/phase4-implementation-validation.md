@@ -1,5 +1,55 @@
 # Phase 4 implementation validation
 
+## P2 cross-version implementation — 2026-11-15 (P3 qualification pending)
+
+Baseline main `5b2ce06124cd2d839a0b0005f1edc582cccbb39b`; work is isolated on
+`feature/cross-version-compatibility`. Owner E1–E5 and D-P1-01/02/03 supersede the
+historical exact-patch admission policy for this change, not historical results.
+
+- **Admitted:** >=21.0.0, no upper bound/exact patch/SHA allowlist. Capability
+  failures are explicit; unsupported hook inheritance disables the adapter safely
+  before class declaration. V21 and future Cores are not thereby qualified.
+- **Source analyzed:** all 15official V22.0.0–22.0.5, V23.0.0–23.0.4,
+  V24.0.0–24.0.3 pins from private P1 reports. Independent R16 SQL checks remain
+  through the analyzed interval, with the 24.0.2 switch; all successful operations
+  also require actual parent update success and observer/object/stored-end equality.
+  Beyond analyzed versions, only the actual Core observation/invariants are used;
+  unknown numbers do not cause rejection or imply verified future semantics.
+- **Locally synthetic tested:** PHP 8.2 against all 15pinned Core sources, six existing
+  runners per target (90 runner invocations, overlapping included assertions are
+  not summed). Actual Core calendar/update_end_date/VAT/price functions execute
+  with inert in-memory adapters; invoice/PDF/mail services use existing isolated
+  doubles. No real DB/config/bootstrap, PDF generation or SMTP was executed.
+  `run.php`:115 contracts/language parity; Node loading:6 assertions; PHP lint and
+  whitespace passed. The future-label 99.0.0 booking subprocess on real V24 methods
+  passes and remains synthetic/unqualified. Typed/final inheritance failures,
+  missing methods/PDF files and changed stored invoice VAT/amount fail safely.
+- **CI configured:** 21 unique pinned pairs, PHP 8.2 on all 15 tags plus PHP 7.4 on
+  six V22 tags. Each actual GitHub result must be reported by commit/job; this
+  configuration statement is not a CI-pass claim. P3 independent evaluation is open.
+- **Real integration:** only the historical bounded V22.0.5/V24.0.3 campaigns below.
+  No P2 live tests. The 71 requirements, 53 partial V24 rows/18 dedicated live gaps and
+  private V2 artifacts remain unchanged; no blanket 15-version runtime PASS.
+
+Uniform VAT policy is the literal set empty/unset, `0`, `defaultforfoundationcountry`;
+actual Core determines the foundation-country rate. Unsupported values are rejected
+on V22 as well as V23/V24, intentionally removing prior silent-zero behavior.
+Subscription-only booking, existing strict invoice profile, transaction ownership,
+rollback/unknown-stop, CSRF/permission/entity/revision guards and post-COMMIT
+PDF/mail orchestration remain. Explicit PDF models are never replaced; empty
+configuration selects available crabe then sponge or fails on missing capability.
+
+Residual risks: unreviewed future contracts cannot be universally proven by
+reflection/observer checks; arbitrary third-party handlers, external writers,
+physical connection loss and general crash recovery remain outside qualification.
+P3 must evaluate all 21 CI combinations and decide from concrete failures whether
+any separately authorized P4 real boundary check is needed. No new live test is
+requested solely because a tag number differs. Module 0.1.0-dev/temporary ID 584620
+and production/public release **NOT QUALIFIED / NOT APPROVED** remain unchanged.
+
+The remaining document is the retained historical PR4/PR6 baseline. Its exact-target
+and tested-commit statements describe those campaigns and do not qualify P2.
+
 ## Current gate status — 2026-11-15
 
 | Gate | Current status / provenance | Scope / next step |
