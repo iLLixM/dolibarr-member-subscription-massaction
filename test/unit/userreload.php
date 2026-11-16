@@ -23,19 +23,25 @@ require __DIR__.'/preview.php';
 require_once __DIR__.'/../../class/booking.class.php';
 require_once __DIR__.'/../../class/invoicepdf.class.php';
 require_once __DIR__.'/../../class/mail.class.php';
+require_once __DIR__.'/../fixtures/database_state.php';
 $reloadBaseline = $passed;
 
 /** Owned-transaction double: only the preflight, lock and rollback statements of book(). */
 class ReloadDatabase extends PreviewDatabase
 {
+	use DatabaseStateModel;
+	public $active = false;
+	public function __construct() { $this->observationInit(); }
 	public $type = 'mysqli'; public $transaction_opened = 0; public $events = array();
 	public function escape($s) { return $s; }
-	public function begin() { $this->events[] = 'begin'; $this->transaction_opened++; return 1; }
-	public function commit() { $this->events[] = 'commit'; $this->transaction_opened--; return 1; }
-	public function rollback() { $this->events[] = 'rollback'; $this->transaction_opened = 0; return 1; }
+	public function begin() { $this->events[] = 'begin'; $this->transaction_opened++; $this->active = true; return 1; }
+	public function commit() { $this->events[] = 'commit'; $this->transaction_opened--; $this->active = $this->transaction_opened > 0; return 1; }
+	public function rollback() { $this->events[] = 'rollback'; $this->transaction_opened = 0; $this->active = false; return 1; }
 	public function query($sql)
 	{
 		$this->queries[] = $sql;
+		$observation = $this->observationQuery($sql);
+		if ($observation !== null) { return $observation; }
 		if ($sql === 'SELECT @@in_transaction AS active') { $row = (object) array('active' => (int) ($this->transaction_opened > 0)); }
 		elseif (strpos($sql, 'SELECT ENGINE AS engine') === 0) { $row = (object) array('engine' => 'InnoDB'); }
 		elseif (strpos($sql, 'FOR UPDATE') !== false) { $this->events[] = 'lock'; $row = (object) array('rowid' => 1, 'fk_adherent_type' => 1); }
@@ -81,6 +87,7 @@ User::$records = array(
 class ReloadBookingFlow extends MsmBookingService
 {
 	public $admitted = false;
+	public function __construct($db) { parent::__construct($db, new SyntheticDatabaseState($db)); }
 	public function reload($user) { return $this->currentUser($user); }
 	// Reached only after the reloaded permission check; stop here with a marker, before any write.
 	protected function member($id) { $this->admitted = true; throw new RuntimeException('MSMReloadAdmitted'); }

@@ -114,3 +114,4 @@ jobs:
           php test/unit/invoicepdf.php
           php test/unit/postcommit.php
           php test/unit/userreload.php
+          php test/unit/request.php
