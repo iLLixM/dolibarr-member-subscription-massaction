@@ -34,6 +34,11 @@ includes the existing preview runner once. Former OPT scenarios allowing invoice
 planning are retained as history; current invoice consent has explicit Phase 4 tests.
 Phase 4 references use `invoiceprofile:`, `invoice:`, `invoicepdf:`, `postcommit:` and
 `loading:` for the correspondingly named runners.
+`userreload:<label>` references test/unit/userreload.php. It runs the unmodified
+current-user reload helpers of booking, PDF and mail against a synthetic `User`
+double (inactive, missing and failed fetch, forced rights reload, denied rights)
+and checks the pinned Core `User` call shape in a subprocess. It is not a real
+user, permission or database integration.
 The Phase 4 review-correction references intentionally use literal labels for the
 critical description-encoding, permission, PDF/hook ordering, symlink-directory,
 `ecm_files` and confirmed-profile rendering cases. A generic runner prefix alone is
