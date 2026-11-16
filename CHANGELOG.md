@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Reload the current user with `User::loadRights()` and check `User::$status`
+  instead of the deprecated `getrights()`/`$statut` (behavior unchanged). Add
+  `test/unit/userreload.php` for the reload and permission paths.
+
 - P2: admit Dolibarr >=21.0.0 without upper bound; separate objective Core
   capability checks from source expectations and qualification. Observe the actual
   Core R16 end while retaining independent known-contract checks at the 24.0.2 boundary.
