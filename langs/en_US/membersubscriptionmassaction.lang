@@ -122,3 +122,6 @@ MSMCoreVersionUnsupported=Dolibarr 21.0.0 or later and a valid version identifie
 MSMInvoiceVatIdUnsupported=The configured membership VAT setting is not supported for invoicing by this module.
 
 MSMCoreContractUnsupported=The required Dolibarr Core interface is unavailable or incompatible.
+MSMDatabaseUnsupported=Unsupported database family, driver or native connection.
+MSMDatabaseObservationUnavailable=The database transaction state cannot be safely verified. Check the documented database prerequisites; no automatic retry.
+MSMDatabaseBootstrapUnavailable=A real InnoDB member row is required to verify database readiness. No data was created.

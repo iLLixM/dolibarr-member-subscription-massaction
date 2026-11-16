@@ -11,19 +11,24 @@ require __DIR__.'/../../class/bookingmember.class.php';
 require __DIR__.'/../../class/mail.class.php';
 require __DIR__.'/../../lib/booking.lib.php';
 require __DIR__.'/../../lib/booking_renderer.lib.php';
+require_once __DIR__.'/../fixtures/database_state.php';
 $baseline = $passed;
 class BookingDatabase extends PreviewDatabase
 {
+	use DatabaseStateModel;
+	public function __construct() { $this->observationInit(); }
 	public $type = 'mysqli'; public $transaction_opened = 0; public $active = false;
 	public $saved = null; public $datefin = null; public $commitFail = false; public $rollbackFail = false;
 	public $events = array(); public $lockFail = false; public $engine = 'InnoDB';
 	public function escape($s) { return $s; }
-	public function begin() { $this->events[] = 'begin'; $this->transaction_opened++; $this->active = true; return 1; }
-	public function commit() { $this->events[] = 'commit'; if ($this->commitFail && $this->transaction_opened === 1) { return 0; } $this->transaction_opened--; if (!$this->transaction_opened) { $this->active = false; } return 1; }
-	public function rollback() { $this->events[] = 'rollback'; $this->transaction_opened = 0; $this->active = false; $this->saved = null; return !$this->rollbackFail; }
+	public function begin() { $this->events[] = 'begin'; if ($this->transaction_opened === 0) { $this->modelBegin(); } $this->transaction_opened++; $this->active = true; return 1; }
+	public function commit() { $this->events[] = 'commit'; if ($this->commitFail && $this->transaction_opened === 1) { return 0; } $this->transaction_opened--; if (!$this->transaction_opened) { $this->modelEnd('COMMITTED'); $this->active = false; } return 1; }
+	public function rollback() { $this->events[] = 'rollback'; $this->modelEnd('ROLLED BACK'); $this->transaction_opened = 0; $this->active = false; $this->saved = null; return !$this->rollbackFail; }
 	public function query($sql)
 	{
 		$this->queries[] = $sql;
+		$observed = $this->observationQuery($sql);
+		if ($observed !== null) { return $observed; }
 		if ($sql === 'SELECT @@in_transaction AS active') { $row = (object) array('active' => (int) $this->active); }
 		elseif (strpos($sql, 'SELECT ENGINE AS engine') === 0) { $row = (object) array('engine' => $this->engine); }
 		elseif (strpos($sql, 'FOR UPDATE') !== false) { if ($this->lockFail) { return false; } $this->events[] = 'lock'; $row = (object) array('rowid' => 1, 'fk_adherent_type' => 1); }
@@ -61,6 +66,8 @@ class BookingPreviewDouble
 class BookingServiceDouble extends MsmBookingService
 {
 	public $object; public $reader;
+	public function __construct($db, $state = null) { parent::__construct($db, $state ?? new SyntheticDatabaseState($db)); }
+	public function observer() { return $this->databaseState; }
 	protected function currentUser($user) { return $user; }
 	protected function member($id) { $this->object->id = $id; return $this->object; }
 	protected function preview($member) { return $this->reader; }
@@ -297,9 +304,10 @@ foreach (array('older-longer', 'newer-longer', 'equal-start-long-first', 'equal-
 // PR11-F01: latest-start Core can legitimately select a later NULL history row.
 // MAX-end Core ignores that NULL and keeps the booked positive end. The actual
 // pinned update_end_date() executes through MsmBookingMember in both cases.
+foreach (array('mariadb', 'mysql') as $family) {
 foreach (array('', 'empty-object', 'empty-storage', 'missing', 'failed', 'object', 'observed', 'storage') as $mode) {
 	list($unused, $service, $row) = bookingFixture();
-	$db = new CoreEndDatabase(); $service = new BookingServiceDouble($db);
+	$db = new CoreEndDatabase(); $db->family = $family; $service = new BookingServiceDouble($db);
 	$service->object = new CoreEndMemberDouble($db); $service->object->id = 1; $service->object->typeid = 1;
 	$service->object->observerMode = $mode;
 	$service->object->corruptEnd = $mode === 'storage';
@@ -313,6 +321,7 @@ foreach (array('', 'empty-object', 'empty-storage', 'missing', 'failed', 'object
 	} else {
 		verify($outcome['message'] === 'MSMConsistencyError' && $outcome['rollback'] === 'confirmed' && $db->saved === null, 'PR11 nullable inconsistency rollback '.$mode);
 	}
+}
 }
 // All-NULL histories exercise successful empty observations even on MAX-end Core.
 foreach (array(null, '') as $emptyEnd) {
@@ -480,6 +489,89 @@ foreach (array('preview', 'confirm') as $phase) {
 }
 $langs->tab_translate['MSMCustomerClassificationMayChange'] = $savedWarning;
 $langs = $renderLangs;
+// I1 synthetic MySQL paths reuse the existing business fixtures, not live SQL.
+class TransactionFaultMember extends BookingMemberDouble
+{
+	public $transactionFault = '';
+	public function subscription($date, $amount, $accountid = 0, $operation = '', $label = '', $num_chq = '', $emetteur_nom = '', $emetteur_banque = '', $datesubend = 0, $fk_type = null, $ref_ext = '')
+	{
+		$result = parent::subscription(...func_get_args());
+		if ($this->transactionFault === 'replace') { $this->db->commit(); $this->db->begin(); }
+		if ($this->transactionFault === 'lost') { $this->db->lost = true; }
+		if ($this->transactionFault === 'handle') { $this->db->native = clone $this->db->native; }
+		if ($this->transactionFault === 'stale') { $this->db->currentInstrumented = false; }
+		return $result;
+	}
+}
+class AbstractStateFixture extends SyntheticDatabaseState
+{
+	public $state = MsmDatabaseState::BUSY; public $calls = 0;
+	public function active()
+	{
+		if (++$this->calls <= 2) { return parent::active(); } // after BEGIN and before subscription
+		return array('state' => $this->state, 'fresh' => $this->state === MsmDatabaseState::FAILED, 'owned' => $this->state === MsmDatabaseState::FAILED);
+	}
+	public function rollbackContext() { return $this->active(); }
+}
+$mysqlOptions = array('invoice' => false, 'autocreate' => false, 'sendmail' => false, 'description' => 'Synthetic fee');
+$mysqlUser = new PreviewUser();
+foreach (array('', 'historical', 'r16', 'wrong_amount', 'wrong_observed', 'depth', 'fail') as $mode) {
+	list($db, $service, $row) = bookingFixture(); $db->family = 'mysql'; $service->object->mode = $mode;
+	$r = $service->book(1, $row, $mysqlOptions, $mysqlUser, false);
+	verify($r['status'] === (in_array($mode, array('', 'historical'), true) ? 'success' : ($mode === 'depth' ? 'unknown' : 'failed')), 'MySQL business mode '.$mode);
+	if ($r['status'] !== 'success' && $mode !== 'depth') { verify($r['rollback'] === 'confirmed' && $db->saved === null, 'MySQL confirmed own rollback '.$mode); }
+}
+list($db, $service, $row) = bookingFixture(); $db->family = 'mysql'; $row['amount'] = 0; $service->reader->row = $row;
+verify($service->book(1, $row, $mysqlOptions, $mysqlUser, false)['status'] === 'success' && $db->saved->subscription === 0, 'MySQL zero contribution');
+foreach (array('replace','lost','handle','stale') as $fault) {
+	list($db, $service, $row) = bookingFixture(); $db->family = 'mysql';
+	$member = new TransactionFaultMember($db);
+	foreach (array('id','typeid','entity','email') as $p) { $member->$p = $service->object->$p; }
+	$member->transactionFault = $fault; $service->object = $member;
+	$r = $service->book(1, $row, $mysqlOptions, $mysqlUser, false);
+	verify($r['status'] === 'unknown' && $r['stop'] && !in_array('rollback', $db->events, true), 'MySQL uncertain Core context no rollback '.$fault);
+	verify(count(array_keys($db->events, 'subscription', true)) === 1, 'no business retry '.$fault);
+}
+foreach (array(MsmDatabaseState::FAILED, MsmDatabaseState::BUSY) as $stateName) {
+	list($db, $old, $row) = bookingFixture(); $db->family = 'mysql'; $state = new AbstractStateFixture($db); $state->state = $stateName;
+	$service = new BookingServiceDouble($db, $state); $service->object = $old->object; $service->reader = $old->reader;
+	$r = $service->book(1, $row, $mysqlOptions, $mysqlUser, false);
+	verify($r['status'] === ($stateName === MsmDatabaseState::FAILED ? 'failed' : 'unknown'), 'abstract state conservative result '.$stateName);
+	verify(in_array('rollback', $db->events, true) === ($stateName === MsmDatabaseState::FAILED), 'only fresh owned failed-but-open allows rollback '.$stateName);
+}
+// A positive acknowledgement cannot replace missing completion evidence; nor can persistence.
+foreach (array('lost-end','false-ack','foreign','begin-false') as $fault) {
+	$db = new class extends BookingDatabase {
+		public $fault;
+		public function commit() {
+			$outer = $this->transaction_opened === 1; $r = parent::commit();
+			if ($outer && $this->fault === 'lost-end') { $this->event = null; }
+			return $outer && $this->fault === 'false-ack' ? 0 : $r;
+		}
+		public function begin() { return $this->fault === 'begin-false' ? 0 : parent::begin(); }
+	};
+	list($unused, $old, $row) = bookingFixture(); $db->family = 'mysql'; $db->fault = $fault;
+	if ($fault === 'foreign') { $db->active = true; $db->modelEvent('ACTIVE'); }
+	$member = new BookingMemberDouble($db); $member->id = $member->typeid = $member->entity = 1;
+	$service = new BookingServiceDouble($db); $service->object = $member; $service->reader = $old->reader;
+	$r = $service->book(1, $row, $mysqlOptions, $mysqlUser, false);
+	verify($r['status'] === 'unknown' && $r['stop'] && !in_array('rollback', $db->events, true), 'MySQL unconfirmed/foreign no compensation '.$fault);
+	if (in_array($fault, array('lost-end','false-ack'), true)) { verify($db->saved !== null, 'synthetic persistence cannot redeem unknown '.$fault); }
+	if ($fault === 'foreign') { verify(!$db->events, 'physical foreign transaction untouched at depth zero'); }
+}
+foreach (array('rollback','missing-member') as $fault) {
+	$db = new class extends BookingDatabase {
+		public $missing = false;
+		public function query($sql) { return $this->missing && strpos($sql, 'SELECT rowid, fk_adherent_type') === 0 ? (object) array('rows' => array()) : parent::query($sql); }
+	};
+	list($unused, $old, $row) = bookingFixture(); $db->family = 'mysql';
+	$db->rollbackFail = $fault === 'rollback'; $db->missing = $fault === 'missing-member';
+	$service = new BookingServiceDouble($db); $service->reader = $old->reader;
+	$service->object = new BookingMemberDouble($db); $service->object->id = $service->object->typeid = 1; $service->object->mode = 'fail';
+	$r = $service->book(1, $row, $mysqlOptions, $mysqlUser, false);
+	verify($r['status'] === ($fault === 'rollback' ? 'unknown' : 'failed'), 'MySQL rollback/missing selected member '.$fault);
+	if ($fault === 'missing-member') { verify(!in_array('subscription', $db->events, true) && $r['rollback'] === 'confirmed', 'no selected member: no business call, safe own rollback'); }
+}
 echo ($passed - $baseline)." booking/mail assertions passed (synthetic transactions and transports only).\n";
 
 // Once per standalone booking invocation, re-label pinned Core source in separate

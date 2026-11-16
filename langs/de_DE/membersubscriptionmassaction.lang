@@ -122,3 +122,6 @@ MSMCoreVersionUnsupported=Dolibarr ab Version 21.0.0 und eine gültige Versionsk
 MSMInvoiceVatIdUnsupported=Die konfigurierte Umsatzsteuer-Einstellung für Mitgliedsbeiträge wird vom Modul für die Rechnungserstellung nicht unterstützt.
 
 MSMCoreContractUnsupported=Die erforderliche Dolibarr-Core-Schnittstelle fehlt oder ist inkompatibel.
+MSMDatabaseUnsupported=Nicht unterstützte Datenbankfamilie, Treiber oder native Verbindung.
+MSMDatabaseObservationUnavailable=Der Datenbank-Transaktionszustand kann nicht sicher geprüft werden. Bitte die dokumentierten Datenbankvoraussetzungen prüfen; keine automatische Wiederholung.
+MSMDatabaseBootstrapUnavailable=Für die Bereitschaftsprüfung wird ein vorhandener InnoDB-Mitgliedsdatensatz benötigt. Es wurden keine Daten angelegt.

@@ -3,11 +3,17 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 require_once __DIR__.'/invoiceprofile.class.php';
+require_once __DIR__.'/databasestate.class.php';
 /** Core business APIs only; the caller owns the outer transaction. */
 class MsmInvoiceService
 {
 	protected $db;
-	public function __construct($db) { $this->db = $db; }
+	protected $databaseState;
+	public function __construct($db, MsmDatabaseState $databaseState = null)
+	{
+		$this->db = $db; $this->databaseState = $databaseState ?? new MsmDatabaseState($db);
+		if (!$this->databaseState->isFor($db)) { throw new InvalidArgumentException('MSMDatabaseUnsupported'); }
+	}
 	protected function one($sql)
 	{
 		$res = $this->db->query($sql);
@@ -16,27 +22,27 @@ class MsmInvoiceService
 	}
 	protected function invoice() { require_once DOL_DOCUMENT_ROOT.'/compta/facture/class/facture.class.php'; return new Facture($this->db); }
 	protected function customer() { require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php'; return new Societe($this->db); }
+	public function checkTables()
+	{
+		$this->databaseState->requireTransactionalTables(array('societe', 'societe_extrafields', 'socpeople', 'socpeople_extrafields', 'societe_commerciaux', 'facture', 'facture_extrafields', 'facturedet', 'facturedet_extrafields', 'element_element', 'ecm_files'));
+	}
 	public function lock($id)
 	{
-		foreach (array('societe', 'societe_extrafields', 'socpeople', 'socpeople_extrafields', 'societe_commerciaux', 'facture', 'facture_extrafields', 'facturedet', 'facturedet_extrafields', 'element_element', 'ecm_files') as $table) {
-			$row = $this->one("SELECT ENGINE AS engine FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '".$this->db->escape($this->db->prefix().$table)."'");
-			if (!$row || strtoupper($row->engine) !== 'INNODB') { throw new RuntimeException('MSMTransactionUnsupported'); }
-		}
+		$this->checkTables();
 		$member = $this->one('SELECT fk_soc FROM '.$this->db->prefix().'adherent WHERE rowid = '.((int) $id).' FOR UPDATE');
 		if (!$member) { throw new RuntimeException('NotEnoughPermissions'); }
 		if ($member->fk_soc) { $this->one('SELECT rowid FROM '.$this->db->prefix().'societe WHERE rowid = '.((int) $member->fk_soc).' FOR UPDATE'); }
 		$product = getDolGlobalInt('ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS');
 		if ($product) {
-			$row = $this->one("SELECT ENGINE AS engine FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '".$this->db->escape($this->db->prefix().'product')."'");
-			if (!$row || strtoupper($row->engine) !== 'INNODB') { throw new RuntimeException('MSMTransactionUnsupported'); }
+			$this->databaseState->requireTransactionalTables(array('product'));
 			$this->one('SELECT rowid FROM '.$this->db->prefix().'product WHERE rowid = '.$product.' FOR UPDATE');
 		}
 	}
 	/** Check after every nested API call, before any further business operation. */
 	protected function owned()
 	{
-		$active = $this->one('SELECT @@in_transaction AS active');
-		if ((int) $this->db->transaction_opened !== 1 || !$active || (int) $active->active !== 1) { throw new RuntimeException('MSMTransactionUnknown'); }
+		$state = $this->databaseState->active();
+		if ($state['state'] !== MsmDatabaseState::ACTIVE || !$state['fresh'] || !$state['owned']) { throw new RuntimeException('MSMTransactionUnknown'); }
 	}
 	/** Encode confirmed plain text once for the HTML-capable Core invoice-line field. */
 	protected function invoiceDescription($description)
@@ -46,6 +52,7 @@ class MsmInvoiceService
 	public function create($member, $subscription, array $row, $actor, array &$diagnostic)
 	{
 		global $conf, $langs, $user;
+		$this->owned();
 		$plan = $row['invoice']; $diagnostic['stage'] = 'customer';
 		$customerid = (int) $plan['customer_id'];
 		if ($plan['create_customer']) {
@@ -71,6 +78,7 @@ class MsmInvoiceService
 		$invoice->multicurrency_code = $plan['currency']; $invoice->model_pdf = $plan['pdf_model'];
 		$invoice->linked_objects = array('subscription' => (int) $subscription);
 		$diagnostic['stage'] = 'invoice_create';
+		$this->owned();
 		$id = $invoice->create($actor); $diagnostic['invoice_id'] = max(0, (int) $id); $this->owned();
 		if ($id <= 0) { throw new RuntimeException('MSMInvoiceFailed'); }
 		$diagnostic['stage'] = 'invoice_line';
