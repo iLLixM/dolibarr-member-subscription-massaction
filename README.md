@@ -3,12 +3,16 @@
 **Database development status — 2026-11-17:** MariaDB and Oracle MySQL use the
 shared `MsmDatabaseState` observer. Original **I1-05 FAILED** (19/20), subsequent
 **I105-FIX01 PASSED** (20/20) and **I1-06 PASSED** remain separate historical gates.
-The initial independent I1-07 review identified two non-blocking security findings;
-the targeted Agenda-engine and actual MySQL-isolation corrections now have bounded
-synthetic/real requalification. See the [I107 evidence and limits](docs/phase4-implementation-validation.md#i107-security-hardening).
+The targeted Agenda-engine and actual MySQL-isolation corrections completed their
+independent I107 follow-up; **I107-F01/F02/F03 are CLOSED**. Real MariaDB
+10.11.19 / Dolibarr V24.0.3 / PHP 8.2.35 requalification **MDB-TEST-01 passed
+9/9**, independently confirmed. Both external follow-ups are complete and positive:
+**APPROVED FOR MERGE WITH DOCUMENTED SCOPE**.
 [PR #13](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/13)
-is **Ready for review**, pending targeted independent follow-up and the Owner's
-merge decision; no production or release approval.
+**merged on 2026-11-17** as `aaf1f3786a4c9ea7e1707ad41cb821b0bb271e3d`.
+See the [closure, evidence and limits](docs/phase4-implementation-validation.md#pr-13-post-merge-closure-and-mdb-test-01--2026-11-17).
+`I107-FU-01` remains open as a non-merge-blocking P3 Low diagnostic observation;
+no general database-version, production or release approval is granted.
 
 **Cross-version admission and P3 baseline — 2026-11-15:** admission now starts at Dolibarr 21.0.0,
 with no upper version or exact-patch allowlist. V21 and future releases remain
@@ -16,8 +20,9 @@ unqualified. P1 analyzed all 15 tags V22.0.0–22.0.5, V23.0.0–23.0.4 and
 V24.0.0–24.0.3. Local PHP 8.2 synthetic runners passed against all 15 pinned
 sources; the configured CI matrix has 21 PHP/Core combinations (PHP 8.2 on all
 15, PHP 7.4 additionally on all six V22 tags). P3 is formally Owner-accepted with
-documented limitations. Independent overall code review remains outstanding;
-admission and source analysis are not real integration evidence.
+documented limitations. At that historical P3 checkpoint, independent overall
+code review was outstanding; later review/merge closure is recorded above.
+Admission and source analysis are not real integration evidence.
 
 See the [P3 qualification and evidence guide](docs/p3-qualification-summary.md) for
 the closed qualification, pinned matrix, supplemental-source correction and limits.
