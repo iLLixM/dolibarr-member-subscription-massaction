@@ -254,4 +254,49 @@ foreach (array('ecm_files', 'product') as $unsupportedTable) {
 	if ($oldProduct === null) { unset($conf->global->ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS); }
 	else { $conf->global->ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS = $oldProduct; }
 }
+// I107-F01: only possible selected invoice/customer/contact events need Agenda.
+$invoiceAgendaGlobals = $conf->global; $invoiceAgendaModules = $conf->modules;
+foreach (array('BILL_CREATE','LINEBILL_INSERT','BILL_VALIDATE','COMPANY_CREATE','CONTACT_CREATE','COMPANY_MODIFY') as $event) {
+	foreach (array(false,true) as $create) {
+		foreach (array(false,true) as $badEngine) {
+			$conf->modules = array('member'=>1,'invoice'=>1,'societe'=>1,'agenda'=>1);
+			$conf->global = (object) array('THIRDPARTY_DEFAULT_CREATE_CONTACT'=>1);
+			$conf->global->{'MAIN_AGENDA_ACTIONAUTO_'.$event} = 1;
+			list($db, $service, $row) = invoiceBookingFixture($create); $db->family = 'mysql';
+			if ($badEngine) { $db->nonTransactionalTable = 'actioncomm_resources'; }
+			$selected = array('invoice'=>true,'autocreate'=>$create,'sendmail'=>false,'description'=>'Synthetic fee');
+			$r = $service->book(1, $row, $selected, new PreviewUser(), false);
+			$reachable = in_array($event,array('BILL_CREATE','LINEBILL_INSERT','BILL_VALIDATE'),true) || ($create && in_array($event,array('COMPANY_CREATE','CONTACT_CREATE'),true));
+			$blocked = $badEngine && $reachable;
+			verify($r['status'] === ($blocked ? 'failed' : 'success'), 'I107 invoice Agenda reachability '.$event.'/'.(int)$create.'/'.(int)$badEngine);
+			$queries = preg_grep("/TABLE_NAME = 'test_actioncomm(?:_resources)?'/", $db->queries);
+			verify((bool)$queries === $reachable, 'I107 no unreachable invoice Agenda dependency '.$event.'/'.(int)$create);
+			if ($blocked) { verify(!$db->calls && !in_array('subscription',$db->events,true), 'I107 invoice Agenda nontransactional gate before all business APIs '.$event); }
+			elseif ($reachable) {
+				$locks = array_keys(array_filter($db->readOrder,static function($sql){return strpos($sql,'FOR UPDATE')!==false;}));
+				$engines = array_keys(array_filter($db->readOrder,static function($sql){return strpos($sql,'SELECT ENGINE AS engine')===0;}));
+				verify(max($locks)<min($engines), 'I107 Agenda metadata remains after all invoice locks '.$event);
+			}
+		}
+	}
+}
+$conf->modules = array('member'=>1,'invoice'=>1,'societe'=>1,'agenda'=>1);
+$conf->global = (object) array('MAIN_AGENDA_ACTIONAUTO_CONTACT_CREATE'=>1);
+list($db,$service,$row)=invoiceBookingFixture(true); $db->nonTransactionalTable='actioncomm';
+$selected=array('invoice'=>true,'autocreate'=>true,'sendmail'=>false,'description'=>'Synthetic fee');
+verify($service->book(1,$row,$selected,new PreviewUser(),false)['status']==='success', 'I107 disabled automatic contact creation has no CONTACT_CREATE dependency');
+foreach (array('REPEATABLE READ','READ COMMITTED','SERIALIZABLE','READ UNCOMMITTED') as $level) {
+	$conf->global=(object)array('MAIN_AGENDA_ACTIONAUTO_BILL_CREATE'=>1);
+	list($db,$service,$row)=invoiceBookingFixture(true);$db->family='mysql';$db->nextIsolation=$level;
+	$r=$service->book(1,$row,$selected,new PreviewUser(),false);
+	verify($r['status']===($level==='REPEATABLE READ'?'success':'failed'), 'I107 invoice isolation and Agenda combined '.$level);
+	if($level!=='REPEATABLE READ'){verify(!$db->calls&&!in_array('subscription',$db->events,true)&&$r['rollback']==='confirmed','I107 invoice isolation rejects before customer/subscription/invoice '.$level);}
+}
+// Direct nested Invoice guard uses the same event policy and retains safe teardown.
+list($db,$service,$row)=invoiceBookingFixture();$db->family='mysql';$state=$service->observer();$state->beforeBegin();$db->nextIsolation='READ COMMITTED';$db->begin();$state->afterBegin();
+$guard=new ReflectionMethod(MsmInvoiceService::class,'owned');$guard->setAccessible(true);
+fails(static function()use($guard,$service){$guard->invoke($service->adapter);},'MSMTransactionUnsupported');
+verify($state->rollbackContext()['owned']&&!$db->calls,'I107 Invoice policy rejection preserves own rollback eligibility');$db->rollback();verify($state->completed('ROLLBACK',true)['state']==='IDLE','I107 Invoice policy own rollback confirmed');
+$conf->global=$invoiceAgendaGlobals;$conf->modules=$invoiceAgendaModules;
+
 echo ($passed - $beforeInvoice)." invoice transaction assertions passed (synthetic Core API doubles; no database).\n";

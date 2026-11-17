@@ -12,7 +12,7 @@ function msmRequireBookingDatabase(array $state, $observer, $service)
 		if ($observed['state'] !== MsmDatabaseState::IDLE || !$observed['fresh']) {
 			throw new RuntimeException($observed['reason']);
 		}
-		$service->checkTables(!empty($state['options']['invoice']));
+		$service->checkTables(!empty($state['options']['invoice']), !empty($state['options']['autocreate']));
 	} catch (Throwable $e) {
 		$reason = in_array($e->getMessage(), array('MSMDatabaseUnsupported', 'MSMDatabaseBootstrapUnavailable', 'MSMDatabaseObservationUnavailable', 'MSMTransactionUnsupported'), true) ? $e->getMessage() : 'MSMDatabaseObservationUnavailable';
 		throw new RuntimeException($reason);

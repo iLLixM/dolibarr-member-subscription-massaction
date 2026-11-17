@@ -42,6 +42,7 @@ class MsmInvoiceService
 	{
 		$state = $this->databaseState->active();
 		if ($state['state'] !== MsmDatabaseState::ACTIVE || !$state['fresh'] || !$state['owned']) { throw new RuntimeException('MSMTransactionUnknown'); }
+		$this->databaseState->requireSupportedIsolation($state);
 	}
 	/** Encode confirmed plain text once for the HTML-capable Core invoice-line field. */
 	protected function invoiceDescription($description)

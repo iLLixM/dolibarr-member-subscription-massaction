@@ -19,6 +19,7 @@ class MsmDatabaseState
 	private $handle;
 	private $connectionId;
 	private $family;
+	private $isolation;
 	private $connection;
 	private $token;
 	private $idleEvent;
@@ -82,8 +83,16 @@ class MsmDatabaseState
 	private function result($state, $fresh, $reason = '')
 	{
 		return array('state' => $state, 'fresh' => $fresh, 'owned' => $this->owning && !$this->uncertain,
-			'family' => $this->family, 'continuity' => $this->family === 'mysql' ? 'event_checkpoint' : 'snapshot',
+			'family' => $this->family, 'isolation' => $this->isolation, 'continuity' => $this->family === 'mysql' ? 'event_checkpoint' : 'snapshot',
 			'connection' => array('id' => $this->connectionId, 'thread' => $this->connection[2] ?? null, 'server' => $this->connection[0] ?? null), 'transaction' => $this->token, 'reason' => $reason);
+	}
+	/** Business admission after a fresh owned observation, not an ownership rule.
+	 * Other known isolation levels must still allow the existing safe rollback path.
+	 * No SQL: the actual event value came from the same freshness observation.
+	 */
+	public function requireSupportedIsolation(array $state)
+	{
+		if (($state['family'] ?? null) === 'mysql' && ($state['isolation'] ?? null) !== 'REPEATABLE READ') { throw new RuntimeException('MSMTransactionUnsupported'); }
 	}
 	private function unknown($reason)
 	{
@@ -105,12 +114,14 @@ class MsmDatabaseState
 		$key = array((string) $m->uuid, self::decimal($m->cid), self::decimal($m->tid ?? null));
 		if ($this->connection !== null && $this->connection !== $key) { throw new RuntimeException('MSMTransactionUnknown'); }
 		$this->connection = $key;
-		$r = $this->one('SELECT THREAD_ID, EVENT_ID, STATE, END_EVENT_ID, NUMBER_OF_SAVEPOINTS, NUMBER_OF_RELEASE_SAVEPOINT FROM performance_schema.events_transactions_current WHERE THREAD_ID = PS_CURRENT_THREAD_ID()');
+		$r = $this->one('SELECT THREAD_ID, EVENT_ID, STATE, END_EVENT_ID, NUMBER_OF_SAVEPOINTS, NUMBER_OF_RELEASE_SAVEPOINT, ISOLATION_LEVEL FROM performance_schema.events_transactions_current WHERE THREAD_ID = PS_CURRENT_THREAD_ID()');
 		$s = array('event' => null, 'raw' => 'missing', 'autocommit' => self::decimal($m->ac ?? null));
 		if (!$r) { return $s; }
-		foreach (array('THREAD_ID', 'EVENT_ID', 'STATE', 'END_EVENT_ID', 'NUMBER_OF_SAVEPOINTS', 'NUMBER_OF_RELEASE_SAVEPOINT') as $field) {
+		foreach (array('THREAD_ID', 'EVENT_ID', 'STATE', 'END_EVENT_ID', 'NUMBER_OF_SAVEPOINTS', 'NUMBER_OF_RELEASE_SAVEPOINT', 'ISOLATION_LEVEL') as $field) {
 			if (!property_exists($r, $field)) { throw new RuntimeException('MSMDatabaseObservationUnavailable'); }
 		}
+		if (!in_array($r->ISOLATION_LEVEL, array('REPEATABLE READ', 'READ COMMITTED', 'READ UNCOMMITTED', 'SERIALIZABLE'), true)) { throw new RuntimeException('MSMDatabaseObservationUnavailable'); }
+		$this->isolation = $r->ISOLATION_LEVEL;
 		if (self::decimal($r->THREAD_ID) !== $key[2]) { throw new RuntimeException('MSMTransactionUnknown'); }
 		$s['event'] = self::decimal($r->EVENT_ID); $s['save'] = self::decimal($r->NUMBER_OF_SAVEPOINTS); $s['release'] = self::decimal($r->NUMBER_OF_RELEASE_SAVEPOINT);
 		if ($r->STATE === 'ACTIVE' && $r->END_EVENT_ID === null) { $s['raw'] = 'active'; }

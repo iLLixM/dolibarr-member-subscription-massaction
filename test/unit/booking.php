@@ -640,6 +640,61 @@ foreach (array('same-start', 'overlap', 'longer-end', 'non-overlap') as $case) {
 	}
 }
 
+// I107-F01: only enabled, reachable regular Core Agenda events add engine gates.
+class AgendaEngineDatabase extends BookingDatabase
+{
+	public $badTable = ''; public $badEngine = 'MyISAM'; public $onlyAfterLock = false;
+	public function query($sql)
+	{
+		if ($this->badTable && strpos($sql, 'SELECT ENGINE AS engine') === 0 && strpos($sql, "'test_".$this->badTable."'") !== false && (!$this->onlyAfterLock || $this->active)) {
+			$this->queries[] = $sql;
+			return (object) array('rows' => $this->badEngine === null ? array() : array((object) array('engine' => $this->badEngine)));
+		}
+		return parent::query($sql);
+	}
+}
+$agendaGlobals = $conf->global; $agendaModules = $conf->modules;
+foreach (array('mariadb','mysql') as $family) {
+	foreach (array('module-off','events-off','invoice-event-only','active','bad-action','bad-resources','missing-action','missing-resources','final-action','final-resources') as $case) {
+		list($unused, $old, $row) = bookingFixture(); $db = new AgendaEngineDatabase(); $db->family = $family;
+		$conf->modules = array('member' => 1, 'agenda' => $case !== 'module-off'); $conf->global = new stdClass();
+		$conf->global->MAIN_AGENDA_ACTIONAUTO_MEMBER_SUBSCRIPTION_CREATE = !in_array($case, array('events-off','invoice-event-only'), true) ? 1 : 0;
+		$conf->global->MAIN_AGENDA_ACTIONAUTO_BILL_VALIDATE = 1;
+		$db->badTable = strpos($case, 'resources') !== false ? 'actioncomm_resources' : 'actioncomm';
+		if ($case === 'active') { $db->badTable = ''; }
+		if (strpos($case, 'missing') === 0) { $db->badEngine = null; }
+		$db->onlyAfterLock = strpos($case, 'final') === 0;
+		$service = new BookingServiceDouble($db); $service->reader = $old->reader; $service->object = new BookingMemberDouble($db); $service->object->id = $service->object->typeid = $service->object->entity = 1;
+		$r = $service->book(1, $row, $mysqlOptions, new PreviewUser(), false);
+		$allowed = in_array($case, array('module-off','events-off','invoice-event-only','active'), true);
+		verify($r['status'] === ($allowed ? 'success' : 'failed'), 'I107 agenda '.$family.' '.$case);
+		$agendaQueries = preg_grep("/TABLE_NAME = 'test_actioncomm(?:_resources)?'/", $db->queries);
+		if (in_array($case, array('module-off','events-off','invoice-event-only'), true)) { verify(!$agendaQueries, 'I107 inactive/unreachable agenda has no dependency '.$family.' '.$case); }
+		elseif ($allowed) { verify(count($agendaQueries) === 4, 'I107 both Agenda tables checked before BEGIN and after locks '.$family); }
+		else {
+			verify(!in_array('subscription', $db->events, true) && $db->saved === null, 'I107 agenda rejects before Core/DML '.$family.' '.$case);
+			verify($db->onlyAfterLock ? $r['rollback'] === 'confirmed' : !in_array('begin', $db->events, true), 'I107 final/initial agenda gate '.$family.' '.$case);
+		}
+	}
+}
+// I107-F02: one-shot event isolation differs from a still-RR session default.
+foreach (array('REPEATABLE READ','READ COMMITTED','SERIALIZABLE','READ UNCOMMITTED') as $isolation) {
+	$conf->modules = array('member'=>1,'agenda'=>1); $conf->global = (object) array('MAIN_AGENDA_ACTIONAUTO_MEMBER_SUBSCRIPTION_CREATE'=>1);
+	list($db, $service, $row) = bookingFixture(); $db->family = 'mysql'; $db->nextIsolation = $isolation;
+	$r = $service->book(1, $row, $mysqlOptions, new PreviewUser(), false);
+	if ($isolation === 'REPEATABLE READ') { verify($r['status'] === 'success', 'I107 actual RR admits booking and Agenda preflight'); }
+	else {
+		verify($r['status'] === 'failed' && $r['message'] === 'MSMTransactionUnsupported' && $r['rollback'] === 'confirmed' && !$r['stop'], 'I107 known own unsupported isolation safely rolled back '.$isolation);
+		verify(!in_array('subscription', $db->events, true) && !in_array('lock', $db->events, true), 'I107 isolation denied before locks/Core/DML '.$isolation);
+	}
+}
+$db = new class extends BookingDatabase { public function begin() { $r = parent::begin(); $this->native = clone $this->native; return $r; } };
+$db->family = 'mysql'; $db->nextIsolation = 'READ COMMITTED'; list($unused, $old, $row) = bookingFixture();
+$service = new BookingServiceDouble($db); $service->object = new BookingMemberDouble($db); $service->reader = $old->reader;
+$r = $service->book(1, $row, $mysqlOptions, new PreviewUser(), false);
+verify($r['status'] === 'unknown' && $r['stop'] && !in_array('rollback', $db->events, true), 'I107 uncertain identity never becomes a safe isolation error');
+$conf->global = $agendaGlobals; $conf->modules = $agendaModules;
+
 echo ($passed - $baseline)." booking/mail assertions passed (synthetic transactions and transports only).\n";
 
 // Once per standalone booking invocation, re-label pinned Core source in separate

@@ -1,12 +1,14 @@
 # Member Subscription Massaction for Dolibarr
 
-**Database development status — 2026-11-17:** MariaDB and Oracle MySQL are
-implemented through the shared `MsmDatabaseState` observer. The original I1-05
-campaign remains **FAILED — CORRECTIONS REQUIRED** (19/20); the first targeted
-I105-FIX01 correction **PASSED — CONCURRENCY AND R16 REQUALIFIED** (20/20).
-Together they requalify only the bounded MySQL reference profile below.
+**Database development status — 2026-11-17:** MariaDB and Oracle MySQL use the
+shared `MsmDatabaseState` observer. Original **I1-05 FAILED** (19/20), subsequent
+**I105-FIX01 PASSED** (20/20) and **I1-06 PASSED** remain separate historical gates.
+The initial independent I1-07 review identified two non-blocking security findings;
+the targeted Agenda-engine and actual MySQL-isolation corrections now have bounded
+synthetic/real requalification. See the [I107 evidence and limits](docs/phase4-implementation-validation.md#i107-security-hardening).
 [PR #13](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/13)
-remains Draft for independent I1-07 review; no merge, production or release approval.
+is **Ready for review**, pending targeted independent follow-up and the Owner's
+merge decision; no production or release approval.
 
 **Cross-version admission and P3 baseline — 2026-11-15:** admission now starts at Dolibarr 21.0.0,
 with no upper version or exact-patch allowlist. V21 and future releases remain
@@ -119,7 +121,7 @@ availability does not imply a released, installable production module.
 | Family / profile | Evidence and qualification boundary |
 | --- | --- |
 | MariaDB 10.11, mysqli/InnoDB | Historical bounded V22.0.5 G2/G3/G4 and V24.0.3 C3 runtime evidence remains separate; current branch retains synthetic regression coverage. No new live MariaDB qualification in this iteration. |
-| Oracle MySQL Community Server 8.4.13, Dolibarr V24.0.3, PHP 8.2.35 | Real I1-05 plus targeted FIX01 business/fault/concurrency/R16 qualification in the exact instrumented reference profile; independent I1-07 review pending. |
+| Oracle MySQL Community Server 8.4.13, Dolibarr V24.0.3, PHP 8.2.35 | Real I1-05 plus targeted FIX01 business/fault/concurrency/R16 qualification in the exact instrumented reference profile; initial I1-07 review completed with findings, targeted follow-up pending. |
 | Other MySQL versions, PHP/Core combinations or configurations | Not generally qualified. The 21 pinned PHP/Core CI pairs are synthetic cross-version evidence, not 21 real MySQL integrations. |
 | PostgreSQL | Not implemented; reserved for iteration 2. |
 
@@ -128,7 +130,9 @@ MySQL requires direct `mysqli`, InnoDB for all touched tables, `REPEATABLE READ`
 in Performance Schema. In addition to the application's existing schema rights,
 the proven observer needs `SELECT` on
 `performance_schema.events_transactions_current`, with the required identity and
-savepoint/release-counter fields and `PS_CURRENT_THREAD_ID()` available. No
+savepoint/release-counter fields, `ISOLATION_LEVEL` and `PS_CURRENT_THREAD_ID()`
+available. The actual own ACTIVE event must report `REPEATABLE READ`, even when
+a one-shot `SET TRANSACTION` differs from the session default. No
 `PROCESS`, `threads`/`setup_*` SELECT or new global administrative grant is needed
 for this profile. Observer queries filter to the current thread; the table-level
 SELECT permission itself does not restrict access to that thread's rows.
@@ -145,7 +149,14 @@ customer/product locks, before ordinary business reads. This prevents an engine
 metadata query from creating a pre-lock MySQL read view that preview and unchanged
 Core R16 reads would retain. No isolation change, extra COMMIT or Core end-date rewrite.
 Uncertain ownership/completion yields `unknown/stop`, without retry or rollback of
-a replacement transaction. Stored results remain readable under F01's authenticated
+a replacement transaction. A known different isolation rejects business admission
+while retaining the existing safe owned rollback path; malformed isolation data
+fail closed under the existing uncertain-observation contract. Enabled relevant
+Core Agenda events additionally require InnoDB `actioncomm` and
+`actioncomm_resources`, checked at the same pre-BEGIN/post-lock gates. Disabled
+Agenda/events and unreachable invoice/customer/contact options add no such
+dependency. This is not generic coverage of arbitrary third-party hooks.
+Stored results remain readable under F01's authenticated
 session contract when readiness is unavailable; this does not permit new bookings.
 
 Core-version admission (>=21.0.0) and backend capability checks do not qualify a

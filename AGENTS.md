@@ -43,12 +43,20 @@
 - Check engines before BEGIN and again after member/type and optional customer/product
   locks, before ordinary business reads. Do not establish a pre-lock MySQL read view,
   change isolation as a workaround or replace Core R16 writes.
+- Include standard Core Agenda tables in both engine gates only when Agenda and a
+  relevant selected-path auto-event are enabled. Keep unknown third-party effects
+  outside any general atomicity promise.
+- Require REPEATABLE READ from the actual own MySQL ACTIVE event, not merely the
+  session default. Keep business isolation policy separate from G0 ownership and
+  completion: a known unsupported isolation may roll back its fresh owned context;
+  malformed/uncertain observations never authorize rollback or retry.
 - Roll back only a fresh, provably owned open context; lost ownership/completion stays
   `unknown/stop` without retry or rollback of a replacement transaction.
 - MySQL real qualification is limited to the V24.0.3/PHP 8.2.35/MySQL Community
   8.4.13 profile in `docs/phase4-implementation-validation.md`. MariaDB keeps its own
   evidence/continuity limits; synthetic CI is not blanket DB qualification.
-  PostgreSQL remains iteration 2; I1-07 and merge approval are separate gates.
+  PostgreSQL remains iteration 2; independent I1-07 follow-up and Owner merge
+  approval are separate gates.
 - Generate PDFs and send mail only after a confirmed COMMIT.
 - Never automatically retry or compensate an unknown booking, COMMIT, PDF, hook, or mail outcome.
 - Reject unsupported invoice, tax, product, stock, entity, or document configurations safely and explicitly.

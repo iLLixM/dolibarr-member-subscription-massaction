@@ -41,14 +41,31 @@ class MsmBookingService
 	{
 		$state = $this->databaseState->active();
 		if ($state['state'] !== MsmDatabaseState::ACTIVE || !$state['fresh'] || !$state['owned']) { throw new RuntimeException('MSMTransactionUnknown'); }
+		$this->databaseState->requireSupportedIsolation($state);
 	}
 	/** Read-only readiness; repeat after all locks, before any business writes. */
-	public function checkTables($invoice = false)
+	public function checkTables($invoice = false, $autocreate = false)
 	{
 		$this->databaseState->requireTransactionalTables(array('adherent', 'adherent_type', 'subscription'));
+		$events = array('MEMBER_SUBSCRIPTION_CREATE');
 		if ($invoice) {
 			$this->invoicing()->checkTables();
+			$events = array_merge($events, array('BILL_CREATE', 'LINEBILL_INSERT', 'BILL_VALIDATE'));
+			if ($autocreate) {
+				$events[] = 'COMPANY_CREATE';
+				if (getDolGlobalString('THIRDPARTY_DEFAULT_CREATE_CONTACT')) { $events[] = 'CONTACT_CREATE'; }
+			}
 			if (getDolGlobalInt('ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS')) { $this->databaseState->requireTransactionalTables(array('product')); }
+		}
+		// Pinned Core ActionsAuto writes these only for enabled automatic events.
+		// No generic promise about unknown third-party triggers or extra-field hooks.
+		if (isModEnabled('agenda')) {
+			foreach ($events as $event) {
+				if (getDolGlobalString('MAIN_AGENDA_ACTIONAUTO_'.$event)) {
+					$this->databaseState->requireTransactionalTables(array('actioncomm', 'actioncomm_resources'));
+					break;
+				}
+			}
 		}
 	}
 	protected function lock($id)
@@ -104,17 +121,18 @@ class MsmBookingService
 			if ($initial['state'] !== MsmDatabaseState::IDLE || !$initial['fresh']) {
 				$result['status'] = 'unknown'; $result['stop'] = true; $result['message'] = $initial['reason']; return $result;
 			}
-			$this->checkTables(!empty($options['invoice']));
+			$this->checkTables(!empty($options['invoice']), !empty($options['autocreate']));
 			$beginAttempted = true;
 			if (!$this->db->begin()) { throw new RuntimeException('SubscriptionBulkDatabaseError'); }
 			$owned = true;
 			$begun = $this->databaseState->afterBegin();
 			if ($begun['state'] !== MsmDatabaseState::ACTIVE || !$begun['fresh'] || !$begun['owned']) { throw new RuntimeException('MSMTransactionUnknown'); }
+			$this->databaseState->requireSupportedIsolation($begun);
 			$this->lock($id);
 			if (!empty($options['invoice'])) { $this->invoicing()->lock($id); }
 			// MySQL ENGINE metadata reads establish a consistent view. Defer them
 			// until all locks are held so preview and Core SELECTs see prior winners.
-			$this->checkTables(!empty($options['invoice']));
+			$this->checkTables(!empty($options['invoice']), !empty($options['autocreate']));
 			$user = $this->currentUser($user);
 			if (!MsmPreviewService::canCreateSubscriptionWithOptions($user, !empty($options['invoice']), !empty($options['sendmail']))) { throw new RuntimeException('NotEnoughPermissions'); }
 			$member = $this->member($id);

@@ -130,4 +130,28 @@ foreach (array('unacknowledged','wrong-kind','completion-replaced','post-idle-st
 	checkState($r['state'] === 'UNKNOWN' && $s->beforeBegin()['state'] === 'UNKNOWN', 'uncertain completion stays unknown '.$fault);
 }
 checkState(MsmDatabaseState::FAILED === 'FAILED' && MsmDatabaseState::BUSY === 'BUSY', 'reserved backend states');
+// I107-F02: policy uses the actual ACTIVE event, not the session default.
+foreach (array('REPEATABLE READ','READ COMMITTED','SERIALIZABLE','READ UNCOMMITTED') as $isolation) {
+	list($db, $s) = idleFixture(); $db->nextIsolation = $isolation; $db->begin();
+	$active = $s->afterBegin();
+	checkState($active['state'] === 'ACTIVE' && $active['fresh'] && $active['owned'] && $active['isolation'] === $isolation && $db->isolation === 'REPEATABLE READ', 'I107 actual one-shot event isolation '.$isolation);
+	$count = count($db->queries); $denied = false;
+	try { $s->requireSupportedIsolation($active); } catch (RuntimeException $e) { $denied = $e->getMessage() === 'MSMTransactionUnsupported'; }
+	checkState($denied === ($isolation !== 'REPEATABLE READ') && count($db->queries) === $count, 'I107 SQL-free admission for '.$isolation);
+	$context = $s->rollbackContext();
+	checkState($context['state'] === 'ACTIVE' && $context['owned'] && $context['fresh'], 'I107 unsupported policy does not destroy own rollback context '.$isolation);
+	$db->rollback(); checkState($s->completed('ROLLBACK', true)['state'] === 'IDLE', 'I107 expected-own rollback completion '.$isolation);
+}
+foreach (array(null,'','REPEATABLE-READ','invented',1,array()) as $badIsolation) {
+	list($db, $s) = activeFixture();
+	if ($badIsolation === null) { unset($db->event->ISOLATION_LEVEL); } else { $db->event->ISOLATION_LEVEL = $badIsolation; }
+	$active = $s->active(); checkState($active['state'] === 'UNKNOWN' && !$active['owned'], 'I107 malformed isolation contract fails closed '.gettype($badIsolation));
+	$count = count($db->queries); checkState($s->rollbackContext()['state'] === 'UNKNOWN' && count($db->queries) === $count, 'I107 malformed contract never redeems uncertain rollback');
+}
+list($db, $s) = activeFixture(); $db->event->ISOLATION_LEVEL = 'READ COMMITTED'; $db->native = clone $db->native;
+checkState($s->active()['state'] === 'UNKNOWN' && $s->rollbackContext()['state'] === 'UNKNOWN', 'I107 invalid identity wins over known isolation policy error');
+$db = new ObservationDatabase(); $db->family = 'mariadb'; $db->isolation = 'not a MySQL value'; $db->psDenied = true;
+$s = new SyntheticDatabaseState($db); $s->beforeBegin(); $db->begin(); $active = $s->afterBegin(); $s->requireSupportedIsolation($active);
+checkState($active['state'] === 'ACTIVE' && !preg_grep('/ISOLATION_LEVEL|performance_schema/', $db->queries), 'I107 MariaDB has no new isolation/PS requirement');
+
 echo $checks." database observation assertions passed (synthetic protocol; no database or network).\n";

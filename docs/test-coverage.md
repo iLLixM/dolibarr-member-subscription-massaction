@@ -213,5 +213,23 @@ V24.0.3/PHP 8.2.35/MySQL Community 8.4.13 instrumented mysqli/InnoDB/RR profile.
 Historical MariaDB G2/G3/G4/C3 evidence, synthetic cross-version CI and Owner mail
 receipt are distinct. Original MySQL post-COMMIT PDF cases do not imply SMTP
 qualification; FIX01 generated no new PDF or mail. Unexecuted variants, PostgreSQL
-iteration 2, independent I1-07 and production/public-release restrictions remain
+iteration 2, independent I1-07 follow-up and production/public-release restrictions remain
 as recorded in the central validation; no general MySQL PASS is inferred.
+
+
+## I107 hardening evidence
+
+See [I107 security hardening](phase4-implementation-validation.md#i107-security-hardening)
+for the initial independent review, current Ready status and targeted follow-up.
+Existing `database:`, `booking:`, `invoice:` and `request:` assertions prefixed
+`I107` cover actual-event isolation policy, known-own versus uncertain rollback,
+Agenda option/event reachability, missing/MyISAM table gates and unchanged lock order.
+These are synthetic adapters; no live Core-table Engine conversion is implied.
+`I107-isolation` is real but read-only (seven own-event cases, no business DML).
+`I107-POS-SUB`, `I107-POS-INVOICE`, `I107-AGENDA-ROLLBACK`,
+`I107-CONCURRENCY` and `I107-R16-LONG/SHORT` use actual Core/MySQL on new synthetic
+fixtures and independent persisted/audit checks. The retained CLI seller-context
+warning does not establish other tax profiles. No new PDF or SMTP evidence, live
+MariaDB rerun or requirement remapping; all71 IDs/18 columns remain unchanged.
+Separate F01/F02 acceptance matrices and the final commit/CI/runtime-hash mapping
+are private execution evidence, not a second requirements matrix.

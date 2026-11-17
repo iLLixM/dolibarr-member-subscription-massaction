@@ -11,6 +11,7 @@ trait DatabaseStateModel
 	public $instrumented = true; public $currentInstrumented = true; public $psDenied = false; public $lost = false; public $membersPresent = true;
 	public $event = null; public $eventSequence = '100'; public $probeFault = ''; public $markers = array();
 	public $versionOverride; public $commentOverride;
+	public $isolation = 'REPEATABLE READ'; public $nextIsolation = null;
 	public function observationInit() { $this->native = (object) array('thread_id' => '51'); }
 	public static function incrementDecimal($value)
 	{
@@ -25,9 +26,9 @@ trait DatabaseStateModel
 		$this->eventSequence = self::incrementDecimal($this->eventSequence);
 		$this->event = (object) array('THREAD_ID' => $this->threadId, 'EVENT_ID' => $this->eventSequence,
 			'STATE' => $state, 'END_EVENT_ID' => $state === 'ACTIVE' ? null : self::incrementDecimal($this->eventSequence),
-			'NUMBER_OF_SAVEPOINTS' => '0', 'NUMBER_OF_RELEASE_SAVEPOINT' => '0');
+			'NUMBER_OF_SAVEPOINTS' => '0', 'NUMBER_OF_RELEASE_SAVEPOINT' => '0', 'ISOLATION_LEVEL' => $this->isolation);
 	}
-	public function modelBegin() { $this->currentInstrumented = $this->instrumented; if ($this->family === 'mysql' && $this->instrumented) { $this->modelEvent('ACTIVE'); } }
+	public function modelBegin() { $this->currentInstrumented = $this->instrumented; if ($this->family === 'mysql' && $this->instrumented) { $this->modelEvent('ACTIVE'); if ($this->nextIsolation !== null) { $this->event->ISOLATION_LEVEL = $this->nextIsolation; } } $this->nextIsolation = null; }
 	public function modelEnd($state)
 	{
 		$this->markers = array();
@@ -45,7 +46,7 @@ trait DatabaseStateModel
 				'version_comment' => $this->commentOverride ?? ($this->family === 'mysql' ? 'MySQL Community Server - GPL' : 'Debian 12'), 'connection_id' => $this->native->thread_id);
 		} elseif ($sql === 'SELECT CONNECTION_ID() AS cid, PS_CURRENT_THREAD_ID() AS tid, @@server_uuid AS uuid, @@autocommit AS ac, @@performance_schema AS ps') {
 			$row = (object) array('cid' => $this->native->thread_id, 'tid' => $this->threadId, 'uuid' => $this->serverUuid, 'ac' => $this->autocommit, 'ps' => $this->performanceSchema);
-		} elseif ($sql === 'SELECT THREAD_ID, EVENT_ID, STATE, END_EVENT_ID, NUMBER_OF_SAVEPOINTS, NUMBER_OF_RELEASE_SAVEPOINT FROM performance_schema.events_transactions_current WHERE THREAD_ID = PS_CURRENT_THREAD_ID()') {
+		} elseif ($sql === 'SELECT THREAD_ID, EVENT_ID, STATE, END_EVENT_ID, NUMBER_OF_SAVEPOINTS, NUMBER_OF_RELEASE_SAVEPOINT, ISOLATION_LEVEL FROM performance_schema.events_transactions_current WHERE THREAD_ID = PS_CURRENT_THREAD_ID()') {
 			if ($this->psDenied) { throw new RuntimeException('Synthetic SELECT denied', 1142); }
 			$row = $this->event ? clone $this->event : null;
 		} elseif ($sql === 'SELECT @@in_transaction AS active') { $row = (object) array('active' => $this->active ? '1' : '0');

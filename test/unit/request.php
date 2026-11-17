@@ -22,10 +22,10 @@ class RequestObserver
 }
 class RequestBookingService
 {
-	public $tables = array(); public $books = 0; public $fault = false;
-	public function checkTables($invoice)
+	public $tables = array(); public $creation = array(); public $books = 0; public $fault = false;
+	public function checkTables($invoice, $autocreate = false)
 	{
-		$this->tables[] = $invoice;
+		$this->tables[] = $invoice; $this->creation[] = $autocreate;
 		if ($this->fault) { throw new RuntimeException('raw SQL SELECT denied 1142'); }
 	}
 	public function book($id, $row, $options, $user, $overlap)
@@ -92,4 +92,8 @@ $dbUnavailable = new class { public function __call($name,$args) { throw new Run
 $done['results'][1]['invoice'] = array('id' => 42, 'entity' => 1, 'customer_id' => 4, 'customer_created' => true);
 $access = msmResultAccess($dbUnavailable,new PreviewUser(),$done);
 verify($access[1] === array('invoice' => false, 'customer' => false), 'F01 unavailable DB denies invoice/customer links without exposing errors');
+// I107 selected customer-creation option reaches the read-only Agenda gate.
+$state=$base;$state['options']['invoice']=true;$state['options']['autocreate']=true;
+$observer=new RequestObserver();$service=new RequestBookingService();msmRequireBookingDatabase($state,$observer,$service);
+verify($service->tables===array(true)&&$service->creation===array(true)&&!$service->books,'I107 authenticated preflight forwards invoice/autocreate without booking');
 echo ($passed-$beforeRequest)." request readiness/result assertions passed (synthetic contracts; no HTTP/database/business operations).\n";
