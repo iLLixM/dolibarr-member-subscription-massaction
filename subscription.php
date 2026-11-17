@@ -49,10 +49,28 @@ require_once __DIR__.'/lib/preview_renderer.lib.php';
 require_once __DIR__.'/lib/booking.lib.php';
 require_once __DIR__.'/lib/booking_renderer.lib.php';
 $langs->load('members');
+/** Render an early rejection without evaluating any selected member. */
+function msmPrintBatchLimit($count)
+{
+	global $langs, $db;
+	llxHeader('', $langs->trans('MSMTitle'));
+	print load_fiche_titre($langs->trans('MSMTitle'));
+	print '<div class="warning">'.dol_escape_htmltag($langs->trans('MSMBatchLimitDetail', $count, msmBatchLimit())).'</div>';
+	print '<p><a href="'.dol_escape_htmltag(msmListUrl()).'">'.msmText('MSMBack').'</a></p>';
+	llxFooter(); $db->close(); exit;
+}
+if ($method === 'GET' && isset($_GET['batchlimit'])) {
+	$notice = $_SESSION['msm_batch_limit'] ?? array();
+	if (!is_string($_GET['batchlimit']) || !isset($notice['token'], $notice['count'], $notice['owner'], $notice['entity'], $notice['expires'])
+		|| !hash_equals($notice['token'], $_GET['batchlimit']) || $notice['owner'] !== (int) $user->id
+		|| $notice['entity'] !== (int) $conf->entity || $notice['expires'] <= dol_now()) { accessforbidden(); }
+	msmPrintBatchLimit($notice['count']);
+}
 $error = '';
 try {
 	if ($method === 'GET' && isset($_GET['run'])) {
 		$selection = msmReadRun($_SESSION, $_GET['run'], (int) $user->id, (int) $conf->entity, dol_now());
+		if (count($selection['ids']) > msmBatchLimit()) { msmPrintBatchLimit(count($selection['ids'])); }
 		msmCheckMembers($db, $user, $selection['ids']);
 		$key = msmCreatePreview($_SESSION, $selection, dol_now());
 		header('Location: '.dol_buildpath('/membersubscriptionmassaction/subscription.php', 1).'?preview='.$key, true, 303);
@@ -65,6 +83,8 @@ try {
 } catch (Exception $e) {
 	accessforbidden($langs->trans('MSMInvalidRun'));
 }
+if ($method === 'POST' && !msmValidCsrf($_POST['token'] ?? null, $_SESSION)) { accessforbidden(); }
+if (in_array($state['phase'], array('preview', 'confirm'), true) && count($state['ids']) > msmBatchLimit()) { msmPrintBatchLimit(count($state['ids'])); }
 if ($method === 'POST') {
 	if (!msmValidCsrf($_POST['token'] ?? null, $_SESSION)) { accessforbidden(); }
 	if (($_POST['action'] ?? null) === 'cancel' && $state['phase'] === 'preview') {
@@ -105,7 +125,7 @@ if ($method === 'POST') {
 			msmRequireBookingDatabase($state, $databaseState, $bookingService);
 			$state = msmEvaluatePreview($db, $user, $state);
 			if ($action === 'confirm') {
-				if (count($state['ids']) > 50) { throw new InvalidArgumentException('MSMBatchLimit'); }
+				msmRequireBatchSize($state['ids']);
 				$state['phase'] = 'confirm';
 			}
 			$_SESSION['msm_previews'][$key] = $state;

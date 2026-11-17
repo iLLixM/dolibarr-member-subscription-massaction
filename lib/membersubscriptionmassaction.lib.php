@@ -4,6 +4,7 @@
  */
 
 require_once __DIR__.'/../class/corecompatibility.class.php';
+require_once __DIR__.'/batch.lib.php';
 
 /**
  * Check the module and existing core permissions; external users are excluded.

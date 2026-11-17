@@ -264,3 +264,13 @@ integrity references are in the central validation, not public download links.
 No new requirement assignment or modification of 71 IDs/18 columns is introduced.
 Historical I1-05 failure, read-only E04, I107 warning and all unexecuted scenarios
 retain their scopes. No new PDF/SMTP, general DB-version or production/release approval.
+
+## Issue #8 configurable batch limit
+
+`run.php` covers module defaults/invalid/overflow values, 25/100/150 boundaries,
+the global minimum and a hook subprocess whose oversized IDs cannot be fetched:
+the count-only notice proves early exit before object access. `request.php` covers
+stale confirmations after reduction, pre-readiness and pre-orchestration rejection,
+no truncation and preserved replay protection. These are synthetic contracts.
+Real 100-member timing, memory, persistence and DE/EN HTTP checks remain pending
+until the separately guarded integration run; no blanket performance claim.

@@ -61,6 +61,14 @@ if (($argv[1] ?? '') === 'entry') {
 	$hook->doMassActions(array('currentcontext' => 'memberlist', 'massaction' => ActionsMemberSubscriptionMassaction::ACTION, 'toselect' => array(2, 1)), $object, $action);
 	exit(2);
 }
+if (($argv[1] ?? '') === 'oversized-entry') {
+	$_SESSION = array('token' => 'trusted-csrf'); $_SERVER['REQUEST_METHOD'] = 'POST';
+	$_POST = array('token' => 'trusted-csrf', 'confirmmassaction' => 'Confirm', 'toselect' => range(10000, 10100));
+	// These IDs cannot be fetched by the fixture: any object query prevents the notice.
+	register_shutdown_function(static function () { echo json_encode($_SESSION); });
+	$hook->doMassActions(array('currentcontext' => 'memberlist', 'massaction' => ActionsMemberSubscriptionMassaction::ACTION, 'toselect' => $_POST['toselect']), $object, $action);
+	exit(2);
+}
 $passed = 0;
 function check($condition, $label)
 {
@@ -237,3 +245,24 @@ $result = (new MsmBookingService($untouched))->book(1, array(), array('invoice' 
 check($result['status'] === 'failed' && $result['message'] === 'MSMCoreContractUnsupported', 'future Core missing DB contract rejected');
 check($untouched->calls === 0, 'capability check performs no database access');
 echo $passed." assertions passed (synthetic contracts; no Dolibarr runtime).\n";
+
+foreach (array(null, '', 'bad', '1.5', '1e2', '-2', '0', 0, -1, true, array(), (string) PHP_INT_MAX.'0') as $bad) {
+	$conf->global = (object) array('MEMBERSUBSCRIPTIONMASSACTION_MAX_MEMBERS_PER_BATCH' => $bad);
+	check(msmBatchLimit() === 100, 'Issue8 invalid module value defaults to100');
+}
+foreach (array(25,100,150) as $max) {
+	$conf->global = (object) array('MEMBERSUBSCRIPTIONMASSACTION_MAX_MEMBERS_PER_BATCH' => (string)$max);
+	check(msmBatchLimit() === $max, 'Issue8 configured boundary');
+	foreach (array($max-1,$max) as $n) { msmRequireBatchSize(range(1,$n)); check(true,'Issue8 within boundary'); }
+	rejects(static function () use ($max) { msmRequireBatchSize(range(1,$max+1)); }, 'Issue8 boundary exceeded');
+}
+$conf->global = (object) array('MEMBERSUBSCRIPTIONMASSACTION_MAX_MEMBERS_PER_BATCH'=>'150','MAIN_LIMIT_FOR_MASS_ACTIONS'=>'25');
+check(msmBatchLimit()===25,'Issue8 global minimum');
+$conf->global = new stdClass();
+exec(escapeshellarg(PHP_BINARY).' '.escapeshellarg(__FILE__).' oversized-entry', $noticeOutput, $noticeExit);
+$notice=json_decode(implode("\n",$noticeOutput),true);
+check($noticeExit===0 && ($notice['msm_batch_limit']['count']??0)===101 && !isset($notice['membersubscriptionmassaction']), 'Issue8 oversized hook exits before object fetch, retains count only');
+echo "Issue8 limit and early-hook contracts passed.\n";
+
+$conf->global=(object)array('MAIN_LIMIT_FOR_MASS_ACTIONS'=>'0');
+check(msmBatchLimit()===0,'Issue8 configured global zero fails closed');

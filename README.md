@@ -247,7 +247,16 @@ outcomes require manual database inspection, never an automatic retry.
 
 Booking implements the mysqli driver with MariaDB or Oracle MySQL and InnoDB only;
 see the profile-specific prerequisites and qualification limits above.
-At most 50 members may be confirmed together; use smaller batches when transport is
+The default maximum is 100 members per run. Configure
+`MEMBERSUBSCRIPTIONMASSACTION_MAX_MEMBERS_PER_BATCH` using Dolibarr constants;
+no additional module settings page is required. Missing, invalid or nonpositive
+module values fall back to 100, including already activated installations.
+The effective maximum is the minimum of this value and
+`MAIN_LIMIT_FOR_MASS_ACTIONS` (unset: 1000; configured invalid/nonpositive: fail
+closed at zero). Oversized selections show their count and the current maximum
+on the first module page before member loading/preview. No selection is truncated
+or split automatically. Pending sessions are rechecked against the current limit;
+consumed results remain readable. Use smaller batches when transport is
 slow. This cap is not a timeout guarantee. A crash leaves pending rows uncertain.
 There is no durable operation journal, SMTP queue or exactly-once claim. Core and
 third-party actions need not honor the module's member-row lock. Core triggers still

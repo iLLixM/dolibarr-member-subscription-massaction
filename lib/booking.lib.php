@@ -2,11 +2,13 @@
 /* Copyright (C) 2026 iLLixM <iLLixM@proton.me>
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
+require_once __DIR__.'/batch.lib.php';
 /** Readiness gates new operations, never the display of consumed session results. */
 function msmRequireBookingDatabase(array $state, $observer, $service)
 {
 	if (in_array($state['phase'] ?? '', array('done', 'processing'), true)) { return; }
 	if (!in_array($state['phase'] ?? '', array('preview', 'confirm'), true)) { throw new InvalidArgumentException('MSMInvalidForm'); }
+	msmRequireBatchSize($state['ids']);
 	try {
 		$observed = $observer->beforeBegin();
 		if ($observed['state'] !== MsmDatabaseState::IDLE || !$observed['fresh']) {
@@ -32,7 +34,8 @@ function msmBookingPost(array $state, array $post, $action)
 function msmConsumeConfirmation(array $state, array $post)
 {
 	$overlap = msmBookingPost($state, $post, 'book');
-	if (($state['phase'] ?? '') !== 'confirm' || count($state['ids']) > 50) { throw new InvalidArgumentException('MSMInvalidForm'); }
+	if (($state['phase'] ?? '') !== 'confirm') { throw new InvalidArgumentException('MSMInvalidForm'); }
+	msmRequireBatchSize($state['ids']);
 	$state['phase'] = 'processing'; $state['revision']++; $state['overlap'] = $overlap;
 	$state['results'] = array();
 	foreach ($state['ids'] as $id) { $state['results'][$id] = array('status' => 'unknown', 'message' => 'MSMInterrupted', 'id' => 0, 'amount' => 0, 'mail' => 'unknown', 'stop' => false); }
@@ -41,6 +44,7 @@ function msmConsumeConfirmation(array $state, array $post)
 /** Pure batch orchestration with a persistence checkpoint before/after each side effect. */
 function msmProcessBooking(array $state, $service, $mailer, $user, callable $save, $pdf = null)
 {
+	msmRequireBatchSize($state['ids']);
 	$stop = false;
 	foreach ($state['ids'] as $id) {
 		$row = $state['rows'][$id];
