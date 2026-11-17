@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- Complete Oracle-MySQL iteration 1 with PR #13 merged on 2026-11-17 as
+  `aaf1f3786a4c9ea7e1707ad41cb821b0bb271e3d` (same tree as tested `0999efb`).
+  Both independent I107/MDB follow-ups completed positively: APPROVED FOR MERGE
+  WITH DOCUMENTED SCOPE; I107-F01/F02/F03 closed. Retain open non-blocking
+  P3 Low diagnostic observation I107-FU-01.
+- Complete real MariaDB 10.11.19 / Dolibarr V24.0.3 / PHP 8.2.35 regression
+  qualification: MDB-01–MDB-09 9/9 PASS, independently confirmed. Actual Core
+  transactions, Agenda, invoices/customer creation, atomic rollback, competition,
+  R16 and authenticated HTTP replay passed within their documented limits.
+  Agenda OFF was process-local; no new PDF/SMTP qualification or release approval.
+
 - I107-F01: conditionally include standard Core Agenda `actioncomm` and
   `actioncomm_resources` in both engine gates, respecting enabled events and
   invoice/customer/contact options without pre-lock metadata reads.
@@ -11,8 +22,8 @@
 - Requalify targeted real Agenda/invoice, post-trigger rollback, concurrency and
   R16 paths plus seven read-only actual-isolation cases. Negative Engine cases
   remain synthetic; no Core table conversion, new PDF generation or SMTP delivery.
-  Correct I107-F03: PR #13 is Ready for review; targeted independent follow-up and
-  explicit Owner merge approval remain outstanding, with no release approval.
+  Historical I107 checkpoint corrected I107-F03 to Ready for review, with targeted
+  follow-up and Owner merge then outstanding; their completion is recorded above.
 
 - Add shared DoliDB-bound `MsmDatabaseState` observation for MariaDB and Oracle
   MySQL; Booking/Invoice keep one outer Core transaction and shared ownership.
@@ -28,7 +39,8 @@
   21/21 synthetic PHP/Core CI on the correction. Together these requalify only
   V24.0.3/PHP 8.2.35/MySQL Community 8.4.13 in the documented instrumented
   mysqli/InnoDB/REPEATABLE READ profile. I1-06 documents the review handoff;
-  independent I1-07, merge and production/public-release approval remain separate.
+  I1-07 and merge were separate subsequent gates, now completed as recorded above.
+  Production/public-release approval remains outside that development merge.
 
 - Reload the current user with `User::loadRights()` and check `User::$status`
   instead of the deprecated `getrights()`/`$statut` (behavior unchanged). Add

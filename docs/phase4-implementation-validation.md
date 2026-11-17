@@ -1,5 +1,73 @@
 # Phase 4 implementation validation
 
+## PR #13 post-merge closure and MDB-TEST-01 — 2026-11-17
+
+**Current status: development merge COMPLETE.** PR [#13](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/13)
+merged as `aaf1f3786a4c9ea7e1707ad41cb821b0bb271e3d`. Its Git tree is identical
+to tested HEAD `0999efb4aafca43d90ce12e38d370662ad0c63a1`; retain that runtime
+reference separately from the merge/development baseline. Both independent external
+follow-ups are complete and positive (MDB confirmation Owner-reported):
+**APPROVED FOR MERGE WITH DOCUMENTED SCOPE**. I107-F01/F02/F03 are **CLOSED**.
+External review conclusions are not formal GitHub review votes.
+
+The complete sequence is **I1-05 FAILED (19/20) → FIX01 PASSED (20/20) → I1-06 →
+I1-07 findings → I107 correction/requalification → positive I107 follow-up →
+MDB-TEST-01 9/9 PASS and positive independent follow-up → PR #13 merged**.
+Original failures, CLI-warning evidence, source references and limits below remain
+historical facts, not retrospectively changed outcomes.
+
+Real MDB profile: **MariaDB 10.11.19-MariaDB-0+deb12u1 / Dolibarr V24.0.3 /
+PHP 8.2.35 / mysqli / InnoDB / entity 1**, at the exact tested HEAD above.
+Owner-executed protected CLI and interactive browser programs used new synthetic
+business fixtures with real Core/DB operations and independent SQL postconditions.
+
+| Case | Actual real result / scope |
+| --- | --- |
+| MDB-01 PASS | MariaDB detection, `@@in_transaction`, own BEGIN/COMMIT/ROLLBACK and fresh idle; no Oracle Performance Schema dependency in traced calls. MariaDB continuity remains snapshot-based. |
+| MDB-02 PASS | Regular Core contribution, independently stored values and confirmed COMMIT. |
+| MDB-03 PASS | Real Agenda ON/OFF contributions: conditional engine gates, standard events and actor links. OFF was process-local `conf.modules`, not persisted module deactivation; no false rejection. |
+| MDB-04 PASS | Existing dedicated synthetic customer, validated 120-EUR/zero-VAT invoice, one line and correct entity/customer/subscription links. |
+| MDB-05 PASS | Automatically created customer, contribution and validated invoice in one outer transaction. |
+| MDB-06 PASS | Controlled exception after actual customer/contribution/validated invoice/Agenda DML, before COMMIT; confirmed rollback and equality of all 24 monitored table hash sets and invoice files. |
+| MDB-07 PASS | Two real connections: A succeeds, B waits about 0.888 seconds then skips changed confirmation before any subscription call/business DML; confirmed own rollback, no 1062. |
+| MDB-08 PASS | Longer Core history, earlier shorter contribution and consented overlapping extension; stored end remains 2095 then extends to 2097. No new SQL-NULL fixture or direct end-date repair. |
+| MDB-09 PASS | Authenticated Chromium preview/confirmation/booking/result, one identical consumed POST replay rejected in the same session; 24-table hashes unchanged on replay. Firefox reads the same real completed result. No invoice/mail selected. |
+
+Nine new synthetic members, ten persisted contributions, two customers (including
+the pre-created MDB-04 customer), two validated invoices and twelve Agenda events/
+assignments were reconciled. All original rows in the 24 monitored business/audit
+tables and physical invoice files were preserved. ECM, payments and bank records
+were unchanged. No captured PHP warnings in successful MDB cases. Standard Core
+bootstrap initialized `$mysoc`; this does not erase the separate I107 CLI warning.
+Chromium 158.0.8127.18 executed MDB-09; Firefox 159.0 inspected its actual result.
+
+Private evidence bundle `dolibarr-mdb-test01-20261117` retains `TEST-MATRIX.json`,
+`evidence/*.json`, original no-effect starter STOPs and corrected harness versions,
+`RUNTIME-ASSIGNMENT.json`, final report and independent SQL/filesystem evidence.
+`MDB-TEST01-EVIDENCE-v1.zip` SHA-256:
+`66c7867bc26463faac457e0eb7c83bb1a0274c84c8547401f14ebe31cae57611`.
+Separate verification passed ZIP/manifest, 83 checksums and 21 runtime Git blobs;
+173 additional read-only trace assertions passed. Those assertions and independent
+reviews are not additional live campaigns. No private artifacts are public downloads.
+
+No regression was identified within this profile. No new PDF generation/SMTP,
+physical crash/network loss, arbitrary third-party writers, persisted activation
+cycle or full role/Multicompany qualification is implied. MDB HTTP used the existing
+test administrator. Initial class-load/browser-path harness interruptions preceded
+business requests and were reconciled without repeating a booking. Owner statements
+on mail routing and absence of SQL triggers were accepted; no new mail configuration,
+trigger or backup/restore checks were performed. Requirement mappings remain unchanged.
+
+**I107-FU-01 OPEN — P3 Low, non-merge-blocking:** the diagnostic `isolation` field
+after completion/idle probing may describe the latest observed event, not the
+completed transaction. Actual ACTIVE admission and safe rollback are unaffected.
+No correction or closure of this diagnostic observation is claimed.
+
+The development merge closes the Oracle-MySQL iteration handoff. Exact MySQL
+8.4.13 and MariaDB 10.11.19 profiles remain separate; other versions, PostgreSQL
+iteration 2 and unexecuted scenarios remain unqualified. Version `0.1.0-dev`, ID
+`584620` and production/public release **NOT QUALIFIED / NOT APPROVED** remain.
+
 ## I107 security hardening
 
 **Follow-up status — 2026-11-17.** Initial independent I1-07 review of
@@ -7,8 +75,9 @@
 NON-BLOCKING FINDINGS**: I107-F01/F02 (P2) and stale Draft wording I107-F03 (P3).
 That external source/trace review did not execute new runtime tests and is not a
 formal GitHub approval or Owner merge authorization. The Owner commissioned the
-bounded corrections before deciding on merge. PR #13 is open and **Ready for review**;
-independent targeted confirmation of these corrections remains outstanding.
+bounded corrections before deciding on merge. At that historical checkpoint PR #13
+was open and **Ready for review**, with targeted confirmation outstanding. The
+completed follow-ups and actual merge are recorded in the current closure above.
 
 The retained sequence is **I1-05 FAILED → I105-FIX01 PASSED → I1-06 PASSED →
 I1-07 with findings → targeted I107 correction/requalification**. Original reports,
@@ -98,7 +167,8 @@ final report and checksums. Real execution used a hash-pinned runtime overlay;
 the final commit was created afterward, with identical runtime contents verified.
 I107-F01/F02 are technically corrected/requalified for the same bounded V24.0.3/
 PHP 8.2.35/MySQL Community 8.4.13 profile. I107-F03 status wording is corrected;
-independent follow-up and the Owner merge decision remain separate. Production/
+independent follow-up and the Owner merge decision were separate subsequent gates,
+now completed as recorded above. Production/
 public release stay **NOT QUALIFIED / NOT APPROVED**; other profiles, arbitrary
 hooks/writers, PostgreSQL iteration 2 and prior unexecuted scenarios remain limited.
 
@@ -124,7 +194,7 @@ approval. The Phase 4 gate table below concerns its earlier profiles.
 | Original I1-05, 2026-11-16 | **FAILED – CORRECTIONS REQUIRED**, 19/20 criteria; T4-09/I105-AC14 failed. Other recorded passes retain only their measured scope. No correction was made during that campaign. |
 | I105-FIX01, 2026-11-17 | **PASSED – CONCURRENCY AND R16 REQUALIFIED**, 20/20 criteria, tested/installed/published correction `d6968c4581ea08169ebc2e8074a959953d76b568`. |
 | I1-06 | **PASSED – DOCUMENTATION COMPLETE AND CI GREEN** at `902697d510e9e75944e2743dacbff5214f0bebea`; separate push/PR CI each 21/21. Original Draft handoff was later moved to Ready by the Owner. |
-| I1-07 | Initial independent review completed with non-blocking F01/F02/F03; targeted correction evidence and outstanding follow-up/Owner merge decision are recorded above. |
+| I1-07 | Initial independent review completed with non-blocking F01/F02/F03; targeted corrections and the subsequently completed follow-up/merge are recorded above. |
 
 F02 CI: [run 43867437518](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/43867437518).
 FIX01 CI: [PR run 44040639439](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44040639439)

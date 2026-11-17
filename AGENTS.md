@@ -55,8 +55,14 @@
 - MySQL real qualification is limited to the V24.0.3/PHP 8.2.35/MySQL Community
   8.4.13 profile in `docs/phase4-implementation-validation.md`. MariaDB keeps its own
   evidence/continuity limits; synthetic CI is not blanket DB qualification.
-  PostgreSQL remains iteration 2; independent I1-07 follow-up and Owner merge
-  approval are separate gates.
+  MariaDB 10.11.19 / V24.0.3 / PHP 8.2.35 / mysqli / InnoDB completed real
+  MDB-01–MDB-09 requalification (9/9 PASS, independently confirmed) at `0999efb`.
+  Both I107 and MDB external follow-ups are complete; I107-F01/F02/F03 are closed.
+  PR #13 merged on 2026-11-17 as `aaf1f3786a4c9ea7e1707ad41cb821b0bb271e3d`
+  with the same tested tree: APPROVED FOR MERGE WITH DOCUMENTED SCOPE.
+  I107-FU-01 remains open, non-blocking P3 Low; preserve the last-observed versus
+  completed-transaction isolation diagnostic distinction. PostgreSQL remains
+  iteration 2; other profiles and production/public releases remain unqualified.
 - Generate PDFs and send mail only after a confirmed COMMIT.
 - Never automatically retry or compensate an unknown booking, COMMIT, PDF, hook, or mail outcome.
 - Reject unsupported invoice, tax, product, stock, entity, or document configurations safely and explicitly.

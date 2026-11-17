@@ -118,10 +118,19 @@ availability does not imply a released, installable production module.
 
 ## Database compatibility
 
+PR [#13](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/13)
+merged on **2026-11-17** as `aaf1f3786a4c9ea7e1707ad41cb821b0bb271e3d`,
+the completed Oracle-MySQL iteration development baseline. Its tree matches tested
+HEAD `0999efb4aafca43d90ce12e38d370662ad0c63a1`. Both external independent
+follow-ups (I107 and MDB-TEST-01) are complete and positive: **APPROVED FOR MERGE
+WITH DOCUMENTED SCOPE**. These external conclusions are not GitHub review votes.
+`I107-FU-01` remains an open, non-merge-blocking P3 Low diagnostic observation.
+The merge grants no production, distribution or release approval.
+
 | Family / profile | Evidence and qualification boundary |
 | --- | --- |
-| MariaDB 10.11, mysqli/InnoDB | Historical bounded V22.0.5 G2/G3/G4 and V24.0.3 C3 runtime evidence remains separate; current branch retains synthetic regression coverage. No new live MariaDB qualification in this iteration. |
-| Oracle MySQL Community Server 8.4.13, Dolibarr V24.0.3, PHP 8.2.35 | Real I1-05 plus targeted FIX01 business/fault/concurrency/R16 qualification in the exact instrumented reference profile; initial I1-07 review completed with findings, targeted follow-up pending. |
+| MariaDB 10.11.19, Dolibarr V24.0.3, PHP 8.2.35, mysqli/InnoDB | Real MDB-TEST-01 requalification at `0999efb`: MDB-01–MDB-09 **9/9 PASS**, independently confirmed. Historical V22 G2/G3/G4 and V24 C3 evidence remains separate; exact limits below. |
+| Oracle MySQL Community Server 8.4.13, Dolibarr V24.0.3, PHP 8.2.35 | Real I1-05 plus targeted FIX01 business/fault/concurrency/R16 qualification in the exact instrumented reference profile; I107 targeted hardening and independent follow-up completed; I107-F01/F02/F03 CLOSED. No blanket version qualification. |
 | Other MySQL versions, PHP/Core combinations or configurations | Not generally qualified. The 21 pinned PHP/Core CI pairs are synthetic cross-version evidence, not 21 real MySQL integrations. |
 | PostgreSQL | Not implemented; reserved for iteration 2. |
 

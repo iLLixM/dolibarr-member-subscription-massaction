@@ -213,14 +213,14 @@ V24.0.3/PHP 8.2.35/MySQL Community 8.4.13 instrumented mysqli/InnoDB/RR profile.
 Historical MariaDB G2/G3/G4/C3 evidence, synthetic cross-version CI and Owner mail
 receipt are distinct. Original MySQL post-COMMIT PDF cases do not imply SMTP
 qualification; FIX01 generated no new PDF or mail. Unexecuted variants, PostgreSQL
-iteration 2, independent I1-07 follow-up and production/public-release restrictions remain
+iteration 2 and production/public-release restrictions remain
 as recorded in the central validation; no general MySQL PASS is inferred.
 
 
 ## I107 hardening evidence
 
 See [I107 security hardening](phase4-implementation-validation.md#i107-security-hardening)
-for the initial independent review, current Ready status and targeted follow-up.
+for the historical initial review/hardening and the completed follow-up/merge.
 Existing `database:`, `booking:`, `invoice:` and `request:` assertions prefixed
 `I107` cover actual-event isolation policy, known-own versus uncertain rollback,
 Agenda option/event reachability, missing/MyISAM table gates and unchanged lock order.
@@ -230,6 +230,37 @@ These are synthetic adapters; no live Core-table Engine conversion is implied.
 `I107-CONCURRENCY` and `I107-R16-LONG/SHORT` use actual Core/MySQL on new synthetic
 fixtures and independent persisted/audit checks. The retained CLI seller-context
 warning does not establish other tax profiles. No new PDF or SMTP evidence, live
-MariaDB rerun or requirement remapping; all71 IDs/18 columns remain unchanged.
+MariaDB rerun at that I107 checkpoint or requirement remapping; all71 IDs/18 columns remain unchanged. The later MDB campaign is distinct below.
 Separate F01/F02 acceptance matrices and the final commit/CI/runtime-hash mapping
 are private execution evidence, not a second requirements matrix.
+
+## MDB-TEST-01 real MariaDB evidence and PR #13 closure
+
+The [central closure and per-case limits](phase4-implementation-validation.md#pr-13-post-merge-closure-and-mdb-test-01--2026-11-17)
+records actual MariaDB 10.11.19 / V24.0.3 / PHP 8.2.35 / mysqli/InnoDB execution
+at `0999efb`, independently confirmed **9/9 PASS**. PR #13 merged on 2026-11-17
+as `aaf1f3786a4c9ea7e1707ad41cb821b0bb271e3d` with the identical tested tree.
+Both independent external follow-ups are complete: APPROVED FOR MERGE WITH
+DOCUMENTED SCOPE; I107-F01/F02/F03 closed, I107-FU-01 remains non-blocking P3 Low.
+
+| Reference | Real evidence; preserve this boundary |
+| --- | --- |
+| MDB-01 | MariaDB native state and own transaction completion; no MySQL P_S dependency, snapshot continuity only. |
+| MDB-02 | Core contribution persistence and confirmed COMMIT. |
+| MDB-03 | Agenda gates/events/actor links ON and process-local OFF; no persisted activation-cycle test. |
+| MDB-04 | Existing-customer invoice/line/entity/subscription link, 120 EUR/VAT0. |
+| MDB-05 | Auto-created customer and validated invoice within the outer transaction. |
+| MDB-06 | Injected fault after real invoice/Agenda DML; confirmed atomic rollback, independent 24-table/file equality. |
+| MDB-07 | Actual concurrent lock wait/current revalidation; loser no Core subscription/DML/1062. |
+| MDB-08 | Actual longer history, earlier shorter period and consented overlap; Core maximum end. No new legacy NULL writer. |
+| MDB-09 | Authenticated Chromium flow and identical consumed POST replay; Firefox real result, no invoice/mail. |
+
+These are real Core/MariaDB tests on synthetic business fixtures, not the existing
+synthetic `database:`, `booking:` or `request:` doubles or the 21 PHP/Core CI pairs.
+The 173 read-only trace assertions and checksum validation are additional evidence
+analysis, not 173 live database tests. Protected CLI/browser runs were Owner-executed;
+external independent MDB confirmation is Owner-reported. Private artifact names and
+integrity references are in the central validation, not public download links.
+No new requirement assignment or modification of 71 IDs/18 columns is introduced.
+Historical I1-05 failure, read-only E04, I107 warning and all unexecuted scenarios
+retain their scopes. No new PDF/SMTP, general DB-version or production/release approval.
