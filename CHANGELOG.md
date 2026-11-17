@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+- Issue #8: replace the fixed 50-member booking cap with configurable
+  `MEMBERSUBSCRIPTIONMASSACTION_MAX_MEMBERS_PER_BATCH`, default 100 even for
+  existing activations, capped by `MAIN_LIMIT_FOR_MASS_ACTIONS`. Reject oversized
+  selections early with DE/EN selected-count/maximum feedback and a return link;
+  recheck current limits for pending sessions, without truncation or splitting.
+- PR #16 independent review of `5f71102` completed: APPROVED FOR MERGE WITH
+  DOCUMENTED SCOPE. F16-01 CLOSED – OWNER ACCEPTED (I105 URL assignment error;
+  actual MariaDB V24 target accepted). F16-02 RESOLVED WITH DOCUMENTED SCOPE –
+  OWNER-CONFIRMED HTTP TEST: later manual authenticated 100/100 contribution-only
+  browser booking, about 6 seconds confirmation-to-results, no invoices/email.
+  Keep original automated CLI evidence separate; no independent HTTP reproduction
+  or new traces claimed. F16-03/04/05 remain P3, non-merge-blocking. No general
+  HTTP-load/replay/parallel/PDF/SMTP, production or release approval; PR stays Draft.
+
 - Complete Oracle-MySQL iteration 1 with PR #13 merged on 2026-11-17 as
   `aaf1f3786a4c9ea7e1707ad41cb821b0bb271e3d` (same tree as tested `0999efb`).
   Both independent I107/MDB follow-ups completed positively: APPROVED FOR MERGE

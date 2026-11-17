@@ -278,3 +278,29 @@ previews, persisted module limits25/150 and a stale26-member direct POST after
 reduction150→25. Temporary module configuration was restored. A small real
 customer/invoice/Agenda path passed separately. See the central Issue8 evidence
 section for exact metrics and CLI-versus-Apache boundaries. No blanket performance claim.
+
+### PR #16 independent review and later Owner acceptance
+
+See the [current finding statuses and evidence separation](phase4-implementation-validation.md#pr-16-documentation-follow-up--2026-11-18).
+Independent review of `5f71102cc631c619496d0d6f2e002b97073ae644` completed:
+**APPROVED FOR MERGE WITH DOCUMENTED SCOPE**. The new documentation follow-up is
+separate from that reviewed implementation/evidence HEAD and changes no tests or
+requirement assignments. New-HEAD PR/push CI is recorded separately in PR #16.
+
+- F16-01: **CLOSED – OWNER ACCEPTED**. The I105 URL was an assignment error;
+  `doli24.test:8090`, V24.0.3/PHP8.2.35/MariaDB10.11.19 is the accepted target.
+  No I105 rerun or installation-equivalence claim.
+- F16-02: **RESOLVED WITH DOCUMENTED SCOPE – OWNER-CONFIRMED HTTP TEST**.
+  A later authenticated manual Owner browser booking created 100/100 subscriptions,
+  no invoice/email, approximately 6 seconds confirmation-to-results. This is
+  Owner-reported acceptance, not a new automated run, independent reproduction,
+  memory measurement, HTTP raw trace or expansion of the original CLI evidence.
+- F16-03/F16-04/F16-05 remain **P3, non-merge-blocking**: O(N) raw-ID validation;
+  incomplete independent reconstruction of individual Agenda links from hashes;
+  safely consumed processing state in a narrow post-consumption limit-change race.
+  No code fix or additional evidence execution is claimed.
+
+The original synthetic contracts, automated CLI100, automated browser/negative
+POST tests and later manual HTTP100 are distinct evidence levels. No general
+HTTP load/replay/parallel-booking/PDF/SMTP or production/release approval. Draft,
+merge decision and Issue #8 closure remain with the Owner; no merge performed.

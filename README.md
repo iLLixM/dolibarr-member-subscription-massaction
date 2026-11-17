@@ -258,6 +258,12 @@ on the first module page before member loading/preview. No selection is truncate
 or split automatically. Pending sessions are rechecked against the current limit;
 consumed results remain readable. Use smaller batches when transport is
 slow. This cap is not a timeout guarantee. A crash leaves pending rows uncertain.
+The independent PR #16 review concluded **APPROVED FOR MERGE WITH DOCUMENTED SCOPE**.
+A later Owner-confirmed authenticated HTTP run created 100/100 subscriptions
+without invoices/email in approximately 6 seconds from confirmation to results.
+That manual observation is separate from the automated CLI benchmark; it does not
+qualify general HTTP load, replay, concurrent batches or PDF/SMTP throughput.
+See the [review and acceptance limits](docs/phase4-implementation-validation.md#pr-16-documentation-follow-up--2026-11-18).
 There is no durable operation journal, SMTP queue or exactly-once claim. Core and
 third-party actions need not honor the module's member-row lock. Core triggers still
 run and can have nontransactional side effects; inventory them before real tests.

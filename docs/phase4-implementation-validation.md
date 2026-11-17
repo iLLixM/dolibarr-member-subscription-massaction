@@ -1,6 +1,53 @@
 # Phase 4 implementation validation
 
+## PR #16 documentation follow-up — 2026-11-18
+
+**Current review status: APPROVED FOR MERGE WITH DOCUMENTED SCOPE.** The external
+independent implementation/regression/evidence review of
+`5f71102cc631c619496d0d6f2e002b97073ae644` is complete. That reviewed HEAD contains
+implementation `72bed7fe9f61ec7488bf29a5388f9f1a777c7910` and its original evidence
+documentation. This subsequent documentation-only follow-up records later Owner
+acceptances; it is not a new independently reviewed implementation or live campaign.
+Its new commit SHA and separate PR/push CI results are recorded in PR #16.
+PR #16 remains **Draft**, pending the separate Owner merge decision; Issue #8 is open.
+The external review conclusion is not a formal GitHub review vote.
+
+| Finding | Current status and scope |
+| --- | --- |
+| F16-01 | **CLOSED – OWNER ACCEPTED.** The Owner confirms that the originally intended I105 URL reference was an error in preparing the assignment. The actually used `http://doli24.test:8090` / Dolibarr V24.0.3 / PHP 8.2.35 / MariaDB 10.11.19 environment is correct and expressly accepted. No I105 requalification is required. This accepts the target; it does not assert that I105 and this installation are identical. |
+| F16-02 | **RESOLVED WITH DOCUMENTED SCOPE – OWNER-CONFIRMED HTTP TEST.** In a later authenticated manual browser run, the Owner reports 100/100 subscriptions created without invoices or email, approximately 6 seconds from booking confirmation to result display. This is a distinct Owner-confirmed HTTP observation, not the earlier automated CLI campaign or an independent reproduction. No new HTTP raw traces, HAR, session-write instrumentation or independent SQL reconciliation of that manual run is claimed. |
+| F16-03 | **P3, non-merge-blocking; remains open.** Raw selection IDs are strictly validated before the size check, so extremely large authenticated input still incurs O(N) validation/memory cost before rejection. Member/preview business queries remain avoided. No robustness change in this follow-up. |
+| F16-04 | **P3, non-merge-blocking; remains open.** The original archive proves 100 added Agenda events/resources by counts/hashes, but does not independently reconstruct every individual foreign-key assignment. Runtime checks, original evidence and this reconstruction limit remain distinct; no additional SQL check was executed. |
+| F16-05 | **P3, non-merge-blocking; remains open.** A limit reduction between persisted session consumption and orchestration admission can leave a safely stopped consumed `processing` run even before business DML. Do not automatically retry, reopen or rebook it; reconcile the outcome first. No recovery-code change or new race test is claimed. |
+
+The review independently checked source/CI/evidence, including 22 runtime file
+hashes and the original archive integrity; it did not independently rerun the live
+campaign. Original implementation CI (PR44188974734/push44188923649) and reviewed
+HEAD CI (PR44190437337/push44190428982) each completed **21/21 PASS**. The formerly
+pending push44190428982 is now historical completed success. New documentation-HEAD
+CI must be assessed separately; synthetic CI is not a live database/load test.
+
+**Evidence separation:** original automated CLI100: 5.89840 seconds with measured
+PHP memory and serialized checkpoints; original automated browser tests: previews,
+localized early rejection and a reduced-limit negative POST; later manual Owner
+HTTP100: 100/100 success and approximately 6 seconds, confirmation to results.
+These observations are not interchangeable. The accepted manual run adds bounded
+HTTP booking evidence without retroactively changing the original CLI report or
+its independently reviewed traces. The supplied Owner report does not state an
+additional test timestamp, browser version or new measured memory value; none is
+invented here. The date above is the documentation/acceptance recording date.
+
+No general HTTP-load, replay, parallel-booking, PDF/SMTP throughput, database-version,
+production or release qualification follows. The manual run does not extend existing
+replay tests to a positive HTTP100 replay campaign, prove all timeout settings or
+qualify simultaneous large runs. Prior restrictions and original evidence remain.
+This task changes documentation only; no test, configuration or DB operation.
+
 ## Issue #8 configurable bulk limit — 2026-11-17
+
+**Historical automated-campaign snapshot:** review and HTTP limitations below describe
+that original stage. Later independent review and Owner acceptances are recorded above;
+the original measured results and artifacts are unchanged.
 
 Implementation `72bed7fe9f61ec7488bf29a5388f9f1a777c7910`, based on main
 `4fdeb862a9a63ffe9126fbb42e95005b049a0ee8`, was tested on actual Dolibarr V24.0.3 /
