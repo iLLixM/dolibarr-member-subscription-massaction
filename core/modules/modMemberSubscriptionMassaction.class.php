@@ -36,7 +36,7 @@ class modMemberSubscriptionMassaction extends DolibarrModules
 		$this->need_dolibarr_version = array(21, 0, 0);
 		$this->dirs = array();
 		$this->config_page_url = array();
-		$this->const = array();
+		$this->const = array(array('MEMBERSUBSCRIPTIONMASSACTION_MAX_MEMBERS_PER_BATCH', 'chaine', '100', 'Maximum members per bulk run', 1, 'current', 0));
 		// Reuse existing member and optional invoice permissions; no redundant module grant.
 		$this->rights = array();
 		$this->menu = array();

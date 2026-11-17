@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+require_once __DIR__.'/batch.lib.php';
+
 /**
  * Resolve only the three supported tokens, without evaluating template code.
  * @param string $template Plain text template (at most 1024 characters)
@@ -201,6 +203,7 @@ function msmUpdatePreview(array $state, array $post)
 /** Read current business data on every refresh; no user-supplied amounts/types. */
 function msmEvaluatePreview($db, $user, array $state)
 {
+	msmRequireBatchSize($state['ids']);
 	require_once DOL_DOCUMENT_ROOT.'/adherents/class/adherent.class.php';
 	require_once __DIR__.'/../class/preview.class.php';
 	foreach ($state['ids'] as $id) {

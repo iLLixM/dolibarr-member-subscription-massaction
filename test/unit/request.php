@@ -97,3 +97,17 @@ $state=$base;$state['options']['invoice']=true;$state['options']['autocreate']=t
 $observer=new RequestObserver();$service=new RequestBookingService();msmRequireBookingDatabase($state,$observer,$service);
 verify($service->tables===array(true)&&$service->creation===array(true)&&!$service->books,'I107 authenticated preflight forwards invoice/autocreate without booking');
 echo ($passed-$beforeRequest)." request readiness/result assertions passed (synthetic contracts; no HTTP/database/business operations).\n";
+
+$state=$base;$state['ids']=range(1,100);$conf->global->MEMBERSUBSCRIPTIONMASSACTION_MAX_MEMBERS_PER_BATCH='100';
+$ready=msmConsumeConfirmation($state,$post);verify($ready['phase']==='processing','Issue8 default100 confirmation');
+$conf->global->MEMBERSUBSCRIPTIONMASSACTION_MAX_MEMBERS_PER_BATCH='25';
+fails(static function () use($state,$post){msmConsumeConfirmation($state,$post);},'MSMBatchLimit');
+$observer=new RequestObserver();$service=new RequestBookingService();
+fails(static function () use($state,$observer,$service){msmRequireBookingDatabase($state,$observer,$service);},'MSMBatchLimit');
+verify(!$observer->calls&&!$service->books,'Issue8 reduced limit blocks before DB readiness');
+fails(static function () use($ready,$service){msmProcessBooking($ready,$service,new RequestMailFence(),new PreviewUser(),static function($x){});},'MSMBatchLimit');
+verify(!$service->books,'Issue8 reduced processing limit zero business calls');
+$conf->global->MEMBERSUBSCRIPTIONMASSACTION_MAX_MEMBERS_PER_BATCH='100';
+$state['ids']=range(1,101);fails(static function () use($state,$post){msmConsumeConfirmation($state,$post);},'MSMBatchLimit');
+verify(count($state['ids'])===101&&$state['phase']==='confirm','Issue8 no truncation or consumption on rejection');
+echo "Issue8 stale/reduced/oversized request contracts passed.\n";

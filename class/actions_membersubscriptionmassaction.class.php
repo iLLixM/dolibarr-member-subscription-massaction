@@ -68,9 +68,14 @@ class ActionsMemberSubscriptionMassaction extends CommonHookActions
 		}
 		try {
 			// Validate raw shape before integer normalization can hide malformed IDs.
-			$ids = msmSelectionIds($_POST['toselect'] ?? null, getDolGlobalInt('MAIN_LIMIT_FOR_MASS_ACTIONS', 1000));
-			if ($ids !== msmSelectionIds($parameters['toselect'] ?? null, getDolGlobalInt('MAIN_LIMIT_FOR_MASS_ACTIONS', 1000))) {
+			$ids = msmSelectionIds($_POST['toselect'] ?? null, is_array($_POST['toselect'] ?? null) ? count($_POST['toselect']) : 0);
+			if ($ids !== msmSelectionIds($parameters['toselect'] ?? null, count($ids))) {
 				throw new InvalidArgumentException('MSMInvalidSelection');
+			}
+			if (count($ids) > msmBatchLimit()) {
+				$notice = msmBatchNotice($_SESSION, count($ids), (int) $user->id, (int) $conf->entity, dol_now());
+				header('Location: '.dol_buildpath('/membersubscriptionmassaction/subscription.php', 1).'?batchlimit='.$notice, true, 303);
+				exit;
 			}
 			msmCheckMembers($this->db, $user, $ids);
 			$token = msmCreateRun($_SESSION, $ids, (int) $user->id, (int) $conf->entity, dol_now());
