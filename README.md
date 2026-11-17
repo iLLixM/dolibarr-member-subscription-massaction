@@ -1,6 +1,14 @@
 # Member Subscription Massaction for Dolibarr
 
-**Cross-version development status — 2026-11-15:** admission now starts at Dolibarr 21.0.0,
+**Database development status — 2026-11-17:** MariaDB and Oracle MySQL are
+implemented through the shared `MsmDatabaseState` observer. The original I1-05
+campaign remains **FAILED — CORRECTIONS REQUIRED** (19/20); the first targeted
+I105-FIX01 correction **PASSED — CONCURRENCY AND R16 REQUALIFIED** (20/20).
+Together they requalify only the bounded MySQL reference profile below.
+[PR #13](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/13)
+remains Draft for independent I1-07 review; no merge, production or release approval.
+
+**Cross-version admission and P3 baseline — 2026-11-15:** admission now starts at Dolibarr 21.0.0,
 with no upper version or exact-patch allowlist. V21 and future releases remain
 unqualified. P1 analyzed all 15 tags V22.0.0–22.0.5, V23.0.0–23.0.4 and
 V24.0.0–24.0.3. Local PHP 8.2 synthetic runners passed against all 15 pinned
@@ -64,11 +72,12 @@ the owner's scoped residual-risk acceptance.
 The module adds an authenticated member-list preview, an explicit confirmation and
 per-member booking results. It can optionally create a linked third party, a validated
 standard invoice and its PDF through Dolibarr Core APIs. It never creates payments or
-bank entries. Invoice evidence is limited to the historical V22.0.5 profile and the separately
+bank entries. Historical invoice evidence covers the V22.0.5 profile and the separately
 tested V24.0.3 C3 profile: standard EUR invoices, quantity 1, VAT 0, no configured
 product, Mercure numbering and Sponge PDF. See the
 [C3 evidence and limits](docs/phase4-implementation-validation.md#c3-v2403-integration-campaign-2026-11-14);
 the completed development merge and fulfilled owner decisions do not broaden the tested profile.
+The separate MySQL iteration below adds its explicitly bounded invoice evidence.
 
 ## Origin and scope
 
@@ -104,6 +113,48 @@ Module ID **584620 is temporary**, checked against local descriptors and the
 It is an unreserved development value above 500000, only for approved isolated
 tests. Reserve and replace it before distributing a module release. Public source
 availability does not imply a released, installable production module.
+
+## Database compatibility
+
+| Family / profile | Evidence and qualification boundary |
+| --- | --- |
+| MariaDB 10.11, mysqli/InnoDB | Historical bounded V22.0.5 G2/G3/G4 and V24.0.3 C3 runtime evidence remains separate; current branch retains synthetic regression coverage. No new live MariaDB qualification in this iteration. |
+| Oracle MySQL Community Server 8.4.13, Dolibarr V24.0.3, PHP 8.2.35 | Real I1-05 plus targeted FIX01 business/fault/concurrency/R16 qualification in the exact instrumented reference profile; independent I1-07 review pending. |
+| Other MySQL versions, PHP/Core combinations or configurations | Not generally qualified. The 21 pinned PHP/Core CI pairs are synthetic cross-version evidence, not 21 real MySQL integrations. |
+| PostgreSQL | Not implemented; reserved for iteration 2. |
+
+MySQL requires direct `mysqli`, InnoDB for all touched tables, `REPEATABLE READ`,
+`autocommit=1` outside explicit transactions and active transaction instrumentation
+in Performance Schema. In addition to the application's existing schema rights,
+the proven observer needs `SELECT` on
+`performance_schema.events_transactions_current`, with the required identity and
+savepoint/release-counter fields and `PS_CURRENT_THREAD_ID()` available. No
+`PROCESS`, `threads`/`setup_*` SELECT or new global administrative grant is needed
+for this profile. Observer queries filter to the current thread; the table-level
+SELECT permission itself does not restrict access to that thread's rows.
+Missing rights/events/freshness fail closed. Idle calibration reads an existing
+InnoDB member row; an empty member table is not silently seeded or accepted.
+
+Booking and Invoice share one DoliDB-bound observer and one outer transaction per
+member. MySQL checks native connection/server/thread/event identity, active
+SAVEPOINT/RELEASE counter freshness and the expected own completion before a new
+idle proof. MariaDB retains `@@in_transaction`, logical depth and InnoDB checks;
+its status-snapshot continuity is not upgraded to MySQL event continuity.
+FIX01 checks engines before BEGIN and again after member/type and optional
+customer/product locks, before ordinary business reads. This prevents an engine
+metadata query from creating a pre-lock MySQL read view that preview and unchanged
+Core R16 reads would retain. No isolation change, extra COMMIT or Core end-date rewrite.
+Uncertain ownership/completion yields `unknown/stop`, without retry or rollback of
+a replacement transaction. Stored results remain readable under F01's authenticated
+session contract when readiness is unavailable; this does not permit new bookings.
+
+Core-version admission (>=21.0.0) and backend capability checks do not qualify a
+runtime profile. V21/future versions, other MySQL editions/configurations, proxies,
+session multiplexing/reconnection and arbitrary foreign writers remain unqualified.
+See the [MySQL qualification and evidence](docs/phase4-implementation-validation.md#mysql-iteration-1)
+for exact tested commits, historical failures, read-only E04 and PDF/mail limits.
+Version `0.1.0-dev`, temporary ID `584620` and production/public-release status
+**NOT QUALIFIED / NOT APPROVED** remain unchanged.
 
 ## Development installation
 
@@ -169,7 +220,8 @@ contribution end; V24.0.3 maximum contribution end). Only confirmed
 commits can proceed to PDF generation and mail. Results survive reload within the session; uncertain
 outcomes require manual database inspection, never an automatic retry.
 
-Booking currently supports the mysqli driver with MySQL/MariaDB and InnoDB only.
+Booking implements the mysqli driver with MariaDB or Oracle MySQL and InnoDB only;
+see the profile-specific prerequisites and qualification limits above.
 At most 50 members may be confirmed together; use smaller batches when transport is
 slow. This cap is not a timeout guarantee. A crash leaves pending rows uncertain.
 There is no durable operation journal, SMTP queue or exactly-once claim. Core and

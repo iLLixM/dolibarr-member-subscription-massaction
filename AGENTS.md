@@ -37,6 +37,18 @@
 - Preserve Phase 3B subscription booking, R16 postconditions, replay protection, transaction ownership, and permission checks.
 - Owner decisions O1–O7 are binding for invoice work; do not change them silently.
 - Keep one controlled database transaction per member for the contribution and optional customer/invoice operations.
+- Booking and Invoice must share one `MsmDatabaseState` bound to the same DoliDB
+  object. Preserve G0 connection/event ownership, freshness, depth and expected-own
+  completion before fresh idle; the observer does not own outer transaction control.
+- Check engines before BEGIN and again after member/type and optional customer/product
+  locks, before ordinary business reads. Do not establish a pre-lock MySQL read view,
+  change isolation as a workaround or replace Core R16 writes.
+- Roll back only a fresh, provably owned open context; lost ownership/completion stays
+  `unknown/stop` without retry or rollback of a replacement transaction.
+- MySQL real qualification is limited to the V24.0.3/PHP 8.2.35/MySQL Community
+  8.4.13 profile in `docs/phase4-implementation-validation.md`. MariaDB keeps its own
+  evidence/continuity limits; synthetic CI is not blanket DB qualification.
+  PostgreSQL remains iteration 2; I1-07 and merge approval are separate gates.
 - Generate PDFs and send mail only after a confirmed COMMIT.
 - Never automatically retry or compensate an unknown booking, COMMIT, PDF, hook, or mail outcome.
 - Reject unsupported invoice, tax, product, stock, entity, or document configurations safely and explicitly.
