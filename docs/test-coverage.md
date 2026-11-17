@@ -59,8 +59,10 @@ Current evidence is separated by provenance (see `docs/phase3b-validation.md`):
 - External confirmation: the owner reported receipt of ten original emails. This is
   not an agent-observed mailbox check or validation of every template/language variant.
 
-Arbitrary external hooks, actual server/connection loss with uncertain COMMIT replies,
-complete session loss and other Dolibarr versions remain unvalidated. No permanent
+At the historical Phase 3B checkpoint, arbitrary external hooks, actual server/connection
+loss with uncertain COMMIT replies, complete session loss and other Dolibarr versions
+remained unvalidated. Later bounded MySQL fault cases are indexed below; they do not
+qualify all network failures or other versions. No permanent
 exactly-once guarantee or unrestricted production approval is claimed. Synthetic
 mail-failure/hook tests do not become real SMTP-failure tests through successful receipts.
 The owner accepted the documented R05–R09 boundaries for Phase 3B on V22.0.5; these
@@ -171,3 +173,63 @@ P3 subsequently closed with Owner acceptance and documented limitations; see the
 [P3 qualification guide](p3-qualification-summary.md) for the 21-job CI evidence,
 PHP-8.2-only supplemental scope and separate P3-DOC01 reference addendum.
 Independent overall code review and merge decisions remain separate.
+
+## MySQL iteration 1 evidence (2026-11-17)
+
+Use the [central MySQL history, profile and private evidence index](phase4-implementation-validation.md#mysql-iteration-1).
+This legend does not create requirement assignments; all 71 IDs/18 columns in
+`requirements.csv` remain unchanged.
+
+- `database:<label>` refers to `test/unit/database.php`: synthetic server-family,
+  native-identity, freshness/event/counter, bootstrap, ownership and completion
+  contracts. `request:<label>` refers to `test/unit/request.php`: synthetic F01
+  stored-result/readiness/session/replay contracts. Neither is a real outage test.
+- FIX01's `BookingReadViewDatabase` and literal `FIX01 ...` assertions in the
+  existing booking/invoice runners separate current locking reads from an old
+  consistent view, reproduce the old metadata order and check pre-Core rejection,
+  actual pinned Core end-date logic and invoice lock order. The unchanged 21 CI
+  pairs exercise PHP/Core source combinations, not live MySQL servers.
+- `G0-*` denotes technical mysqli/InnoDB observation and separately Owner-executed
+  negative windows, before installed Dolibarr business qualification.
+- Original I1-05 `T3-*`/`T4-*` references require the **I1-05** campaign context;
+  they are not every generic T3/T4 test level or the earlier C3 campaign. Actual
+  serial business/fault/PDF/HTTP cases retain their exact profiles and partial
+  scopes. Original `T4-09` remains FAIL/1062, 19/20 acceptance, not a new PASS.
+- `FIX-D01`–`FIX-D04` are real controlled MySQL concurrency/lock/rollback cases;
+  `FIX-E01`–`FIX-E03` are real current-history/R16 cases, and `FIX-E05` includes a
+  real Core invoice/customer positive and a rejected competitor with zero DML.
+  D03/E01/E02 use predeclared legitimate disjoint periods; changed overlap consent
+  is tested by D02/E03. No first-writer retry or new consent rule is implied.
+- `FIX-E04` is **read-only** existing SQL-NULL/current-history/MAX/object/storage
+  evidence, not a new Core `update_end_date()` invocation or NULL-fixture write.
+  Historical real I1-05 T3-15 and current synthetic actual-Core NULL regressions
+  remain separate supporting evidence.
+- The D01 coordinator/diagnostic STOPs remain original artifacts. Read-only
+  reconciliation establishes the normal successful writer's Core Agenda side
+  effect and the passed concurrency contract; no booking was repeated.
+
+I1-05 FAILED → FIX01 PASSED (20/20) requalifies only the stated
+V24.0.3/PHP 8.2.35/MySQL Community 8.4.13 instrumented mysqli/InnoDB/RR profile.
+Historical MariaDB G2/G3/G4/C3 evidence, synthetic cross-version CI and Owner mail
+receipt are distinct. Original MySQL post-COMMIT PDF cases do not imply SMTP
+qualification; FIX01 generated no new PDF or mail. Unexecuted variants, PostgreSQL
+iteration 2, independent I1-07 follow-up and production/public-release restrictions remain
+as recorded in the central validation; no general MySQL PASS is inferred.
+
+
+## I107 hardening evidence
+
+See [I107 security hardening](phase4-implementation-validation.md#i107-security-hardening)
+for the initial independent review, current Ready status and targeted follow-up.
+Existing `database:`, `booking:`, `invoice:` and `request:` assertions prefixed
+`I107` cover actual-event isolation policy, known-own versus uncertain rollback,
+Agenda option/event reachability, missing/MyISAM table gates and unchanged lock order.
+These are synthetic adapters; no live Core-table Engine conversion is implied.
+`I107-isolation` is real but read-only (seven own-event cases, no business DML).
+`I107-POS-SUB`, `I107-POS-INVOICE`, `I107-AGENDA-ROLLBACK`,
+`I107-CONCURRENCY` and `I107-R16-LONG/SHORT` use actual Core/MySQL on new synthetic
+fixtures and independent persisted/audit checks. The retained CLI seller-context
+warning does not establish other tax profiles. No new PDF or SMTP evidence, live
+MariaDB rerun or requirement remapping; all71 IDs/18 columns remain unchanged.
+Separate F01/F02 acceptance matrices and the final commit/CI/runtime-hash mapping
+are private execution evidence, not a second requirements matrix.

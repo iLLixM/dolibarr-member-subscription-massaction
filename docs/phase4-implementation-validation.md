@@ -1,5 +1,271 @@
 # Phase 4 implementation validation
 
+## I107 security hardening
+
+**Follow-up status — 2026-11-17.** Initial independent I1-07 review of
+`902697d510e9e75944e2743dacbff5214f0bebea` concluded **APPROVED FOR MERGE WITH
+NON-BLOCKING FINDINGS**: I107-F01/F02 (P2) and stale Draft wording I107-F03 (P3).
+That external source/trace review did not execute new runtime tests and is not a
+formal GitHub approval or Owner merge authorization. The Owner commissioned the
+bounded corrections before deciding on merge. PR #13 is open and **Ready for review**;
+independent targeted confirmation of these corrections remains outstanding.
+
+The retained sequence is **I1-05 FAILED → I105-FIX01 PASSED → I1-06 PASSED →
+I1-07 with findings → targeted I107 correction/requalification**. Original reports,
+19/20 and 20/20 gates, previous CI and accepted limits are unchanged.
+
+### Bounded implementation and architecture checkpoint
+
+The pre-implementation analysis did not trigger the Owner's architecture stop:
+F01 covers a fixed set of regular Core events/two tables; F02 adds an observed
+fact and a separate business-admission predicate. No generic trigger scanner,
+new transaction controller or change to ownership/continuity/completion states.
+
+- **F01:** Core `ActionsAuto` first checks Agenda and truthy
+  `MAIN_AGENDA_ACTIONAUTO_<event>`. Contribution creation reaches
+  `MEMBER_SUBSCRIPTION_CREATE`; invoicing can reach `BILL_CREATE`,
+  `LINEBILL_INSERT` and `BILL_VALIDATE`. Selected customer creation can reach
+  `COMPANY_CREATE`, plus `CONTACT_CREATE` when automatic contact creation is enabled.
+  Internal company initialization suppresses `COMPANY_MODIFY`; customer classification
+  uses a direct Core update without that trigger. A fresh standard `ActionComm`
+  writes `actioncomm`/`actioncomm_resources`; its empty extra-field options do not
+  enter the extra-field write path. Custom hooks populating additional data remain
+  outside this bounded contract. `checkTables()` checks both engines only when a
+  relevant enabled event can occur under the selected options, before BEGIN and
+  after **all** member/type/customer/product locks. No metadata read was inserted
+  into the protected pre-lock interval.
+- **F02:** the same existing own-thread Performance-Schema query now selects
+  `ISOLATION_LEVEL`; all expected fields/valid enum values must be present. After
+  fresh owned ACTIVE verification, a SQL-free admission predicate requires
+  `REPEATABLE READ`. Session defaults cannot replace the actual event, including
+  one-shot next-transaction overrides. Other valid levels are configuration errors
+  and retain the existing confirmed-own rollback path. Missing/invalid facts follow
+  the existing UNKNOWN latch and cannot redeem uncertain ownership. `sameActive`,
+  BEGIN ownership, G0 counter probes, rollback-context and completion transitions
+  remain unchanged. MariaDB neither queries nor requires this MySQL field. No
+  additional observation round trip, production SET or isolation workaround.
+
+### Executed evidence and limitations
+
+Existing synthetic runners cover Agenda module/events off, reachable invoice/
+customer/contact options, InnoDB positives, missing/MyISAM tables and initial/final
+engine rejection before business APIs. Both MariaDB and MySQL models are covered.
+Isolation vectors include all four actual event levels, one-shot/session distinction,
+malformed/missing fields, fresh-owned rollback versus unknown identity, invoice
+admission and combined Agenda preflight. Existing G0/R16/NULL/request/replay/
+post-COMMIT assertions are retained. Local PHP 8.2/V24.0.3 passed: 188 adapter,
+369 booking/mail, 236 invoice and 59 request assertions plus all other existing
+runners, language parity, PHP lint and whitespace checks. These overlapping counts
+are not a unique scenario total or new live MariaDB qualification. The unchanged
+21-pair CI on the final correction commit is recorded separately in PR #13 and
+`CI-RESULTS.json`, with distinct push/PR run URLs.
+
+| Real case | Actual result / scope |
+| --- | --- |
+| `I107-isolation` | Seven read-only cases: four next-transaction settings while the session default remains RR, plus three other session defaults. Actual own event read correctly; non-RR rejects before locks/Core/DML; RR reaches deliberate stale-fingerprint rejection without writing. Seven confirmed own rollbacks; business/files identical. |
+| `I107-POS-SUB` | Real Core contribution and regular Agenda event/resource creation. |
+| `I107-POS-INVOICE` | Real new customer, validated standard zero-VAT invoice and subscription link; active company/invoice Agenda paths verified. |
+| `I107-AGENDA-ROLLBACK` | Controlled application fault after real contribution and Agenda insertion, before outer COMMIT; own rollback confirmed and all monitored table/file hashes equal. |
+| `I107-CONCURRENCY` | Two physical connections, A success; B waits about 0.826 seconds, then changed-confirmation skip before any subscription/DML, confirmed own rollback, no 1062. |
+| `I107-R16-LONG/SHORT` | New longer history then earlier disjoint shorter contribution; unchanged Core retains the maximum end. |
+
+The actual configuration had subscription-create, bill-validate and company-create
+Agenda events enabled; bill-create and line-insert were disabled. Contact-create was
+enabled but automatic contact creation was off. The tests preserved these settings.
+Five new synthetic members/five persisted contributions, one customer/invoice and
+seven Agenda events/resources were independently reconciled; all prior business/
+audit rows and PDFs were unchanged. No new PDF/ECM generation, payments or mail.
+
+The invoice CLI run emitted a Core `country_code` warning in
+`getLocalTaxesFromRate()`: the existing `NOREQUIRESOC` CLI bootstrap leaves the
+global seller object unset. Its zero-VAT invoice/amount/link and Agenda postconditions
+passed. This test-context limitation is retained; no Core tax fix, new tax-profile
+qualification or repeat invoice was introduced. Raw Xdebug argument/object output
+is not part of the public documentation or sanitized evidence package.
+
+Negative Engine conversion/missing-table cases are **synthetic**, not a claim of
+real MyISAM execution. No existing Core table was converted and no new privilege,
+global variable, instrumentation or infrastructure change occurred. Missing/invalid
+isolation and lost-identity negatives are synthetic; actual valid isolation-level
+rejection is real. Historical I1-05/FIX01/G0, PDF/mail and MariaDB evidence is not
+re-executed or broadened by this follow-up.
+
+Private evidence set `dolibarr-db-iter1-i107-fix01-20261117` retains
+`PREIMPLEMENTATION-ANALYSIS.txt`, `RUNTIME-MANIFEST.json`, local results, real
+inspection/isolation/business/SQL traces, independent postconditions, separate
+`F01-ACCEPTANCE.json` and `F02-ACCEPTANCE.json` (ten criteria each), CI evidence,
+final report and checksums. Real execution used a hash-pinned runtime overlay;
+the final commit was created afterward, with identical runtime contents verified.
+I107-F01/F02 are technically corrected/requalified for the same bounded V24.0.3/
+PHP 8.2.35/MySQL Community 8.4.13 profile. I107-F03 status wording is corrected;
+independent follow-up and the Owner merge decision remain separate. Production/
+public release stay **NOT QUALIFIED / NOT APPROVED**; other profiles, arbitrary
+hooks/writers, PostgreSQL iteration 2 and prior unexecuted scenarios remain limited.
+
+## MySQL iteration 1
+
+**Historical I1-06 database handoff — 2026-11-17.** The Owner accepted
+DB-FIX01-DEC-01–07: FIX01 complete, I105-FIND-01 technically resolved subject to
+independent I1-07 confirmation, no full I1-05 rerun, I1-06 documentation/review
+preparation authorized, no merge/production/release approval. PR #13 was Draft
+at that checkpoint; its later Ready status and I1-07 findings are recorded above.
+The bounded conclusion is **I1-05 FAILED → I105-FIX01 PASSED → bounded MySQL profile
+requalified**. It does not rewrite any original test status or historical MariaDB
+approval. The Phase 4 gate table below concerns its earlier profiles.
+
+### History and tested commits
+
+| Stage | Actual result / evidence level |
+| --- | --- |
+| DB-P1 / DB-ITER1, 2026-11-16 | Conditional technical feasibility; naive event snapshots failed freshness cases. Not an installed-module qualification. |
+| G0, 2026-11-16 | **PASSED – IMPLEMENTATION PLANNING RELEASED**, 15/15 criteria for the composed technical freshness/continuity mechanism; no business-module qualification at that stage. |
+| I1-01–04 | Shared observer, Booking/Invoice and authenticated preflight implemented at `40a262589de0c16d5482839800ac3c805a6cb9bd`; local PHP 8.2 synthetic qualification. Initial PHP 7.4 gap was historical. |
+| F01 / F02 | F01 **RESOLVED** at `e9c4cac022f9a4b5a1b700e6aea0c26c1ff7f051`: stored authenticated results bypass new-operation readiness without bypassing identity/entity/CSRF/consumption/replay. F02 closed by actual 21/21 CI, including six PHP 7.4 jobs. |
+| Original I1-05, 2026-11-16 | **FAILED – CORRECTIONS REQUIRED**, 19/20 criteria; T4-09/I105-AC14 failed. Other recorded passes retain only their measured scope. No correction was made during that campaign. |
+| I105-FIX01, 2026-11-17 | **PASSED – CONCURRENCY AND R16 REQUALIFIED**, 20/20 criteria, tested/installed/published correction `d6968c4581ea08169ebc2e8074a959953d76b568`. |
+| I1-06 | **PASSED – DOCUMENTATION COMPLETE AND CI GREEN** at `902697d510e9e75944e2743dacbff5214f0bebea`; separate push/PR CI each 21/21. Original Draft handoff was later moved to Ready by the Owner. |
+| I1-07 | Initial independent review completed with non-blocking F01/F02/F03; targeted correction evidence and outstanding follow-up/Owner merge decision are recorded above. |
+
+F02 CI: [run 43867437518](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/43867437518).
+FIX01 CI: [PR run 44040639439](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44040639439)
+and [push run 44040634394](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44040634394),
+each 21/21 at `d6968c4`. These are synthetic adapter/Core/API/PHP regressions:
+six PHP 7.4/V22 and fifteen PHP 8.2/V22–V24 pairs, with unchanged Core SHA pins.
+They do not establish 21 real MySQL runtime profiles. The new documentation
+commit and its separate PR/push run URLs are recorded in PR #13 and the I1-06
+completion report; earlier runs are not evidence for that new HEAD.
+
+### Reference profile and transaction contract
+
+Real qualification applies only to Dolibarr V24.0.3, Core
+`5c6c7ff6a5112413b1c27221c8d11750afad56f8`, PHP 8.2.35, Oracle MySQL Community
+Server 8.4.13, direct `mysqli`, InnoDB, entity 1, `REPEATABLE READ` and
+`autocommit=1` outside explicit transactions. Business fixtures were synthetic;
+Core business APIs and MySQL connections were real. Invoice scope was standard
+EUR/quantity-one/zero-VAT/free-text, Mercure numbering and Sponge PDF.
+
+Performance Schema transaction instrumentation must be active and fresh, with
+`PS_CURRENT_THREAD_ID()` and the event/identity/savepoint/release-counter fields
+used by `MsmDatabaseState`: `performance_schema=ON`, the `transaction` instrument
+and `events_transactions_current`, `thread_instrumentation` and
+`global_instrumentation` consumers enabled in the reference profile. Existing
+application-schema rights plus the single
+`SELECT` on `performance_schema.events_transactions_current` were sufficient;
+no `PROCESS`, `threads`/`setup_*` SELECT or extra global admin grant was required.
+Observer SQL filters to its own thread, although the table grant is not row-scoped.
+Missing/partial/stale/denied observations never imply idle. Idle calibration reads
+an existing InnoDB member row; an empty member table is rejected without seeding.
+
+Booking owns one outer DoliDB transaction per member. Every Invoice factory shares
+the same DoliDB-bound observer. MySQL binds native handle, connection/server/thread/
+event and exact active SAVEPOINT/RELEASE counters; it checks the expected own
+COMMIT/ROLLBACK event before obtaining a separate fresh-idle proof. MariaDB retains
+`@@in_transaction`, depth and InnoDB checks with **snapshot** continuity, not a
+claim of MySQL event continuity. Only a fresh owned open context can be rolled back;
+uncertain completion/ownership remains `unknown/stop`, with no retry or compensation.
+
+### I105-FIND-01 and the targeted correction
+
+Original T4-09's losing process acquired the member lock after the winner's COMMIT,
+but ordinary post-lock validation retained an older view and reached the contribution
+INSERT. MySQL 1062/unique-index rejection and confirmed rollback prevented a stored
+duplicate; they did **not** satisfy the required pre-write business revalidation.
+No actual duplicate or R16 corruption was observed in that original campaign.
+
+The FIX01 prefix experiment isolated the first snapshot-effective statement in the
+tested server: `SELECT ENGINE AS engine FROM information_schema.TABLES ...`.
+BEGIN, identity/event queries and the full G0 after-BEGIN checkpoint did not reproduce
+the stale view; adding that first engine query did. A later `FOR UPDATE` could see
+newly committed rows while ordinary SELECTs still missed them. This is an observed
+MySQL 8.4.13 boundary, not a universal claim about all metadata implementations.
+
+FIX01 performs engine preflight before BEGIN, then acquires member → member type →
+optional customer/product locks, then repeats engine checks **after all those locks**
+and before actor reload, preview and Core business reads. Core's ordinary history
+reads and R16 end calculation therefore share the post-wait view. Lock order, G0
+checks, fingerprint/overlap-consent policy and Core-only writes remain intact.
+No extra production BEGIN/COMMIT, isolation change, blanket locking preview or
+independent end-date recalculation was introduced.
+
+### Real targeted qualification
+
+| Case | Executed scope / outcome |
+| --- | --- |
+| FIX-D01 | Same start: A success; B genuinely waits, then `skipped/MSMChangedConfirmation` before any subscription call or DML; own rollback confirmed, no 1062, one persisted contribution. |
+| FIX-D02 | Different overlapping starts: old consent does not authorize the new overlap; B skips before Core/DML. |
+| FIX-D03 | Disjoint fixed-amount periods: both serialize successfully. This outcome was declared before execution because displayed/source fingerprint inputs remain unchanged; full history/datefin alone are not consent inputs. |
+| FIX-D04 | Controlled failure after A's locks: confirmed own rollback before Core; B waits and succeeds. Original timeout case retained, not rerun. |
+| FIX-E01 | New longer period first, then earlier disjoint shorter period; both succeed, Core preserves the longer end and B's ordinary post-lock history sees A. |
+| FIX-E02 | Shorter period first, then later disjoint longer period; both succeed with current-history evidence, not only a coincidentally correct final end. |
+| FIX-E03 | Two new historical contributions stay unchanged; current consent permits A, while B's now-stale overlap consent is rejected. Core MAX end retained. |
+| FIX-E04 | **Read-only** recheck of the existing legacy SQL-NULL fixture through the corrected locked read path; history/MAX, Core-fetched object and storage agree. Zero new subscription/end-update calls or NULL mutations. Historical real T3-15 and current synthetic actual-Core end-update tests remain distinct. |
+| FIX-E05 | One real validated Core invoice/customer path succeeds; rejected competitor performs no subscription/customer/invoice DML. Direct transactional API only: PDF remains pending, no new PDF generation or mail. |
+
+Independent connections, identities/completions, SQL order, bounded waits and before/
+after row/file hashes support these results. All initial business/audit rows and
+existing PDFs were preserved. The D01 coordinator originally stopped on an overly
+broad no-Agenda assertion despite the correct A/B outcome. Separate read-only
+reconciliation verified the normal Core Agenda event/assignment for the winner;
+a first diagnostic's wrong subscription-link assumption was corrected to the
+Core's explicit member mapping. Both STOP records remain; no D01 booking was repeated
+and no second product correction was needed.
+
+Original I1-05 additionally retains real serial subscription/invoice/customer/zero-fee,
+R16/NULL, nested transaction, pre-COMMIT rollback, foreign/replacement/own-connection
+loss, withheld-COMMIT-acknowledgement, batch-stop and bounded timeout evidence.
+Physical own-connection closure and deliberately withheld acknowledgement are
+specific fault mechanisms, not blanket network/packet-loss qualification. Its real
+PDF/ECM and controlled post-COMMIT PDF-failure checks remain separate from FIX01's
+no-generation scope. Its consumed HTTP replay and F01 observation-outage/result
+checks, followed by real Chromium/Firefox completion, retain their exact boundaries.
+No external SMTP delivery occurred in I1-05/FIX01. Historical MariaDB C3.3-D owner-
+confirmed delivery and V22 Core diagnostic 121 despite receipt do not qualify MySQL
+SMTP delivery. PDF/mail remain permitted only after confirmed successful COMMIT.
+
+### Evidence index and remaining gates
+
+The private evidence sets are **not** public repository artifacts. Their report,
+acceptance, findings and checksum/manifest files identify the actual executions:
+
+- `dolibarr-db-iter1-20261116`: feasibility/architecture/conditional-plan reports,
+  `DECISION.json`, application results, Owner controls and `checksums.sha256`.
+- `dolibarr-db-iter1-g0-20261116`: `FINAL-REPORT.txt`, `ACCEPTANCE.json` (15 criteria),
+  `TEST-MATRIX.json`, Owner windows, restoration and `checksums.sha256`.
+- `dolibarr-db-iter1-impl-20261116`: `IMPLEMENTATION-REPORT.txt`, `ACCEPTANCE.json`,
+  final synthetic results, self-review, historical inputs and `checksums.sha256`.
+- `dolibarr-db-iter1-followup-20261116`: `FINAL-REPORT.txt`, `FOLLOWUP-STATUS.json`,
+  `github-ci.json` (F01/F02) and `checksums.sha256`; environment preparation is
+  distinct from later business qualification.
+- `dolibarr-db-iter1-i105-20261116`: `FINAL-REPORT.txt`, `ACCEPTANCE.json`,
+  `TEST-MATRIX.json`, `FINDINGS.json`, `MANIFEST.json`/`checksums.sha256` and
+  `I105-EVIDENCE-v1.zip`. Original 19/20 and T4-09 FAIL remain immutable.
+- `dolibarr-db-iter1-i105-fix01-20261117`: `FINAL-REPORT.txt`, `ROOT-CAUSE.txt`,
+  `REAL-CONCURRENCY-RESULTS.json`, `R16-QUALIFICATION.json`, `TEST-MATRIX.json`,
+  `ACCEPTANCE.json` (20/20), `CI-RESULTS.json`, `MANIFEST.json`, `checksums.sha256`,
+  `INTEGRITY-RESULT.json` and `I105-FIX01-EVIDENCE-v1.zip`. ZIP structure and all
+  148 inner checksums were independently verified; original 251 I1-05 checksums
+  remained unchanged. Original and follow-up packages are separate.
+
+No new requirement or mapping is introduced: `requirements.csv` stays byte-identical
+(71 IDs, 18 columns including all historical fields). This evidence index distinguishes
+test levels; it does not expand a requirement's PASS beyond its measured aspect.
+Unexecuted variants retain their original NOT EXECUTED status, including physical
+packet-loss/half-open networking, arbitrary administrative races, optional deadlock,
+foreign writers ignoring member locks and unqualified custom hook/trigger effects.
+MySQL 8.0/other versions or editions, V21/future Cores, other real PHP/Core profiles,
+proxies/session multiplexing/reconnect and PostgreSQL are not generally qualified.
+PostgreSQL remains iteration 2. Checkpoints are endpoint evidence, not continuous
+tracking, crash recovery or an exactly-once guarantee. New MySQL SMTP delivery,
+full browser/role/Multicompany matrices and broad performance qualification remain
+NOT EXECUTED; historical approvals are not transferred to these scenarios.
+
+The Owner accepts the bounded combined I1-05/FIX01 qualification. At the historical
+I1-06 handoff, independent I1-07 and merge decisions were pending; I1-06 itself
+performed no review, real tests or installation changes. The later initial review
+and targeted correction/follow-up status are recorded above.
+Version `0.1.0-dev` and temporary module ID `584620` remain unchanged;
+production/public release remain **NOT QUALIFIED / NOT APPROVED**.
+
 ## Post-P3 PR11 review correction addendum — 2026-11-15
 
 P3 remains formally closed: **ACCEPTED WITH DOCUMENTED LIMITATIONS**, originally
@@ -37,8 +303,9 @@ qualification. Original 78 P3 checksums and logs remain unchanged.
 Real DB/business/PDF/SMTP/browser tests: **NOT EXECUTED** in this correction task.
 V21/future Cores, broader installed profiles, production and public release remain
 unqualified. Existing risk limits and historical real evidence remain unchanged.
-PR #11 precedes PR #10 by Owner decision; independent follow-up review and any merge
-approval remain pending.
+At that historical correction checkpoint, PR #11 preceded PR #10 by Owner
+decision; independent follow-up review and merge approval were still pending.
+That retained intermediate status is separate from the current PR #13 handoff.
 
 ## P3 formal closure and P3-DOC01 — 2026-11-15
 
@@ -46,8 +313,9 @@ Owner decision: **P3 SYNTHETIC CROSS-VERSION QUALIFICATION – ACCEPTED WITH
 DOCUMENTED LIMITATIONS**. P3 is closed on implementation HEAD
 `a1843e14c71c89f7148aa2e8f6c5352409bca7b1`; all 21 CI pairs passed in
 [run 43731843114](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/43731843114).
-No confirmed implementation defect or real P4 test need was found for the agreed
-synthetic scope. Independent overall code review and merge decision remain pending.
+At that P3 closure checkpoint, no confirmed implementation defect or real P4 test
+need had been found for the agreed synthetic scope; independent overall code review
+and merge decision were still pending. The later PR11 findings above remain separate.
 
 The [public qualification guide](p3-qualification-summary.md) records all 15 Core
 pins, regular CI test links, precise supplemental P3 program/result identifiers

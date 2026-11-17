@@ -2,6 +2,22 @@
 /* Copyright (C) 2026 iLLixM <iLLixM@proton.me>
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
+/** Readiness gates new operations, never the display of consumed session results. */
+function msmRequireBookingDatabase(array $state, $observer, $service)
+{
+	if (in_array($state['phase'] ?? '', array('done', 'processing'), true)) { return; }
+	if (!in_array($state['phase'] ?? '', array('preview', 'confirm'), true)) { throw new InvalidArgumentException('MSMInvalidForm'); }
+	try {
+		$observed = $observer->beforeBegin();
+		if ($observed['state'] !== MsmDatabaseState::IDLE || !$observed['fresh']) {
+			throw new RuntimeException($observed['reason']);
+		}
+		$service->checkTables(!empty($state['options']['invoice']), !empty($state['options']['autocreate']));
+	} catch (Throwable $e) {
+		$reason = in_array($e->getMessage(), array('MSMDatabaseUnsupported', 'MSMDatabaseBootstrapUnavailable', 'MSMDatabaseObservationUnavailable', 'MSMTransactionUnsupported'), true) ? $e->getMessage() : 'MSMDatabaseObservationUnavailable';
+		throw new RuntimeException($reason);
+	}
+}
 /** Strict confirmation request: all business values remain on the server. */
 function msmBookingPost(array $state, array $post, $action)
 {
@@ -80,7 +96,7 @@ function msmResultAccess($db, $user, array $state)
 					&& in_array((int) $customer->entity, array_map('intval', explode(',', getEntity('societe'))), true)
 					&& checkUserAccessToObject($user, array('societe'), $customer)) { $access[$id]['customer'] = true; }
 			}
-		} catch (Throwable $ignored) {}
+		} catch (Throwable $ignored) { $access[$id] = array('invoice' => false, 'customer' => false); }
 	}
 	return $access;
 }

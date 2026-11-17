@@ -71,7 +71,7 @@ MSMBookingFailed=Beitrag konnte nicht gebucht werden.
 MSMChangedConfirmation=Fachdaten oder Überschneidungen geändert. Neue Vorschau erstellen und erneut bestätigen.
 MSMConsistencyError=Gespeicherter Beitrag oder Mitgliedschaftsende inkonsistent; zurückgerollt.
 MSMTransactionUnknown=Transaktionsergebnis ungeklärt. Verarbeitung gestoppt; vor jedem neuen Versuch Datenbankzustand prüfen.
-MSMTransactionUnsupported=Buchung benötigt den unterstützten MySQL/MariaDB-Treiber und InnoDB-Tabellen.
+MSMTransactionUnsupported=Buchung benötigt den unterstützten MySQL/MariaDB-Treiber und InnoDB-Tabellen. MySQL benötigt außerdem REPEATABLE READ für die tatsächliche Transaktion.
 MSMUnsupportedAction=Die angeforderte Rechnungs- oder Geschäftspartneraktion ist im bestätigten Zustand nicht verfügbar.
 MSMInterrupted=Verarbeitung läuft oder wurde unterbrochen. Offene Ergebnisse sind ungeklärt; keine automatische Wiederholung oder erneuter Mailversand.
 MSMBatchStopped=Wegen Batch-Abbruch nicht verarbeitet.
@@ -122,3 +122,6 @@ MSMCoreVersionUnsupported=Dolibarr ab Version 21.0.0 und eine gültige Versionsk
 MSMInvoiceVatIdUnsupported=Die konfigurierte Umsatzsteuer-Einstellung für Mitgliedsbeiträge wird vom Modul für die Rechnungserstellung nicht unterstützt.
 
 MSMCoreContractUnsupported=Die erforderliche Dolibarr-Core-Schnittstelle fehlt oder ist inkompatibel.
+MSMDatabaseUnsupported=Nicht unterstützte Datenbankfamilie, Treiber oder native Verbindung.
+MSMDatabaseObservationUnavailable=Der Datenbank-Transaktionszustand kann nicht sicher geprüft werden. Bitte die dokumentierten Datenbankvoraussetzungen prüfen; keine automatische Wiederholung.
+MSMDatabaseBootstrapUnavailable=Für die Bereitschaftsprüfung wird ein vorhandener InnoDB-Mitgliedsdatensatz benötigt. Es wurden keine Daten angelegt.

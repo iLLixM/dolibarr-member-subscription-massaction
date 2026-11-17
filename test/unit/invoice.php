@@ -7,9 +7,11 @@ require __DIR__.'/../../class/invoice.class.php';
 $beforeInvoice = $passed;
 class InvoiceDatabaseDouble extends BookingDatabase
 {
+	public $readOrder = array();
 	public $invoice = null; public $invoiceLine = null; public $link = false; public $customerId = 4; public $mode = ''; public $calls = array(); public $nonTransactionalTable = '';
 	public function query($sql)
 	{
+		if ($this->active && (strpos($sql, 'FOR UPDATE') !== false || strpos($sql, 'SELECT ENGINE AS engine') === 0)) { $this->readOrder[] = $sql; }
 		if ($this->nonTransactionalTable !== '' && strpos($sql, 'SELECT ENGINE AS engine') === 0 && strpos($sql, "'test_".$this->nonTransactionalTable."'") !== false) {
 			$this->queries[] = $sql; return (object) array('rows' => array((object) array('engine' => 'MyISAM')));
 		}
@@ -91,9 +93,19 @@ function invoiceBookingFixture($create = false)
 	$member = new BookingMemberDouble($db); $member->id = 1; $member->entity = 1; $member->typeid = 1; $member->socid = $db->customerId; $member->morphy = 'phy'; $member->company = ''; $member->firstname = 'Synthetic'; $member->lastname = 'Invoice';
 	$row['invoice'] = array('customer_id' => $db->customerId, 'create_customer' => $create, 'entity' => 1, 'date' => '2026-11-10', 'term' => 1, 'payment_mode' => 0, 'bank' => 0, 'currency' => 'EUR', 'pdf_model' => 'crabe', 'product' => 0, 'vat' => 0, 'quantity' => 1, 'price_base' => 'TTC', 'type' => 1);
 	$row['autocreate'] = $create;
-	$service = new InvoiceBookingDouble($db); $service->object = $member; $service->reader = new BookingPreviewDouble(); $service->reader->row = $row; $service->adapter = new InvoiceServiceDouble($db);
+	$service = new InvoiceBookingDouble($db); $service->object = $member; $service->reader = new BookingPreviewDouble(); $service->reader->row = $row; $service->adapter = new InvoiceServiceDouble($db, $service->observer());
 	return array($db, $service, $row);
 }
+// FIX01: no consistent metadata read before customer/product lock acquisition.
+$conf->global = new stdClass(); $conf->global->ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS = 9;
+list($db, $service, $row) = invoiceBookingFixture(); $db->family = 'mysql';
+$invoiceOptions = array('invoice' => true, 'autocreate' => false, 'sendmail' => false, 'description' => 'Synthetic fee');
+$r = $service->book(1, $row, $invoiceOptions, new PreviewUser(), false);
+$locks = array_filter(array_keys($db->readOrder), static function ($i) use ($db) { return strpos($db->readOrder[$i], 'FOR UPDATE') !== false; });
+$engines = array_filter(array_keys($db->readOrder), static function ($i) use ($db) { return strpos($db->readOrder[$i], 'SELECT ENGINE AS engine') === 0; });
+verify($r['status'] === 'success' && max($locks) < min($engines), 'FIX01 all invoice locks precede first consistent metadata read');
+verify(count(array_filter($db->readOrder, static function ($sql) { return strpos($sql, 'product WHERE rowid = 9 FOR UPDATE') !== false; })) === 1, 'FIX01 product lock retained');
+
 $conf->global = new stdClass(); $conf->modules = array('member' => 1, 'invoice' => 1, 'societe' => 1);
 $user = new PreviewUser(); $opts = array('invoice' => true, 'autocreate' => false, 'sendmail' => false, 'description' => 'Synthetic fee');
 foreach (array('', 'create', 'line', 'validate', 'link', 'amount', 'vat', 'price_hook', 'depth') as $mode) {
@@ -170,4 +182,121 @@ $confirmed = $service->reader->previewSubscriptionWithOptions($user, stamp('2030
 verify(!$confirmed['errors'] && !isset($confirmed['invoice']), 'VAT subscription-only confirmation valid');
 $result = $service->book(1, $confirmed, $opts, $user, false);
 verify($result['status'] === 'success' && !$db->calls, 'VAT ID does not block subscription-only booking');
+// The same context must survive every factory call and every nested invoice API.
+$opts = array('invoice' => true, 'autocreate' => true, 'sendmail' => false, 'description' => 'Synthetic fee');
+foreach (array(false,true) as $create) {
+	foreach (array(0,24.5) as $amount) {
+		list($db, $service, $row) = invoiceBookingFixture($create); $db->family = 'mysql'; $row['amount'] = $amount; $service->reader->row = $row;
+		$r = $service->book(1, $row, $opts, new PreviewUser(), false);
+		verify($r['status'] === 'success' && $r['invoice']['customer_created'] === $create && $r['invoice']['subscription_id'] === 9, 'MySQL shared invoice/customer/zero context '.(int) $create.'/'.$amount);
+		verify($db->invoice->fk_statut === 1 && $db->link && $db->invoice->total_ttc === $amount && $db->transaction_opened === 0, 'MySQL confirmed linked validated invoice');
+	}
+}
+foreach (array('customer','create','line','validate','link','amount','vat','price_hook','depth') as $mode) {
+	list($db, $service, $row) = invoiceBookingFixture(true); $db->family = 'mysql'; $db->mode = $mode;
+	$r = $service->book(1, $row, $opts, new PreviewUser(), false);
+	verify($r['status'] === ($mode === 'depth' ? 'unknown' : 'failed'), 'MySQL invoice negative '.$mode);
+	if ($mode !== 'depth') { verify($r['rollback'] === 'confirmed' && $db->invoice === null && $db->saved === null, 'MySQL invoice and contribution rollback '.$mode); }
+}
+// A replacement still ACTIVE event after each Core write cannot permit the NEXT API.
+class ReplacingInvoice extends InvoiceObjectDouble
+{
+	private $database; public $replaceAt;
+	public function __construct($db, $stage) { parent::__construct($db); $this->database = $db; $this->replaceAt = $stage; }
+	private function replace($stage) { if ($this->replaceAt === $stage) { $this->database->modelEvent('ACTIVE'); } }
+	public function create($user) { $r = parent::create($user); $this->replace('create'); return $r; }
+	public function addline(...$args) { $r = parent::addline(...$args); $this->replace('line'); return $r; }
+	public function validate($user) { $r = parent::validate($user); $this->replace('validate'); return $r; }
+}
+class ReplacingCustomer extends InvoiceCustomerDouble
+{
+	private $database;
+	public function __construct($db) { parent::__construct($db); $this->database = $db; }
+	public function create_from_member($member, $name, $alias) { $r = parent::create_from_member($member,$name,$alias); $this->database->modelEvent('ACTIVE'); return $r; }
+}
+class FaultInvoiceService extends InvoiceServiceDouble
+{
+	public $replaceAt;
+	protected function invoice() { return new ReplacingInvoice($this->db, $this->replaceAt); }
+	protected function customer() { return $this->replaceAt === 'customer' ? new ReplacingCustomer($this->db) : parent::customer(); }
+}
+foreach (array('customer','create','line','validate') as $stage) {
+	list($db, $service, $row) = invoiceBookingFixture(true); $db->family = 'mysql';
+	$service->adapter = new FaultInvoiceService($db, $service->observer()); $service->adapter->replaceAt = $stage;
+	$r = $service->book(1, $row, $opts, new PreviewUser(), false);
+	verify($r['status'] === 'unknown' && $r['stop'] && !in_array('rollback', $db->events, true), 'invoice API event replacement unknown/stop '.$stage);
+	$expectedCalls = array('customer-create','invoice-create','invoice-line','invoice-validate');
+	verify($db->calls === array_slice($expectedCalls,0,array_search($stage,array('customer','create','line','validate'),true)+1), 'no API after lost invoice context '.$stage);
+}
+// Exercise the actual production factory repeatedly, not just the static invoice double.
+class FactoryBookingFixture extends BookingServiceDouble { public function invoiceFactory() { return parent::invoicing(); } }
+$db = new BookingDatabase(); $db->family = 'mysql'; $service = new FactoryBookingFixture($db);
+verify($service->observer()->beforeBegin()['state'] === 'IDLE', 'factory idle setup'); $db->begin();
+verify($service->observer()->afterBegin()['state'] === 'ACTIVE', 'factory owned setup');
+$ownedCheck = new ReflectionMethod(MsmInvoiceService::class, 'owned'); $ownedCheck->setAccessible(true);
+$token = $db->event->EVENT_ID;
+foreach (array($service->invoiceFactory(), $service->invoiceFactory()) as $freshFactory) { $ownedCheck->invoke($freshFactory); }
+verify($db->event->EVENT_ID === $token && !$db->markers, 'all production invoice factories share unchanged owned context');
+$db->rollback(); verify($service->observer()->completed('ROLLBACK', true)['state'] === 'IDLE', 'factory own rollback setup complete');
+$otherDb = new BookingDatabase(); $otherState = new SyntheticDatabaseState($otherDb);
+foreach (array(MsmBookingService::class, MsmInvoiceService::class) as $serviceClass) {
+	fails(static function () use ($db,$otherState,$serviceClass) { new $serviceClass($db, $otherState); }, 'MSMDatabaseUnsupported');
+}
+// Early read-only table readiness is invoice-selective; final lock checks remain.
+foreach (array('ecm_files', 'product') as $unsupportedTable) {
+	list($db, $service, $row) = invoiceBookingFixture(); $db->family = 'mysql'; $db->nonTransactionalTable = $unsupportedTable;
+	$oldProduct = $conf->global->ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS ?? null;
+	$conf->global->ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS = $unsupportedTable === 'product' ? 7 : 0;
+	$service->checkTables(false);
+	verify(!$db->events && !$db->calls, 'contribution-only readiness ignores invoice/product engine '.$unsupportedTable);
+	fails(static function () use ($service) { $service->checkTables(true); }, 'MSMTransactionUnsupported');
+	verify(!$db->events && !$db->calls, 'invoice readiness fails before BEGIN/business writes '.$unsupportedTable);
+	if ($oldProduct === null) { unset($conf->global->ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS); }
+	else { $conf->global->ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS = $oldProduct; }
+}
+// I107-F01: only possible selected invoice/customer/contact events need Agenda.
+$invoiceAgendaGlobals = $conf->global; $invoiceAgendaModules = $conf->modules;
+foreach (array('BILL_CREATE','LINEBILL_INSERT','BILL_VALIDATE','COMPANY_CREATE','CONTACT_CREATE','COMPANY_MODIFY') as $event) {
+	foreach (array(false,true) as $create) {
+		foreach (array(false,true) as $badEngine) {
+			$conf->modules = array('member'=>1,'invoice'=>1,'societe'=>1,'agenda'=>1);
+			$conf->global = (object) array('THIRDPARTY_DEFAULT_CREATE_CONTACT'=>1);
+			$conf->global->{'MAIN_AGENDA_ACTIONAUTO_'.$event} = 1;
+			list($db, $service, $row) = invoiceBookingFixture($create); $db->family = 'mysql';
+			if ($badEngine) { $db->nonTransactionalTable = 'actioncomm_resources'; }
+			$selected = array('invoice'=>true,'autocreate'=>$create,'sendmail'=>false,'description'=>'Synthetic fee');
+			$r = $service->book(1, $row, $selected, new PreviewUser(), false);
+			$reachable = in_array($event,array('BILL_CREATE','LINEBILL_INSERT','BILL_VALIDATE'),true) || ($create && in_array($event,array('COMPANY_CREATE','CONTACT_CREATE'),true));
+			$blocked = $badEngine && $reachable;
+			verify($r['status'] === ($blocked ? 'failed' : 'success'), 'I107 invoice Agenda reachability '.$event.'/'.(int)$create.'/'.(int)$badEngine);
+			$queries = preg_grep("/TABLE_NAME = 'test_actioncomm(?:_resources)?'/", $db->queries);
+			verify((bool)$queries === $reachable, 'I107 no unreachable invoice Agenda dependency '.$event.'/'.(int)$create);
+			if ($blocked) { verify(!$db->calls && !in_array('subscription',$db->events,true), 'I107 invoice Agenda nontransactional gate before all business APIs '.$event); }
+			elseif ($reachable) {
+				$locks = array_keys(array_filter($db->readOrder,static function($sql){return strpos($sql,'FOR UPDATE')!==false;}));
+				$engines = array_keys(array_filter($db->readOrder,static function($sql){return strpos($sql,'SELECT ENGINE AS engine')===0;}));
+				verify(max($locks)<min($engines), 'I107 Agenda metadata remains after all invoice locks '.$event);
+			}
+		}
+	}
+}
+$conf->modules = array('member'=>1,'invoice'=>1,'societe'=>1,'agenda'=>1);
+$conf->global = (object) array('MAIN_AGENDA_ACTIONAUTO_CONTACT_CREATE'=>1);
+list($db,$service,$row)=invoiceBookingFixture(true); $db->nonTransactionalTable='actioncomm';
+$selected=array('invoice'=>true,'autocreate'=>true,'sendmail'=>false,'description'=>'Synthetic fee');
+verify($service->book(1,$row,$selected,new PreviewUser(),false)['status']==='success', 'I107 disabled automatic contact creation has no CONTACT_CREATE dependency');
+foreach (array('REPEATABLE READ','READ COMMITTED','SERIALIZABLE','READ UNCOMMITTED') as $level) {
+	$conf->global=(object)array('MAIN_AGENDA_ACTIONAUTO_BILL_CREATE'=>1);
+	list($db,$service,$row)=invoiceBookingFixture(true);$db->family='mysql';$db->nextIsolation=$level;
+	$r=$service->book(1,$row,$selected,new PreviewUser(),false);
+	verify($r['status']===($level==='REPEATABLE READ'?'success':'failed'), 'I107 invoice isolation and Agenda combined '.$level);
+	if($level!=='REPEATABLE READ'){verify(!$db->calls&&!in_array('subscription',$db->events,true)&&$r['rollback']==='confirmed','I107 invoice isolation rejects before customer/subscription/invoice '.$level);}
+}
+// Direct nested Invoice guard uses the same event policy and retains safe teardown.
+list($db,$service,$row)=invoiceBookingFixture();$db->family='mysql';$state=$service->observer();$state->beforeBegin();$db->nextIsolation='READ COMMITTED';$db->begin();$state->afterBegin();
+$guard=new ReflectionMethod(MsmInvoiceService::class,'owned');$guard->setAccessible(true);
+fails(static function()use($guard,$service){$guard->invoke($service->adapter);},'MSMTransactionUnsupported');
+verify($state->rollbackContext()['owned']&&!$db->calls,'I107 Invoice policy rejection preserves own rollback eligibility');$db->rollback();verify($state->completed('ROLLBACK',true)['state']==='IDLE','I107 Invoice policy own rollback confirmed');
+$conf->global=$invoiceAgendaGlobals;$conf->modules=$invoiceAgendaModules;
+
 echo ($passed - $beforeInvoice)." invoice transaction assertions passed (synthetic Core API doubles; no database).\n";

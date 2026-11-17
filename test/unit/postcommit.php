@@ -62,4 +62,17 @@ $saves = array(); $service = new PostCommitBookingDouble(); $service->invoice = 
 $pdf = new PostCommitPdfDouble(); $pdf->saves =& $saves; $mail = new PostCommitMailDouble(); $mail->saves =& $saves;
 $done = msmProcessBooking(postState(false, true), $service, $mail, new PreviewUser(), static function ($state) use (&$saves) { $saves[] = $state; }, $pdf);
 verify($pdf->calls === 0 && $mail->calls === 1 && $done['results'][1]['mail'] === 'transport', 'subscription-only mail remains independent');
+// Real module Booking + simulated MySQL observation, through production orchestration.
+// No transport or files: these doubles fail if effects occur before confirmed completion.
+foreach (array(false, true) as $ambiguous) {
+	list($db, $service, $row) = bookingFixture(); $db->family = 'mysql'; $db->commitFail = $ambiguous;
+	$state = postState(false, true); $state['rows'][1] = $row; $state['ids'] = array(1, 2);
+	$state['rows'][2] = $row; $state['results'][2] = array('status' => 'unknown');
+	$saves = array(); $pdf = new PostCommitPdfDouble(); $pdf->saves =& $saves;
+	$mail = new PostCommitMailDouble(); $mail->saves =& $saves;
+	$done = msmProcessBooking($state, $service, $mail, new PreviewUser(), static function ($updated) use (&$saves) { $saves[] = $updated; }, $pdf);
+	verify($pdf->calls === 0 && $mail->calls === ($ambiguous ? 0 : 2), 'MySQL mail only after confirmed outer commit');
+	verify($done['results'][1]['status'] === ($ambiguous ? 'unknown' : 'success'), 'MySQL orchestration preserves unknown result');
+	if ($ambiguous) { verify($done['results'][2]['message'] === 'MSMBatchStopped' && count(array_keys($db->events, 'subscription', true)) === 1, 'unknown stops batch without retry or postcommit effects'); }
+}
 echo ($passed - $postBaseline)." post-commit assertions passed (synthetic checkpoints; no files, database or SMTP).\n";

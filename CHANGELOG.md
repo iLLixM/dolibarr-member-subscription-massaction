@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+- I107-F01: conditionally include standard Core Agenda `actioncomm` and
+  `actioncomm_resources` in both engine gates, respecting enabled events and
+  invoice/customer/contact options without pre-lock metadata reads.
+- I107-F02: observe actual own event `ISOLATION_LEVEL` in the existing MySQL query;
+  admit only REPEATABLE READ. Preserve known-own rollback for other valid levels
+  and fail closed on malformed observations, without changing G0 ownership states.
+- Requalify targeted real Agenda/invoice, post-trigger rollback, concurrency and
+  R16 paths plus seven read-only actual-isolation cases. Negative Engine cases
+  remain synthetic; no Core table conversion, new PDF generation or SMTP delivery.
+  Correct I107-F03: PR #13 is Ready for review; targeted independent follow-up and
+  explicit Owner merge approval remain outstanding, with no release approval.
+
+- Add shared DoliDB-bound `MsmDatabaseState` observation for MariaDB and Oracle
+  MySQL; Booking/Invoice keep one outer Core transaction and shared ownership.
+- Add MySQL fresh-idle, connection/thread/event and SAVEPOINT/RELEASE freshness
+  checks; verify expected own COMMIT/ROLLBACK before the next idle proof. Retain
+  MariaDB snapshot semantics, conditional engine preflight and fail-closed admission.
+- Resolve F01: authenticated stored results remain readable without new-operation
+  readiness; preserve CSRF, single-use confirmation and replay protection.
+- Resolve I105-FIND-01 through FIX01: defer in-transaction engine metadata reads
+  until member/type/customer/product locks are held, keeping preview and unchanged
+  Core R16 reads current without isolation or transaction-control changes.
+- Retain historical I1-05 FAILED (19/20), then record FIX01 PASSED (20/20) and
+  21/21 synthetic PHP/Core CI on the correction. Together these requalify only
+  V24.0.3/PHP 8.2.35/MySQL Community 8.4.13 in the documented instrumented
+  mysqli/InnoDB/REPEATABLE READ profile. I1-06 documents the review handoff;
+  independent I1-07, merge and production/public-release approval remain separate.
+
 - Reload the current user with `User::loadRights()` and check `User::$status`
   instead of the deprecated `getrights()`/`$statut` (behavior unchanged). Add
   `test/unit/userreload.php` for the reload and permission paths.
