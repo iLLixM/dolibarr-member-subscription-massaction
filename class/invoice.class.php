@@ -28,13 +28,12 @@ class MsmInvoiceService
 	}
 	public function lock($id)
 	{
-		$this->checkTables();
+		// The booking owner checks engines before BEGIN and after all locks.
 		$member = $this->one('SELECT fk_soc FROM '.$this->db->prefix().'adherent WHERE rowid = '.((int) $id).' FOR UPDATE');
 		if (!$member) { throw new RuntimeException('NotEnoughPermissions'); }
 		if ($member->fk_soc) { $this->one('SELECT rowid FROM '.$this->db->prefix().'societe WHERE rowid = '.((int) $member->fk_soc).' FOR UPDATE'); }
 		$product = getDolGlobalInt('ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS');
 		if ($product) {
-			$this->databaseState->requireTransactionalTables(array('product'));
 			$this->one('SELECT rowid FROM '.$this->db->prefix().'product WHERE rowid = '.$product.' FOR UPDATE');
 		}
 	}

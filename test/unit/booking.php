@@ -572,6 +572,74 @@ foreach (array('rollback','missing-member') as $fault) {
 	verify($r['status'] === ($fault === 'rollback' ? 'unknown' : 'failed'), 'MySQL rollback/missing selected member '.$fault);
 	if ($fault === 'missing-member') { verify(!in_array('subscription', $db->events, true) && $r['rollback'] === 'confirmed', 'no selected member: no business call, safe own rollback'); }
 }
+// FIX01: metadata can capture an old consistent view before a locking read.
+// The model keeps committed rows, current locking reads and the Core view separate.
+class BookingReadViewDatabase extends CoreEndDatabase
+{
+	public $committed = array(); public $view = null; public $concurrent = array(); public $locked = false;
+	public function query($sql)
+	{
+		if (strpos($sql, 'SELECT ENGINE AS engine') === 0 && $this->active && $this->view === null) {
+			$this->view = $this->committed;
+		}
+		if (strpos($sql, 'SELECT rowid, fk_adherent_type') === 0 && strpos($sql, 'FOR UPDATE') !== false) {
+			// Model a previous owner's COMMIT while this caller waited for its lock.
+			$this->committed = $this->concurrent; $this->locked = true;
+		}
+		if (strpos($sql, 'SELECT rowid, dateadh, datef FROM test_subscription') === 0) {
+			$current = strpos($sql, 'FOR UPDATE') !== false;
+			if (!$current && $this->view === null) { $this->view = $this->committed; }
+			return (object) array('rows' => array_map(static function ($r) { return (object) $r; }, $current ? $this->committed : $this->view));
+		}
+		// Core update_end_date() must also use the post-lock view, not just preview.
+		$this->prior = $this->view ?? $this->committed;
+		return parent::query($sql);
+	}
+}
+class BookingReadViewPreview extends BookingPreviewDouble
+{
+	public $db; public $rejectHistory = true;
+	public function previewSubscriptionWithOptions(...$args)
+	{
+		$r = $this->db->query('SELECT rowid, dateadh, datef FROM test_subscription WHERE fk_adherent = 1');
+		$row = $this->row;
+		if ($this->db->fetch_object($r) && $this->rejectHistory) { $row['fingerprint'] = 'changed history'; }
+		return $row;
+	}
+}
+class BookingOldReadViewOrder extends BookingServiceDouble
+{
+	protected function lock($id) { $this->checkTables(); parent::lock($id); }
+}
+foreach (array('same-start', 'overlap', 'longer-end', 'non-overlap') as $case) {
+	foreach (array(false, true) as $oldOrder) {
+		list($unused, $old, $row) = bookingFixture(); $db = new BookingReadViewDatabase(); $db->family = 'mysql';
+		$db->concurrent = array(array('dateadh' => $case === 'same-start' ? $db->idate($row['start']) : '2025-01-01 00:00:00', 'datef' => '2035-12-31 00:00:00'));
+		$service = $oldOrder ? new BookingOldReadViewOrder($db) : new BookingServiceDouble($db);
+		$service->object = new CoreEndMemberDouble($db); $service->object->id = $service->object->typeid = $service->object->entity = 1;
+		$service->reader = new BookingReadViewPreview(); $service->reader->db = $db; $service->reader->row = $row;
+		$service->reader->rejectHistory = $case !== 'non-overlap';
+		$r = $service->book(1, $row, $options, $user, false);
+		if ($oldOrder) {
+			verify($db->view === array() && $db->committed !== array(), 'FIX01 old metadata order reproduces stale view '.$case);
+			verify(in_array('subscription', $db->events, true), 'FIX01 old order incorrectly reaches Core '.$case);
+		} else {
+			verify($db->view === $db->committed && $db->locked, 'FIX01 first consistent view follows member lock '.$case);
+			if ($case === 'non-overlap') {
+				verify($r['status'] === 'success', 'FIX01 unchanged non-overlap consent remains usable');
+				$end = $coreUsesMaxEnd ? '2035-12-31 00:00:00' : $db->idate($row['end']);
+				verify($db->datefin === $end, 'FIX01 actual Core R16 sees newly committed history');
+			} else {
+				verify($r['status'] === 'skipped' && $r['message'] === 'MSMChangedConfirmation', 'FIX01 current history rejects old consent '.$case);
+				verify(!in_array('subscription', $db->events, true) && $r['rollback'] === 'confirmed', 'FIX01 reject before Core, own rollback '.$case);
+			}
+		}
+		// A current locking read still sees new rows even in the deliberately stale model.
+		$locked = $db->query('SELECT rowid, dateadh, datef FROM test_subscription WHERE fk_adherent = 1 FOR UPDATE');
+		verify((bool) $db->fetch_object($locked), 'FIX01 model distinguishes current and consistent rows '.$case);
+	}
+}
+
 echo ($passed - $baseline)." booking/mail assertions passed (synthetic transactions and transports only).\n";
 
 // Once per standalone booking invocation, re-label pinned Core source in separate

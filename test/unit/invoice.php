@@ -7,9 +7,11 @@ require __DIR__.'/../../class/invoice.class.php';
 $beforeInvoice = $passed;
 class InvoiceDatabaseDouble extends BookingDatabase
 {
+	public $readOrder = array();
 	public $invoice = null; public $invoiceLine = null; public $link = false; public $customerId = 4; public $mode = ''; public $calls = array(); public $nonTransactionalTable = '';
 	public function query($sql)
 	{
+		if ($this->active && (strpos($sql, 'FOR UPDATE') !== false || strpos($sql, 'SELECT ENGINE AS engine') === 0)) { $this->readOrder[] = $sql; }
 		if ($this->nonTransactionalTable !== '' && strpos($sql, 'SELECT ENGINE AS engine') === 0 && strpos($sql, "'test_".$this->nonTransactionalTable."'") !== false) {
 			$this->queries[] = $sql; return (object) array('rows' => array((object) array('engine' => 'MyISAM')));
 		}
@@ -94,6 +96,16 @@ function invoiceBookingFixture($create = false)
 	$service = new InvoiceBookingDouble($db); $service->object = $member; $service->reader = new BookingPreviewDouble(); $service->reader->row = $row; $service->adapter = new InvoiceServiceDouble($db, $service->observer());
 	return array($db, $service, $row);
 }
+// FIX01: no consistent metadata read before customer/product lock acquisition.
+$conf->global = new stdClass(); $conf->global->ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS = 9;
+list($db, $service, $row) = invoiceBookingFixture(); $db->family = 'mysql';
+$invoiceOptions = array('invoice' => true, 'autocreate' => false, 'sendmail' => false, 'description' => 'Synthetic fee');
+$r = $service->book(1, $row, $invoiceOptions, new PreviewUser(), false);
+$locks = array_filter(array_keys($db->readOrder), static function ($i) use ($db) { return strpos($db->readOrder[$i], 'FOR UPDATE') !== false; });
+$engines = array_filter(array_keys($db->readOrder), static function ($i) use ($db) { return strpos($db->readOrder[$i], 'SELECT ENGINE AS engine') === 0; });
+verify($r['status'] === 'success' && max($locks) < min($engines), 'FIX01 all invoice locks precede first consistent metadata read');
+verify(count(array_filter($db->readOrder, static function ($sql) { return strpos($sql, 'product WHERE rowid = 9 FOR UPDATE') !== false; })) === 1, 'FIX01 product lock retained');
+
 $conf->global = new stdClass(); $conf->modules = array('member' => 1, 'invoice' => 1, 'societe' => 1);
 $user = new PreviewUser(); $opts = array('invoice' => true, 'autocreate' => false, 'sendmail' => false, 'description' => 'Synthetic fee');
 foreach (array('', 'create', 'line', 'validate', 'link', 'amount', 'vat', 'price_hook', 'depth') as $mode) {

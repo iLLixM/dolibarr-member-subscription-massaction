@@ -42,7 +42,7 @@ class MsmBookingService
 		$state = $this->databaseState->active();
 		if ($state['state'] !== MsmDatabaseState::ACTIVE || !$state['fresh'] || !$state['owned']) { throw new RuntimeException('MSMTransactionUnknown'); }
 	}
-	/** Read-only readiness; final locks repeat the checks under the owned transaction. */
+	/** Read-only readiness; repeat after all locks, before any business writes. */
 	public function checkTables($invoice = false)
 	{
 		$this->databaseState->requireTransactionalTables(array('adherent', 'adherent_type', 'subscription'));
@@ -53,7 +53,6 @@ class MsmBookingService
 	}
 	protected function lock($id)
 	{
-		$this->checkTables();
 		$row = $this->one('SELECT rowid, fk_adherent_type FROM '.$this->db->prefix().'adherent WHERE rowid = '.((int) $id).' FOR UPDATE');
 		if (!$row) { throw new RuntimeException('NotEnoughPermissions'); }
 		$this->one('SELECT rowid FROM '.$this->db->prefix().'adherent_type WHERE rowid = '.((int) $row->fk_adherent_type).' FOR UPDATE');
@@ -105,6 +104,7 @@ class MsmBookingService
 			if ($initial['state'] !== MsmDatabaseState::IDLE || !$initial['fresh']) {
 				$result['status'] = 'unknown'; $result['stop'] = true; $result['message'] = $initial['reason']; return $result;
 			}
+			$this->checkTables(!empty($options['invoice']));
 			$beginAttempted = true;
 			if (!$this->db->begin()) { throw new RuntimeException('SubscriptionBulkDatabaseError'); }
 			$owned = true;
@@ -112,6 +112,9 @@ class MsmBookingService
 			if ($begun['state'] !== MsmDatabaseState::ACTIVE || !$begun['fresh'] || !$begun['owned']) { throw new RuntimeException('MSMTransactionUnknown'); }
 			$this->lock($id);
 			if (!empty($options['invoice'])) { $this->invoicing()->lock($id); }
+			// MySQL ENGINE metadata reads establish a consistent view. Defer them
+			// until all locks are held so preview and Core SELECTs see prior winners.
+			$this->checkTables(!empty($options['invoice']));
 			$user = $this->currentUser($user);
 			if (!MsmPreviewService::canCreateSubscriptionWithOptions($user, !empty($options['invoice']), !empty($options['sendmail']))) { throw new RuntimeException('NotEnoughPermissions'); }
 			$member = $this->member($id);
