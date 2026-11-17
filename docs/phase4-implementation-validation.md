@@ -1,5 +1,49 @@
 # Phase 4 implementation validation
 
+## Issue #8 configurable bulk limit — 2026-11-17
+
+Implementation `72bed7fe9f61ec7488bf29a5388f9f1a777c7910`, based on main
+`4fdeb862a9a63ffe9126fbb42e95005b049a0ee8`, was tested on actual Dolibarr V24.0.3 /
+PHP 8.2.35 / MariaDB 10.11.19-MariaDB-0+deb12u1 / mysqli / InnoDB. The target
+was positively identified as MariaDB before any writes. No Oracle-MySQL
+integration requalification is inferred from this campaign.
+
+| Group | Result / evidence level |
+| --- | --- |
+| Module configuration | PASS synthetic: missing/empty/malformed/nonpositive/overflow module values fall back to100; configured25/100/150 below/at/above boundaries; smaller global limit caps selection. Explicit invalid/nonpositive global limit fails closed at zero. Existing activation needs no reactivation. |
+| Early entry | PASS synthetic hook subprocess: oversized valid IDs with no accessible fixture objects exit to a count-only notice before member access; no preview evaluation or selected-ID session copy. |
+| Security | PASS existing/request regressions: malformed/mismatched IDs, CSRF/replay, reduced stale confirmations, pre-readiness and pre-orchestration rejection without writes or truncation. |
+| Real UI | PASS authenticated Chromium158.0.8127.18: 99/100 previews at default100; 101 early rejection in DE and EN with selected/max counts and return link; configured150 preview/151 rejection and25 preview/26 rejection. |
+| Real stale confirmation | PASS:26-member confirmation under150, then module configuration reduced to25; direct booking POST rejected, independent24-table hashes unchanged. Only the module constant was changed via Core admin actions and restored to its original absent state in finally. No global setting changes. |
+| Real bulk100 | PASS:100 new synthetic members,120 EUR each for2090, contribution-only;100 success results and independently reconciled Core persistence, member ends and standard Agenda rows. No invoice/mail selected. |
+| Small regression | PASS real direct transactional Core customer/invoice/Agenda path on one other new member,120 EUR/VAT0, validated invoice and link. PDF remains pending; no generation or mail. Existing preview/booking/invoice runners also passed synthetically. |
+| CI | Implementation push44188923649 and PR44188974734 each21/21 SUCCESS at exact72bed7f; six PHP7.4 and fifteen PHP8.2 pinned Core pairs. These are synthetic CI, not a real DB-version matrix. |
+
+The synchronous100-member CLI run measured0.69046s preview,5.19836s booking and
+5.89840s total;20 MiB peak PHP memory,4 MiB additional peak and76164 bytes maximum
+serialized session state.202 checkpoints serialized state and wrote small evidence
+records. This supports practical synchronous contribution-only use in this exact
+local CLI profile, below predeclared60s/128MiB-additional stop thresholds. It does
+**not** qualify an Apache100-member booking request, web/PHP/proxy timeouts, heavy
+third-party triggers, invoice/PDF/SMTP throughput or simultaneous load. Use smaller
+batches where deployment limits require it; changing the configured count alone
+is not a performance qualification. No automatic splitting/truncation is introduced.
+
+151 new synthetic members were created;100 bulk contributions and one separate
+invoice contribution persisted. All original rows across24 monitored business/audit
+tables and existing invoice files were preserved. No payments, new PDFs or external
+mail. Tests were Owner-executed under www-data/interactive test login because
+protected application access remains unavailable to the agent; persisted evidence
+and runtime hashes were then independently inspected. No independent external
+Issue8 review or merge approval is claimed.
+
+Private evidence set `dolibarr-issue8-20261117` / shared `issue8-20261117` retains
+runtime mapping, baseline/prepared fixtures, all202 checkpoints, bulk observed/
+result traces, browser result with restoration flag, small-invoice/final snapshots,
+and a reproducible report/checksum bundle. No credentials, tokens, raw sessions or
+private business contents are public artifacts. The71-ID/18-column matrix and all
+historical qualification boundaries remain unchanged; no production/release approval.
+
 ## PR #13 post-merge closure and MDB-TEST-01 — 2026-11-17
 
 **Current status: development merge COMPLETE.** PR [#13](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/13)

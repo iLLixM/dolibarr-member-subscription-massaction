@@ -272,5 +272,9 @@ the global minimum and a hook subprocess whose oversized IDs cannot be fetched:
 the count-only notice proves early exit before object access. `request.php` covers
 stale confirmations after reduction, pre-readiness and pre-orchestration rejection,
 no truncation and preserved replay protection. These are synthetic contracts.
-Real 100-member timing, memory, persistence and DE/EN HTTP checks remain pending
-until the separately guarded integration run; no blanket performance claim.
+Real MariaDB qualification at implementation `72bed7f` passed: 100 contribution-only
+bookings, independent 24-table persistence checks, DE/EN early notices, 99/100
+previews, persisted module limits25/150 and a stale26-member direct POST after
+reduction150→25. Temporary module configuration was restored. A small real
+customer/invoice/Agenda path passed separately. See the central Issue8 evidence
+section for exact metrics and CLI-versus-Apache boundaries. No blanket performance claim.
