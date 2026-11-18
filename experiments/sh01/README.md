@@ -3,7 +3,8 @@
 Read [the feasibility report](../../docs/sh01-mysql-restricted-feasibility.md) first.
 Source base `a74edb29ba6ca49af46c389f98c4bfd86cf161b6`. Recommendation: **NO-GO for
 SH-02 from this tested construction**; independent architecture review and Owner
-decision remain required. No code here is loaded by the module or in its allowlist.
+decision remain required. **SH-02 is NOT AUTHORIZED.**
+No code here is loaded by the module or in its allowlist.
 Do not copy `ShMarkerHypothesis` into product code or treat positive primitive
 checks as proof of ownership/completion. It intentionally always stops at completion.
 

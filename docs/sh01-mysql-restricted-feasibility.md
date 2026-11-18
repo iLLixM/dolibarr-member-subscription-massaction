@@ -5,6 +5,8 @@ Study branch: `spike/sh01-restricted-mysql`. Binding workstream:
 [Issue #21](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/21).
 
 **Recommendation: NO-GO for SH-02 on the evidence from the tested construction.**
+**SH-02 is NOT AUTHORIZED.** Independent architecture review and an explicit Owner
+decision remain prerequisites; this evidence publication grants neither.
 The combination of standard mysqli identity, next-transaction isolation setup and
 SAVEPOINT markers does not supply the unchanged ownership, isolation and exact
 completion proofs. Positive primitive tests do not make an equivalent observer.
@@ -215,5 +217,7 @@ Owner options after review: retain the existing required P_S grant if actually
 available, explicitly revisit the restricted-host/release scope, or authorize another
 bounded investigation. None is executed by this report. The source, tests, CI,
 release branch/PR19, prepared ZIP61e4ad4… and existing database configuration remain
-untouched by SH-01. No push, remote PR/issue edit, merge, tag or release is part of
-this delivery.
+untouched by SH-01. The initial study delivery was local-only. The subsequent Owner-authorized
+publication on `docs/sh01-feasibility-evidence` distributes the study files and an
+Issue #21 evidence comment. It does not change product code, tests, CI, main, PR #19
+or the prepared ZIP, and authorizes no implementation, merge, tag or release.

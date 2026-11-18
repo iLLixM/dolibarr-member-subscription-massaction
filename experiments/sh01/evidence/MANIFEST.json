@@ -11,13 +11,13 @@
   "files": [
     {
       "path": "docs/sh01-mysql-restricted-feasibility.md",
-      "bytes": 20457,
-      "sha256": "2a72ef0e1d75a12a9d9eec3adc2b7479b0194cece9b986e3de6c7ac9383f633d"
+      "bytes": 20855,
+      "sha256": "016d60cdcf365123de19211f35f899406330fd7545d29260500634ed6fa36afc"
     },
     {
       "path": "experiments/sh01/README.md",
-      "bytes": 6610,
-      "sha256": "02d040f44b5bb1a0b407567e992612a4e359fa0783fd2b491485dfbd9c5192dc"
+      "bytes": 6639,
+      "sha256": "0ca3d69c6ffcaaa0da54f4d5eb7f88c263a668b405aaf7410cb8481dfbc594f1"
     },
     {
       "path": "experiments/sh01/evidence/EVIDENCE-ORIGINS.json",
