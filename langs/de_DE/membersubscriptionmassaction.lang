@@ -126,3 +126,22 @@ MSMDatabaseUnsupported=Nicht unterstützte Datenbankfamilie, Treiber oder native
 MSMDatabaseObservationUnavailable=Der Datenbank-Transaktionszustand kann nicht sicher geprüft werden. Bitte die dokumentierten Datenbankvoraussetzungen prüfen; keine automatische Wiederholung.
 MSMDatabaseBootstrapUnavailable=Für die Bereitschaftsprüfung wird ein vorhandener InnoDB-Mitgliedsdatensatz benötigt. Es wurden keine Daten angelegt.
 MSMBatchLimitDetail=Sie haben %s Mitglieder ausgewählt. Aktuell sind höchstens %s pro Bulk-Durchlauf zulässig. Kehren Sie zur Mitgliederliste zurück und wählen Sie weniger Mitglieder aus.
+
+// CF-01 profile selection and readiness
+MSMProfileSetup=Transaktionsprofil
+MSMProfileSetupHelp=Das Datenbankprofil für diesen Mandanten ausdrücklich auswählen. Neue MySQL-Installationen sollen Core-Guarded für die spätere Nutzung wählen; Buchungen bleiben bis zum Abschluss der Implementierung und Qualifikation gesperrt. Bestehende MySQL-Installationen können Enhanced ausdrücklich beibehalten. Eine fehlende Konfiguration beweist keine Neuinstallation. Jede Speicherung macht alte Bestätigungen ungültig. Kein automatischer Fallback.
+MSMProfileSelect=Profil auswählen
+MSMProfileCoreGuarded=Core-Guarded (Buchung noch nicht verfügbar)
+MSMProfileEnhancedMySQL=Enhanced MySQL (Performance Schema erforderlich)
+MSMProfileMariaDBSnapshot=MariaDB Snapshot
+MSMProfileSelectionRequired=Ein MySQL-Profil muss gewählt werden. Ein Administrator muss das Profil in der Moduleinrichtung ausdrücklich festlegen; eine fehlende Konfiguration kennzeichnet keine Neuinstallation. Die Vorschau bleibt schreibfrei.
+MSMProfileInvalid=Das konfigurierte Transaktionsprofil ist ungültig oder passt nicht zur Datenbankfamilie. Ein Administrator muss es korrigieren; die Buchung ist gesperrt.
+MSMProfileUnavailable=Das aktuelle Transaktionsprofil kann nicht sicher gelesen werden. Eine Buchung ist nicht zulässig.
+MSMProfileChanged=Das Transaktionsprofil oder die Bestätigungsbindung hat sich geändert. Eine neue Vorschau prüfen und erneut bestätigen; für das abgewiesene Mitglied wurde keine Buchung begonnen.
+MSMProfileFeatureUnavailable=Diese Aktion ist im gewählten Transaktionsprofil nicht verfügbar.
+MSMCoreGuardedPending=Core-Guarded ist konfiguriert, die Buchung ist jedoch noch nicht implementiert oder qualifiziert. Die Vorschau ist verfügbar; es erfolgt kein Fallback auf Enhanced.
+MSMEnhancedUnavailable=Das konfigurierte Enhanced-MySQL-Profil kann die Transaktionsbereitschaft nicht prüfen. Performance-Schema-SELECT-Recht und Instrumentierung prüfen. Kein Fallback und keine automatische Wiederholung.
+MSMProfileSaveConflict=Das Profil wurde gleichzeitig geändert oder konnte nicht gespeichert werden. Die Einrichtung neu laden und erneut ausdrücklich wählen; es erfolgt keine automatische Wiederholung.
+MSMProfileSaved=Transaktionsprofil gespeichert. Bisherige Bestätigungen benötigen eine neue Vorschau.
+MSMProfilePreviewOnly=Die Vorschau ist schreibfrei. Profil und Transaktionsbereitschaft werden vor der Buchung erneut geprüft; die Vorschau erteilt keine Buchungsfreigabe.
+MSMProfileUsed=Verwendetes Transaktionsprofil: %s

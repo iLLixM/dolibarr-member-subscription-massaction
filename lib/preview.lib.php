@@ -180,6 +180,7 @@ function msmUpdatePreview(array $state, array $post)
 	foreach (array('invoice', 'sendmail', 'autocreate') as $field) {
 		if (isset($post[$field]) && $post[$field] !== '1') { throw new InvalidArgumentException('MSMInvalidForm'); }
 		$state['options'][$field] = isset($post[$field]);
+		if ($state['options'][$field] && isset($state['profile']) && empty($state['profile']['features'][$field])) { throw new RuntimeException('MSMProfileFeatureUnavailable'); }
 	}
 	// A no-JavaScript form can still submit the previously checked dependent box.
 	// Disabling invoices only removes an option; it never grants an action.
@@ -197,6 +198,7 @@ function msmUpdatePreview(array $state, array $post)
 		$state['input'][$id] = msmPeriodInput($state['rows'][$id], msmReadDate($post['start'][$id]), msmReadDate($post['end'][$id]), $reset === $id, $common, $action === 'calendar');
 	}
 	$state['revision']++;
+	if (isset($state['profile'])) { $state['profile']['confirmation_revision'] = $state['revision']; }
 	return $state;
 }
 

@@ -36,6 +36,8 @@ if (!msmCanUse($user)) {
 require_once __DIR__.'/class/booking.class.php';
 $databaseState = new MsmDatabaseState($db);
 $bookingService = new MsmBookingService($db, $databaseState);
+require_once __DIR__.'/lib/profile.lib.php';
+$profiles = new MsmTransactionProfile($db, $databaseState, (int) $conf->entity);
 $method = $_SERVER['REQUEST_METHOD'] ?? '';
 if ($method !== 'GET' && $method !== 'POST') {
 	http_response_code(405);
@@ -66,6 +68,8 @@ if ($method === 'GET' && isset($_GET['batchlimit'])) {
 		|| $notice['entity'] !== (int) $conf->entity || $notice['expires'] <= dol_now()) { accessforbidden(); }
 	msmPrintBatchLimit($notice['count']);
 }
+// Reject invalid POST tokens before any module preview/session mutation.
+if ($method === 'POST' && !msmValidCsrf($_POST['token'] ?? null, $_SESSION)) { accessforbidden(); }
 $error = '';
 try {
 	if ($method === 'GET' && isset($_GET['run'])) {
@@ -79,14 +83,13 @@ try {
 	$key = $method === 'POST' ? ($_POST['preview'] ?? null) : ($_GET['preview'] ?? null);
 	$state = msmReadPreview($_SESSION, $key, (int) $user->id, (int) $conf->entity, dol_now());
 	$state = msmUpgradePreview($state);
+	$state = msmSyncPreviewProfile($state, $profiles, $user);
 	$_SESSION['msm_previews'][$key] = $state;
-} catch (Exception $e) {
-	accessforbidden($langs->trans('MSMInvalidRun'));
+} catch (Throwable $e) {
+	accessforbidden($langs->trans(msmProfileError($e->getMessage()) ? $e->getMessage() : 'MSMInvalidRun'));
 }
-if ($method === 'POST' && !msmValidCsrf($_POST['token'] ?? null, $_SESSION)) { accessforbidden(); }
 if (in_array($state['phase'], array('preview', 'confirm'), true) && count($state['ids']) > msmBatchLimit()) { msmPrintBatchLimit(count($state['ids'])); }
 if ($method === 'POST') {
-	if (!msmValidCsrf($_POST['token'] ?? null, $_SESSION)) { accessforbidden(); }
 	if (($_POST['action'] ?? null) === 'cancel' && $state['phase'] === 'preview') {
 		unset($_SESSION['msm_previews'][$key]);
 		header('Location: '.msmListUrl(), true, 303);
@@ -95,8 +98,9 @@ if ($method === 'POST') {
 	try {
 		$action = $_POST['action'] ?? null;
 		if ($action === 'book') {
+			if (($state['flash'] ?? '') === 'MSMProfileChanged') { throw new RuntimeException('MSMProfileChanged'); }
 			$ready = msmConsumeConfirmation($state, $_POST); // Reject consumed/replayed requests first.
-			msmRequireBookingDatabase($state, $databaseState, $bookingService);
+			msmRequireBookingDatabase($state, $databaseState, $bookingService, $profiles, $user);
 			$state = $ready;
 			$_SESSION['msm_previews'][$key] = $state;
 			// Persist consumed state before releasing PHP's session lock and before any write.
@@ -116,13 +120,10 @@ if ($method === 'POST') {
 			$save($state); // Read back consumed state before the first database side effect.
 			$state = msmProcessBooking($state, $bookingService, new MsmSubscriptionMail($db), $user, $save, new MsmInvoicePdfService($db));
 		} elseif ($action === 'edit') {
-			msmBookingPost($state, $_POST, 'edit');
-			if ($state['phase'] !== 'confirm') { throw new InvalidArgumentException('MSMInvalidForm'); }
-			$state['phase'] = 'preview'; $state['revision']++;
+			$state = msmEditConfirmation($state, $_POST);
 			$_SESSION['msm_previews'][$key] = $state;
 		} else {
 			$state = msmUpdatePreview($state, $_POST);
-			msmRequireBookingDatabase($state, $databaseState, $bookingService);
 			$state = msmEvaluatePreview($db, $user, $state);
 			if ($action === 'confirm') {
 				msmRequireBatchSize($state['ids']);
@@ -133,14 +134,13 @@ if ($method === 'POST') {
 	} catch (Throwable $e) {
 		// Once consumed, keep results/pending uncertainty intact; never reopen booking.
 		if (session_status() === PHP_SESSION_ACTIVE && isset($_SESSION['msm_previews'][$key])) {
-			$_SESSION['msm_previews'][$key]['flash'] = in_array($e->getMessage(), array('SubscriptionBulkInvalidDate', 'SubscriptionBulkDescriptionInvalid', 'MSMBatchLimit', 'MSMTransactionUnsupported', 'MSMDatabaseObservationUnavailable', 'MSMDatabaseUnsupported', 'MSMDatabaseBootstrapUnavailable'), true) ? $e->getMessage() : 'MSMInvalidForm';
+			$_SESSION['msm_previews'][$key]['flash'] = msmProfileError($e->getMessage()) || in_array($e->getMessage(), array('SubscriptionBulkInvalidDate', 'SubscriptionBulkDescriptionInvalid', 'MSMBatchLimit', 'MSMTransactionUnsupported', 'MSMDatabaseObservationUnavailable', 'MSMDatabaseUnsupported', 'MSMDatabaseBootstrapUnavailable'), true) ? $e->getMessage() : 'MSMInvalidForm';
 		}
 	}
 	header('Location: '.dol_buildpath('/membersubscriptionmassaction/subscription.php', 1).'?preview='.$key, true, 303);
 	exit;
 }
 try {
-	msmRequireBookingDatabase($state, $databaseState, $bookingService);
 	if ($state['phase'] === 'preview') { $state = msmEvaluatePreview($db, $user, $state); }
 	$error = $state['flash'] ?? '';
 	unset($state['flash']);
@@ -154,6 +154,10 @@ $morejs = $state['phase'] === 'confirm' ? array(dol_buildpath('/membersubscripti
 llxHeader('', $langs->trans($titlekey), '', '', 0, 0, $morejs);
 print load_fiche_titre($langs->trans($titlekey));
 if ($error) { print '<div class="error">'.msmText($error).'</div>'; }
+if (in_array($state['phase'], array('preview', 'confirm'), true)) {
+	print '<div class="info">'.msmText('MSMProfilePreviewOnly').'</div>';
+	if (!empty($state['profile_notice'])) { print '<div class="warning">'.msmText($state['profile_notice']).'</div>'; }
+}
 if ($state['rows']) {
 	$access = $state['phase'] === 'done' ? msmResultAccess($db, $user, $state) : array();
 	print $state['phase'] === 'preview' ? msmRenderPreview($state, $key) : msmRenderBooking($state, $key, $access);

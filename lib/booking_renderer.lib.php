@@ -7,6 +7,7 @@ function msmRenderBooking(array $state, $key, array $access = array())
 	global $conf;
 	$confirm = $state['phase'] === 'confirm';
 	$html = '<div class="info">'.msmText($confirm ? 'MSMConfirmNotice' : 'MSMResultNotice').'</div>';
+	if (!empty($state['profile']['profile'])) { $html .= '<p>'.msmText('MSMProfileUsed', $state['profile']['profile']).'</p>'; }
 	if (!$confirm && $state['phase'] !== 'done') { $html .= '<div class="warning">'.msmText('MSMInterrupted').'</div>'; }
 	if ($confirm) {
 		$html .= '<form method="post" id="msm-confirm-form"><input type="hidden" name="token" value="'.dol_escape_htmltag(newToken()).'"><input type="hidden" name="preview" value="'.dol_escape_htmltag($key).'"><input type="hidden" name="revision" value="'.$state['revision'].'">';
@@ -80,7 +81,7 @@ function msmRenderBooking(array $state, $key, array $access = array())
 	}
 	if ($confirm) {
 		$html .= '<div id="msm-submit-status" class="info" role="status" aria-live="polite" hidden>'.msmText('MSMProcessingNotice').'</div>';
-		$html .= '<button class="button" id="msm-final-submit" name="action" value="book">'.msmText('MSMBook').'</button> <button class="button" name="action" value="edit">'.msmText('MSMEdit').'</button></form>';
+		$html .= '<button class="button" id="msm-final-submit" name="action" value="book"'.(!empty($state['profile_notice']) ? ' disabled' : '').'>'.msmText('MSMBook').'</button> <button class="button" name="action" value="edit">'.msmText('MSMEdit').'</button></form>';
 	}
 	return $html.'<p><a href="'.dol_escape_htmltag(msmListUrl()).'">'.msmText('MSMBack').'</a></p>';
 }

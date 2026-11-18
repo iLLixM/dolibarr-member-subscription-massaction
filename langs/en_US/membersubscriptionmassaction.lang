@@ -126,3 +126,22 @@ MSMDatabaseUnsupported=Unsupported database family, driver or native connection.
 MSMDatabaseObservationUnavailable=The database transaction state cannot be safely verified. Check the documented database prerequisites; no automatic retry.
 MSMDatabaseBootstrapUnavailable=A real InnoDB member row is required to verify database readiness. No data was created.
 MSMBatchLimitDetail=You selected %s members. The current maximum is %s per bulk run. Return to the member list and select fewer members.
+
+// CF-01 profile selection and readiness
+MSMProfileSetup=Transaction profile
+MSMProfileSetupHelp=Select the database profile explicitly for this entity. New MySQL installations should select Core-Guarded for future use; booking remains unavailable until its implementation and qualification are complete. Existing MySQL installations can explicitly retain Enhanced. Missing configuration does not prove a new installation. Each save invalidates old confirmations. No automatic fallback.
+MSMProfileSelect=Select a profile
+MSMProfileCoreGuarded=Core-Guarded (booking not yet available)
+MSMProfileEnhancedMySQL=Enhanced MySQL (Performance Schema required)
+MSMProfileMariaDBSnapshot=MariaDB Snapshot
+MSMProfileSelectionRequired=MySQL profile selection is required. An administrator must explicitly choose a profile in the module setup; missing configuration is not a new-installation signal. Preview remains read-only.
+MSMProfileInvalid=The configured transaction profile is invalid or incompatible with this database family. An administrator must correct it; booking is blocked.
+MSMProfileUnavailable=The current transaction profile cannot be read safely. No booking is allowed.
+MSMProfileChanged=The transaction profile or confirmation binding changed. Review a fresh preview and confirm again; no booking was started for the rejected member.
+MSMProfileFeatureUnavailable=This action is not available in the selected transaction profile.
+MSMCoreGuardedPending=Core-Guarded is configured, but booking is not implemented or qualified yet. Preview is available; no fallback to Enhanced will occur.
+MSMEnhancedUnavailable=The configured Enhanced MySQL profile cannot verify transaction readiness. Check its Performance Schema SELECT permission and instrumentation. No fallback or automatic retry.
+MSMProfileSaveConflict=The profile was changed concurrently or could not be saved. Reload setup and make an explicit new choice; nothing is retried automatically.
+MSMProfileSaved=Transaction profile saved. Previous confirmations require a fresh preview.
+MSMProfilePreviewOnly=Preview is read-only. The profile and transaction readiness are checked again at booking; preview does not authorize a booking.
+MSMProfileUsed=Transaction profile used: %s

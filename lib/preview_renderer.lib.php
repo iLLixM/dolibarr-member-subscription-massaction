@@ -74,7 +74,7 @@ function msmRenderPreview(array $state, $key)
 	$html .= '<button class="button" name="action" value="common">'.msmText('SubscriptionBulkApplyCommon').'</button><br>';
 	$invoiceAvailable = MsmPreviewService::canCreateSubscriptionWithOptions($user, true, false);
 	foreach (array('sendmail' => 'MSMPlanMail', 'invoice' => 'MSMPlanInvoice', 'autocreate' => 'MSMPlanThirdParty') as $option => $label) {
-		$disabled = ($option === 'invoice' && !$invoiceAvailable)
+		$disabled = (isset($state['profile']) && empty($state['profile']['features'][$option])) || ($option === 'invoice' && !$invoiceAvailable)
 			|| ($option === 'autocreate' && (!$state['options']['invoice'] || !msmCanPlanThirdParty(true, $user)));
 		$html .= '<label><input type="checkbox" name="'.$option.'" value="1"'.($state['options'][$option] && !$disabled ? ' checked' : '').($disabled ? ' disabled' : '').'> '.msmText($label).'</label><br>';
 	}

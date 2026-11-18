@@ -19,20 +19,24 @@
 - Core-first strategy: Owner decisions ADR-01–ADR-12 in Issue #22 (2026-11-18)
   govern the new Core-Guarded design; see
   [ADR-0001](docs/adr/ADR-0001-core-first-transaction-profiles.md), its risk register
-  and review handoff. Detailed design is pending independent architecture review;
-  CF-00 authorizes no implementation or release. The existing G0/MySQL event,
+  and review handoff. CF-00 was independently and Owner-accepted on 2026-11-18,
+  merged in PR #23 as `6247704815cf532ec632616011133c646aa00005`; this is no release
+  approval. CF-01 implements profile/readiness boundaries only, with Core-Guarded
+  booking still disabled pending separately authorized CF-02 and qualification. The existing G0/MySQL event,
   actual-event isolation and provable-completion rules below still constrain the
   current code and Enhanced MySQL; they are not universal requirements for the new,
   deliberately weaker Core-Guarded profile. MariaDB retains its existing snapshot
   contract. No silent Enhanced downgrade or historical evidence reinterpretation.
   Owner-approved D-01/D-02 (2026-11-18) fix the preferred Core-Guarded SET→Core-BEGIN
-  entry sequence and bounded Core/standard-Agenda scope; follow-up review is pending.
+  entry sequence and bounded Core/standard-Agenda scope; F23-01–07/K23-01 are closed.
   For this design, the older event/isolation/physical ownership/completion wording
   below applies to Enhanced evidence, not Core-Guarded rollback admission or
   post-commit acceptance. Use ADR section 5: a permitted single Core rollback needs
   application-context checks; normal acknowledged Core commit is application success.
   Neither requires an Enhanced physical event proof. MariaDB remains snapshot-based.
-  This does not authorize CF-01/CF-02 work, session/global rewrites or new mail tests.
+  CF-00 alone did not authorize coding. The separate CF-01 task authorizes only
+  profile configuration, revision binding and preview separation, not CF-02 booking,
+  session/global rewrites or new mail tests.
 
 - P2 admission is >=21.0.0 with no upper bound or exact patch/SHA allowlist.
   P1 source-analyzed 15 V22/V23/V24 tags; V21/future versions remain unqualified.

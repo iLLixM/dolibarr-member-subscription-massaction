@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- CF-01: add administrator-controlled transaction profiles with entity-specific revision/CAS,
+  safe explicit MySQL migration and unchanged MariaDB Snapshot default. Separate read-only
+  preview from final/per-member booking admission; invalidate stale confirmations without
+  reopening consumed results. Core-Guarded bookings remain disabled pending CF-02/qualification.
+  Development implementation pending independent review/Owner acceptance; no release approval.
+
 - Issue #8: replace the fixed 50-member booking cap with configurable
   `MEMBERSUBSCRIPTIONMASSACTION_MAX_MEMBERS_PER_BATCH`, default 100 even for
   existing activations, capped by `MAIN_LIMIT_FOR_MASS_ACTIONS`. Reject oversized

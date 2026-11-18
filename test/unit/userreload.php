@@ -84,10 +84,12 @@ User::$records = array(
 	5 => array('status' => 1, 'denied' => array('adherent.cotisation.creer')),
 	6 => array('status' => 1, 'denied' => array('facture.creer')),
 );
+require_once __DIR__.'/../fixtures/profile.php';
 class ReloadBookingFlow extends MsmBookingService
 {
+	use ProfileBookingFixture;
 	public $admitted = false;
-	public function __construct($db) { parent::__construct($db, new SyntheticDatabaseState($db)); }
+	public function __construct($db) { $this->profileDb = $db; parent::__construct($db, new SyntheticDatabaseState($db)); }
 	public function reload($user) { return $this->currentUser($user); }
 	// Reached only after the reloaded permission check; stop here with a marker, before any write.
 	protected function member($id) { $this->admitted = true; throw new RuntimeException('MSMReloadAdmitted'); }

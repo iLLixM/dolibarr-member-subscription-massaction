@@ -35,6 +35,10 @@ class RequestBookingService
 			'mail' => 'not_selected', 'stop' => false, '_member' => (object) array('id' => $id));
 	}
 }
+class RequestProfiles
+{
+	public function admit(...$args) { return array('profile' => 'MariaDBSnapshot'); }
+}
 class RequestMailFence { public function send(...$args) { return 'not_selected'; } }
 $now = dol_now(); $key = str_repeat('c',32);
 $base = array('owner' => 1, 'entity' => 1, 'expires' => $now + 300, 'format' => 4,
@@ -42,20 +46,20 @@ $base = array('owner' => 1, 'entity' => 1, 'expires' => $now + 300, 'format' => 
 	'rows' => array(1 => array('member' => 'Synthetic <member>', 'type' => 'Synthetic type', 'amount' => 12, 'description' => '<safe description>',
 		'start' => stamp('2030-01-01'), 'end' => stamp('2030-12-31'), 'errors' => array(), 'notices' => array(), 'overlaps' => array(), 'quantity' => 1, 'unit' => 'y')));
 $post = array('preview' => $key, 'token' => 'synthetic-token', 'revision' => '5', 'action' => 'book');
-foreach (array('preview','confirm') as $phase) {
+foreach (array('confirm') as $phase) {
 	$state = $base; $state['phase'] = $phase; $observer = new RequestObserver(); $service = new RequestBookingService();
-	msmRequireBookingDatabase($state, $observer, $service);
+	msmRequireBookingDatabase($state, $observer, $service, new RequestProfiles(), new PreviewUser());
 	verify($observer->calls === 1 && $service->tables === array(false) && !$service->books, 'F01 '.$phase.' requires readiness without writes');
-	$state['options']['invoice'] = true; msmRequireBookingDatabase($state, $observer, $service);
+	$state['options']['invoice'] = true; msmRequireBookingDatabase($state, $observer, $service, new RequestProfiles(), new PreviewUser());
 	verify($service->tables === array(false,true), 'F01 invoice readiness only when selected '.$phase);
 	foreach (array('unobservable','instrumentation','denied') as $fault) {
 		$observer->fault = $fault;
-		fails(static function () use ($state,$observer,$service) { msmRequireBookingDatabase($state,$observer,$service); }, 'MSMDatabaseObservationUnavailable');
+		fails(static function () use ($state,$observer,$service) { msmRequireBookingDatabase($state,$observer,$service, new RequestProfiles(), new PreviewUser()); }, 'MSMDatabaseObservationUnavailable');
 		verify(!$service->books, 'F01 readiness rejection cannot book '.$phase.'/'.$fault);
 	}
 }
 $observer = new RequestObserver(); $service = new RequestBookingService(); $service->fault = true;
-fails(static function () use ($base,$observer,$service) { msmRequireBookingDatabase($base,$observer,$service); }, 'MSMDatabaseObservationUnavailable');
+fails(static function () use ($base,$observer,$service) { msmRequireBookingDatabase($base,$observer,$service, new RequestProfiles(), new PreviewUser()); }, 'MSMDatabaseObservationUnavailable');
 // Stored results bypass ALL readiness, including missing rights/instrumentation.
 foreach (array('done','processing') as $phase) {
 	foreach (array('success','unknown') as $status) {
@@ -68,7 +72,7 @@ foreach (array('done','processing') as $phase) {
 		foreach (array('GET','GET','POST') as $method) {
 			$read = msmReadPreview($session,$key,1,1,$now);
 			if ($method === 'POST') { fails(static function () use ($read,$post) { msmConsumeConfirmation($read,$post); }, 'MSMInvalidForm'); }
-			msmRequireBookingDatabase($read,$observer,$service);
+			msmRequireBookingDatabase($read,$observer,$service, new RequestProfiles(), new PreviewUser());
 			$html = msmRenderBooking($read,$key);
 			verify(strpos($html,'<form') === false && strpos($html,'MSMStatus_'.$status) !== false && strpos($html,'&lt;safe description&gt;') !== false, 'F01 stored result visible and escaped '.$phase.'/'.$status.'/'.$method);
 			verify($session['msm_previews'][$key] === $state && !$observer->calls && !$service->tables && !$service->books, 'F01 consumed result read never restarts or mutates '.$phase.'/'.$status.'/'.$method);
@@ -81,7 +85,7 @@ foreach (array('done','processing') as $phase) {
 $session = array('token' => 'synthetic-token', 'msm_previews' => array($key => $base));
 verify(msmValidCsrf($post['token'],$session) && !msmValidCsrf('wrong',$session) && !msmValidCsrf(null,$session), 'F01 CSRF contract unchanged');
 $state = msmReadPreview($session,$key,1,1,$now); $ready = msmConsumeConfirmation($state,$post);
-$observer = new RequestObserver(); $service = new RequestBookingService(); msmRequireBookingDatabase($state,$observer,$service);
+$observer = new RequestObserver(); $service = new RequestBookingService(); msmRequireBookingDatabase($state,$observer,$service, new RequestProfiles(), new PreviewUser());
 $session['msm_previews'][$key] = $ready; $checkpoints = array();
 $done = msmProcessBooking($ready,$service,new RequestMailFence(),new PreviewUser(),static function ($updated) use (&$session,$key,&$checkpoints) { $session['msm_previews'][$key] = $updated; $checkpoints[] = $updated; });
 verify($service->books === 1 && $done['phase'] === 'done' && $done['results'][1]['status'] === 'success', 'F01 valid synthetic POST books once');
@@ -94,7 +98,7 @@ $access = msmResultAccess($dbUnavailable,new PreviewUser(),$done);
 verify($access[1] === array('invoice' => false, 'customer' => false), 'F01 unavailable DB denies invoice/customer links without exposing errors');
 // I107 selected customer-creation option reaches the read-only Agenda gate.
 $state=$base;$state['options']['invoice']=true;$state['options']['autocreate']=true;
-$observer=new RequestObserver();$service=new RequestBookingService();msmRequireBookingDatabase($state,$observer,$service);
+$observer=new RequestObserver();$service=new RequestBookingService();msmRequireBookingDatabase($state,$observer,$service, new RequestProfiles(), new PreviewUser());
 verify($service->tables===array(true)&&$service->creation===array(true)&&!$service->books,'I107 authenticated preflight forwards invoice/autocreate without booking');
 echo ($passed-$beforeRequest)." request readiness/result assertions passed (synthetic contracts; no HTTP/database/business operations).\n";
 
@@ -103,7 +107,7 @@ $ready=msmConsumeConfirmation($state,$post);verify($ready['phase']==='processing
 $conf->global->MEMBERSUBSCRIPTIONMASSACTION_MAX_MEMBERS_PER_BATCH='25';
 fails(static function () use($state,$post){msmConsumeConfirmation($state,$post);},'MSMBatchLimit');
 $observer=new RequestObserver();$service=new RequestBookingService();
-fails(static function () use($state,$observer,$service){msmRequireBookingDatabase($state,$observer,$service);},'MSMBatchLimit');
+fails(static function () use($state,$observer,$service){msmRequireBookingDatabase($state,$observer,$service, new RequestProfiles(), new PreviewUser());},'MSMBatchLimit');
 verify(!$observer->calls&&!$service->books,'Issue8 reduced limit blocks before DB readiness');
 fails(static function () use($ready,$service){msmProcessBooking($ready,$service,new RequestMailFence(),new PreviewUser(),static function($x){});},'MSMBatchLimit');
 verify(!$service->books,'Issue8 reduced processing limit zero business calls');
@@ -111,3 +115,9 @@ $conf->global->MEMBERSUBSCRIPTIONMASSACTION_MAX_MEMBERS_PER_BATCH='100';
 $state['ids']=range(1,101);fails(static function () use($state,$post){msmConsumeConfirmation($state,$post);},'MSMBatchLimit');
 verify(count($state['ids'])===101&&$state['phase']==='confirm','Issue8 no truncation or consumption on rejection');
 echo "Issue8 stale/reduced/oversized request contracts passed.\n";
+
+// CF-01: readiness is a final-confirmation gate, never a preview operation.
+$state=$base;$state['phase']='preview';$observer=new RequestObserver();$service=new RequestBookingService();
+fails(static function()use($state,$observer,$service){msmRequireBookingDatabase($state,$observer,$service,new RequestProfiles(),new PreviewUser());},'MSMInvalidForm');
+verify(!$observer->calls&&!$service->tables,'CF01 preview never invokes transaction readiness');
+require __DIR__.'/profile.php';
