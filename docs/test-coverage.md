@@ -304,3 +304,21 @@ The original synthetic contracts, automated CLI100, automated browser/negative
 POST tests and later manual HTTP100 are distinct evidence levels. No general
 HTTP load/replay/parallel-booking/PDF/SMTP or production/release approval. Draft,
 merge decision and Issue #8 closure remain with the Owner; no merge performed.
+
+## CF-01 profile/readiness regression (2026-11-18)
+
+`CF01` assertions in `test/unit/profile.php` run through the existing request runner.
+They reuse the booking/protocol fixtures and exercise the production profile/CAS
+logic with in-memory SQL results, including admin/CSRF, migration ambiguity,
+concurrent config updates, confirmation binding, P_S denial, preview isolation,
+consumed result/replay and per-member snapshot semantics. These are **synthetic**;
+no real admin HTTP, DB or Core-Guarded write qualification is implied. Existing
+business fixtures supply server context as the controller now does, rather than
+bypassing profile admission. The old F01 preview-readiness expectation is superseded
+by CF-01; historical campaign outcomes are not reclassified.
+
+See [CF-01 contract and execution limits](phase4-implementation-validation.md#cf-01-profile-selection-and-preview-boundaries--2026-11-18).
+Real CF-01 setup/configuration/race/HTTP and live Enhanced/MariaDB regression remain
+**NOT EXECUTED** pending a separately authorized environment. CoreGuarded booking
+and D-01 qualification remain disabled/deferred. No new assignment in the sole
+71-ID requirements matrix is made by this legend.

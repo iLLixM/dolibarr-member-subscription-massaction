@@ -1,6 +1,18 @@
 # ADR-0001 — Core-first transaction profiles
 
-**OWNER-APPROVED ARCHITECTURE STRATEGY – DETAILED DESIGN PENDING INDEPENDENT REVIEW**
+**CF-00 OWNER-ACCEPTED – APPROVED FOR DOCUMENTATION MERGE (2026-11-18)**
+
+CF-00 closure: [PR #23](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/23),
+normal merge `6247704815cf532ec632616011133c646aa00005`, final reviewed HEAD
+`d867c19c57b40e286ec08a9a935c4be138601a8a`;
+[external verdict and Owner acceptance](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/23#issuecomment-6985938043):
+**APPROVED FOR CF-00 WITH DOCUMENTED SCOPE**. F23-01–07 and K23-01 CLOSED.
+The original drafting/review-request status below is historical and superseded for
+CF-00; decisions, risk boundaries and unexecuted technical gates remain preserved.
+CF-01 implementation status is recorded in the central validation; no Core-Guarded
+booking, real D-01 integration or release approval follows from this closure.
+
+**Historical drafting/review context:**
 
 Decision owner: repository Owner, 2026-11-18. Detailed design author: Codex;
 independent F23 follow-up acceptance: **PENDING**. The initial independent review

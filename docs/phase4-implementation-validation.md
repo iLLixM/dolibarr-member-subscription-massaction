@@ -1,5 +1,94 @@
 # Phase 4 implementation validation
 
+## CF-01 profile selection and preview boundaries — 2026-11-18
+
+Base: fetched `origin/main` exactly `6247704815cf532ec632616011133c646aa00005`
+(PR #23 normal merge). CF-00 independently approved, Owner-accepted, F23-01–07 and
+K23-01 CLOSED; its old pending-review prefaces are explicitly historical. Separate
+CF-01 task authorizes this implementation, not CF-02/Core-Guarded booking or release.
+
+### Configuration and migration contract
+
+One entity-specific Core `const` row,
+`MEMBERSUBSCRIPTIONMASSACTION_TRANSACTION_PROFILE`, contains JSON schema version 1,
+server family, allowed profile and random revision nonce. Configuration reads use
+DoliDB directly, never cached `conf->global`. Core `encrypt`/`decrypt`, table prefix
+and entity predicates are retained. No new table, journal or schema migration.
+
+Admin-only setup uses Core authenticated bootstrap plus mandatory CSRF, strict
+POST/field validation and server-family selection. The ordinary constant setter's
+DELETE+INSERT is unsuitable for revision CAS: use one conditional byte-exact UPDATE
+(or first INSERT protected by Core's unique name/entity key), require one affected
+row, and never auto-retry a conflict/unclear save. Depth 0 and autocommit=1 are
+required for this single-statement config write; no transaction cleanup or global/
+session setting change. The private setting is not an activation default/deletion
+entry in the descriptor, so activation cannot overwrite a choice or infer fresh
+history. Its actual live activation/reactivation behavior remains to be qualified.
+
+No trustworthy fresh-install discriminator is available in the previous module
+metadata. Therefore missing MySQL config on fresh/legacy/reactivated/unknown installs
+requires an explicit administrator choice; it is never treated as permission to
+select a weaker profile automatically. Setup recommends future CoreGuarded for new
+MySQL, but denies **all** its bookings now. Explicit EnhancedMySQL preserves the
+existing observer; missing/invalid config or P_S failure cannot downgrade it.
+MariaDB's unconfigured default remains the existing Snapshot contract. Family mismatch,
+unknown profile or malformed config denies booking; no server version scope is widened.
+
+### Confirmation and admission boundary
+
+Server-held state binds actual family/profile, SHA-256 of raw config (including
+nonce), feature policy, owner/entity and confirmation revision. A profile save,
+including same-profile reselection, changes the revision. Old unconsumed sessions
+without binding and changed bindings return to preview with new revision/consent;
+processing/done sessions bypass profile reads and remain consumed/readable.
+Strict POST, CSRF, expiry, permissions/entity and current batch limit are retained.
+
+The linearization point for **each member** is the fresh config SELECT in
+`MsmBookingService::book()`, after Core capability/nonforeign logical-depth checks
+and before observer admission/BEGIN. The member admitted under that snapshot retains
+its original profile/context even if an administrator saves afterward. The next
+member reads current config and stops on mismatch, without starting another BEGIN.
+This is an explicit per-member snapshot rule, not global admin/batch serialization.
+The batch remains per-member transactional, not all-or-nothing. Direct Booking
+service calls now require the same server-owned `_profile` binding; old external
+harnesses must supply it explicitly rather than inheriting an unsafe default.
+
+Read-only profile sync and business preview never call physical readiness, BEGIN,
+SET or transaction row locks. Confirmation is advisory; only the final book POST
+runs readiness, and Booking repeats profile admission immediately per member.
+Enhanced readiness diagnostics explain P_S/instrumentation requirements without
+exposing raw SQL and without fallback. Existing ownership/isolation/engine/rollback/
+completion code is unchanged apart from a family-only discovery accessor. No D-01
+SET recipe or Core-Guarded transaction adapter is implemented. Existing financial
+paths still require their established profile/tax/entity/rights capabilities.
+
+### Executed evidence and missing qualification
+
+All new `CF01` assertions are synthetic, reusing existing protocol/booking/preview
+fixtures with a strict in-memory config/CAS result model. They do not connect to a
+DB or bootstrap a real Dolibarr request. Existing business fixtures now supply the
+same server profile context as the controller, without bypassing production
+admission logic. The dedicated negative tests exercise production config SQL and
+admission with missing/wrong bindings, not an always-allow stub.
+
+| Required area | Actual evidence / boundary |
+| --- | --- |
+| Install/upgrade states | Synthetic fresh/legacy/reactivated/unknown missing MySQL refuses until explicit admin choice; missing MariaDB preserves Snapshot. No live activation history inferred. |
+| Config validity and 1142 | Missing/malformed/family mismatch rejects; configured Enhanced P_S-denied model fails with dedicated message, no fallback. CoreGuarded blocks before P_S/BEGIN. |
+| Admin security | Synthetic admin/external-user checks, CSRF, method, injected entity/unknown fields, invalid family and non-autocommit refusal; zero unauthorized writes. |
+| Concurrent admin writes | Synthetic first-INSERT and UPDATE CAS races preserve the winner; same-profile save rotates revision; stale request is not retried. |
+| Binding/races/replay | Wrong owner/entity/revision/family/features, unbound old sessions, changed confirmations and consumed POST replay reject; saved results readable even when config is unavailable. Simulated post-admission admin change lets the admitted member finish, then rejects the next member before BEGIN. |
+| Read-only preview | Profile sync with denied P_S emits only nonlocking reads; controller has a single physical-readiness call, solely in book. Existing preview/request/calendar/render/escaping regressions retained. This is not live HTTP trace evidence. |
+| Profile non-regression | Real production admission over synthetic SQL + existing actual-Core calendar/API source fixtures: Enhanced and MariaDB contributions pass; CoreGuarded/direct-unbound booking refuses. Existing invoice/Agenda/ownership/R16 runners remain passing with server context. |
+| Local T1/T2 | PHP 8.2 lint, standalone/language parity, 188 observer and six loading contracts; eight existing runners on pinned V22.0.5 and V24.0.3 source PASS. Overlapping assertion counts are not unique test totals. Full 21-pair CI is recorded against the final HEAD in the Draft PR. |
+| Real T3/T4 | **NOT EXECUTED:** setup GET/POST/rights/CSRF and config CAS against real DB; live upgrade/reactivation, concurrent admin/member requests, real preview/replay and Enhanced/MariaDB contribution/invoice regression on this new source. No separately approved CF-01 installation/deployment or runtime operations were provided. |
+| Core-Guarded/D-01 | **NOT EXECUTED / NOT QUALIFIED:** loaded-Core/restricted-MySQL D-01 sequence and contribution booking remain later separately authorized pre-DML gates; all CoreGuarded bookings are intentionally blocked in CF-01. |
+
+No live deployment/symlink, Core, DB/configuration, Documents, SMTP, release artifact
+or 71-ID/18-column requirements mapping was changed. CF-01 checkboxes in Issue #22
+remain open until independent review and Owner acceptance. Production/release and
+later CF-02–CF-05 gates remain open.
+
 ## PR #16 documentation follow-up — 2026-11-18
 
 **Current review status: APPROVED FOR MERGE WITH DOCUMENTED SCOPE.** The external

@@ -86,6 +86,28 @@ product, Mercure numbering and Sponge PDF. See the
 the completed development merge and fulfilled owner decisions do not broaden the tested profile.
 The separate MySQL iteration below adds its explicitly bounded invoice evidence.
 
+## Transaction profile setup (CF-01)
+
+Administrators select a profile under the module's setup link (entity-specific).
+Core-Guarded on Oracle MySQL is available for future use, but **all Core-Guarded
+bookings are blocked until CF-02 implementation/qualification**. It never falls
+back to Enhanced. Read-only preview works without physical observer readiness;
+booking independently checks current configuration and the existing observer.
+
+Missing MySQL configuration does not prove a new installation: fresh, legacy and
+reactivated installations with unknown history require an explicit administrator
+choice. Select EnhancedMySQL to retain the existing instrumented MySQL booking
+contract; its P_S permission/instrumentation errors remain fail closed. MariaDB
+retains MariaDBSnapshot when no explicit configuration exists. Invalid or
+family-incompatible settings cannot authorize booking.
+
+Each saved profile changes its revision and invalidates old confirmations, including
+saves selecting the same profile. Completed/consumed sessions keep their original
+results; they are never reopened. Profile reads bypass cached Dolibarr constants.
+See the [CF-01 implementation and evidence limits](docs/phase4-implementation-validation.md#cf-01-profile-selection-and-preview-boundaries--2026-11-18).
+This development change is pending independent review/Owner acceptance; synthetic
+regression is not real DB/HTTP or Core-Guarded qualification.
+
 ## Origin and scope
 
 Derived from the architecture of [Dolibarr PR #42620](https://github.com/Dolibarr/dolibarr/pull/42620),
