@@ -1,5 +1,24 @@
 # Member Subscription Massaction for Dolibarr
 
+**Current Core-first development status — 2026-11-18:** CF-01 is Owner-accepted
+and merged in [PR #24](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/24).
+D-01 [PR #25](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/25)
+is merged as `3bc9e4653778cdc870d79e2f5b7e025bc9ca036a`: bounded evidence accepted,
+**Option A — Bounded STOP conditionally approved**. Core-Guarded booking remains
+**disabled / not qualified**. Before CF-02 contribution DML, independently assessed
+completion/session-checkpoint/logger evidence is mandatory and still **NOT EXECUTED**.
+The conditional design preserves acknowledged member results but stops immediately
+after CHAIN/RELEASE before further SQL, mail/PDF or another member; controlled partial
+processing must be transparent. It does not guarantee complete multi-member batches
+under every MySQL configuration. See the [Owner architecture addendum](docs/adr/ADR-0001-core-first-transaction-profiles.md#d-01-owner-addendum--2026-11-18)
+and [evidence/remaining gates](docs/phase4-implementation-validation.md#d-01-evidence-and-conditional-option-a-closure--2026-11-18).
+No general P_S prerequisite, compatibility, production or release approval follows.
+Permanent CHAIN/RELEASE support and Option C remain separate later decisions;
+EnhancedMySQL/MariaDB behavior and their bounded evidence remain unchanged.
+This AP2 documentation proposal awaits independent review and separate Owner
+acceptance before merge. Earlier dated development/evidence records below remain
+historical; the unchanged D-01 experiment verdict is not retroactively replaced.
+
 **Database development status — 2026-11-17:** MariaDB and Oracle MySQL use the
 shared `MsmDatabaseState` observer. Original **I1-05 FAILED** (19/20), subsequent
 **I105-FIX01 PASSED** (20/20) and **I1-06 PASSED** remain separate historical gates.
@@ -105,8 +124,8 @@ Each saved profile changes its revision and invalidates old confirmations, inclu
 saves selecting the same profile. Completed/consumed sessions keep their original
 results; they are never reopened. Profile reads bypass cached Dolibarr constants.
 See the [CF-01 implementation and evidence limits](docs/phase4-implementation-validation.md#cf-01-profile-selection-and-preview-boundaries--2026-11-18).
-This development change is pending independent review/Owner acceptance; synthetic
-regression is not real DB/HTTP or Core-Guarded qualification.
+CF-01 development review/Owner acceptance is complete; its real DB/HTTP/CAS
+evidence remains outstanding. Synthetic regression is not Core-Guarded qualification.
 
 ## Origin and scope
 
