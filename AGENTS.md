@@ -16,6 +16,16 @@
 
 ## Architecture and compatibility
 
+- Core-first strategy: Owner decisions ADR-01–ADR-12 in Issue #22 (2026-11-18)
+  govern the new Core-Guarded design; see
+  [ADR-0001](docs/adr/ADR-0001-core-first-transaction-profiles.md), its risk register
+  and review handoff. Detailed design is pending independent architecture review;
+  CF-00 authorizes no implementation or release. The existing G0/MySQL event,
+  actual-event isolation and provable-completion rules below still constrain the
+  current code and Enhanced MySQL; they are not universal requirements for the new,
+  deliberately weaker Core-Guarded profile. MariaDB retains its existing snapshot
+  contract. No silent Enhanced downgrade or historical evidence reinterpretation.
+
 - P2 admission is >=21.0.0 with no upper bound or exact patch/SHA allowlist.
   P1 source-analyzed 15 V22/V23/V24 tags; V21/future versions remain unqualified.
   Keep capability checks, actual Core R16 observation and independent known-contract
