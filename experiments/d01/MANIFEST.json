@@ -1,0 +1,159 @@
+{
+  "format": "D01 private-free review evidence v1",
+  "date": "2026-11-18",
+  "base_commit": "6247704815cf532ec632616011133c646aa00005",
+  "core_commit": "5c6c7ff6a5112413b1c27221c8d11750afad56f8",
+  "verdict": "D-01 CHANGES REQUIRED",
+  "files": [
+    {
+      "path": "docs/d01-loaded-core-feasibility-v1.md",
+      "bytes": 12552,
+      "sha256": "d16384197e36ef15e8ce7ccf3a784891ed2838bc828536d992cee72da8997a26"
+    },
+    {
+      "path": "experiments/d01/README.md",
+      "bytes": 5289,
+      "sha256": "a3f983c9bf5c50beaefaeb2e46e4496bbcd49de7a3436d58dba8770199bd58df"
+    },
+    {
+      "path": "experiments/d01/build-manifest.py",
+      "bytes": 3733,
+      "sha256": "b603efb7a83f9634e4713df4a9f681500db948673d2718f3ebe8b43a7cf9807a"
+    },
+    {
+      "path": "experiments/d01/core-lab.php",
+      "bytes": 5415,
+      "sha256": "8e427f1137334f8dc0cb273a96d2cfe005b9089a1ae7114e414b168c7c2ed6eb"
+    },
+    {
+      "path": "experiments/d01/evidence/TEST-MATRIX.json",
+      "bytes": 44494,
+      "sha256": "26e6c19fe2e8e59f082cf26d474189cd8a1443dffdc009953904618d5e13b283"
+    },
+    {
+      "path": "experiments/d01/evidence/core-cases.json",
+      "bytes": 181558,
+      "sha256": "10bd543122a08599f7a68885cc9582fc203b67337724b193ace0d0cfee804321"
+    },
+    {
+      "path": "experiments/d01/evidence/core-cases.json.started",
+      "bytes": 95,
+      "sha256": "ef3d5a180d8f4b0d94497044f97051b60d88e21d8ad045f6899a38b423d519dd"
+    },
+    {
+      "path": "experiments/d01/evidence/core-lab-first-run.php.txt",
+      "bytes": 5387,
+      "sha256": "db7e9080a570abbc7218c7144b507ed9de89be9faa87c921cdea86522b125d61"
+    },
+    {
+      "path": "experiments/d01/evidence/factory.json",
+      "bytes": 3515,
+      "sha256": "8d3f7106a1c0d861eab62bd1064501b9a1626d783417d424bfc9238cb42799ad"
+    },
+    {
+      "path": "experiments/d01/evidence/factory.json.started",
+      "bytes": 95,
+      "sha256": "fba030bdc5bc8328a5e3969901bf86270289b0b974b63008ecb2e1c67ca3784c"
+    },
+    {
+      "path": "experiments/d01/evidence/final-read.json",
+      "bytes": 2702,
+      "sha256": "ad1e6e2468c1a31b854164b685200fc284052c9120baf7312ea970e670a055af"
+    },
+    {
+      "path": "experiments/d01/evidence/inspection.json",
+      "bytes": 4266,
+      "sha256": "05a85d798628e1ec2cb1122df4aef55f81eb7841d6adc9d609b3b698ac045ff3"
+    },
+    {
+      "path": "experiments/d01/evidence/locks.json",
+      "bytes": 15392,
+      "sha256": "e31d9621f9ad5856d0e23423dbc7b0053dd6298d464a090ff6866227e63c645c"
+    },
+    {
+      "path": "experiments/d01/evidence/locks.json.started",
+      "bytes": 49,
+      "sha256": "0b88edd663717a145c9adba78916b980aab91677b6002e37bbae87dabdb6c943"
+    },
+    {
+      "path": "experiments/d01/evidence/lost-COMMIT.json",
+      "bytes": 2836,
+      "sha256": "bb68205f1b2a42b72e351bb48928bf94e0a93f203a3066fa6cb9b77c710d617f"
+    },
+    {
+      "path": "experiments/d01/evidence/lost-COMMIT.json.started",
+      "bytes": 67,
+      "sha256": "79e10fa586727c0bc2721d5080236e1686eaf4ef704ca0ed4cf8e2fe7189cd32"
+    },
+    {
+      "path": "experiments/d01/evidence/lost-ROLLBACK.json",
+      "bytes": 2863,
+      "sha256": "29e1e3f4dc43830994c27528652540dca2af93c1bf40b8588346d8cf9a472cb7"
+    },
+    {
+      "path": "experiments/d01/evidence/lost-ROLLBACK.json.started",
+      "bytes": 69,
+      "sha256": "24e40ebeb6899c7a58235653ab65b8a378cb169ad7d47c45d8cf437cf9c649d9"
+    },
+    {
+      "path": "experiments/d01/evidence/reference-http.json",
+      "bytes": 189,
+      "sha256": "a87a8945389bd18b392fbed266dbc32ff05a439f2780ac8a20893248a7a6eb59"
+    },
+    {
+      "path": "experiments/d01/evidence/stop-reconciled.json",
+      "bytes": 6493,
+      "sha256": "619d190a7aab56fc6ae2613c994120cfcde31d3e60c37af42ceb95a87e2457c7"
+    },
+    {
+      "path": "experiments/d01/factory.php",
+      "bytes": 2477,
+      "sha256": "5946e62eed54a0426c1dfdd965f4adcb6dc131f8766ebc07b8c5974c0919c210"
+    },
+    {
+      "path": "experiments/d01/final-read.php",
+      "bytes": 2232,
+      "sha256": "af71892a31c532db595784807effebfe7460508735839f72a126d3a137a58f27"
+    },
+    {
+      "path": "experiments/d01/inspect.php",
+      "bytes": 2986,
+      "sha256": "a024c7f8ee19d2a047880d88bdae58975a770f71095e88c7a2dc1e9835d4e8ef"
+    },
+    {
+      "path": "experiments/d01/lock-worker.php",
+      "bytes": 1595,
+      "sha256": "44014329919771de4dc34548c77b299b47c36236ffea3898b892e7d5c2758332"
+    },
+    {
+      "path": "experiments/d01/locks.php",
+      "bytes": 2532,
+      "sha256": "1ae6f6675cd32015b700d5018502b074a5b4aa130493566194304d6945de9b0d"
+    },
+    {
+      "path": "experiments/d01/lost-ack.php",
+      "bytes": 1502,
+      "sha256": "8b4f8ad9e0d8011efbcd9ab9a4c09f500a40a07f441789dc5b233f97d818366a"
+    },
+    {
+      "path": "experiments/d01/lost-ack.py",
+      "bytes": 4555,
+      "sha256": "cb0a21342d89d64461c41a3e86fd73c6c283e8f8f79c7d8b122b4ad8e32c5721"
+    },
+    {
+      "path": "experiments/d01/reconcile.php",
+      "bytes": 1325,
+      "sha256": "18fe4a9d604a4b0cbedbc8a2b39202fdf66fb6a91cbcdec412429588e563b905"
+    },
+    {
+      "path": "experiments/d01/run.php",
+      "bytes": 10812,
+      "sha256": "5d90d7bd27ac5696f825d14f83f22b9517e3c5c5d94f7ecdbf1e01a1a724f6b9"
+    },
+    {
+      "path": "experiments/d01/verify.py",
+      "bytes": 5236,
+      "sha256": "a368bca8e1742761b2c4234e3d0da7421d716ac8309163aa295347a80d793fa1"
+    }
+  ]
+}

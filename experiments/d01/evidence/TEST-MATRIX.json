@@ -1,0 +1,1426 @@
+{
+  "version": 1,
+  "verdict": "D-01 CHANGES REQUIRED",
+  "cases": [
+    {
+      "id": "D01-BASE-commit",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4000,
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            5,
+            6
+          ],
+          "connection": 92
+        },
+        "return": 1,
+        "depth": 0,
+        "persisted": 2,
+        "id": "D01-BASE-commit",
+        "measurement": "PASS",
+        "trace_range": [
+          2,
+          12
+        ]
+      },
+      "assessment": "Observed expected real Core/SQL result; see report group contract",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-BASE-rollback",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4001,
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            16,
+            17
+          ],
+          "connection": 93
+        },
+        "return": true,
+        "depth": 0,
+        "persisted": 0,
+        "id": "D01-BASE-rollback",
+        "measurement": "PASS",
+        "trace_range": [
+          13,
+          23
+        ]
+      },
+      "assessment": "Observed expected real Core/SQL result; see report group contract",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-NEST-commit",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4002,
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            26,
+            27
+          ],
+          "connection": 94
+        },
+        "inner_return": 1,
+        "inner_SQL": [
+          "UPDATE probe SET n=3 WHERE id=4002"
+        ],
+        "outer_commit": 1,
+        "persisted": 3,
+        "limit": "Core nesting uses counters; inner rollback does not undo inner writes",
+        "id": "D01-NEST-commit",
+        "measurement": "PASS",
+        "trace_range": [
+          24,
+          31
+        ]
+      },
+      "assessment": "Core nesting uses counters; inner rollback does not undo inner writes",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-NEST-rollback",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4003,
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            34,
+            35
+          ],
+          "connection": 95
+        },
+        "inner_return": 1,
+        "inner_SQL": [
+          "UPDATE probe SET n=3 WHERE id=4003"
+        ],
+        "outer_commit": 1,
+        "persisted": 3,
+        "limit": "Core nesting uses counters; inner rollback does not undo inner writes",
+        "id": "D01-NEST-rollback",
+        "measurement": "PASS",
+        "trace_range": [
+          32,
+          39
+        ]
+      },
+      "assessment": "Core nesting uses counters; inner rollback does not undo inner writes",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-ISO-READ-UNCOMMITTED-READ-UNCOMMITTED",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4004,
+        "guard": 4005,
+        "session": "READ-UNCOMMITTED",
+        "pending_before_D01": "READ UNCOMMITTED",
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            48,
+            49
+          ],
+          "connection": 96
+        },
+        "reads": [
+          0,
+          0,
+          1,
+          0
+        ],
+        "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+        "id": "D01-ISO-READ-UNCOMMITTED-READ-UNCOMMITTED",
+        "measurement": "PASS",
+        "trace_range": [
+          40,
+          59
+        ]
+      },
+      "assessment": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-ISO-READ-UNCOMMITTED-READ-COMMITTED",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4006,
+        "guard": 4007,
+        "session": "READ-UNCOMMITTED",
+        "pending_before_D01": "READ COMMITTED",
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            68,
+            69
+          ],
+          "connection": 98
+        },
+        "reads": [
+          0,
+          0,
+          1,
+          0
+        ],
+        "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+        "id": "D01-ISO-READ-UNCOMMITTED-READ-COMMITTED",
+        "measurement": "PASS",
+        "trace_range": [
+          60,
+          79
+        ]
+      },
+      "assessment": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-ISO-READ-UNCOMMITTED-REPEATABLE-READ",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4008,
+        "guard": 4009,
+        "session": "READ-UNCOMMITTED",
+        "pending_before_D01": "REPEATABLE READ",
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            88,
+            89
+          ],
+          "connection": 100
+        },
+        "reads": [
+          0,
+          0,
+          1,
+          0
+        ],
+        "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+        "id": "D01-ISO-READ-UNCOMMITTED-REPEATABLE-READ",
+        "measurement": "PASS",
+        "trace_range": [
+          80,
+          99
+        ]
+      },
+      "assessment": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-ISO-READ-UNCOMMITTED-SERIALIZABLE",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4010,
+        "guard": 4011,
+        "session": "READ-UNCOMMITTED",
+        "pending_before_D01": "SERIALIZABLE",
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            108,
+            109
+          ],
+          "connection": 102
+        },
+        "reads": [
+          0,
+          0,
+          1,
+          0
+        ],
+        "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+        "id": "D01-ISO-READ-UNCOMMITTED-SERIALIZABLE",
+        "measurement": "PASS",
+        "trace_range": [
+          100,
+          119
+        ]
+      },
+      "assessment": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-ISO-READ-COMMITTED-READ-UNCOMMITTED",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4012,
+        "guard": 4013,
+        "session": "READ-COMMITTED",
+        "pending_before_D01": "READ UNCOMMITTED",
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            128,
+            129
+          ],
+          "connection": 104
+        },
+        "reads": [
+          0,
+          0,
+          1,
+          0
+        ],
+        "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+        "id": "D01-ISO-READ-COMMITTED-READ-UNCOMMITTED",
+        "measurement": "PASS",
+        "trace_range": [
+          120,
+          139
+        ]
+      },
+      "assessment": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-ISO-READ-COMMITTED-READ-COMMITTED",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4014,
+        "guard": 4015,
+        "session": "READ-COMMITTED",
+        "pending_before_D01": "READ COMMITTED",
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            148,
+            149
+          ],
+          "connection": 106
+        },
+        "reads": [
+          0,
+          0,
+          1,
+          0
+        ],
+        "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+        "id": "D01-ISO-READ-COMMITTED-READ-COMMITTED",
+        "measurement": "PASS",
+        "trace_range": [
+          140,
+          159
+        ]
+      },
+      "assessment": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-ISO-READ-COMMITTED-REPEATABLE-READ",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4016,
+        "guard": 4017,
+        "session": "READ-COMMITTED",
+        "pending_before_D01": "REPEATABLE READ",
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            168,
+            169
+          ],
+          "connection": 108
+        },
+        "reads": [
+          0,
+          0,
+          1,
+          0
+        ],
+        "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+        "id": "D01-ISO-READ-COMMITTED-REPEATABLE-READ",
+        "measurement": "PASS",
+        "trace_range": [
+          160,
+          179
+        ]
+      },
+      "assessment": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-ISO-READ-COMMITTED-SERIALIZABLE",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4018,
+        "guard": 4019,
+        "session": "READ-COMMITTED",
+        "pending_before_D01": "SERIALIZABLE",
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            188,
+            189
+          ],
+          "connection": 110
+        },
+        "reads": [
+          0,
+          0,
+          1,
+          0
+        ],
+        "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+        "id": "D01-ISO-READ-COMMITTED-SERIALIZABLE",
+        "measurement": "PASS",
+        "trace_range": [
+          180,
+          199
+        ]
+      },
+      "assessment": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-ISO-REPEATABLE-READ-READ-UNCOMMITTED",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4020,
+        "guard": 4021,
+        "session": "REPEATABLE-READ",
+        "pending_before_D01": "READ UNCOMMITTED",
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            208,
+            209
+          ],
+          "connection": 112
+        },
+        "reads": [
+          0,
+          0,
+          1,
+          0
+        ],
+        "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+        "id": "D01-ISO-REPEATABLE-READ-READ-UNCOMMITTED",
+        "measurement": "PASS",
+        "trace_range": [
+          200,
+          219
+        ]
+      },
+      "assessment": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-ISO-REPEATABLE-READ-READ-COMMITTED",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4022,
+        "guard": 4023,
+        "session": "REPEATABLE-READ",
+        "pending_before_D01": "READ COMMITTED",
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            228,
+            229
+          ],
+          "connection": 114
+        },
+        "reads": [
+          0,
+          0,
+          1,
+          0
+        ],
+        "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+        "id": "D01-ISO-REPEATABLE-READ-READ-COMMITTED",
+        "measurement": "PASS",
+        "trace_range": [
+          220,
+          239
+        ]
+      },
+      "assessment": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-ISO-REPEATABLE-READ-REPEATABLE-READ",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4024,
+        "guard": 4025,
+        "session": "REPEATABLE-READ",
+        "pending_before_D01": "REPEATABLE READ",
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            248,
+            249
+          ],
+          "connection": 116
+        },
+        "reads": [
+          0,
+          0,
+          1,
+          0
+        ],
+        "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+        "id": "D01-ISO-REPEATABLE-READ-REPEATABLE-READ",
+        "measurement": "PASS",
+        "trace_range": [
+          240,
+          259
+        ]
+      },
+      "assessment": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-ISO-REPEATABLE-READ-SERIALIZABLE",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4026,
+        "guard": 4027,
+        "session": "REPEATABLE-READ",
+        "pending_before_D01": "SERIALIZABLE",
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            268,
+            269
+          ],
+          "connection": 118
+        },
+        "reads": [
+          0,
+          0,
+          1,
+          0
+        ],
+        "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+        "id": "D01-ISO-REPEATABLE-READ-SERIALIZABLE",
+        "measurement": "PASS",
+        "trace_range": [
+          260,
+          279
+        ]
+      },
+      "assessment": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-ISO-SERIALIZABLE-READ-UNCOMMITTED",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4028,
+        "guard": 4029,
+        "session": "SERIALIZABLE",
+        "pending_before_D01": "READ UNCOMMITTED",
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            288,
+            289
+          ],
+          "connection": 120
+        },
+        "reads": [
+          0,
+          0,
+          1,
+          0
+        ],
+        "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+        "id": "D01-ISO-SERIALIZABLE-READ-UNCOMMITTED",
+        "measurement": "PASS",
+        "trace_range": [
+          280,
+          299
+        ]
+      },
+      "assessment": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-ISO-SERIALIZABLE-READ-COMMITTED",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4030,
+        "guard": 4031,
+        "session": "SERIALIZABLE",
+        "pending_before_D01": "READ COMMITTED",
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            308,
+            309
+          ],
+          "connection": 122
+        },
+        "reads": [
+          0,
+          0,
+          1,
+          0
+        ],
+        "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+        "id": "D01-ISO-SERIALIZABLE-READ-COMMITTED",
+        "measurement": "PASS",
+        "trace_range": [
+          300,
+          319
+        ]
+      },
+      "assessment": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-ISO-SERIALIZABLE-REPEATABLE-READ",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4032,
+        "guard": 4033,
+        "session": "SERIALIZABLE",
+        "pending_before_D01": "REPEATABLE READ",
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            328,
+            329
+          ],
+          "connection": 124
+        },
+        "reads": [
+          0,
+          0,
+          1,
+          0
+        ],
+        "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+        "id": "D01-ISO-SERIALIZABLE-REPEATABLE-READ",
+        "measurement": "PASS",
+        "trace_range": [
+          320,
+          339
+        ]
+      },
+      "assessment": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-ISO-SERIALIZABLE-SERIALIZABLE",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4034,
+        "guard": 4035,
+        "session": "SERIALIZABLE",
+        "pending_before_D01": "SERIALIZABLE",
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            348,
+            349
+          ],
+          "connection": 126
+        },
+        "reads": [
+          0,
+          0,
+          1,
+          0
+        ],
+        "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+        "id": "D01-ISO-SERIALIZABLE-SERIALIZABLE",
+        "measurement": "PASS",
+        "trace_range": [
+          340,
+          359
+        ]
+      },
+      "assessment": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-FOREIGN-1568",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4036,
+        "native_errno": 1568,
+        "Core_errno": "DB_ERROR_1568",
+        "attempt_SQL": [
+          "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ"
+        ],
+        "foreign_end_by_admission": 0,
+        "foreign_uncommitted_value": 7,
+        "cleanup": "single native rollback by fault-originator after rejection",
+        "id": "D01-FOREIGN-1568",
+        "measurement": "PASS",
+        "trace_range": [
+          360,
+          368
+        ]
+      },
+      "assessment": "Observed expected real Core/SQL result; see report group contract",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-COMPLETION-0-commit",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4037,
+        "settings": {
+          "ac": "1",
+          "completion_type": "NO_CHAIN"
+        },
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            373,
+            374
+          ],
+          "connection": 129
+        },
+        "Core_return": 1,
+        "Core_depth": 0,
+        "persisted": 4,
+        "next_SET_ok": true,
+        "next_SET_errno": 0,
+        "next_begin": true,
+        "observation": "No normalization or completion whitelist; next SET failure/connection error stops the next operation",
+        "id": "D01-COMPLETION-0-commit",
+        "measurement": "PASS",
+        "trace_range": [
+          369,
+          381
+        ]
+      },
+      "assessment": "No normalization or completion whitelist; next SET failure/connection error stops the next operation",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-COMPLETION-0-rollback",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4038,
+        "settings": {
+          "ac": "1",
+          "completion_type": "NO_CHAIN"
+        },
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            386,
+            387
+          ],
+          "connection": 130
+        },
+        "Core_return": true,
+        "Core_depth": 0,
+        "persisted": 0,
+        "next_SET_ok": true,
+        "next_SET_errno": 0,
+        "next_begin": true,
+        "observation": "No normalization or completion whitelist; next SET failure/connection error stops the next operation",
+        "id": "D01-COMPLETION-0-rollback",
+        "measurement": "PASS",
+        "trace_range": [
+          382,
+          394
+        ]
+      },
+      "assessment": "No normalization or completion whitelist; next SET failure/connection error stops the next operation",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-COMPLETION-1-commit",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4039,
+        "settings": {
+          "ac": "1",
+          "completion_type": "CHAIN"
+        },
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            399,
+            400
+          ],
+          "connection": 131
+        },
+        "Core_return": 1,
+        "Core_depth": 0,
+        "persisted": 4,
+        "next_SET_ok": false,
+        "next_SET_errno": 1568,
+        "next_begin": false,
+        "observation": "No normalization or completion whitelist; next SET failure/connection error stops the next operation",
+        "id": "D01-COMPLETION-1-commit",
+        "measurement": "PASS",
+        "trace_range": [
+          395,
+          405
+        ]
+      },
+      "assessment": "No normalization or completion whitelist; next SET failure/connection error stops the next operation",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-COMPLETION-1-rollback",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4040,
+        "settings": {
+          "ac": "1",
+          "completion_type": "CHAIN"
+        },
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            410,
+            411
+          ],
+          "connection": 132
+        },
+        "Core_return": true,
+        "Core_depth": 0,
+        "persisted": 0,
+        "next_SET_ok": false,
+        "next_SET_errno": 1568,
+        "next_begin": false,
+        "observation": "No normalization or completion whitelist; next SET failure/connection error stops the next operation",
+        "id": "D01-COMPLETION-1-rollback",
+        "measurement": "PASS",
+        "trace_range": [
+          406,
+          416
+        ]
+      },
+      "assessment": "No normalization or completion whitelist; next SET failure/connection error stops the next operation",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-COMPLETION-2-commit",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4041,
+        "settings": {
+          "ac": "1",
+          "completion_type": "RELEASE"
+        },
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            421,
+            422
+          ],
+          "connection": 133
+        },
+        "Core_return": 1,
+        "Core_depth": 0,
+        "persisted": 4,
+        "next_SET_ok": false,
+        "next_SET_errno": 2006,
+        "next_begin": false,
+        "observation": "No normalization or completion whitelist; next SET failure/connection error stops the next operation",
+        "id": "D01-COMPLETION-2-commit",
+        "measurement": "PASS",
+        "trace_range": [
+          417,
+          427
+        ]
+      },
+      "assessment": "No normalization or completion whitelist; next SET failure/connection error stops the next operation",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-COMPLETION-2-rollback",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4042,
+        "settings": {
+          "ac": "1",
+          "completion_type": "RELEASE"
+        },
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            432,
+            433
+          ],
+          "connection": 134
+        },
+        "Core_return": true,
+        "Core_depth": 0,
+        "persisted": 0,
+        "next_SET_ok": false,
+        "next_SET_errno": 2006,
+        "next_begin": false,
+        "observation": "No normalization or completion whitelist; next SET failure/connection error stops the next operation",
+        "id": "D01-COMPLETION-2-rollback",
+        "measurement": "PASS",
+        "trace_range": [
+          428,
+          438
+        ]
+      },
+      "assessment": "No normalization or completion whitelist; next SET failure/connection error stops the next operation",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-INTERVENING-constant",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4043,
+        "prefix": "SELECT 1",
+        "Core_begin": 1,
+        "first": 0,
+        "second": 0,
+        "RR_retained": true,
+        "classification": "negative ordering control outside supported D01; observational result",
+        "id": "D01-INTERVENING-constant",
+        "measurement": "PASS",
+        "trace_range": [
+          439,
+          449
+        ]
+      },
+      "assessment": "negative ordering control outside supported D01; observational result",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-INTERVENING-InnoDB",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4044,
+        "prefix": "SELECT n FROM probe WHERE id=1",
+        "Core_begin": 1,
+        "first": 0,
+        "second": 1,
+        "RR_retained": false,
+        "classification": "negative ordering control outside supported D01; observational result",
+        "id": "D01-INTERVENING-InnoDB",
+        "measurement": "PASS",
+        "trace_range": [
+          450,
+          460
+        ]
+      },
+      "assessment": "negative ordering control outside supported D01; observational result",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-LATE-OVERRIDE",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4045,
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            464,
+            465
+          ],
+          "connection": 139
+        },
+        "Core_ack": 1,
+        "reads": [
+          0,
+          1
+        ],
+        "classification": "EXPECTED LIMIT: honest entry does not detect later same-connection replacement or prove ongoing isolation/identity",
+        "id": "D01-LATE-OVERRIDE",
+        "measurement": "PASS",
+        "trace_range": [
+          461,
+          472
+        ]
+      },
+      "assessment": "EXPECTED LIMIT: honest entry does not detect later same-connection replacement or prove ongoing isolation/identity",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-STATEMENT-ERROR",
+      "measurement": "PASS",
+      "expected": "Measure the exact group objective defined in report section 2; negative controls are not safety acceptance",
+      "observed": {
+        "fixture": 4046,
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            475,
+            476
+          ],
+          "connection": 141
+        },
+        "native_errno": 1054,
+        "Core_errno": "DB_ERROR_NOSUCHFIELD",
+        "rollback_return": true,
+        "persisted": 0,
+        "limit": "one known local lab statement; no general CF02 S-class mapping",
+        "id": "D01-STATEMENT-ERROR",
+        "measurement": "PASS",
+        "trace_range": [
+          473,
+          480
+        ]
+      },
+      "assessment": "one known local lab statement; no general CF02 S-class mapping",
+      "evidence": "evidence/core-cases.json"
+    },
+    {
+      "id": "D01-LOCK-correct",
+      "measurement": "PASS",
+      "expected": "B blocks until A commit; post-lock consistent read1, pre-lock metadata control read0",
+      "observed": {
+        "fixture": 4060,
+        "mode": "correct",
+        "A_entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            3,
+            4
+          ],
+          "connection": 145
+        },
+        "A_commit_window": [
+          1795026120.060708,
+          1795026120.077343
+        ],
+        "B_pending_before_A_commit": true,
+        "B": {
+          "status": "PASS",
+          "mode": "correct",
+          "entry": {
+            "begin": 1,
+            "depth": 1,
+            "sql_indices": [
+              2,
+              3
+            ],
+            "connection": 146
+          },
+          "lock_start": 1795026119.609014,
+          "lock_end": 1795026120.077323,
+          "lock_seconds": 0.4683089256286621,
+          "locked": 1,
+          "consistent": 1,
+          "rollback": true,
+          "trace": [
+            {
+              "case": "D01-LOCK-B-correct",
+              "connection": 146,
+              "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+              "start": 1795026119.598875,
+              "end": 1795026119.600546,
+              "ok": true,
+              "errno": 0,
+              "rows": 1
+            },
+            {
+              "case": "D01-LOCK-B-correct",
+              "connection": 146,
+              "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+              "start": 1795026119.600634,
+              "end": 1795026119.605398,
+              "ok": true,
+              "errno": 0,
+              "rows": 1
+            },
+            {
+              "case": "D01-LOCK-B-correct",
+              "connection": 146,
+              "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+              "start": 1795026119.605442,
+              "end": 1795026119.607937,
+              "ok": true,
+              "errno": 0,
+              "rows": 0
+            },
+            {
+              "case": "D01-LOCK-B-correct",
+              "connection": 146,
+              "sql": "BEGIN",
+              "start": 1795026119.607962,
+              "end": 1795026119.608407,
+              "ok": true,
+              "errno": 0,
+              "rows": 0
+            },
+            {
+              "case": "D01-LOCK-B-correct",
+              "connection": 146,
+              "sql": "SELECT n FROM probe WHERE id=4060 FOR UPDATE",
+              "start": 1795026119.609039,
+              "end": 1795026120.077293,
+              "ok": true,
+              "errno": 0,
+              "rows": 1
+            },
+            {
+              "case": "D01-LOCK-B-correct",
+              "connection": 146,
+              "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+              "start": 1795026120.077347,
+              "end": 1795026120.080712,
+              "ok": true,
+              "errno": 0,
+              "rows": 1
+            },
+            {
+              "case": "D01-LOCK-B-correct",
+              "connection": 146,
+              "sql": "SELECT n FROM probe WHERE id=4060",
+              "start": 1795026120.080762,
+              "end": 1795026120.082837,
+              "ok": true,
+              "errno": 0,
+              "rows": 1
+            },
+            {
+              "case": "D01-LOCK-B-correct",
+              "connection": 146,
+              "sql": "ROLLBACK",
+              "start": 1795026120.082888,
+              "end": 1795026120.084493,
+              "ok": true,
+              "errno": 0,
+              "rows": 0
+            }
+          ]
+        },
+        "assessment": "Fresh read after lock and metadata"
+      },
+      "assessment": "Fresh read after lock and metadata",
+      "evidence": "evidence/locks.json"
+    },
+    {
+      "id": "D01-LOCK-prelock-metadata",
+      "measurement": "PASS",
+      "expected": "B blocks until A commit; post-lock consistent read1, pre-lock metadata control read0",
+      "observed": {
+        "fixture": 4061,
+        "mode": "prelock-metadata",
+        "A_entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            11,
+            12
+          ],
+          "connection": 147
+        },
+        "A_commit_window": [
+          1795026120.686648,
+          1795026120.706705
+        ],
+        "B_pending_before_A_commit": true,
+        "B": {
+          "status": "PASS",
+          "mode": "prelock-metadata",
+          "entry": {
+            "begin": 1,
+            "depth": 1,
+            "sql_indices": [
+              2,
+              3
+            ],
+            "connection": 148
+          },
+          "lock_start": 1795026120.235973,
+          "lock_end": 1795026120.706518,
+          "lock_seconds": 0.47054505348205566,
+          "locked": 1,
+          "consistent": 0,
+          "rollback": true,
+          "trace": [
+            {
+              "case": "D01-LOCK-B-prelock-metadata",
+              "connection": 148,
+              "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+              "start": 1795026120.223213,
+              "end": 1795026120.225713,
+              "ok": true,
+              "errno": 0,
+              "rows": 1
+            },
+            {
+              "case": "D01-LOCK-B-prelock-metadata",
+              "connection": 148,
+              "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+              "start": 1795026120.225836,
+              "end": 1795026120.230396,
+              "ok": true,
+              "errno": 0,
+              "rows": 1
+            },
+            {
+              "case": "D01-LOCK-B-prelock-metadata",
+              "connection": 148,
+              "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+              "start": 1795026120.230455,
+              "end": 1795026120.23178,
+              "ok": true,
+              "errno": 0,
+              "rows": 0
+            },
+            {
+              "case": "D01-LOCK-B-prelock-metadata",
+              "connection": 148,
+              "sql": "BEGIN",
+              "start": 1795026120.231814,
+              "end": 1795026120.232503,
+              "ok": true,
+              "errno": 0,
+              "rows": 0
+            },
+            {
+              "case": "D01-LOCK-B-prelock-metadata",
+              "connection": 148,
+              "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+              "start": 1795026120.232537,
+              "end": 1795026120.235343,
+              "ok": true,
+              "errno": 0,
+              "rows": 1
+            },
+            {
+              "case": "D01-LOCK-B-prelock-metadata",
+              "connection": 148,
+              "sql": "SELECT n FROM probe WHERE id=4061 FOR UPDATE",
+              "start": 1795026120.235999,
+              "end": 1795026120.706491,
+              "ok": true,
+              "errno": 0,
+              "rows": 1
+            },
+            {
+              "case": "D01-LOCK-B-prelock-metadata",
+              "connection": 148,
+              "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+              "start": 1795026120.706542,
+              "end": 1795026120.708262,
+              "ok": true,
+              "errno": 0,
+              "rows": 1
+            },
+            {
+              "case": "D01-LOCK-B-prelock-metadata",
+              "connection": 148,
+              "sql": "SELECT n FROM probe WHERE id=4061",
+              "start": 1795026120.708301,
+              "end": 1795026120.709707,
+              "ok": true,
+              "errno": 0,
+              "rows": 1
+            },
+            {
+              "case": "D01-LOCK-B-prelock-metadata",
+              "connection": 148,
+              "sql": "ROLLBACK",
+              "start": 1795026120.709795,
+              "end": 1795026120.712239,
+              "ok": true,
+              "errno": 0,
+              "rows": 0
+            }
+          ]
+        },
+        "assessment": "EXPECTED COUNTEREXAMPLE: pre-lock ENGINE SELECT establishes stale consistent read; ordering is required"
+      },
+      "assessment": "EXPECTED COUNTEREXAMPLE: pre-lock ENGINE SELECT establishes stale consistent read; ordering is required",
+      "evidence": "evidence/locks.json"
+    },
+    {
+      "id": "D01-LOST-COMMIT",
+      "measurement": "PASS",
+      "expected": "Server OK discarded, Core failure, UNKNOWN/STOP regardless of persistence",
+      "observed": {
+        "status": "PASS",
+        "kind": "COMMIT",
+        "fixture": 4080,
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            3,
+            4
+          ],
+          "connection": 150
+        },
+        "Core_return": 0,
+        "native_errno": 2006,
+        "Core_errno": null,
+        "Core_depth": 1,
+        "persisted": 9,
+        "classification": "UNKNOWN/STOP regardless of independent readback; no retry or compensating rollback",
+        "proxy": {
+          "forwarded_target": 1,
+          "server_ok_discarded": 1,
+          "raw_packets_logged": 0,
+          "scope": "one dedicated loopback client; no KILL or server restart"
+        }
+      },
+      "assessment": "UNKNOWN/STOP regardless of independent readback; no retry or compensating rollback",
+      "evidence": "evidence/lost-COMMIT.json"
+    },
+    {
+      "id": "D01-LOST-ROLLBACK",
+      "measurement": "PASS",
+      "expected": "Server OK discarded, Core failure, UNKNOWN/STOP regardless of persistence",
+      "observed": {
+        "status": "PASS",
+        "kind": "ROLLBACK",
+        "fixture": 4081,
+        "entry": {
+          "begin": 1,
+          "depth": 1,
+          "sql_indices": [
+            3,
+            4
+          ],
+          "connection": 152
+        },
+        "Core_return": false,
+        "native_errno": 2006,
+        "Core_errno": null,
+        "Core_depth": 0,
+        "persisted": 0,
+        "classification": "UNKNOWN/STOP regardless of independent readback; no retry or compensating rollback",
+        "proxy": {
+          "forwarded_target": 1,
+          "server_ok_discarded": 1,
+          "raw_packets_logged": 0,
+          "scope": "one dedicated loopback client; no KILL or server restart"
+        }
+      },
+      "assessment": "UNKNOWN/STOP regardless of independent readback; no retry or compensating rollback",
+      "evidence": "evidence/lost-ROLLBACK.json"
+    },
+    {
+      "id": "D01-FACTORY-commit",
+      "measurement": "PASS",
+      "expected": "Exact Core factory, entry and independent commit/rollback persistence",
+      "observed": {
+        "operation": "commit",
+        "fixture": 4090,
+        "identity": {
+          "db": "msmsh01lab",
+          "account": "msmsh01lab@%",
+          "version": "8.4.13",
+          "ac": "1"
+        },
+        "begin": 1,
+        "return": 1,
+        "depth": 0,
+        "persisted": 12,
+        "DoliDB_class": "DoliDBMysqli",
+        "native_class": "mysqli",
+        "connection": 154,
+        "trace_limit": "Exact factory connection is deliberately not instrumented; wire/order corroboration is supplied by inherited-method/native-instrumented cases"
+      },
+      "assessment": "Real driver control; no native SQL tracing seam on factory connection",
+      "evidence": "evidence/factory.json"
+    },
+    {
+      "id": "D01-FACTORY-rollback",
+      "measurement": "PASS",
+      "expected": "Exact Core factory, entry and independent commit/rollback persistence",
+      "observed": {
+        "operation": "rollback",
+        "fixture": 4091,
+        "identity": {
+          "db": "msmsh01lab",
+          "account": "msmsh01lab@%",
+          "version": "8.4.13",
+          "ac": "1"
+        },
+        "begin": 1,
+        "return": true,
+        "depth": 0,
+        "persisted": 0,
+        "DoliDB_class": "DoliDBMysqli",
+        "native_class": "mysqli",
+        "connection": 155,
+        "trace_limit": "Exact factory connection is deliberately not instrumented; wire/order corroboration is supplied by inherited-method/native-instrumented cases"
+      },
+      "assessment": "Real driver control; no native SQL tracing seam on factory connection",
+      "evidence": "evidence/factory.json"
+    },
+    {
+      "id": "D01-CLOSED-CONNECTION",
+      "measurement": "PARTIAL",
+      "expected": "Preserve failure/return on closed client; no retry/rollback",
+      "observed": {
+        "class": "LogicException",
+        "errno": 0,
+        "reason": "Connection error must escape"
+      },
+      "assessment": "Original harness STOP; read-only reconciliation proves fixture4047=0 and old data unchanged, not retained error class/return",
+      "evidence": [
+        "evidence/core-cases.json",
+        "evidence/stop-reconciled.json"
+      ]
+    }
+  ]
+}

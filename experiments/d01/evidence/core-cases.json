@@ -1,0 +1,5696 @@
+{
+    "format": "D01 evidence v1",
+    "status": "STOP",
+    "cases": [
+        {
+            "fixture": 4000,
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    5,
+                    6
+                ],
+                "connection": 92
+            },
+            "return": 1,
+            "depth": 0,
+            "persisted": 2,
+            "id": "D01-BASE-commit",
+            "measurement": "PASS",
+            "trace_range": [
+                2,
+                12
+            ]
+        },
+        {
+            "fixture": 4001,
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    16,
+                    17
+                ],
+                "connection": 93
+            },
+            "return": true,
+            "depth": 0,
+            "persisted": 0,
+            "id": "D01-BASE-rollback",
+            "measurement": "PASS",
+            "trace_range": [
+                13,
+                23
+            ]
+        },
+        {
+            "fixture": 4002,
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    26,
+                    27
+                ],
+                "connection": 94
+            },
+            "inner_return": 1,
+            "inner_SQL": [
+                "UPDATE probe SET n=3 WHERE id=4002"
+            ],
+            "outer_commit": 1,
+            "persisted": 3,
+            "limit": "Core nesting uses counters; inner rollback does not undo inner writes",
+            "id": "D01-NEST-commit",
+            "measurement": "PASS",
+            "trace_range": [
+                24,
+                31
+            ]
+        },
+        {
+            "fixture": 4003,
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    34,
+                    35
+                ],
+                "connection": 95
+            },
+            "inner_return": 1,
+            "inner_SQL": [
+                "UPDATE probe SET n=3 WHERE id=4003"
+            ],
+            "outer_commit": 1,
+            "persisted": 3,
+            "limit": "Core nesting uses counters; inner rollback does not undo inner writes",
+            "id": "D01-NEST-rollback",
+            "measurement": "PASS",
+            "trace_range": [
+                32,
+                39
+            ]
+        },
+        {
+            "fixture": 4004,
+            "guard": 4005,
+            "session": "READ-UNCOMMITTED",
+            "pending_before_D01": "READ UNCOMMITTED",
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    48,
+                    49
+                ],
+                "connection": 96
+            },
+            "reads": [
+                0,
+                0,
+                1,
+                0
+            ],
+            "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+            "id": "D01-ISO-READ-UNCOMMITTED-READ-UNCOMMITTED",
+            "measurement": "PASS",
+            "trace_range": [
+                40,
+                59
+            ]
+        },
+        {
+            "fixture": 4006,
+            "guard": 4007,
+            "session": "READ-UNCOMMITTED",
+            "pending_before_D01": "READ COMMITTED",
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    68,
+                    69
+                ],
+                "connection": 98
+            },
+            "reads": [
+                0,
+                0,
+                1,
+                0
+            ],
+            "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+            "id": "D01-ISO-READ-UNCOMMITTED-READ-COMMITTED",
+            "measurement": "PASS",
+            "trace_range": [
+                60,
+                79
+            ]
+        },
+        {
+            "fixture": 4008,
+            "guard": 4009,
+            "session": "READ-UNCOMMITTED",
+            "pending_before_D01": "REPEATABLE READ",
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    88,
+                    89
+                ],
+                "connection": 100
+            },
+            "reads": [
+                0,
+                0,
+                1,
+                0
+            ],
+            "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+            "id": "D01-ISO-READ-UNCOMMITTED-REPEATABLE-READ",
+            "measurement": "PASS",
+            "trace_range": [
+                80,
+                99
+            ]
+        },
+        {
+            "fixture": 4010,
+            "guard": 4011,
+            "session": "READ-UNCOMMITTED",
+            "pending_before_D01": "SERIALIZABLE",
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    108,
+                    109
+                ],
+                "connection": 102
+            },
+            "reads": [
+                0,
+                0,
+                1,
+                0
+            ],
+            "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+            "id": "D01-ISO-READ-UNCOMMITTED-SERIALIZABLE",
+            "measurement": "PASS",
+            "trace_range": [
+                100,
+                119
+            ]
+        },
+        {
+            "fixture": 4012,
+            "guard": 4013,
+            "session": "READ-COMMITTED",
+            "pending_before_D01": "READ UNCOMMITTED",
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    128,
+                    129
+                ],
+                "connection": 104
+            },
+            "reads": [
+                0,
+                0,
+                1,
+                0
+            ],
+            "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+            "id": "D01-ISO-READ-COMMITTED-READ-UNCOMMITTED",
+            "measurement": "PASS",
+            "trace_range": [
+                120,
+                139
+            ]
+        },
+        {
+            "fixture": 4014,
+            "guard": 4015,
+            "session": "READ-COMMITTED",
+            "pending_before_D01": "READ COMMITTED",
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    148,
+                    149
+                ],
+                "connection": 106
+            },
+            "reads": [
+                0,
+                0,
+                1,
+                0
+            ],
+            "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+            "id": "D01-ISO-READ-COMMITTED-READ-COMMITTED",
+            "measurement": "PASS",
+            "trace_range": [
+                140,
+                159
+            ]
+        },
+        {
+            "fixture": 4016,
+            "guard": 4017,
+            "session": "READ-COMMITTED",
+            "pending_before_D01": "REPEATABLE READ",
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    168,
+                    169
+                ],
+                "connection": 108
+            },
+            "reads": [
+                0,
+                0,
+                1,
+                0
+            ],
+            "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+            "id": "D01-ISO-READ-COMMITTED-REPEATABLE-READ",
+            "measurement": "PASS",
+            "trace_range": [
+                160,
+                179
+            ]
+        },
+        {
+            "fixture": 4018,
+            "guard": 4019,
+            "session": "READ-COMMITTED",
+            "pending_before_D01": "SERIALIZABLE",
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    188,
+                    189
+                ],
+                "connection": 110
+            },
+            "reads": [
+                0,
+                0,
+                1,
+                0
+            ],
+            "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+            "id": "D01-ISO-READ-COMMITTED-SERIALIZABLE",
+            "measurement": "PASS",
+            "trace_range": [
+                180,
+                199
+            ]
+        },
+        {
+            "fixture": 4020,
+            "guard": 4021,
+            "session": "REPEATABLE-READ",
+            "pending_before_D01": "READ UNCOMMITTED",
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    208,
+                    209
+                ],
+                "connection": 112
+            },
+            "reads": [
+                0,
+                0,
+                1,
+                0
+            ],
+            "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+            "id": "D01-ISO-REPEATABLE-READ-READ-UNCOMMITTED",
+            "measurement": "PASS",
+            "trace_range": [
+                200,
+                219
+            ]
+        },
+        {
+            "fixture": 4022,
+            "guard": 4023,
+            "session": "REPEATABLE-READ",
+            "pending_before_D01": "READ COMMITTED",
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    228,
+                    229
+                ],
+                "connection": 114
+            },
+            "reads": [
+                0,
+                0,
+                1,
+                0
+            ],
+            "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+            "id": "D01-ISO-REPEATABLE-READ-READ-COMMITTED",
+            "measurement": "PASS",
+            "trace_range": [
+                220,
+                239
+            ]
+        },
+        {
+            "fixture": 4024,
+            "guard": 4025,
+            "session": "REPEATABLE-READ",
+            "pending_before_D01": "REPEATABLE READ",
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    248,
+                    249
+                ],
+                "connection": 116
+            },
+            "reads": [
+                0,
+                0,
+                1,
+                0
+            ],
+            "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+            "id": "D01-ISO-REPEATABLE-READ-REPEATABLE-READ",
+            "measurement": "PASS",
+            "trace_range": [
+                240,
+                259
+            ]
+        },
+        {
+            "fixture": 4026,
+            "guard": 4027,
+            "session": "REPEATABLE-READ",
+            "pending_before_D01": "SERIALIZABLE",
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    268,
+                    269
+                ],
+                "connection": 118
+            },
+            "reads": [
+                0,
+                0,
+                1,
+                0
+            ],
+            "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+            "id": "D01-ISO-REPEATABLE-READ-SERIALIZABLE",
+            "measurement": "PASS",
+            "trace_range": [
+                260,
+                279
+            ]
+        },
+        {
+            "fixture": 4028,
+            "guard": 4029,
+            "session": "SERIALIZABLE",
+            "pending_before_D01": "READ UNCOMMITTED",
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    288,
+                    289
+                ],
+                "connection": 120
+            },
+            "reads": [
+                0,
+                0,
+                1,
+                0
+            ],
+            "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+            "id": "D01-ISO-SERIALIZABLE-READ-UNCOMMITTED",
+            "measurement": "PASS",
+            "trace_range": [
+                280,
+                299
+            ]
+        },
+        {
+            "fixture": 4030,
+            "guard": 4031,
+            "session": "SERIALIZABLE",
+            "pending_before_D01": "READ COMMITTED",
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    308,
+                    309
+                ],
+                "connection": 122
+            },
+            "reads": [
+                0,
+                0,
+                1,
+                0
+            ],
+            "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+            "id": "D01-ISO-SERIALIZABLE-READ-COMMITTED",
+            "measurement": "PASS",
+            "trace_range": [
+                300,
+                319
+            ]
+        },
+        {
+            "fixture": 4032,
+            "guard": 4033,
+            "session": "SERIALIZABLE",
+            "pending_before_D01": "REPEATABLE READ",
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    328,
+                    329
+                ],
+                "connection": 124
+            },
+            "reads": [
+                0,
+                0,
+                1,
+                0
+            ],
+            "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+            "id": "D01-ISO-SERIALIZABLE-REPEATABLE-READ",
+            "measurement": "PASS",
+            "trace_range": [
+                320,
+                339
+            ]
+        },
+        {
+            "fixture": 4034,
+            "guard": 4035,
+            "session": "SERIALIZABLE",
+            "pending_before_D01": "SERIALIZABLE",
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    348,
+                    349
+                ],
+                "connection": 126
+            },
+            "reads": [
+                0,
+                0,
+                1,
+                0
+            ],
+            "evidence": "Repeatable consistent reads plus current locking read; not actual-event isolation proof",
+            "id": "D01-ISO-SERIALIZABLE-SERIALIZABLE",
+            "measurement": "PASS",
+            "trace_range": [
+                340,
+                359
+            ]
+        },
+        {
+            "fixture": 4036,
+            "native_errno": 1568,
+            "Core_errno": "DB_ERROR_1568",
+            "attempt_SQL": [
+                "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ"
+            ],
+            "foreign_end_by_admission": 0,
+            "foreign_uncommitted_value": 7,
+            "cleanup": "single native rollback by fault-originator after rejection",
+            "id": "D01-FOREIGN-1568",
+            "measurement": "PASS",
+            "trace_range": [
+                360,
+                368
+            ]
+        },
+        {
+            "fixture": 4037,
+            "settings": {
+                "ac": "1",
+                "completion_type": "NO_CHAIN"
+            },
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    373,
+                    374
+                ],
+                "connection": 129
+            },
+            "Core_return": 1,
+            "Core_depth": 0,
+            "persisted": 4,
+            "next_SET_ok": true,
+            "next_SET_errno": 0,
+            "next_begin": true,
+            "observation": "No normalization or completion whitelist; next SET failure/connection error stops the next operation",
+            "id": "D01-COMPLETION-0-commit",
+            "measurement": "PASS",
+            "trace_range": [
+                369,
+                381
+            ]
+        },
+        {
+            "fixture": 4038,
+            "settings": {
+                "ac": "1",
+                "completion_type": "NO_CHAIN"
+            },
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    386,
+                    387
+                ],
+                "connection": 130
+            },
+            "Core_return": true,
+            "Core_depth": 0,
+            "persisted": 0,
+            "next_SET_ok": true,
+            "next_SET_errno": 0,
+            "next_begin": true,
+            "observation": "No normalization or completion whitelist; next SET failure/connection error stops the next operation",
+            "id": "D01-COMPLETION-0-rollback",
+            "measurement": "PASS",
+            "trace_range": [
+                382,
+                394
+            ]
+        },
+        {
+            "fixture": 4039,
+            "settings": {
+                "ac": "1",
+                "completion_type": "CHAIN"
+            },
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    399,
+                    400
+                ],
+                "connection": 131
+            },
+            "Core_return": 1,
+            "Core_depth": 0,
+            "persisted": 4,
+            "next_SET_ok": false,
+            "next_SET_errno": 1568,
+            "next_begin": false,
+            "observation": "No normalization or completion whitelist; next SET failure/connection error stops the next operation",
+            "id": "D01-COMPLETION-1-commit",
+            "measurement": "PASS",
+            "trace_range": [
+                395,
+                405
+            ]
+        },
+        {
+            "fixture": 4040,
+            "settings": {
+                "ac": "1",
+                "completion_type": "CHAIN"
+            },
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    410,
+                    411
+                ],
+                "connection": 132
+            },
+            "Core_return": true,
+            "Core_depth": 0,
+            "persisted": 0,
+            "next_SET_ok": false,
+            "next_SET_errno": 1568,
+            "next_begin": false,
+            "observation": "No normalization or completion whitelist; next SET failure/connection error stops the next operation",
+            "id": "D01-COMPLETION-1-rollback",
+            "measurement": "PASS",
+            "trace_range": [
+                406,
+                416
+            ]
+        },
+        {
+            "fixture": 4041,
+            "settings": {
+                "ac": "1",
+                "completion_type": "RELEASE"
+            },
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    421,
+                    422
+                ],
+                "connection": 133
+            },
+            "Core_return": 1,
+            "Core_depth": 0,
+            "persisted": 4,
+            "next_SET_ok": false,
+            "next_SET_errno": 2006,
+            "next_begin": false,
+            "observation": "No normalization or completion whitelist; next SET failure/connection error stops the next operation",
+            "id": "D01-COMPLETION-2-commit",
+            "measurement": "PASS",
+            "trace_range": [
+                417,
+                427
+            ]
+        },
+        {
+            "fixture": 4042,
+            "settings": {
+                "ac": "1",
+                "completion_type": "RELEASE"
+            },
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    432,
+                    433
+                ],
+                "connection": 134
+            },
+            "Core_return": true,
+            "Core_depth": 0,
+            "persisted": 0,
+            "next_SET_ok": false,
+            "next_SET_errno": 2006,
+            "next_begin": false,
+            "observation": "No normalization or completion whitelist; next SET failure/connection error stops the next operation",
+            "id": "D01-COMPLETION-2-rollback",
+            "measurement": "PASS",
+            "trace_range": [
+                428,
+                438
+            ]
+        },
+        {
+            "fixture": 4043,
+            "prefix": "SELECT 1",
+            "Core_begin": 1,
+            "first": 0,
+            "second": 0,
+            "RR_retained": true,
+            "classification": "negative ordering control outside supported D01; observational result",
+            "id": "D01-INTERVENING-constant",
+            "measurement": "PASS",
+            "trace_range": [
+                439,
+                449
+            ]
+        },
+        {
+            "fixture": 4044,
+            "prefix": "SELECT n FROM probe WHERE id=1",
+            "Core_begin": 1,
+            "first": 0,
+            "second": 1,
+            "RR_retained": false,
+            "classification": "negative ordering control outside supported D01; observational result",
+            "id": "D01-INTERVENING-InnoDB",
+            "measurement": "PASS",
+            "trace_range": [
+                450,
+                460
+            ]
+        },
+        {
+            "fixture": 4045,
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    464,
+                    465
+                ],
+                "connection": 139
+            },
+            "Core_ack": 1,
+            "reads": [
+                0,
+                1
+            ],
+            "classification": "EXPECTED LIMIT: honest entry does not detect later same-connection replacement or prove ongoing isolation/identity",
+            "id": "D01-LATE-OVERRIDE",
+            "measurement": "PASS",
+            "trace_range": [
+                461,
+                472
+            ]
+        },
+        {
+            "fixture": 4046,
+            "entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    475,
+                    476
+                ],
+                "connection": 141
+            },
+            "native_errno": 1054,
+            "Core_errno": "DB_ERROR_NOSUCHFIELD",
+            "rollback_return": true,
+            "persisted": 0,
+            "limit": "one known local lab statement; no general CF02 S-class mapping",
+            "id": "D01-STATEMENT-ERROR",
+            "measurement": "PASS",
+            "trace_range": [
+                473,
+                480
+            ]
+        }
+    ],
+    "failure": {
+        "class": "LogicException",
+        "errno": 0,
+        "reason": "Connection error must escape"
+    },
+    "new_fixture_range": [
+        4000,
+        4047
+    ],
+    "historical_preserved": false,
+    "trace": [
+        {
+            "case": "inspect",
+            "connection": 91,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026015.460257,
+            "end": 1795026015.464013,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "inspect",
+            "connection": 91,
+            "sql": "SELECT id,label,n FROM probe ORDER BY id",
+            "start": 1795026015.464154,
+            "end": 1795026015.4684,
+            "ok": true,
+            "errno": 0,
+            "rows": 27
+        },
+        {
+            "case": "D01-BASE-commit",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4000,'D01-base-commit',0)",
+            "start": 1795026015.468719,
+            "end": 1795026015.519294,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-BASE-commit",
+            "connection": 92,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026015.528379,
+            "end": 1795026015.53048,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-BASE-commit",
+            "connection": 92,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026015.530536,
+            "end": 1795026015.540472,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-BASE-commit",
+            "connection": 92,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026015.540528,
+            "end": 1795026015.542263,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-BASE-commit",
+            "connection": 92,
+            "sql": "BEGIN",
+            "start": 1795026015.542303,
+            "end": 1795026015.544063,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-BASE-commit",
+            "connection": 92,
+            "sql": "SELECT n FROM probe WHERE id=4000 FOR UPDATE",
+            "start": 1795026015.544141,
+            "end": 1795026015.548899,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-BASE-commit",
+            "connection": 92,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026015.548962,
+            "end": 1795026015.551608,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-BASE-commit",
+            "connection": 92,
+            "sql": "UPDATE probe SET n=2 WHERE id=4000",
+            "start": 1795026015.55168,
+            "end": 1795026015.559362,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-BASE-commit",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4000",
+            "start": 1795026015.559437,
+            "end": 1795026015.564688,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-BASE-commit",
+            "connection": 92,
+            "sql": "COMMIT",
+            "start": 1795026015.564743,
+            "end": 1795026015.592132,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-BASE-commit",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4000",
+            "start": 1795026015.592236,
+            "end": 1795026015.59584,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-BASE-rollback",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4001,'D01-base-rollback',0)",
+            "start": 1795026015.596212,
+            "end": 1795026015.620333,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-BASE-rollback",
+            "connection": 93,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026015.630883,
+            "end": 1795026015.632637,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-BASE-rollback",
+            "connection": 93,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026015.632675,
+            "end": 1795026015.640637,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-BASE-rollback",
+            "connection": 93,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026015.640693,
+            "end": 1795026015.645162,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-BASE-rollback",
+            "connection": 93,
+            "sql": "BEGIN",
+            "start": 1795026015.645219,
+            "end": 1795026015.648008,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-BASE-rollback",
+            "connection": 93,
+            "sql": "SELECT n FROM probe WHERE id=4001 FOR UPDATE",
+            "start": 1795026015.64808,
+            "end": 1795026015.651061,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-BASE-rollback",
+            "connection": 93,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026015.651099,
+            "end": 1795026015.652826,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-BASE-rollback",
+            "connection": 93,
+            "sql": "UPDATE probe SET n=2 WHERE id=4001",
+            "start": 1795026015.652867,
+            "end": 1795026015.654758,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-BASE-rollback",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4001",
+            "start": 1795026015.654815,
+            "end": 1795026015.659754,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-BASE-rollback",
+            "connection": 93,
+            "sql": "ROLLBACK",
+            "start": 1795026015.659821,
+            "end": 1795026015.669229,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-BASE-rollback",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4001",
+            "start": 1795026015.669278,
+            "end": 1795026015.67034,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-NEST-commit",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4002,'D01-nested-commit',0)",
+            "start": 1795026015.670608,
+            "end": 1795026015.710197,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-NEST-commit",
+            "connection": 94,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026015.720693,
+            "end": 1795026015.72277,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-NEST-commit",
+            "connection": 94,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026015.723111,
+            "end": 1795026015.724192,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-NEST-commit",
+            "connection": 94,
+            "sql": "BEGIN",
+            "start": 1795026015.724217,
+            "end": 1795026015.726699,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-NEST-commit",
+            "connection": 94,
+            "sql": "UPDATE probe SET n=3 WHERE id=4002",
+            "start": 1795026015.726801,
+            "end": 1795026015.733198,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-NEST-commit",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4002",
+            "start": 1795026015.733247,
+            "end": 1795026015.738123,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-NEST-commit",
+            "connection": 94,
+            "sql": "COMMIT",
+            "start": 1795026015.73819,
+            "end": 1795026015.76711,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-NEST-commit",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4002",
+            "start": 1795026015.767158,
+            "end": 1795026015.767744,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-NEST-rollback",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4003,'D01-nested-rollback',0)",
+            "start": 1795026015.768011,
+            "end": 1795026015.787974,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-NEST-rollback",
+            "connection": 95,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026015.799339,
+            "end": 1795026015.800493,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-NEST-rollback",
+            "connection": 95,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026015.800534,
+            "end": 1795026015.802211,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-NEST-rollback",
+            "connection": 95,
+            "sql": "BEGIN",
+            "start": 1795026015.802233,
+            "end": 1795026015.805951,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-NEST-rollback",
+            "connection": 95,
+            "sql": "UPDATE probe SET n=3 WHERE id=4003",
+            "start": 1795026015.806023,
+            "end": 1795026015.809855,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-NEST-rollback",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4003",
+            "start": 1795026015.809913,
+            "end": 1795026015.810872,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-NEST-rollback",
+            "connection": 95,
+            "sql": "COMMIT",
+            "start": 1795026015.81092,
+            "end": 1795026015.827548,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-NEST-rollback",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4003",
+            "start": 1795026015.827593,
+            "end": 1795026015.829129,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-UNCOMMITTED",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4004,'D01-isolation',0)",
+            "start": 1795026015.829443,
+            "end": 1795026015.846343,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-UNCOMMITTED",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4005,'D01-guard',0)",
+            "start": 1795026015.846427,
+            "end": 1795026015.863143,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-UNCOMMITTED",
+            "connection": 96,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026015.87233,
+            "end": 1795026015.873878,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-UNCOMMITTED",
+            "connection": 97,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026015.883963,
+            "end": 1795026015.886245,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-UNCOMMITTED",
+            "connection": 96,
+            "sql": "SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED",
+            "start": 1795026015.886318,
+            "end": 1795026015.889749,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-UNCOMMITTED",
+            "connection": 96,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026015.889788,
+            "end": 1795026015.898553,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-UNCOMMITTED",
+            "connection": 96,
+            "sql": "SELECT @@transaction_isolation AS session_default",
+            "start": 1795026015.898599,
+            "end": 1795026015.901432,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-UNCOMMITTED",
+            "connection": 96,
+            "sql": "SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED",
+            "start": 1795026015.901477,
+            "end": 1795026015.902151,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-UNCOMMITTED",
+            "connection": 96,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026015.902202,
+            "end": 1795026015.904193,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-UNCOMMITTED",
+            "connection": 96,
+            "sql": "BEGIN",
+            "start": 1795026015.904222,
+            "end": 1795026015.905869,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-UNCOMMITTED",
+            "connection": 96,
+            "sql": "SELECT n FROM probe WHERE id=4005 FOR UPDATE",
+            "start": 1795026015.905913,
+            "end": 1795026015.908362,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-UNCOMMITTED",
+            "connection": 96,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026015.908409,
+            "end": 1795026015.911295,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-UNCOMMITTED",
+            "connection": 96,
+            "sql": "SELECT n FROM probe WHERE id=4004",
+            "start": 1795026015.911359,
+            "end": 1795026015.914035,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-UNCOMMITTED",
+            "connection": 97,
+            "sql": "SET SESSION innodb_lock_wait_timeout=1",
+            "start": 1795026015.914087,
+            "end": 1795026015.91943,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-UNCOMMITTED",
+            "connection": 97,
+            "sql": "UPDATE probe SET n=1 WHERE id=4004",
+            "start": 1795026015.919505,
+            "end": 1795026015.936945,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-UNCOMMITTED",
+            "connection": 96,
+            "sql": "SELECT n FROM probe WHERE id=4004",
+            "start": 1795026015.936998,
+            "end": 1795026015.939604,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-UNCOMMITTED",
+            "connection": 96,
+            "sql": "SELECT n FROM probe WHERE id=4004 FOR UPDATE",
+            "start": 1795026015.939669,
+            "end": 1795026015.944518,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-UNCOMMITTED",
+            "connection": 96,
+            "sql": "SELECT n FROM probe WHERE id=4004",
+            "start": 1795026015.944571,
+            "end": 1795026015.946482,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-UNCOMMITTED",
+            "connection": 96,
+            "sql": "ROLLBACK",
+            "start": 1795026015.946527,
+            "end": 1795026015.948226,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-UNCOMMITTED",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4004",
+            "start": 1795026015.948273,
+            "end": 1795026015.950769,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-COMMITTED",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4006,'D01-isolation',0)",
+            "start": 1795026015.951313,
+            "end": 1795026015.967684,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-COMMITTED",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4007,'D01-guard',0)",
+            "start": 1795026015.967736,
+            "end": 1795026015.988762,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-COMMITTED",
+            "connection": 98,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026016.004102,
+            "end": 1795026016.005522,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-COMMITTED",
+            "connection": 99,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026016.016432,
+            "end": 1795026016.017928,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-COMMITTED",
+            "connection": 98,
+            "sql": "SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED",
+            "start": 1795026016.019744,
+            "end": 1795026016.022256,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-COMMITTED",
+            "connection": 98,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026016.022298,
+            "end": 1795026016.030728,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-COMMITTED",
+            "connection": 98,
+            "sql": "SELECT @@transaction_isolation AS session_default",
+            "start": 1795026016.030776,
+            "end": 1795026016.033714,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-COMMITTED",
+            "connection": 98,
+            "sql": "SET TRANSACTION ISOLATION LEVEL READ COMMITTED",
+            "start": 1795026016.033756,
+            "end": 1795026016.03502,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-COMMITTED",
+            "connection": 98,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026016.035058,
+            "end": 1795026016.03634,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-COMMITTED",
+            "connection": 98,
+            "sql": "BEGIN",
+            "start": 1795026016.03636,
+            "end": 1795026016.037981,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-COMMITTED",
+            "connection": 98,
+            "sql": "SELECT n FROM probe WHERE id=4007 FOR UPDATE",
+            "start": 1795026016.038025,
+            "end": 1795026016.040231,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-COMMITTED",
+            "connection": 98,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026016.040275,
+            "end": 1795026016.043391,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-COMMITTED",
+            "connection": 98,
+            "sql": "SELECT n FROM probe WHERE id=4006",
+            "start": 1795026016.043441,
+            "end": 1795026016.044877,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-COMMITTED",
+            "connection": 99,
+            "sql": "SET SESSION innodb_lock_wait_timeout=1",
+            "start": 1795026016.044911,
+            "end": 1795026016.046106,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-COMMITTED",
+            "connection": 99,
+            "sql": "UPDATE probe SET n=1 WHERE id=4006",
+            "start": 1795026016.046148,
+            "end": 1795026016.059924,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-COMMITTED",
+            "connection": 98,
+            "sql": "SELECT n FROM probe WHERE id=4006",
+            "start": 1795026016.059973,
+            "end": 1795026016.061332,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-COMMITTED",
+            "connection": 98,
+            "sql": "SELECT n FROM probe WHERE id=4006 FOR UPDATE",
+            "start": 1795026016.061386,
+            "end": 1795026016.063979,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-COMMITTED",
+            "connection": 98,
+            "sql": "SELECT n FROM probe WHERE id=4006",
+            "start": 1795026016.064026,
+            "end": 1795026016.066073,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-COMMITTED",
+            "connection": 98,
+            "sql": "ROLLBACK",
+            "start": 1795026016.066119,
+            "end": 1795026016.067586,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-READ-COMMITTED",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4006",
+            "start": 1795026016.067625,
+            "end": 1795026016.069044,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-REPEATABLE-READ",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4008,'D01-isolation',0)",
+            "start": 1795026016.069784,
+            "end": 1795026016.082205,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-REPEATABLE-READ",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4009,'D01-guard',0)",
+            "start": 1795026016.082252,
+            "end": 1795026016.099313,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-REPEATABLE-READ",
+            "connection": 100,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026016.108446,
+            "end": 1795026016.109965,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-REPEATABLE-READ",
+            "connection": 101,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026016.118736,
+            "end": 1795026016.120991,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-REPEATABLE-READ",
+            "connection": 100,
+            "sql": "SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED",
+            "start": 1795026016.121039,
+            "end": 1795026016.122438,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-REPEATABLE-READ",
+            "connection": 100,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026016.122466,
+            "end": 1795026016.128665,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-REPEATABLE-READ",
+            "connection": 100,
+            "sql": "SELECT @@transaction_isolation AS session_default",
+            "start": 1795026016.128705,
+            "end": 1795026016.130092,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-REPEATABLE-READ",
+            "connection": 100,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026016.130151,
+            "end": 1795026016.131812,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-REPEATABLE-READ",
+            "connection": 100,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026016.131847,
+            "end": 1795026016.133938,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-REPEATABLE-READ",
+            "connection": 100,
+            "sql": "BEGIN",
+            "start": 1795026016.133971,
+            "end": 1795026016.13604,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-REPEATABLE-READ",
+            "connection": 100,
+            "sql": "SELECT n FROM probe WHERE id=4009 FOR UPDATE",
+            "start": 1795026016.136101,
+            "end": 1795026016.138078,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-REPEATABLE-READ",
+            "connection": 100,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026016.138117,
+            "end": 1795026016.142125,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-REPEATABLE-READ",
+            "connection": 100,
+            "sql": "SELECT n FROM probe WHERE id=4008",
+            "start": 1795026016.142179,
+            "end": 1795026016.144024,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-REPEATABLE-READ",
+            "connection": 101,
+            "sql": "SET SESSION innodb_lock_wait_timeout=1",
+            "start": 1795026016.144074,
+            "end": 1795026016.146013,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-REPEATABLE-READ",
+            "connection": 101,
+            "sql": "UPDATE probe SET n=1 WHERE id=4008",
+            "start": 1795026016.146056,
+            "end": 1795026016.160182,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-REPEATABLE-READ",
+            "connection": 100,
+            "sql": "SELECT n FROM probe WHERE id=4008",
+            "start": 1795026016.160244,
+            "end": 1795026016.16222,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-REPEATABLE-READ",
+            "connection": 100,
+            "sql": "SELECT n FROM probe WHERE id=4008 FOR UPDATE",
+            "start": 1795026016.162258,
+            "end": 1795026016.165499,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-REPEATABLE-READ",
+            "connection": 100,
+            "sql": "SELECT n FROM probe WHERE id=4008",
+            "start": 1795026016.165548,
+            "end": 1795026016.167609,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-REPEATABLE-READ",
+            "connection": 100,
+            "sql": "ROLLBACK",
+            "start": 1795026016.167665,
+            "end": 1795026016.169784,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-REPEATABLE-READ",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4008",
+            "start": 1795026016.169821,
+            "end": 1795026016.172189,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-SERIALIZABLE",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4010,'D01-isolation',0)",
+            "start": 1795026016.172594,
+            "end": 1795026016.186828,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-SERIALIZABLE",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4011,'D01-guard',0)",
+            "start": 1795026016.186867,
+            "end": 1795026016.20439,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-SERIALIZABLE",
+            "connection": 102,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026016.213889,
+            "end": 1795026016.216341,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-SERIALIZABLE",
+            "connection": 103,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026016.222763,
+            "end": 1795026016.223892,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-SERIALIZABLE",
+            "connection": 102,
+            "sql": "SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED",
+            "start": 1795026016.223944,
+            "end": 1795026016.22461,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-SERIALIZABLE",
+            "connection": 102,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026016.224668,
+            "end": 1795026016.228963,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-SERIALIZABLE",
+            "connection": 102,
+            "sql": "SELECT @@transaction_isolation AS session_default",
+            "start": 1795026016.229383,
+            "end": 1795026016.231047,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-SERIALIZABLE",
+            "connection": 102,
+            "sql": "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE",
+            "start": 1795026016.231102,
+            "end": 1795026016.232618,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-SERIALIZABLE",
+            "connection": 102,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026016.232669,
+            "end": 1795026016.233471,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-SERIALIZABLE",
+            "connection": 102,
+            "sql": "BEGIN",
+            "start": 1795026016.233485,
+            "end": 1795026016.233737,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-SERIALIZABLE",
+            "connection": 102,
+            "sql": "SELECT n FROM probe WHERE id=4011 FOR UPDATE",
+            "start": 1795026016.233769,
+            "end": 1795026016.234616,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-SERIALIZABLE",
+            "connection": 102,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026016.234673,
+            "end": 1795026016.237633,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-SERIALIZABLE",
+            "connection": 102,
+            "sql": "SELECT n FROM probe WHERE id=4010",
+            "start": 1795026016.237688,
+            "end": 1795026016.239586,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-SERIALIZABLE",
+            "connection": 103,
+            "sql": "SET SESSION innodb_lock_wait_timeout=1",
+            "start": 1795026016.239625,
+            "end": 1795026016.241415,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-SERIALIZABLE",
+            "connection": 103,
+            "sql": "UPDATE probe SET n=1 WHERE id=4010",
+            "start": 1795026016.241475,
+            "end": 1795026016.254865,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-SERIALIZABLE",
+            "connection": 102,
+            "sql": "SELECT n FROM probe WHERE id=4010",
+            "start": 1795026016.254901,
+            "end": 1795026016.256015,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-SERIALIZABLE",
+            "connection": 102,
+            "sql": "SELECT n FROM probe WHERE id=4010 FOR UPDATE",
+            "start": 1795026016.256069,
+            "end": 1795026016.25779,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-SERIALIZABLE",
+            "connection": 102,
+            "sql": "SELECT n FROM probe WHERE id=4010",
+            "start": 1795026016.25786,
+            "end": 1795026016.260314,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-SERIALIZABLE",
+            "connection": 102,
+            "sql": "ROLLBACK",
+            "start": 1795026016.260383,
+            "end": 1795026016.263061,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-UNCOMMITTED-SERIALIZABLE",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4010",
+            "start": 1795026016.263114,
+            "end": 1795026016.265151,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-UNCOMMITTED",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4012,'D01-isolation',0)",
+            "start": 1795026016.266068,
+            "end": 1795026016.280857,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-UNCOMMITTED",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4013,'D01-guard',0)",
+            "start": 1795026016.280905,
+            "end": 1795026016.294388,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-UNCOMMITTED",
+            "connection": 104,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026016.302009,
+            "end": 1795026016.30464,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-UNCOMMITTED",
+            "connection": 105,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026016.312146,
+            "end": 1795026016.313824,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-UNCOMMITTED",
+            "connection": 104,
+            "sql": "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED",
+            "start": 1795026016.31389,
+            "end": 1795026016.315606,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-UNCOMMITTED",
+            "connection": 104,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026016.315644,
+            "end": 1795026016.321384,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-UNCOMMITTED",
+            "connection": 104,
+            "sql": "SELECT @@transaction_isolation AS session_default",
+            "start": 1795026016.321424,
+            "end": 1795026016.323962,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-UNCOMMITTED",
+            "connection": 104,
+            "sql": "SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED",
+            "start": 1795026016.324004,
+            "end": 1795026016.325561,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-UNCOMMITTED",
+            "connection": 104,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026016.325607,
+            "end": 1795026016.327279,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-UNCOMMITTED",
+            "connection": 104,
+            "sql": "BEGIN",
+            "start": 1795026016.327316,
+            "end": 1795026016.328671,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-UNCOMMITTED",
+            "connection": 104,
+            "sql": "SELECT n FROM probe WHERE id=4013 FOR UPDATE",
+            "start": 1795026016.328732,
+            "end": 1795026016.330339,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-UNCOMMITTED",
+            "connection": 104,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026016.330399,
+            "end": 1795026016.333198,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-UNCOMMITTED",
+            "connection": 104,
+            "sql": "SELECT n FROM probe WHERE id=4012",
+            "start": 1795026016.333246,
+            "end": 1795026016.33663,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-UNCOMMITTED",
+            "connection": 105,
+            "sql": "SET SESSION innodb_lock_wait_timeout=1",
+            "start": 1795026016.336706,
+            "end": 1795026016.339381,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-UNCOMMITTED",
+            "connection": 105,
+            "sql": "UPDATE probe SET n=1 WHERE id=4012",
+            "start": 1795026016.339469,
+            "end": 1795026016.360442,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-UNCOMMITTED",
+            "connection": 104,
+            "sql": "SELECT n FROM probe WHERE id=4012",
+            "start": 1795026016.360512,
+            "end": 1795026016.362793,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-UNCOMMITTED",
+            "connection": 104,
+            "sql": "SELECT n FROM probe WHERE id=4012 FOR UPDATE",
+            "start": 1795026016.36287,
+            "end": 1795026016.364968,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-UNCOMMITTED",
+            "connection": 104,
+            "sql": "SELECT n FROM probe WHERE id=4012",
+            "start": 1795026016.365033,
+            "end": 1795026016.367275,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-UNCOMMITTED",
+            "connection": 104,
+            "sql": "ROLLBACK",
+            "start": 1795026016.36733,
+            "end": 1795026016.368475,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-UNCOMMITTED",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4012",
+            "start": 1795026016.368512,
+            "end": 1795026016.369355,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-COMMITTED",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4014,'D01-isolation',0)",
+            "start": 1795026016.369944,
+            "end": 1795026016.389832,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-COMMITTED",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4015,'D01-guard',0)",
+            "start": 1795026016.389869,
+            "end": 1795026016.404422,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-COMMITTED",
+            "connection": 106,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026016.417454,
+            "end": 1795026016.418817,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-COMMITTED",
+            "connection": 107,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026016.426789,
+            "end": 1795026016.427662,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-COMMITTED",
+            "connection": 106,
+            "sql": "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED",
+            "start": 1795026016.427725,
+            "end": 1795026016.42914,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-COMMITTED",
+            "connection": 106,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026016.42919,
+            "end": 1795026016.434601,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-COMMITTED",
+            "connection": 106,
+            "sql": "SELECT @@transaction_isolation AS session_default",
+            "start": 1795026016.434663,
+            "end": 1795026016.43979,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-COMMITTED",
+            "connection": 106,
+            "sql": "SET TRANSACTION ISOLATION LEVEL READ COMMITTED",
+            "start": 1795026016.439868,
+            "end": 1795026016.440775,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-COMMITTED",
+            "connection": 106,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026016.44085,
+            "end": 1795026016.443782,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-COMMITTED",
+            "connection": 106,
+            "sql": "BEGIN",
+            "start": 1795026016.443818,
+            "end": 1795026016.444185,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-COMMITTED",
+            "connection": 106,
+            "sql": "SELECT n FROM probe WHERE id=4015 FOR UPDATE",
+            "start": 1795026016.444236,
+            "end": 1795026016.444823,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-COMMITTED",
+            "connection": 106,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026016.44487,
+            "end": 1795026016.44669,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-COMMITTED",
+            "connection": 106,
+            "sql": "SELECT n FROM probe WHERE id=4014",
+            "start": 1795026016.446754,
+            "end": 1795026016.447841,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-COMMITTED",
+            "connection": 107,
+            "sql": "SET SESSION innodb_lock_wait_timeout=1",
+            "start": 1795026016.447908,
+            "end": 1795026016.448543,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-COMMITTED",
+            "connection": 107,
+            "sql": "UPDATE probe SET n=1 WHERE id=4014",
+            "start": 1795026016.448583,
+            "end": 1795026016.461797,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-COMMITTED",
+            "connection": 106,
+            "sql": "SELECT n FROM probe WHERE id=4014",
+            "start": 1795026016.461846,
+            "end": 1795026016.46598,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-COMMITTED",
+            "connection": 106,
+            "sql": "SELECT n FROM probe WHERE id=4014 FOR UPDATE",
+            "start": 1795026016.466045,
+            "end": 1795026016.469293,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-COMMITTED",
+            "connection": 106,
+            "sql": "SELECT n FROM probe WHERE id=4014",
+            "start": 1795026016.469354,
+            "end": 1795026016.471527,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-COMMITTED",
+            "connection": 106,
+            "sql": "ROLLBACK",
+            "start": 1795026016.471571,
+            "end": 1795026016.472066,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-READ-COMMITTED",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4014",
+            "start": 1795026016.47209,
+            "end": 1795026016.472428,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-REPEATABLE-READ",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4016,'D01-isolation',0)",
+            "start": 1795026016.474814,
+            "end": 1795026016.487735,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-REPEATABLE-READ",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4017,'D01-guard',0)",
+            "start": 1795026016.48778,
+            "end": 1795026016.501433,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-REPEATABLE-READ",
+            "connection": 108,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026016.51374,
+            "end": 1795026016.51555,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-REPEATABLE-READ",
+            "connection": 109,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026016.523455,
+            "end": 1795026016.525427,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-REPEATABLE-READ",
+            "connection": 108,
+            "sql": "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED",
+            "start": 1795026016.525482,
+            "end": 1795026016.528826,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-REPEATABLE-READ",
+            "connection": 108,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026016.52888,
+            "end": 1795026016.533224,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-REPEATABLE-READ",
+            "connection": 108,
+            "sql": "SELECT @@transaction_isolation AS session_default",
+            "start": 1795026016.533274,
+            "end": 1795026016.534124,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-REPEATABLE-READ",
+            "connection": 108,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026016.534171,
+            "end": 1795026016.535732,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-REPEATABLE-READ",
+            "connection": 108,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026016.535785,
+            "end": 1795026016.536126,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-REPEATABLE-READ",
+            "connection": 108,
+            "sql": "BEGIN",
+            "start": 1795026016.536149,
+            "end": 1795026016.536631,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-REPEATABLE-READ",
+            "connection": 108,
+            "sql": "SELECT n FROM probe WHERE id=4017 FOR UPDATE",
+            "start": 1795026016.537984,
+            "end": 1795026016.540736,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-REPEATABLE-READ",
+            "connection": 108,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026016.540784,
+            "end": 1795026016.54258,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-REPEATABLE-READ",
+            "connection": 108,
+            "sql": "SELECT n FROM probe WHERE id=4016",
+            "start": 1795026016.542648,
+            "end": 1795026016.544533,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-REPEATABLE-READ",
+            "connection": 109,
+            "sql": "SET SESSION innodb_lock_wait_timeout=1",
+            "start": 1795026016.544582,
+            "end": 1795026016.545875,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-REPEATABLE-READ",
+            "connection": 109,
+            "sql": "UPDATE probe SET n=1 WHERE id=4016",
+            "start": 1795026016.545925,
+            "end": 1795026016.562265,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-REPEATABLE-READ",
+            "connection": 108,
+            "sql": "SELECT n FROM probe WHERE id=4016",
+            "start": 1795026016.56232,
+            "end": 1795026016.564081,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-REPEATABLE-READ",
+            "connection": 108,
+            "sql": "SELECT n FROM probe WHERE id=4016 FOR UPDATE",
+            "start": 1795026016.564137,
+            "end": 1795026016.566158,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-REPEATABLE-READ",
+            "connection": 108,
+            "sql": "SELECT n FROM probe WHERE id=4016",
+            "start": 1795026016.566218,
+            "end": 1795026016.567487,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-REPEATABLE-READ",
+            "connection": 108,
+            "sql": "ROLLBACK",
+            "start": 1795026016.567542,
+            "end": 1795026016.567931,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-REPEATABLE-READ",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4016",
+            "start": 1795026016.567965,
+            "end": 1795026016.570508,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-SERIALIZABLE",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4018,'D01-isolation',0)",
+            "start": 1795026016.571832,
+            "end": 1795026016.590374,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-SERIALIZABLE",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4019,'D01-guard',0)",
+            "start": 1795026016.59042,
+            "end": 1795026016.609117,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-SERIALIZABLE",
+            "connection": 110,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026016.619632,
+            "end": 1795026016.621272,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-SERIALIZABLE",
+            "connection": 111,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026016.631165,
+            "end": 1795026016.63283,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-SERIALIZABLE",
+            "connection": 110,
+            "sql": "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED",
+            "start": 1795026016.632908,
+            "end": 1795026016.63355,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-SERIALIZABLE",
+            "connection": 110,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026016.633583,
+            "end": 1795026016.644806,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-SERIALIZABLE",
+            "connection": 110,
+            "sql": "SELECT @@transaction_isolation AS session_default",
+            "start": 1795026016.644838,
+            "end": 1795026016.645904,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-SERIALIZABLE",
+            "connection": 110,
+            "sql": "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE",
+            "start": 1795026016.645935,
+            "end": 1795026016.646937,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-SERIALIZABLE",
+            "connection": 110,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026016.646967,
+            "end": 1795026016.648697,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-SERIALIZABLE",
+            "connection": 110,
+            "sql": "BEGIN",
+            "start": 1795026016.648718,
+            "end": 1795026016.649931,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-SERIALIZABLE",
+            "connection": 110,
+            "sql": "SELECT n FROM probe WHERE id=4019 FOR UPDATE",
+            "start": 1795026016.649979,
+            "end": 1795026016.65253,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-SERIALIZABLE",
+            "connection": 110,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026016.652566,
+            "end": 1795026016.655216,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-SERIALIZABLE",
+            "connection": 110,
+            "sql": "SELECT n FROM probe WHERE id=4018",
+            "start": 1795026016.655256,
+            "end": 1795026016.657314,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-SERIALIZABLE",
+            "connection": 111,
+            "sql": "SET SESSION innodb_lock_wait_timeout=1",
+            "start": 1795026016.657358,
+            "end": 1795026016.658417,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-SERIALIZABLE",
+            "connection": 111,
+            "sql": "UPDATE probe SET n=1 WHERE id=4018",
+            "start": 1795026016.65846,
+            "end": 1795026016.677884,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-SERIALIZABLE",
+            "connection": 110,
+            "sql": "SELECT n FROM probe WHERE id=4018",
+            "start": 1795026016.677927,
+            "end": 1795026016.680067,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-SERIALIZABLE",
+            "connection": 110,
+            "sql": "SELECT n FROM probe WHERE id=4018 FOR UPDATE",
+            "start": 1795026016.680115,
+            "end": 1795026016.682356,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-SERIALIZABLE",
+            "connection": 110,
+            "sql": "SELECT n FROM probe WHERE id=4018",
+            "start": 1795026016.682401,
+            "end": 1795026016.684951,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-SERIALIZABLE",
+            "connection": 110,
+            "sql": "ROLLBACK",
+            "start": 1795026016.684984,
+            "end": 1795026016.686097,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-READ-COMMITTED-SERIALIZABLE",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4018",
+            "start": 1795026016.68613,
+            "end": 1795026016.68936,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-UNCOMMITTED",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4020,'D01-isolation',0)",
+            "start": 1795026016.690549,
+            "end": 1795026016.708662,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-UNCOMMITTED",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4021,'D01-guard',0)",
+            "start": 1795026016.708711,
+            "end": 1795026016.725386,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-UNCOMMITTED",
+            "connection": 112,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026016.735678,
+            "end": 1795026016.737293,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-UNCOMMITTED",
+            "connection": 113,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026016.747624,
+            "end": 1795026016.749925,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-UNCOMMITTED",
+            "connection": 112,
+            "sql": "SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026016.749976,
+            "end": 1795026016.752041,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-UNCOMMITTED",
+            "connection": 112,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026016.752079,
+            "end": 1795026016.75452,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-UNCOMMITTED",
+            "connection": 112,
+            "sql": "SELECT @@transaction_isolation AS session_default",
+            "start": 1795026016.754554,
+            "end": 1795026016.756293,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-UNCOMMITTED",
+            "connection": 112,
+            "sql": "SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED",
+            "start": 1795026016.756339,
+            "end": 1795026016.759242,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-UNCOMMITTED",
+            "connection": 112,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026016.759296,
+            "end": 1795026016.760374,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-UNCOMMITTED",
+            "connection": 112,
+            "sql": "BEGIN",
+            "start": 1795026016.760408,
+            "end": 1795026016.7627,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-UNCOMMITTED",
+            "connection": 112,
+            "sql": "SELECT n FROM probe WHERE id=4021 FOR UPDATE",
+            "start": 1795026016.762775,
+            "end": 1795026016.76423,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-UNCOMMITTED",
+            "connection": 112,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026016.764284,
+            "end": 1795026016.766063,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-UNCOMMITTED",
+            "connection": 112,
+            "sql": "SELECT n FROM probe WHERE id=4020",
+            "start": 1795026016.766108,
+            "end": 1795026016.76787,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-UNCOMMITTED",
+            "connection": 113,
+            "sql": "SET SESSION innodb_lock_wait_timeout=1",
+            "start": 1795026016.767909,
+            "end": 1795026016.769002,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-UNCOMMITTED",
+            "connection": 113,
+            "sql": "UPDATE probe SET n=1 WHERE id=4020",
+            "start": 1795026016.769038,
+            "end": 1795026016.788217,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-UNCOMMITTED",
+            "connection": 112,
+            "sql": "SELECT n FROM probe WHERE id=4020",
+            "start": 1795026016.788265,
+            "end": 1795026016.789745,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-UNCOMMITTED",
+            "connection": 112,
+            "sql": "SELECT n FROM probe WHERE id=4020 FOR UPDATE",
+            "start": 1795026016.789785,
+            "end": 1795026016.791329,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-UNCOMMITTED",
+            "connection": 112,
+            "sql": "SELECT n FROM probe WHERE id=4020",
+            "start": 1795026016.791379,
+            "end": 1795026016.793197,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-UNCOMMITTED",
+            "connection": 112,
+            "sql": "ROLLBACK",
+            "start": 1795026016.793259,
+            "end": 1795026016.794849,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-UNCOMMITTED",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4020",
+            "start": 1795026016.794896,
+            "end": 1795026016.796245,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-COMMITTED",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4022,'D01-isolation',0)",
+            "start": 1795026016.797663,
+            "end": 1795026016.815431,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-COMMITTED",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4023,'D01-guard',0)",
+            "start": 1795026016.815474,
+            "end": 1795026016.831504,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-COMMITTED",
+            "connection": 114,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026016.843942,
+            "end": 1795026016.845355,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-COMMITTED",
+            "connection": 115,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026016.854309,
+            "end": 1795026016.856478,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-COMMITTED",
+            "connection": 114,
+            "sql": "SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026016.856528,
+            "end": 1795026016.858345,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-COMMITTED",
+            "connection": 114,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026016.858398,
+            "end": 1795026016.862519,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-COMMITTED",
+            "connection": 114,
+            "sql": "SELECT @@transaction_isolation AS session_default",
+            "start": 1795026016.862575,
+            "end": 1795026016.864363,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-COMMITTED",
+            "connection": 114,
+            "sql": "SET TRANSACTION ISOLATION LEVEL READ COMMITTED",
+            "start": 1795026016.864413,
+            "end": 1795026016.866226,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-COMMITTED",
+            "connection": 114,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026016.866269,
+            "end": 1795026016.868135,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-COMMITTED",
+            "connection": 114,
+            "sql": "BEGIN",
+            "start": 1795026016.868481,
+            "end": 1795026016.869719,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-COMMITTED",
+            "connection": 114,
+            "sql": "SELECT n FROM probe WHERE id=4023 FOR UPDATE",
+            "start": 1795026016.869769,
+            "end": 1795026016.872242,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-COMMITTED",
+            "connection": 114,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026016.872295,
+            "end": 1795026016.875773,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-COMMITTED",
+            "connection": 114,
+            "sql": "SELECT n FROM probe WHERE id=4022",
+            "start": 1795026016.875827,
+            "end": 1795026016.877348,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-COMMITTED",
+            "connection": 115,
+            "sql": "SET SESSION innodb_lock_wait_timeout=1",
+            "start": 1795026016.877383,
+            "end": 1795026016.87939,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-COMMITTED",
+            "connection": 115,
+            "sql": "UPDATE probe SET n=1 WHERE id=4022",
+            "start": 1795026016.879429,
+            "end": 1795026016.894201,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-COMMITTED",
+            "connection": 114,
+            "sql": "SELECT n FROM probe WHERE id=4022",
+            "start": 1795026016.894259,
+            "end": 1795026016.896421,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-COMMITTED",
+            "connection": 114,
+            "sql": "SELECT n FROM probe WHERE id=4022 FOR UPDATE",
+            "start": 1795026016.896491,
+            "end": 1795026016.899542,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-COMMITTED",
+            "connection": 114,
+            "sql": "SELECT n FROM probe WHERE id=4022",
+            "start": 1795026016.899586,
+            "end": 1795026016.900352,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-COMMITTED",
+            "connection": 114,
+            "sql": "ROLLBACK",
+            "start": 1795026016.900375,
+            "end": 1795026016.902351,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-READ-COMMITTED",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4022",
+            "start": 1795026016.902398,
+            "end": 1795026016.904896,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-REPEATABLE-READ",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4024,'D01-isolation',0)",
+            "start": 1795026016.905352,
+            "end": 1795026016.921501,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-REPEATABLE-READ",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4025,'D01-guard',0)",
+            "start": 1795026016.921547,
+            "end": 1795026016.938104,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-REPEATABLE-READ",
+            "connection": 116,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026016.946043,
+            "end": 1795026016.946872,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-REPEATABLE-READ",
+            "connection": 117,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026016.952476,
+            "end": 1795026016.953396,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-REPEATABLE-READ",
+            "connection": 116,
+            "sql": "SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026016.953448,
+            "end": 1795026016.954363,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-REPEATABLE-READ",
+            "connection": 116,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026016.954392,
+            "end": 1795026016.957252,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-REPEATABLE-READ",
+            "connection": 116,
+            "sql": "SELECT @@transaction_isolation AS session_default",
+            "start": 1795026016.957299,
+            "end": 1795026016.959753,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-REPEATABLE-READ",
+            "connection": 116,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026016.959819,
+            "end": 1795026016.962192,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-REPEATABLE-READ",
+            "connection": 116,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026016.962254,
+            "end": 1795026016.963523,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-REPEATABLE-READ",
+            "connection": 116,
+            "sql": "BEGIN",
+            "start": 1795026016.963556,
+            "end": 1795026016.964731,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-REPEATABLE-READ",
+            "connection": 116,
+            "sql": "SELECT n FROM probe WHERE id=4025 FOR UPDATE",
+            "start": 1795026016.964793,
+            "end": 1795026016.966732,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-REPEATABLE-READ",
+            "connection": 116,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026016.966789,
+            "end": 1795026016.969227,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-REPEATABLE-READ",
+            "connection": 116,
+            "sql": "SELECT n FROM probe WHERE id=4024",
+            "start": 1795026016.96929,
+            "end": 1795026016.971876,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-REPEATABLE-READ",
+            "connection": 117,
+            "sql": "SET SESSION innodb_lock_wait_timeout=1",
+            "start": 1795026016.971915,
+            "end": 1795026016.973116,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-REPEATABLE-READ",
+            "connection": 117,
+            "sql": "UPDATE probe SET n=1 WHERE id=4024",
+            "start": 1795026016.973162,
+            "end": 1795026016.991029,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-REPEATABLE-READ",
+            "connection": 116,
+            "sql": "SELECT n FROM probe WHERE id=4024",
+            "start": 1795026016.991072,
+            "end": 1795026016.993793,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-REPEATABLE-READ",
+            "connection": 116,
+            "sql": "SELECT n FROM probe WHERE id=4024 FOR UPDATE",
+            "start": 1795026016.993861,
+            "end": 1795026016.994507,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-REPEATABLE-READ",
+            "connection": 116,
+            "sql": "SELECT n FROM probe WHERE id=4024",
+            "start": 1795026016.994557,
+            "end": 1795026016.995802,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-REPEATABLE-READ",
+            "connection": 116,
+            "sql": "ROLLBACK",
+            "start": 1795026016.995875,
+            "end": 1795026016.997397,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-REPEATABLE-READ",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4024",
+            "start": 1795026016.997444,
+            "end": 1795026016.99843,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-SERIALIZABLE",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4026,'D01-isolation',0)",
+            "start": 1795026016.999477,
+            "end": 1795026017.015994,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-SERIALIZABLE",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4027,'D01-guard',0)",
+            "start": 1795026017.016031,
+            "end": 1795026017.032618,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-SERIALIZABLE",
+            "connection": 118,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026017.041414,
+            "end": 1795026017.044122,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-SERIALIZABLE",
+            "connection": 119,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026017.05186,
+            "end": 1795026017.054414,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-SERIALIZABLE",
+            "connection": 118,
+            "sql": "SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026017.05447,
+            "end": 1795026017.056554,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-SERIALIZABLE",
+            "connection": 118,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026017.056591,
+            "end": 1795026017.059414,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-SERIALIZABLE",
+            "connection": 118,
+            "sql": "SELECT @@transaction_isolation AS session_default",
+            "start": 1795026017.060049,
+            "end": 1795026017.061032,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-SERIALIZABLE",
+            "connection": 118,
+            "sql": "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE",
+            "start": 1795026017.061086,
+            "end": 1795026017.061784,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-SERIALIZABLE",
+            "connection": 118,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026017.061833,
+            "end": 1795026017.063936,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-SERIALIZABLE",
+            "connection": 118,
+            "sql": "BEGIN",
+            "start": 1795026017.063965,
+            "end": 1795026017.065621,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-SERIALIZABLE",
+            "connection": 118,
+            "sql": "SELECT n FROM probe WHERE id=4027 FOR UPDATE",
+            "start": 1795026017.065663,
+            "end": 1795026017.067497,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-SERIALIZABLE",
+            "connection": 118,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026017.067549,
+            "end": 1795026017.069627,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-SERIALIZABLE",
+            "connection": 118,
+            "sql": "SELECT n FROM probe WHERE id=4026",
+            "start": 1795026017.069662,
+            "end": 1795026017.071519,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-SERIALIZABLE",
+            "connection": 119,
+            "sql": "SET SESSION innodb_lock_wait_timeout=1",
+            "start": 1795026017.071556,
+            "end": 1795026017.073621,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-SERIALIZABLE",
+            "connection": 119,
+            "sql": "UPDATE probe SET n=1 WHERE id=4026",
+            "start": 1795026017.073668,
+            "end": 1795026017.089246,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-SERIALIZABLE",
+            "connection": 118,
+            "sql": "SELECT n FROM probe WHERE id=4026",
+            "start": 1795026017.08929,
+            "end": 1795026017.095009,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-SERIALIZABLE",
+            "connection": 118,
+            "sql": "SELECT n FROM probe WHERE id=4026 FOR UPDATE",
+            "start": 1795026017.095054,
+            "end": 1795026017.096588,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-SERIALIZABLE",
+            "connection": 118,
+            "sql": "SELECT n FROM probe WHERE id=4026",
+            "start": 1795026017.096636,
+            "end": 1795026017.098404,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-SERIALIZABLE",
+            "connection": 118,
+            "sql": "ROLLBACK",
+            "start": 1795026017.098445,
+            "end": 1795026017.099729,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-REPEATABLE-READ-SERIALIZABLE",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4026",
+            "start": 1795026017.099773,
+            "end": 1795026017.101847,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-UNCOMMITTED",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4028,'D01-isolation',0)",
+            "start": 1795026017.102175,
+            "end": 1795026017.120388,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-UNCOMMITTED",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4029,'D01-guard',0)",
+            "start": 1795026017.120449,
+            "end": 1795026017.137201,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-UNCOMMITTED",
+            "connection": 120,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026017.148807,
+            "end": 1795026017.150579,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-UNCOMMITTED",
+            "connection": 121,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026017.157153,
+            "end": 1795026017.159244,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-UNCOMMITTED",
+            "connection": 120,
+            "sql": "SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE",
+            "start": 1795026017.159304,
+            "end": 1795026017.161428,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-UNCOMMITTED",
+            "connection": 120,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026017.161507,
+            "end": 1795026017.164835,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-UNCOMMITTED",
+            "connection": 120,
+            "sql": "SELECT @@transaction_isolation AS session_default",
+            "start": 1795026017.164885,
+            "end": 1795026017.165287,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-UNCOMMITTED",
+            "connection": 120,
+            "sql": "SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED",
+            "start": 1795026017.165311,
+            "end": 1795026017.166197,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-UNCOMMITTED",
+            "connection": 120,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026017.166242,
+            "end": 1795026017.169184,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-UNCOMMITTED",
+            "connection": 120,
+            "sql": "BEGIN",
+            "start": 1795026017.169214,
+            "end": 1795026017.171521,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-UNCOMMITTED",
+            "connection": 120,
+            "sql": "SELECT n FROM probe WHERE id=4029 FOR UPDATE",
+            "start": 1795026017.171569,
+            "end": 1795026017.17325,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-UNCOMMITTED",
+            "connection": 120,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026017.173302,
+            "end": 1795026017.177026,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-UNCOMMITTED",
+            "connection": 120,
+            "sql": "SELECT n FROM probe WHERE id=4028",
+            "start": 1795026017.177092,
+            "end": 1795026017.178114,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-UNCOMMITTED",
+            "connection": 121,
+            "sql": "SET SESSION innodb_lock_wait_timeout=1",
+            "start": 1795026017.178178,
+            "end": 1795026017.180548,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-UNCOMMITTED",
+            "connection": 121,
+            "sql": "UPDATE probe SET n=1 WHERE id=4028",
+            "start": 1795026017.180592,
+            "end": 1795026017.192901,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-UNCOMMITTED",
+            "connection": 120,
+            "sql": "SELECT n FROM probe WHERE id=4028",
+            "start": 1795026017.192949,
+            "end": 1795026017.194431,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-UNCOMMITTED",
+            "connection": 120,
+            "sql": "SELECT n FROM probe WHERE id=4028 FOR UPDATE",
+            "start": 1795026017.194491,
+            "end": 1795026017.196941,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-UNCOMMITTED",
+            "connection": 120,
+            "sql": "SELECT n FROM probe WHERE id=4028",
+            "start": 1795026017.196995,
+            "end": 1795026017.198923,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-UNCOMMITTED",
+            "connection": 120,
+            "sql": "ROLLBACK",
+            "start": 1795026017.199356,
+            "end": 1795026017.201035,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-UNCOMMITTED",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4028",
+            "start": 1795026017.201088,
+            "end": 1795026017.202909,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-COMMITTED",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4030,'D01-isolation',0)",
+            "start": 1795026017.203195,
+            "end": 1795026017.221617,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-COMMITTED",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4031,'D01-guard',0)",
+            "start": 1795026017.221661,
+            "end": 1795026017.235986,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-COMMITTED",
+            "connection": 122,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026017.246512,
+            "end": 1795026017.248908,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-COMMITTED",
+            "connection": 123,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026017.256601,
+            "end": 1795026017.258231,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-COMMITTED",
+            "connection": 122,
+            "sql": "SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE",
+            "start": 1795026017.258282,
+            "end": 1795026017.259963,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-COMMITTED",
+            "connection": 122,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026017.260026,
+            "end": 1795026017.26263,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-COMMITTED",
+            "connection": 122,
+            "sql": "SELECT @@transaction_isolation AS session_default",
+            "start": 1795026017.262687,
+            "end": 1795026017.263001,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-COMMITTED",
+            "connection": 122,
+            "sql": "SET TRANSACTION ISOLATION LEVEL READ COMMITTED",
+            "start": 1795026017.26303,
+            "end": 1795026017.263654,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-COMMITTED",
+            "connection": 122,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026017.263701,
+            "end": 1795026017.264325,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-COMMITTED",
+            "connection": 122,
+            "sql": "BEGIN",
+            "start": 1795026017.264349,
+            "end": 1795026017.265141,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-COMMITTED",
+            "connection": 122,
+            "sql": "SELECT n FROM probe WHERE id=4031 FOR UPDATE",
+            "start": 1795026017.265201,
+            "end": 1795026017.266904,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-COMMITTED",
+            "connection": 122,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026017.266956,
+            "end": 1795026017.268982,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-COMMITTED",
+            "connection": 122,
+            "sql": "SELECT n FROM probe WHERE id=4030",
+            "start": 1795026017.269037,
+            "end": 1795026017.270341,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-COMMITTED",
+            "connection": 123,
+            "sql": "SET SESSION innodb_lock_wait_timeout=1",
+            "start": 1795026017.270384,
+            "end": 1795026017.273263,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-COMMITTED",
+            "connection": 123,
+            "sql": "UPDATE probe SET n=1 WHERE id=4030",
+            "start": 1795026017.273299,
+            "end": 1795026017.30052,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-COMMITTED",
+            "connection": 122,
+            "sql": "SELECT n FROM probe WHERE id=4030",
+            "start": 1795026017.300555,
+            "end": 1795026017.302618,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-COMMITTED",
+            "connection": 122,
+            "sql": "SELECT n FROM probe WHERE id=4030 FOR UPDATE",
+            "start": 1795026017.302665,
+            "end": 1795026017.305504,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-COMMITTED",
+            "connection": 122,
+            "sql": "SELECT n FROM probe WHERE id=4030",
+            "start": 1795026017.305542,
+            "end": 1795026017.308063,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-COMMITTED",
+            "connection": 122,
+            "sql": "ROLLBACK",
+            "start": 1795026017.308119,
+            "end": 1795026017.30926,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-READ-COMMITTED",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4030",
+            "start": 1795026017.309303,
+            "end": 1795026017.312036,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-REPEATABLE-READ",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4032,'D01-isolation',0)",
+            "start": 1795026017.312512,
+            "end": 1795026017.327733,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-REPEATABLE-READ",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4033,'D01-guard',0)",
+            "start": 1795026017.327805,
+            "end": 1795026017.344721,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-REPEATABLE-READ",
+            "connection": 124,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026017.355002,
+            "end": 1795026017.358101,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-REPEATABLE-READ",
+            "connection": 125,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026017.367687,
+            "end": 1795026017.36917,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-REPEATABLE-READ",
+            "connection": 124,
+            "sql": "SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE",
+            "start": 1795026017.369411,
+            "end": 1795026017.372847,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-REPEATABLE-READ",
+            "connection": 124,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026017.372906,
+            "end": 1795026017.376245,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-REPEATABLE-READ",
+            "connection": 124,
+            "sql": "SELECT @@transaction_isolation AS session_default",
+            "start": 1795026017.376299,
+            "end": 1795026017.376674,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-REPEATABLE-READ",
+            "connection": 124,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026017.376715,
+            "end": 1795026017.377587,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-REPEATABLE-READ",
+            "connection": 124,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026017.377629,
+            "end": 1795026017.379428,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-REPEATABLE-READ",
+            "connection": 124,
+            "sql": "BEGIN",
+            "start": 1795026017.379453,
+            "end": 1795026017.380856,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-REPEATABLE-READ",
+            "connection": 124,
+            "sql": "SELECT n FROM probe WHERE id=4033 FOR UPDATE",
+            "start": 1795026017.38089,
+            "end": 1795026017.382311,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-REPEATABLE-READ",
+            "connection": 124,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026017.382359,
+            "end": 1795026017.384383,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-REPEATABLE-READ",
+            "connection": 124,
+            "sql": "SELECT n FROM probe WHERE id=4032",
+            "start": 1795026017.384442,
+            "end": 1795026017.386062,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-REPEATABLE-READ",
+            "connection": 125,
+            "sql": "SET SESSION innodb_lock_wait_timeout=1",
+            "start": 1795026017.386107,
+            "end": 1795026017.388151,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-REPEATABLE-READ",
+            "connection": 125,
+            "sql": "UPDATE probe SET n=1 WHERE id=4032",
+            "start": 1795026017.388186,
+            "end": 1795026017.40369,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-REPEATABLE-READ",
+            "connection": 124,
+            "sql": "SELECT n FROM probe WHERE id=4032",
+            "start": 1795026017.403727,
+            "end": 1795026017.406051,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-REPEATABLE-READ",
+            "connection": 124,
+            "sql": "SELECT n FROM probe WHERE id=4032 FOR UPDATE",
+            "start": 1795026017.406099,
+            "end": 1795026017.408515,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-REPEATABLE-READ",
+            "connection": 124,
+            "sql": "SELECT n FROM probe WHERE id=4032",
+            "start": 1795026017.408789,
+            "end": 1795026017.409353,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-REPEATABLE-READ",
+            "connection": 124,
+            "sql": "ROLLBACK",
+            "start": 1795026017.409381,
+            "end": 1795026017.410341,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-REPEATABLE-READ",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4032",
+            "start": 1795026017.410385,
+            "end": 1795026017.411819,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-SERIALIZABLE",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4034,'D01-isolation',0)",
+            "start": 1795026017.412096,
+            "end": 1795026017.42762,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-SERIALIZABLE",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4035,'D01-guard',0)",
+            "start": 1795026017.427687,
+            "end": 1795026017.442389,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-SERIALIZABLE",
+            "connection": 126,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026017.452082,
+            "end": 1795026017.453376,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-SERIALIZABLE",
+            "connection": 127,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026017.461057,
+            "end": 1795026017.462609,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-SERIALIZABLE",
+            "connection": 126,
+            "sql": "SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE",
+            "start": 1795026017.462656,
+            "end": 1795026017.465083,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-SERIALIZABLE",
+            "connection": 126,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026017.465128,
+            "end": 1795026017.468962,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-SERIALIZABLE",
+            "connection": 126,
+            "sql": "SELECT @@transaction_isolation AS session_default",
+            "start": 1795026017.469006,
+            "end": 1795026017.470454,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-SERIALIZABLE",
+            "connection": 126,
+            "sql": "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE",
+            "start": 1795026017.470496,
+            "end": 1795026017.471569,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-SERIALIZABLE",
+            "connection": 126,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026017.471604,
+            "end": 1795026017.473,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-SERIALIZABLE",
+            "connection": 126,
+            "sql": "BEGIN",
+            "start": 1795026017.473027,
+            "end": 1795026017.475687,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-SERIALIZABLE",
+            "connection": 126,
+            "sql": "SELECT n FROM probe WHERE id=4035 FOR UPDATE",
+            "start": 1795026017.475758,
+            "end": 1795026017.477452,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-SERIALIZABLE",
+            "connection": 126,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795026017.477524,
+            "end": 1795026017.479575,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-SERIALIZABLE",
+            "connection": 126,
+            "sql": "SELECT n FROM probe WHERE id=4034",
+            "start": 1795026017.479623,
+            "end": 1795026017.480528,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-SERIALIZABLE",
+            "connection": 127,
+            "sql": "SET SESSION innodb_lock_wait_timeout=1",
+            "start": 1795026017.480576,
+            "end": 1795026017.48223,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-SERIALIZABLE",
+            "connection": 127,
+            "sql": "UPDATE probe SET n=1 WHERE id=4034",
+            "start": 1795026017.48228,
+            "end": 1795026017.499493,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-SERIALIZABLE",
+            "connection": 126,
+            "sql": "SELECT n FROM probe WHERE id=4034",
+            "start": 1795026017.499537,
+            "end": 1795026017.500897,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-SERIALIZABLE",
+            "connection": 126,
+            "sql": "SELECT n FROM probe WHERE id=4034 FOR UPDATE",
+            "start": 1795026017.501885,
+            "end": 1795026017.50491,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-SERIALIZABLE",
+            "connection": 126,
+            "sql": "SELECT n FROM probe WHERE id=4034",
+            "start": 1795026017.504946,
+            "end": 1795026017.506476,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-SERIALIZABLE",
+            "connection": 126,
+            "sql": "ROLLBACK",
+            "start": 1795026017.50652,
+            "end": 1795026017.507872,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-ISO-SERIALIZABLE-SERIALIZABLE",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4034",
+            "start": 1795026017.507908,
+            "end": 1795026017.509962,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-FOREIGN-1568",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4036,'D01-foreign',0)",
+            "start": 1795026017.512567,
+            "end": 1795026017.525775,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-FOREIGN-1568",
+            "connection": 128,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026017.534566,
+            "end": 1795026017.536816,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-FOREIGN-1568",
+            "connection": 128,
+            "sql": "BEGIN",
+            "start": 1795026017.53685,
+            "end": 1795026017.538177,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-FOREIGN-1568",
+            "connection": 128,
+            "sql": "UPDATE probe SET n=7 WHERE id=4036",
+            "start": 1795026017.538212,
+            "end": 1795026017.540402,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-FOREIGN-1568",
+            "connection": 128,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026017.540449,
+            "end": 1795026017.546232,
+            "ok": false,
+            "errno": 1568,
+            "rows": -1
+        },
+        {
+            "case": "D01-FOREIGN-1568",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4036",
+            "start": 1795026017.546304,
+            "end": 1795026017.548954,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-FOREIGN-1568",
+            "connection": 128,
+            "sql": "SELECT n FROM probe WHERE id=4036",
+            "start": 1795026017.548994,
+            "end": 1795026017.55069,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-FOREIGN-1568",
+            "connection": 128,
+            "sql": "ROLLBACK",
+            "start": 1795026017.550707,
+            "end": 1795026017.557891,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-FOREIGN-1568",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4036",
+            "start": 1795026017.557946,
+            "end": 1795026017.559846,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-0-commit",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4037,'D01-completion',0)",
+            "start": 1795026017.560074,
+            "end": 1795026017.576072,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-0-commit",
+            "connection": 129,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026017.584538,
+            "end": 1795026017.585687,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-0-commit",
+            "connection": 129,
+            "sql": "SET SESSION completion_type=0",
+            "start": 1795026017.585728,
+            "end": 1795026017.587136,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-0-commit",
+            "connection": 129,
+            "sql": "SELECT @@autocommit AS ac,@@completion_type AS completion_type",
+            "start": 1795026017.587172,
+            "end": 1795026017.588879,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-0-commit",
+            "connection": 129,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026017.588944,
+            "end": 1795026017.590223,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-0-commit",
+            "connection": 129,
+            "sql": "BEGIN",
+            "start": 1795026017.590248,
+            "end": 1795026017.592279,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-0-commit",
+            "connection": 129,
+            "sql": "SELECT n FROM probe WHERE id=4037 FOR UPDATE",
+            "start": 1795026017.592622,
+            "end": 1795026017.594285,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-0-commit",
+            "connection": 129,
+            "sql": "UPDATE probe SET n=4 WHERE id=4037",
+            "start": 1795026017.594332,
+            "end": 1795026017.59785,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-0-commit",
+            "connection": 129,
+            "sql": "COMMIT",
+            "start": 1795026017.597901,
+            "end": 1795026017.613635,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-0-commit",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4037",
+            "start": 1795026017.613679,
+            "end": 1795026017.617533,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-0-commit",
+            "connection": 129,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026017.617583,
+            "end": 1795026017.619063,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-0-commit",
+            "connection": 129,
+            "sql": "BEGIN",
+            "start": 1795026017.619087,
+            "end": 1795026017.620887,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-0-commit",
+            "connection": 129,
+            "sql": "ROLLBACK",
+            "start": 1795026017.620934,
+            "end": 1795026017.622817,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-0-rollback",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4038,'D01-completion',0)",
+            "start": 1795026017.623518,
+            "end": 1795026017.637707,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-0-rollback",
+            "connection": 130,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026017.64346,
+            "end": 1795026017.644733,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-0-rollback",
+            "connection": 130,
+            "sql": "SET SESSION completion_type=0",
+            "start": 1795026017.644789,
+            "end": 1795026017.646303,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-0-rollback",
+            "connection": 130,
+            "sql": "SELECT @@autocommit AS ac,@@completion_type AS completion_type",
+            "start": 1795026017.646335,
+            "end": 1795026017.648837,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-0-rollback",
+            "connection": 130,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026017.648871,
+            "end": 1795026017.650557,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-0-rollback",
+            "connection": 130,
+            "sql": "BEGIN",
+            "start": 1795026017.650587,
+            "end": 1795026017.65259,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-0-rollback",
+            "connection": 130,
+            "sql": "SELECT n FROM probe WHERE id=4038 FOR UPDATE",
+            "start": 1795026017.652642,
+            "end": 1795026017.654571,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-0-rollback",
+            "connection": 130,
+            "sql": "UPDATE probe SET n=4 WHERE id=4038",
+            "start": 1795026017.654641,
+            "end": 1795026017.657156,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-0-rollback",
+            "connection": 130,
+            "sql": "ROLLBACK",
+            "start": 1795026017.657201,
+            "end": 1795026017.665338,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-0-rollback",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4038",
+            "start": 1795026017.665381,
+            "end": 1795026017.666525,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-0-rollback",
+            "connection": 130,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026017.666559,
+            "end": 1795026017.668397,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-0-rollback",
+            "connection": 130,
+            "sql": "BEGIN",
+            "start": 1795026017.668417,
+            "end": 1795026017.669493,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-0-rollback",
+            "connection": 130,
+            "sql": "ROLLBACK",
+            "start": 1795026017.669527,
+            "end": 1795026017.670529,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-1-commit",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4039,'D01-completion',0)",
+            "start": 1795026017.672306,
+            "end": 1795026017.688824,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-1-commit",
+            "connection": 131,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026017.700722,
+            "end": 1795026017.702414,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-1-commit",
+            "connection": 131,
+            "sql": "SET SESSION completion_type=1",
+            "start": 1795026017.702454,
+            "end": 1795026017.704613,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-1-commit",
+            "connection": 131,
+            "sql": "SELECT @@autocommit AS ac,@@completion_type AS completion_type",
+            "start": 1795026017.704638,
+            "end": 1795026017.706277,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-1-commit",
+            "connection": 131,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026017.706324,
+            "end": 1795026017.708037,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-1-commit",
+            "connection": 131,
+            "sql": "BEGIN",
+            "start": 1795026017.708066,
+            "end": 1795026017.709037,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-1-commit",
+            "connection": 131,
+            "sql": "SELECT n FROM probe WHERE id=4039 FOR UPDATE",
+            "start": 1795026017.7091,
+            "end": 1795026017.710781,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-1-commit",
+            "connection": 131,
+            "sql": "UPDATE probe SET n=4 WHERE id=4039",
+            "start": 1795026017.710836,
+            "end": 1795026017.714161,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-1-commit",
+            "connection": 131,
+            "sql": "COMMIT",
+            "start": 1795026017.714204,
+            "end": 1795026017.729291,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-1-commit",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4039",
+            "start": 1795026017.729371,
+            "end": 1795026017.731747,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-1-commit",
+            "connection": 131,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026017.731805,
+            "end": 1795026017.735337,
+            "ok": false,
+            "errno": 1568,
+            "rows": -1
+        },
+        {
+            "case": "D01-COMPLETION-1-rollback",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4040,'D01-completion',0)",
+            "start": 1795026017.736142,
+            "end": 1795026017.752737,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-1-rollback",
+            "connection": 132,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026017.7621,
+            "end": 1795026017.764316,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-1-rollback",
+            "connection": 132,
+            "sql": "SET SESSION completion_type=1",
+            "start": 1795026017.764361,
+            "end": 1795026017.765479,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-1-rollback",
+            "connection": 132,
+            "sql": "SELECT @@autocommit AS ac,@@completion_type AS completion_type",
+            "start": 1795026017.765505,
+            "end": 1795026017.767261,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-1-rollback",
+            "connection": 132,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026017.767309,
+            "end": 1795026017.769046,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-1-rollback",
+            "connection": 132,
+            "sql": "BEGIN",
+            "start": 1795026017.769072,
+            "end": 1795026017.769974,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-1-rollback",
+            "connection": 132,
+            "sql": "SELECT n FROM probe WHERE id=4040 FOR UPDATE",
+            "start": 1795026017.770035,
+            "end": 1795026017.772149,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-1-rollback",
+            "connection": 132,
+            "sql": "UPDATE probe SET n=4 WHERE id=4040",
+            "start": 1795026017.772188,
+            "end": 1795026017.773709,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-1-rollback",
+            "connection": 132,
+            "sql": "ROLLBACK",
+            "start": 1795026017.773745,
+            "end": 1795026017.781703,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-1-rollback",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4040",
+            "start": 1795026017.781743,
+            "end": 1795026017.783369,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-1-rollback",
+            "connection": 132,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026017.783416,
+            "end": 1795026017.785171,
+            "ok": false,
+            "errno": 1568,
+            "rows": -1
+        },
+        {
+            "case": "D01-COMPLETION-2-commit",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4041,'D01-completion',0)",
+            "start": 1795026017.78549,
+            "end": 1795026017.800146,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-2-commit",
+            "connection": 133,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026017.81108,
+            "end": 1795026017.814089,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-2-commit",
+            "connection": 133,
+            "sql": "SET SESSION completion_type=2",
+            "start": 1795026017.814128,
+            "end": 1795026017.815643,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-2-commit",
+            "connection": 133,
+            "sql": "SELECT @@autocommit AS ac,@@completion_type AS completion_type",
+            "start": 1795026017.815683,
+            "end": 1795026017.817617,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-2-commit",
+            "connection": 133,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026017.817658,
+            "end": 1795026017.820027,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-2-commit",
+            "connection": 133,
+            "sql": "BEGIN",
+            "start": 1795026017.820051,
+            "end": 1795026017.821851,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-2-commit",
+            "connection": 133,
+            "sql": "SELECT n FROM probe WHERE id=4041 FOR UPDATE",
+            "start": 1795026017.821914,
+            "end": 1795026017.823437,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-2-commit",
+            "connection": 133,
+            "sql": "UPDATE probe SET n=4 WHERE id=4041",
+            "start": 1795026017.823484,
+            "end": 1795026017.826382,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-2-commit",
+            "connection": 133,
+            "sql": "COMMIT",
+            "start": 1795026017.826437,
+            "end": 1795026017.842717,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-2-commit",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4041",
+            "start": 1795026017.842762,
+            "end": 1795026017.845421,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-2-commit",
+            "connection": 133,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026017.845473,
+            "end": 1795026017.846873,
+            "ok": false,
+            "errno": 2006,
+            "rows": -1
+        },
+        {
+            "case": "D01-COMPLETION-2-rollback",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4042,'D01-completion',0)",
+            "start": 1795026017.847628,
+            "end": 1795026017.865008,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-2-rollback",
+            "connection": 134,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026017.871034,
+            "end": 1795026017.872764,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-2-rollback",
+            "connection": 134,
+            "sql": "SET SESSION completion_type=2",
+            "start": 1795026017.872812,
+            "end": 1795026017.874004,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-2-rollback",
+            "connection": 134,
+            "sql": "SELECT @@autocommit AS ac,@@completion_type AS completion_type",
+            "start": 1795026017.874035,
+            "end": 1795026017.876006,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-2-rollback",
+            "connection": 134,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026017.876058,
+            "end": 1795026017.876953,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-2-rollback",
+            "connection": 134,
+            "sql": "BEGIN",
+            "start": 1795026017.876979,
+            "end": 1795026017.877672,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-2-rollback",
+            "connection": 134,
+            "sql": "SELECT n FROM probe WHERE id=4042 FOR UPDATE",
+            "start": 1795026017.877714,
+            "end": 1795026017.878831,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-2-rollback",
+            "connection": 134,
+            "sql": "UPDATE probe SET n=4 WHERE id=4042",
+            "start": 1795026017.878861,
+            "end": 1795026017.880004,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-2-rollback",
+            "connection": 134,
+            "sql": "ROLLBACK",
+            "start": 1795026017.880037,
+            "end": 1795026017.895537,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-COMPLETION-2-rollback",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4042",
+            "start": 1795026017.895599,
+            "end": 1795026017.897267,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-COMPLETION-2-rollback",
+            "connection": 134,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026017.897317,
+            "end": 1795026017.898457,
+            "ok": false,
+            "errno": 2006,
+            "rows": -1
+        },
+        {
+            "case": "D01-INTERVENING-constant",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4043,'D01-intervening',0)",
+            "start": 1795026017.898653,
+            "end": 1795026017.914341,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-INTERVENING-constant",
+            "connection": 135,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026017.923091,
+            "end": 1795026017.924902,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-INTERVENING-constant",
+            "connection": 136,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026017.9331,
+            "end": 1795026017.935479,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-INTERVENING-constant",
+            "connection": 135,
+            "sql": "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED",
+            "start": 1795026017.935535,
+            "end": 1795026017.937155,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-INTERVENING-constant",
+            "connection": 135,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026017.937192,
+            "end": 1795026017.939394,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-INTERVENING-constant",
+            "connection": 135,
+            "sql": "SELECT 1",
+            "start": 1795026017.93943,
+            "end": 1795026017.9409,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-INTERVENING-constant",
+            "connection": 135,
+            "sql": "BEGIN",
+            "start": 1795026017.940931,
+            "end": 1795026017.94346,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-INTERVENING-constant",
+            "connection": 135,
+            "sql": "SELECT n FROM probe WHERE id=4043",
+            "start": 1795026017.943516,
+            "end": 1795026017.945028,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-INTERVENING-constant",
+            "connection": 136,
+            "sql": "UPDATE probe SET n=1 WHERE id=4043",
+            "start": 1795026017.945094,
+            "end": 1795026017.959467,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-INTERVENING-constant",
+            "connection": 135,
+            "sql": "SELECT n FROM probe WHERE id=4043",
+            "start": 1795026017.959523,
+            "end": 1795026017.961673,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-INTERVENING-constant",
+            "connection": 135,
+            "sql": "ROLLBACK",
+            "start": 1795026017.961732,
+            "end": 1795026017.962551,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-INTERVENING-InnoDB",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4044,'D01-intervening',0)",
+            "start": 1795026017.96287,
+            "end": 1795026017.977948,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-INTERVENING-InnoDB",
+            "connection": 137,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026017.984519,
+            "end": 1795026017.985864,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-INTERVENING-InnoDB",
+            "connection": 138,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026017.993445,
+            "end": 1795026017.995808,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-INTERVENING-InnoDB",
+            "connection": 137,
+            "sql": "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED",
+            "start": 1795026017.995856,
+            "end": 1795026017.997579,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-INTERVENING-InnoDB",
+            "connection": 137,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026017.997625,
+            "end": 1795026017.999484,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-INTERVENING-InnoDB",
+            "connection": 137,
+            "sql": "SELECT n FROM probe WHERE id=1",
+            "start": 1795026017.999524,
+            "end": 1795026018.001954,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-INTERVENING-InnoDB",
+            "connection": 137,
+            "sql": "BEGIN",
+            "start": 1795026018.001973,
+            "end": 1795026018.003735,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-INTERVENING-InnoDB",
+            "connection": 137,
+            "sql": "SELECT n FROM probe WHERE id=4044",
+            "start": 1795026018.003766,
+            "end": 1795026018.00526,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-INTERVENING-InnoDB",
+            "connection": 138,
+            "sql": "UPDATE probe SET n=1 WHERE id=4044",
+            "start": 1795026018.005321,
+            "end": 1795026018.026623,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-INTERVENING-InnoDB",
+            "connection": 137,
+            "sql": "SELECT n FROM probe WHERE id=4044",
+            "start": 1795026018.026679,
+            "end": 1795026018.029643,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-INTERVENING-InnoDB",
+            "connection": 137,
+            "sql": "ROLLBACK",
+            "start": 1795026018.029709,
+            "end": 1795026018.032749,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-LATE-OVERRIDE",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4045,'D01-override',0)",
+            "start": 1795026018.033452,
+            "end": 1795026018.051333,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-LATE-OVERRIDE",
+            "connection": 139,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026018.061674,
+            "end": 1795026018.06318,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-LATE-OVERRIDE",
+            "connection": 140,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026018.072252,
+            "end": 1795026018.074179,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-LATE-OVERRIDE",
+            "connection": 139,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026018.074219,
+            "end": 1795026018.075656,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-LATE-OVERRIDE",
+            "connection": 139,
+            "sql": "BEGIN",
+            "start": 1795026018.075687,
+            "end": 1795026018.077134,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-LATE-OVERRIDE",
+            "connection": 139,
+            "sql": "COMMIT",
+            "start": 1795026018.077185,
+            "end": 1795026018.078393,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-LATE-OVERRIDE",
+            "connection": 139,
+            "sql": "SET TRANSACTION ISOLATION LEVEL READ COMMITTED",
+            "start": 1795026018.078412,
+            "end": 1795026018.080696,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-LATE-OVERRIDE",
+            "connection": 139,
+            "sql": "BEGIN",
+            "start": 1795026018.08071,
+            "end": 1795026018.082259,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-LATE-OVERRIDE",
+            "connection": 139,
+            "sql": "SELECT n FROM probe WHERE id=4045",
+            "start": 1795026018.082296,
+            "end": 1795026018.084246,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-LATE-OVERRIDE",
+            "connection": 140,
+            "sql": "UPDATE probe SET n=1 WHERE id=4045",
+            "start": 1795026018.084286,
+            "end": 1795026018.099058,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-LATE-OVERRIDE",
+            "connection": 139,
+            "sql": "SELECT n FROM probe WHERE id=4045",
+            "start": 1795026018.099105,
+            "end": 1795026018.10084,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-LATE-OVERRIDE",
+            "connection": 139,
+            "sql": "COMMIT",
+            "start": 1795026018.100877,
+            "end": 1795026018.102792,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-STATEMENT-ERROR",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4046,'D01-statement-error',0)",
+            "start": 1795026018.10412,
+            "end": 1795026018.12059,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-STATEMENT-ERROR",
+            "connection": 141,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026018.127857,
+            "end": 1795026018.130244,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-STATEMENT-ERROR",
+            "connection": 141,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026018.130296,
+            "end": 1795026018.13163,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-STATEMENT-ERROR",
+            "connection": 141,
+            "sql": "BEGIN",
+            "start": 1795026018.131649,
+            "end": 1795026018.132517,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-STATEMENT-ERROR",
+            "connection": 141,
+            "sql": "UPDATE probe SET n=5 WHERE id=4046",
+            "start": 1795026018.132917,
+            "end": 1795026018.134623,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-STATEMENT-ERROR",
+            "connection": 141,
+            "sql": "SELECT missing_d01_column FROM probe WHERE id=4046",
+            "start": 1795026018.134669,
+            "end": 1795026018.138701,
+            "ok": false,
+            "errno": 1054,
+            "rows": -1
+        },
+        {
+            "case": "D01-STATEMENT-ERROR",
+            "connection": 141,
+            "sql": "ROLLBACK",
+            "start": 1795026018.138772,
+            "end": 1795026018.145165,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-STATEMENT-ERROR",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4046",
+            "start": 1795026018.145205,
+            "end": 1795026018.146405,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-CLOSED-CONNECTION",
+            "connection": 91,
+            "sql": "INSERT INTO probe VALUES (4047,'D01-disconnect',0)",
+            "start": 1795026018.147064,
+            "end": 1795026018.161135,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-CLOSED-CONNECTION",
+            "connection": 142,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026018.168711,
+            "end": 1795026018.17077,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-CLOSED-CONNECTION",
+            "connection": 142,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026018.170821,
+            "end": 1795026018.171826,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-CLOSED-CONNECTION",
+            "connection": 142,
+            "sql": "BEGIN",
+            "start": 1795026018.171998,
+            "end": 1795026018.17337,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-CLOSED-CONNECTION",
+            "connection": 142,
+            "sql": "UPDATE probe SET n=6 WHERE id=4047",
+            "start": 1795026018.173423,
+            "end": 1795026018.176065,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-CLOSED-CONNECTION",
+            "connection": 91,
+            "sql": "SELECT n FROM probe WHERE id=4047",
+            "start": 1795026018.176228,
+            "end": 1795026018.177574,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        }
+    ]
+}

@@ -1,0 +1,285 @@
+{
+    "status": "PASS",
+    "mode": "read-only; no retry",
+    "historical_preserved": true,
+    "historical_sha256": "c3991963041eaece14192788a9423faa11ce527bf600b25f1655e7f8999a4cdc",
+    "new_fixtures": [
+        {
+            "id": "4000",
+            "label": "D01-base-commit",
+            "n": "2"
+        },
+        {
+            "id": "4001",
+            "label": "D01-base-rollback",
+            "n": "0"
+        },
+        {
+            "id": "4002",
+            "label": "D01-nested-commit",
+            "n": "3"
+        },
+        {
+            "id": "4003",
+            "label": "D01-nested-rollback",
+            "n": "3"
+        },
+        {
+            "id": "4004",
+            "label": "D01-isolation",
+            "n": "1"
+        },
+        {
+            "id": "4005",
+            "label": "D01-guard",
+            "n": "0"
+        },
+        {
+            "id": "4006",
+            "label": "D01-isolation",
+            "n": "1"
+        },
+        {
+            "id": "4007",
+            "label": "D01-guard",
+            "n": "0"
+        },
+        {
+            "id": "4008",
+            "label": "D01-isolation",
+            "n": "1"
+        },
+        {
+            "id": "4009",
+            "label": "D01-guard",
+            "n": "0"
+        },
+        {
+            "id": "4010",
+            "label": "D01-isolation",
+            "n": "1"
+        },
+        {
+            "id": "4011",
+            "label": "D01-guard",
+            "n": "0"
+        },
+        {
+            "id": "4012",
+            "label": "D01-isolation",
+            "n": "1"
+        },
+        {
+            "id": "4013",
+            "label": "D01-guard",
+            "n": "0"
+        },
+        {
+            "id": "4014",
+            "label": "D01-isolation",
+            "n": "1"
+        },
+        {
+            "id": "4015",
+            "label": "D01-guard",
+            "n": "0"
+        },
+        {
+            "id": "4016",
+            "label": "D01-isolation",
+            "n": "1"
+        },
+        {
+            "id": "4017",
+            "label": "D01-guard",
+            "n": "0"
+        },
+        {
+            "id": "4018",
+            "label": "D01-isolation",
+            "n": "1"
+        },
+        {
+            "id": "4019",
+            "label": "D01-guard",
+            "n": "0"
+        },
+        {
+            "id": "4020",
+            "label": "D01-isolation",
+            "n": "1"
+        },
+        {
+            "id": "4021",
+            "label": "D01-guard",
+            "n": "0"
+        },
+        {
+            "id": "4022",
+            "label": "D01-isolation",
+            "n": "1"
+        },
+        {
+            "id": "4023",
+            "label": "D01-guard",
+            "n": "0"
+        },
+        {
+            "id": "4024",
+            "label": "D01-isolation",
+            "n": "1"
+        },
+        {
+            "id": "4025",
+            "label": "D01-guard",
+            "n": "0"
+        },
+        {
+            "id": "4026",
+            "label": "D01-isolation",
+            "n": "1"
+        },
+        {
+            "id": "4027",
+            "label": "D01-guard",
+            "n": "0"
+        },
+        {
+            "id": "4028",
+            "label": "D01-isolation",
+            "n": "1"
+        },
+        {
+            "id": "4029",
+            "label": "D01-guard",
+            "n": "0"
+        },
+        {
+            "id": "4030",
+            "label": "D01-isolation",
+            "n": "1"
+        },
+        {
+            "id": "4031",
+            "label": "D01-guard",
+            "n": "0"
+        },
+        {
+            "id": "4032",
+            "label": "D01-isolation",
+            "n": "1"
+        },
+        {
+            "id": "4033",
+            "label": "D01-guard",
+            "n": "0"
+        },
+        {
+            "id": "4034",
+            "label": "D01-isolation",
+            "n": "1"
+        },
+        {
+            "id": "4035",
+            "label": "D01-guard",
+            "n": "0"
+        },
+        {
+            "id": "4036",
+            "label": "D01-foreign",
+            "n": "0"
+        },
+        {
+            "id": "4037",
+            "label": "D01-completion",
+            "n": "4"
+        },
+        {
+            "id": "4038",
+            "label": "D01-completion",
+            "n": "0"
+        },
+        {
+            "id": "4039",
+            "label": "D01-completion",
+            "n": "4"
+        },
+        {
+            "id": "4040",
+            "label": "D01-completion",
+            "n": "0"
+        },
+        {
+            "id": "4041",
+            "label": "D01-completion",
+            "n": "4"
+        },
+        {
+            "id": "4042",
+            "label": "D01-completion",
+            "n": "0"
+        },
+        {
+            "id": "4043",
+            "label": "D01-intervening",
+            "n": "1"
+        },
+        {
+            "id": "4044",
+            "label": "D01-intervening",
+            "n": "1"
+        },
+        {
+            "id": "4045",
+            "label": "D01-override",
+            "n": "1"
+        },
+        {
+            "id": "4046",
+            "label": "D01-statement-error",
+            "n": "0"
+        },
+        {
+            "id": "4047",
+            "label": "D01-disconnect",
+            "n": "0"
+        }
+    ],
+    "closed_connection_fixture": {
+        "id": 4047,
+        "persisted": 0
+    },
+    "original_case": "PARTIAL: harness counted its independent audit SELECT as an unexpected extra trace; exception class/return not retained in original result, so no retrospective full PASS",
+    "trace": [
+        {
+            "case": "inspect",
+            "connection": 143,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026115.268842,
+            "end": 1795026115.271283,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "inspect",
+            "connection": 143,
+            "sql": "SELECT id,label,n FROM probe ORDER BY id",
+            "start": 1795026115.271407,
+            "end": 1795026115.273254,
+            "ok": true,
+            "errno": 0,
+            "rows": 75
+        },
+        {
+            "case": "inspect",
+            "connection": 143,
+            "sql": "SELECT n FROM probe WHERE id=4047",
+            "start": 1795026115.273428,
+            "end": 1795026115.27482,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        }
+    ]
+}

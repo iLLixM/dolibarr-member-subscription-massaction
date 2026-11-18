@@ -1,0 +1,118 @@
+{
+  "status": "PASS",
+  "kind": "ROLLBACK",
+  "fixture": 4081,
+  "entry": {
+    "begin": 1,
+    "depth": 1,
+    "sql_indices": [
+      3,
+      4
+    ],
+    "connection": 152
+  },
+  "Core_return": false,
+  "native_errno": 2006,
+  "Core_errno": null,
+  "Core_depth": 0,
+  "persisted": 0,
+  "classification": "UNKNOWN/STOP regardless of independent readback; no retry or compensating rollback",
+  "trace": [
+    {
+      "case": "D01-LOST-ROLLBACK",
+      "connection": 151,
+      "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+      "start": 1795026184.70941,
+      "end": 1795026184.710692,
+      "ok": true,
+      "errno": 0,
+      "rows": 1
+    },
+    {
+      "case": "D01-LOST-ROLLBACK",
+      "connection": 151,
+      "sql": "INSERT INTO probe VALUES (4081,'D01-lost-rollback',0)",
+      "start": 1795026184.71084,
+      "end": 1795026184.733006,
+      "ok": true,
+      "errno": 0,
+      "rows": 1
+    },
+    {
+      "case": "D01-LOST-ROLLBACK",
+      "connection": 152,
+      "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+      "start": 1795026184.794194,
+      "end": 1795026184.845013,
+      "ok": true,
+      "errno": 0,
+      "rows": 1
+    },
+    {
+      "case": "D01-LOST-ROLLBACK",
+      "connection": 152,
+      "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+      "start": 1795026184.845093,
+      "end": 1795026184.848511,
+      "ok": true,
+      "errno": 0,
+      "rows": 0
+    },
+    {
+      "case": "D01-LOST-ROLLBACK",
+      "connection": 152,
+      "sql": "BEGIN",
+      "start": 1795026184.848536,
+      "end": 1795026184.850418,
+      "ok": true,
+      "errno": 0,
+      "rows": 0
+    },
+    {
+      "case": "D01-LOST-ROLLBACK",
+      "connection": 152,
+      "sql": "SELECT n FROM probe WHERE id=4081 FOR UPDATE",
+      "start": 1795026184.85046,
+      "end": 1795026184.896333,
+      "ok": true,
+      "errno": 0,
+      "rows": 1
+    },
+    {
+      "case": "D01-LOST-ROLLBACK",
+      "connection": 152,
+      "sql": "UPDATE probe SET n=9 WHERE id=4081",
+      "start": 1795026184.896403,
+      "end": 1795026184.900016,
+      "ok": true,
+      "errno": 0,
+      "rows": 1
+    },
+    {
+      "case": "D01-LOST-ROLLBACK",
+      "connection": 152,
+      "sql": "ROLLBACK",
+      "start": 1795026184.900111,
+      "end": 1795026184.908676,
+      "ok": false,
+      "errno": 2006,
+      "rows": -1
+    },
+    {
+      "case": "D01-LOST-ROLLBACK",
+      "connection": 151,
+      "sql": "SELECT n FROM probe WHERE id=4081",
+      "start": 1795026184.908733,
+      "end": 1795026184.910374,
+      "ok": true,
+      "errno": 0,
+      "rows": 1
+    }
+  ],
+  "proxy": {
+    "forwarded_target": 1,
+    "server_ok_discarded": 1,
+    "raw_packets_logged": 0,
+    "scope": "one dedicated loopback client; no KILL or server restart"
+  }
+}

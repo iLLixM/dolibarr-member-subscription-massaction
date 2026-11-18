@@ -1,0 +1,114 @@
+{
+    "status": "PASS",
+    "cases": [
+        {
+            "operation": "commit",
+            "fixture": 4090,
+            "identity": {
+                "db": "msmsh01lab",
+                "account": "msmsh01lab@%",
+                "version": "8.4.13",
+                "ac": "1"
+            },
+            "begin": 1,
+            "return": 1,
+            "depth": 0,
+            "persisted": 12,
+            "DoliDB_class": "DoliDBMysqli",
+            "native_class": "mysqli",
+            "connection": 154,
+            "trace_limit": "Exact factory connection is deliberately not instrumented; wire/order corroboration is supplied by inherited-method/native-instrumented cases"
+        },
+        {
+            "operation": "rollback",
+            "fixture": 4091,
+            "identity": {
+                "db": "msmsh01lab",
+                "account": "msmsh01lab@%",
+                "version": "8.4.13",
+                "ac": "1"
+            },
+            "begin": 1,
+            "return": true,
+            "depth": 0,
+            "persisted": 0,
+            "DoliDB_class": "DoliDBMysqli",
+            "native_class": "mysqli",
+            "connection": 155,
+            "trace_limit": "Exact factory connection is deliberately not instrumented; wire/order corroboration is supplied by inherited-method/native-instrumented cases"
+        }
+    ],
+    "failure": null,
+    "audit_trace": [
+        {
+            "case": "inspect",
+            "connection": 153,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026230.198481,
+            "end": 1795026230.200268,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "inspect",
+            "connection": 153,
+            "sql": "INSERT INTO probe VALUES (4090,'D01-factory-commit',0)",
+            "start": 1795026230.200424,
+            "end": 1795026230.210691,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "inspect",
+            "connection": 153,
+            "sql": "SELECT n FROM probe WHERE id=4090",
+            "start": 1795026230.227242,
+            "end": 1795026230.228757,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "inspect",
+            "connection": 153,
+            "sql": "SELECT n FROM probe WHERE id=4090",
+            "start": 1795026230.244682,
+            "end": 1795026230.246278,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "inspect",
+            "connection": 153,
+            "sql": "INSERT INTO probe VALUES (4091,'D01-factory-rollback',0)",
+            "start": 1795026230.246633,
+            "end": 1795026230.260318,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "inspect",
+            "connection": 153,
+            "sql": "SELECT n FROM probe WHERE id=4091",
+            "start": 1795026230.275855,
+            "end": 1795026230.277698,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "inspect",
+            "connection": 153,
+            "sql": "SELECT n FROM probe WHERE id=4091",
+            "start": 1795026230.289232,
+            "end": 1795026230.290879,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        }
+    ]
+}
