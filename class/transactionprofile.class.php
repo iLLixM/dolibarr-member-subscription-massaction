@@ -94,7 +94,8 @@ class MsmTransactionProfile
 		if ($method !== 'POST' || !msmValidCsrf($post['token'] ?? null, $session)
 			|| array_diff(array_keys($post), array('token', 'action', 'profile', 'revision')) || ($post['action'] ?? null) !== 'save') { throw new RuntimeException('MSMInvalidForm'); }
 		if ((int) $this->db->transaction_opened !== 0) { throw new RuntimeException('MSMProfileUnavailable'); }
-		// A single-statement CAS must be durable; do not join an implicit admin tx.
+		// CAS persistence assumes the ordinary admin path, without a foreign explicit tx.
+		// Core depth 0 and autocommit=1 alone do not prove physical transaction absence.
 		$r = $this->db->query('SELECT @@autocommit AS enabled');
 		if (!$r) { throw new RuntimeException('MSMProfileUnavailable'); }
 		try { $mode = $this->db->fetch_object($r); }

@@ -68,6 +68,8 @@ if ($method === 'GET' && isset($_GET['batchlimit'])) {
 		|| $notice['entity'] !== (int) $conf->entity || $notice['expires'] <= dol_now()) { accessforbidden(); }
 	msmPrintBatchLimit($notice['count']);
 }
+// Reject invalid POST tokens before any module preview/session mutation.
+if ($method === 'POST' && !msmValidCsrf($_POST['token'] ?? null, $_SESSION)) { accessforbidden(); }
 $error = '';
 try {
 	if ($method === 'GET' && isset($_GET['run'])) {
@@ -86,10 +88,8 @@ try {
 } catch (Throwable $e) {
 	accessforbidden($langs->trans(msmProfileError($e->getMessage()) ? $e->getMessage() : 'MSMInvalidRun'));
 }
-if ($method === 'POST' && !msmValidCsrf($_POST['token'] ?? null, $_SESSION)) { accessforbidden(); }
 if (in_array($state['phase'], array('preview', 'confirm'), true) && count($state['ids']) > msmBatchLimit()) { msmPrintBatchLimit(count($state['ids'])); }
 if ($method === 'POST') {
-	if (!msmValidCsrf($_POST['token'] ?? null, $_SESSION)) { accessforbidden(); }
 	if (($_POST['action'] ?? null) === 'cancel' && $state['phase'] === 'preview') {
 		unset($_SESSION['msm_previews'][$key]);
 		header('Location: '.msmListUrl(), true, 303);

@@ -161,7 +161,8 @@ The merge grants no production, distribution or release approval.
 | Other MySQL versions, PHP/Core combinations or configurations | Not generally qualified. The 21 pinned PHP/Core CI pairs are synthetic cross-version evidence, not 21 real MySQL integrations. |
 | PostgreSQL | Not implemented; reserved for iteration 2. |
 
-MySQL requires direct `mysqli`, InnoDB for all touched tables, `REPEATABLE READ`,
+The currently supported **EnhancedMySQL booking path** requires direct `mysqli`,
+InnoDB for all touched tables, `REPEATABLE READ`,
 `autocommit=1` outside explicit transactions and active transaction instrumentation
 in Performance Schema. In addition to the application's existing schema rights,
 the proven observer needs `SELECT` on
@@ -172,11 +173,15 @@ a one-shot `SET TRANSACTION` differs from the session default. No
 `PROCESS`, `threads`/`setup_*` SELECT or new global administrative grant is needed
 for this profile. Observer queries filter to the current thread; the table-level
 SELECT permission itself does not restrict access to that thread's rows.
-Missing rights/events/freshness fail closed. Idle calibration reads an existing
-InnoDB member row; an empty member table is not silently seeded or accepted.
+These P_S prerequisites apply to EnhancedMySQL booking, not to read-only preview
+or to Core-Guarded as a general requirement. Core-Guarded booking remains blocked
+until CF-02 implementation/qualification; no additional compatibility or release
+approval follows from profile selection. Missing Enhanced rights/events/freshness
+fail closed. Idle calibration reads an existing InnoDB member row; an empty member
+table is not silently seeded or accepted.
 
 Booking and Invoice share one DoliDB-bound observer and one outer transaction per
-member. MySQL checks native connection/server/thread/event identity, active
+member. EnhancedMySQL checks native connection/server/thread/event identity, active
 SAVEPOINT/RELEASE counter freshness and the expected own completion before a new
 idle proof. MariaDB retains `@@in_transaction`, logical depth and InnoDB checks;
 its status-snapshot continuity is not upgraded to MySQL event continuity.

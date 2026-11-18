@@ -160,4 +160,46 @@ verify($first['status']==='success'&&$second['message']==='MSMProfileChanged'&&$
 // Controller's only physical-readiness call remains inside the book action.
 $controller=file_get_contents(__DIR__.'/../../subscription.php');
 verify(substr_count($controller,'msmRequireBookingDatabase(')===1,'CF01 controller readiness only on final booking');
+// F24-03: execute the actual controller's session-admission block, replacing only
+// its terminal HTTP denial with an exception. No bootstrap, HTTP or duplicated flow.
+$start=strpos($controller,'// Reject invalid POST tokens before any module preview/session mutation.');
+$end=strpos($controller,"\n".'if (in_array($state[\'phase\']',$start===false?0:$start);
+verify($start!==false&&$end!==false&&$end>$start,'F24 controller admission block located');
+$admission=substr($controller,$start,$end-$start);
+$admission=str_replace('accessforbidden(', '$deny(', $admission);
+verify(substr_count($controller,'msmValidCsrf(')===1,'F24 one controller CSRF check');
+list($pd,$ps)=profileStore('mysql',profileRaw('mysql','EnhancedMySQL'));
+$stale=profileState();$stale['revision']=3;$stale['phase']='confirm';
+$stale['profile']=$ps->binding($ps->current(),$user,3);
+$pd->profileRaw=profileRaw('mysql','EnhancedMySQL','e');
+$previewKey=str_repeat('f',32);
+$invoke=static function($method,$token,$session)use($admission,$previewKey,$ps,$user){
+	global $conf,$langs;
+	$_POST=array('preview'=>$previewKey,'token'=>$token);$_GET=array('preview'=>$previewKey);$_SESSION=$session;
+	$profiles=$ps;
+	$deny=static function(...$args){throw new RuntimeException('F24TestAccessDenied');};
+	eval($admission);
+};
+$savedGlobals=array($_SESSION,$_POST??array(),$_GET??array());
+try {
+	foreach(array('preview','confirm','processing','done') as $phase){
+	 $stored=$stale;$stored['phase']=$phase;
+	 $session=array('token'=>'synthetic-csrf','msm_previews'=>array($previewKey=>$stored),'unrelated'=>'preserved');
+	 $before=count($pd->queries);
+	 fails(static function()use($invoke,$session){$invoke('POST','invalid',$session);},'F24TestAccessDenied');
+	 verify($_SESSION===$session&&count($pd->queries)===$before,'F24 invalid POST rejects stale '.$phase.' before profile reads/session mutation');
+	}
+	foreach(array('POST','GET') as $method){
+	 $session=array('token'=>'synthetic-csrf','msm_previews'=>array($previewKey=>$stale));
+	 $invoke($method,$method==='POST'?'synthetic-csrf':null,$session);
+	 $synced=$_SESSION['msm_previews'][$previewKey];
+	 verify($synced['phase']==='preview'&&$synced['revision']===4&&$synced['flash']==='MSMProfileChanged','F24 valid '.$method.' retains stale-binding invalidation');
+	}
+	foreach(array('processing','done') as $phase){
+	 $stored=$stale;$stored['phase']=$phase;
+	 $session=array('token'=>'synthetic-csrf','msm_previews'=>array($previewKey=>$stored));$before=count($pd->queries);
+	 $invoke('POST','synthetic-csrf',$session);
+	 verify($_SESSION===$session&&count($pd->queries)===$before,'F24 valid consumed '.$phase.' unchanged by admission');
+	}
+} finally {list($_SESSION,$_POST,$_GET)=$savedGlobals;}
 echo ($passed-$profileBaseline)." CF01 profile/configuration/readiness assertions passed (synthetic only; no real DB/HTTP).\n";

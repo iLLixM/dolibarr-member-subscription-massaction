@@ -7,6 +7,21 @@ Base: fetched `origin/main` exactly `6247704815cf532ec632616011133c646aa00005`
 K23-01 CLOSED; its old pending-review prefaces are explicitly historical. Separate
 CF-01 task authorizes this implementation, not CF-02/Core-Guarded booking or release.
 
+### Minimal review follow-up F24-01–F24-03
+
+External independent review of `4c7d1a1ed546f0a4992c2ecefcd3af29c00bebfc`:
+**APPROVED FOR DEVELOPMENT MERGE WITH DOCUMENTED SCOPE**, with no mandatory
+development-merge blockers reported. This follow-up documents the CAS assumption
+(F24-01), scopes README P_S requirements to EnhancedMySQL booking (F24-02), and
+moves the single POST-CSRF check before preview read/upgrade/profile synchronization
+and session writes (F24-03). The focused request regression executes the controller
+admission block with a stale profile binding: invalid tokens leave the session and
+profile-query count unchanged; valid POST/GET still synchronize, and consumed
+states remain unchanged. This is synthetic controller-block evidence, not HTTP.
+Finding dispositions are implementation responses **pending targeted independent
+verification**, not independent finding closure or Owner acceptance. The new
+review HEAD and push/PR CI are recorded in PR #24; Issue #22 checkboxes stay open.
+
 ### Configuration and migration contract
 
 One entity-specific Core `const` row,
@@ -24,6 +39,20 @@ required for this single-statement config write; no transaction cleanup or globa
 session setting change. The private setting is not an activation default/deletion
 entry in the descriptor, so activation cannot overwrite a choice or infer fresh
 history. Its actual live activation/reactivation behavior remains to be qualified.
+
+**F24-01 — conditional CAS persistence:** independent persistence assumes the
+ordinary administrative call path with no already active foreign explicit SQL
+transaction. `transaction_opened=0` and `@@autocommit=1` are necessary checks here,
+not a complete physical transaction-absence or ownership proof. An explicit foreign
+transaction can exist despite both values; a successful CAS statement could then
+remain part of that transaction rather than independently persisted. No physical
+observer, extra rights, foreign COMMIT/ROLLBACK or alternative persistence is added.
+A targeted later real test must verify visibility/durability from an independent
+connection on the normal admin path and the negative case with a foreign explicit
+transaction at logical depth0/autocommit1. End that injected context only through
+its test originator, and do not reinterpret affected_rows as independent commit
+proof. **NOT EXECUTED:** this focused real persistence/negative test needs separate
+authorization; the in-memory CAS model does not establish it.
 
 No trustworthy fresh-install discriminator is available in the previous module
 metadata. Therefore missing MySQL config on fresh/legacy/reactivated/unknown installs
