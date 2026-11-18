@@ -147,11 +147,13 @@ Complete all preflight SQL first: server-owned profile/feature binding, current
 permissions/entity/batch limit, Core capabilities, relevant InnoDB engines and
 supported connection settings. Require logical depth 0, the same DoliDB object,
 actual mysqli handle/connection identity and autocommit=1; these are application
-controls, **not physical ownership proofs**. The initial supported completion mode
-is ordinary non-chaining/non-releasing `completion_type=0` (`NO_CHAIN`). Refuse
-unsupported/unreadable entry settings; never normalize session/global settings.
-Read-only settings checks occur before SET. Other completion modes need a separate
-qualified design; acknowledgements with unexpected disconnect/depth are not success.
+controls, **not physical ownership proofs**. Keep autocommit=1 as an entry
+prerequisite, without an additional `completion_type` value whitelist or refusal
+solely because that value is unreadable. Read-only settings checks occur before SET;
+never normalize session/global settings. Relevant completion behavior remains a
+later loaded-Core/MySQL test subject, not a general admission exclusion. Detected
+unexpected completion, connection errors or uncertain transaction state still lead
+to UNKNOWN/STOP; no completion variant is claimed already qualified.
 
 The preferred first implementation **must** successfully execute
 `SET TRANSACTION ISOLATION LEVEL REPEATABLE READ` immediately before
@@ -202,8 +204,8 @@ D-01 now fixes the design choice; it is no longer an undecided candidate. Its
 It is a later CF-01/CF-02 gate **before production contribution DML**, not a demand
 to run real implementation tests in CF-00. It must cover foreign active transactions
 at logical depth 0/1568 with no foreign end, acknowledged begin/depth, all four
-session/one-shot isolation settings, intervening SQL/late overrides, completion-mode
-limits and independent behavioral/read-view checks. Use an approved isolated lab
+session/one-shot isolation settings, intervening SQL/late overrides, relevant completion
+variants under autocommit=1 and independent behavioral/read-view checks. Use an approved isolated lab
 and actual loaded DoliDB/driver; SH-01's native positives and ordering counterexamples
 remain evidence of primitives, not this missing Core integration. Report detected
 violations and accepted undetectable post-entry changes honestly. No actual physical
@@ -277,10 +279,11 @@ failure may continue to the next member.
 explain why 1213 and 1205 need different classes: deadlock aborts the transaction;
 timeout scope depends on rollback-on-timeout configuration. The matrix deliberately
 forbids the automatic retries often suggested for generic applications. The
-[completion-mode reference](https://dev.mysql.com/doc/refman/8.4/en/commit.html)
-also motivates refusing unsupported chaining/releasing entry settings rather than
-silently rewriting them. These are reference semantics and design requirements,
-not measurements in this PR or universal physical session control.
+[completion-type reference](https://dev.mysql.com/doc/refman/8.4/en/server-system-variables.html#sysvar_completion_type)
+documents the autocommit=1 exception. Retain the later bounded test of relevant
+completion variants, without a mandatory completion-value restriction or session/
+global workaround. These are reference semantics and future test obligations,
+not measurements in this PR or qualification of every completion variant.
 
 Core-Guarded still may miss a premature opposite end/same-connection replacement
 and accept a later no-op acknowledgement. This accepted ADR-12 residual limitation
