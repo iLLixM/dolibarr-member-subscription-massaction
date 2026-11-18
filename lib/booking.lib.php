@@ -3,12 +3,14 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 require_once __DIR__.'/batch.lib.php';
+require_once __DIR__.'/profile.lib.php';
 /** Readiness gates new operations, never the display of consumed session results. */
-function msmRequireBookingDatabase(array $state, $observer, $service)
+function msmRequireBookingDatabase(array $state, $observer, $service, $profiles, $user)
 {
 	if (in_array($state['phase'] ?? '', array('done', 'processing'), true)) { return; }
-	if (!in_array($state['phase'] ?? '', array('preview', 'confirm'), true)) { throw new InvalidArgumentException('MSMInvalidForm'); }
+	if (($state['phase'] ?? '') !== 'confirm') { throw new InvalidArgumentException('MSMInvalidForm'); }
 	msmRequireBatchSize($state['ids']);
+	$profile = $profiles->admit($state['profile'] ?? null, $user, $state['options'], $state['revision']);
 	try {
 		$observed = $observer->beforeBegin();
 		if ($observed['state'] !== MsmDatabaseState::IDLE || !$observed['fresh']) {
@@ -17,7 +19,7 @@ function msmRequireBookingDatabase(array $state, $observer, $service)
 		$service->checkTables(!empty($state['options']['invoice']), !empty($state['options']['autocreate']));
 	} catch (Throwable $e) {
 		$reason = in_array($e->getMessage(), array('MSMDatabaseUnsupported', 'MSMDatabaseBootstrapUnavailable', 'MSMDatabaseObservationUnavailable', 'MSMTransactionUnsupported'), true) ? $e->getMessage() : 'MSMDatabaseObservationUnavailable';
-		throw new RuntimeException($reason);
+		throw new RuntimeException($reason === 'MSMDatabaseObservationUnavailable' && $profile['profile'] === 'EnhancedMySQL' ? 'MSMEnhancedUnavailable' : $reason);
 	}
 }
 /** Strict confirmation request: all business values remain on the server. */
@@ -29,6 +31,15 @@ function msmBookingPost(array $state, array $post, $action)
 	if (!is_array($overlap) || array_diff(array_keys($overlap), $state['ids'])) { throw new InvalidArgumentException('MSMInvalidForm'); }
 	foreach ($overlap as $value) { if ($value !== '1') { throw new InvalidArgumentException('MSMInvalidForm'); } }
 	return $overlap;
+}
+/** Editing valid consent advances its revision without changing the selected profile. */
+function msmEditConfirmation(array $state, array $post)
+{
+	msmBookingPost($state, $post, 'edit');
+	if (($state['phase'] ?? '') !== 'confirm') { throw new InvalidArgumentException('MSMInvalidForm'); }
+	$state['phase'] = 'preview'; $state['revision']++;
+	if (isset($state['profile'])) { $state['profile']['confirmation_revision'] = $state['revision']; }
+	return $state;
 }
 /** Consume before any business write. The controller must durably save the session first. */
 function msmConsumeConfirmation(array $state, array $post)
@@ -52,6 +63,7 @@ function msmProcessBooking(array $state, $service, $mailer, $user, callable $sav
 			$state['results'][$id] = array('status' => 'skipped', 'message' => $stop ? 'MSMBatchStopped' : 'MSMNotConfirmed', 'id' => 0, 'amount' => 0, 'mail' => 'not_selected', 'stop' => false);
 			$save($state); continue;
 		}
+		$row['_profile'] = $state['profile'] ?? null;
 		$result = $service->book($id, $row, $state['options'], $user, !empty($state['overlap'][$id]));
 		$member = $result['_member'] ?? null; unset($result['_member']);
 		if ($result['status'] === 'success' && $state['options']['sendmail']) { $result['mail'] = 'unknown'; }

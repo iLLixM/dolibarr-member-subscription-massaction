@@ -5,13 +5,14 @@
 // Version labels below exercise unknown contracts on pinned source, not real releases.
 if (($argv[1] ?? '') === '--r16-version') { define('DOL_VERSION', $argv[2]); }
 // Reuse the real V22 API bootstrap and synthetic preview fixtures, never main/conf/DB.
-require __DIR__.'/preview.php';
-require __DIR__.'/../../class/booking.class.php';
-require __DIR__.'/../../class/bookingmember.class.php';
-require __DIR__.'/../../class/mail.class.php';
-require __DIR__.'/../../lib/booking.lib.php';
-require __DIR__.'/../../lib/booking_renderer.lib.php';
+require_once __DIR__.'/preview.php';
+require_once __DIR__.'/../../class/booking.class.php';
+require_once __DIR__.'/../../class/bookingmember.class.php';
+require_once __DIR__.'/../../class/mail.class.php';
+require_once __DIR__.'/../../lib/booking.lib.php';
+require_once __DIR__.'/../../lib/booking_renderer.lib.php';
 require_once __DIR__.'/../fixtures/database_state.php';
+require_once __DIR__.'/../fixtures/profile.php';
 $baseline = $passed;
 class BookingDatabase extends PreviewDatabase
 {
@@ -65,8 +66,9 @@ class BookingPreviewDouble
 }
 class BookingServiceDouble extends MsmBookingService
 {
+	use ProfileBookingFixture;
 	public $object; public $reader;
-	public function __construct($db, $state = null) { parent::__construct($db, $state ?? new SyntheticDatabaseState($db)); }
+	public function __construct($db, $state = null) { $this->profileDb = $db; parent::__construct($db, $state ?? new SyntheticDatabaseState($db)); }
 	public function observer() { return $this->databaseState; }
 	protected function currentUser($user) { return $user; }
 	protected function member($id) { $this->object->id = $id; return $this->object; }

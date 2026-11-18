@@ -5,6 +5,7 @@
 require_once __DIR__.'/preview.class.php';
 require_once __DIR__.'/corecompatibility.class.php';
 require_once __DIR__.'/databasestate.class.php';
+require_once __DIR__.'/transactionprofile.class.php';
 /** One owned transaction per member. Invoice operations share the owned transaction. */
 class MsmBookingService
 {
@@ -14,6 +15,11 @@ class MsmBookingService
 	{
 		$this->db = $db; $this->databaseState = $databaseState ?? new MsmDatabaseState($db);
 		if (!$this->databaseState->isFor($db)) { throw new InvalidArgumentException('MSMDatabaseUnsupported'); }
+	}
+	protected function profiles()
+	{
+		global $conf;
+		return new MsmTransactionProfile($this->db, $this->databaseState, (int) $conf->entity);
 	}
 	protected function invoicing() { require_once __DIR__.'/invoice.class.php'; return new MsmInvoiceService($this->db, $this->databaseState); }
 	protected function member($id)
@@ -117,6 +123,7 @@ class MsmBookingService
 		$diagnostic = array('stage' => 'preflight', 'subscription_id' => 0, 'invoice_id' => 0, 'customer_id' => 0);
 		try {
 			MsmCoreCompatibility::booking($this->db); // Capability failures precede transactions/writes.
+			$this->profiles()->admit($expected['_profile'] ?? null, $user, $options);
 			$initial = $this->databaseState->beforeBegin();
 			if ($initial['state'] !== MsmDatabaseState::IDLE || !$initial['fresh']) {
 				$result['status'] = 'unknown'; $result['stop'] = true; $result['message'] = $initial['reason']; return $result;
@@ -165,7 +172,7 @@ class MsmBookingService
 			if (!$owned) { $result['stop'] = true; }
 			if ($owned && !$committing) { try { $safe = $this->rollbackOwned(); } catch (Throwable $ignored) {} }
 			if ($committing || ($beginAttempted && !$owned) || ($owned && !$safe)) { $result['status'] = 'unknown'; $result['stop'] = true; $result['message'] = 'MSMTransactionUnknown'; }
-			else { $result['message'] = in_array($e->getMessage(), array('MSMCoreVersionUnsupported', 'MSMCoreContractUnsupported', 'MSMChangedConfirmation', 'MSMConsistencyError', 'MSMTransactionUnsupported', 'NotEnoughPermissions', 'MSMInvoiceFailed'), true) ? $e->getMessage() : 'MSMBookingFailed'; }
+			else { $result['message'] = in_array($e->getMessage(), array('MSMCoreVersionUnsupported', 'MSMCoreContractUnsupported', 'MSMChangedConfirmation', 'MSMConsistencyError', 'MSMTransactionUnsupported', 'MSMProfileChanged', 'MSMProfileInvalid', 'MSMProfileUnavailable', 'MSMProfileSelectionRequired', 'MSMProfileFeatureUnavailable', 'MSMCoreGuardedPending', 'NotEnoughPermissions', 'MSMInvoiceFailed'), true) ? $e->getMessage() : 'MSMBookingFailed'; }
 		}
 		if ($result['status'] !== 'success') { $result['diagnostic'] = $diagnostic; $result['rollback'] = $owned && !$committing && !empty($safe) ? 'confirmed' : 'unconfirmed'; }
 		return $result;

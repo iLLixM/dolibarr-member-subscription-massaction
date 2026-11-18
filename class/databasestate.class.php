@@ -80,6 +80,8 @@ class MsmDatabaseState
 		else { throw new RuntimeException('MSMDatabaseUnsupported'); }
 		$this->handle = $handle; $this->connectionId = $id; $this->family = $family;
 	}
+	/** Server-family discovery only; no physical transaction readiness/probe. */
+	public function family() { $this->identify(); return $this->family; }
 	private function result($state, $fresh, $reason = '')
 	{
 		return array('state' => $state, 'fresh' => $fresh, 'owned' => $this->owning && !$this->uncertain,
