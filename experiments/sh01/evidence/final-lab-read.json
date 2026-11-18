@@ -1,0 +1,333 @@
+{
+    "status": "PASS",
+    "database": "msmsh01lab",
+    "rows": [
+        {
+            "id": "1",
+            "label": "isolated-counter",
+            "n": "0"
+        },
+        {
+            "id": "2",
+            "label": "isolation-counter",
+            "n": "0"
+        },
+        {
+            "id": "102",
+            "label": "SH01-102",
+            "n": "0"
+        },
+        {
+            "id": "110",
+            "label": "SH01-110",
+            "n": "1"
+        },
+        {
+            "id": "111",
+            "label": "SH01-111",
+            "n": "0"
+        },
+        {
+            "id": "120",
+            "label": "SH01-120",
+            "n": "1"
+        },
+        {
+            "id": "121",
+            "label": "SH01-121",
+            "n": "0"
+        },
+        {
+            "id": "122",
+            "label": "SH01-122",
+            "n": "1"
+        },
+        {
+            "id": "123",
+            "label": "SH01-123",
+            "n": "1"
+        },
+        {
+            "id": "130",
+            "label": "SH01-130",
+            "n": "0"
+        },
+        {
+            "id": "131",
+            "label": "SH01-131",
+            "n": "0"
+        },
+        {
+            "id": "132",
+            "label": "SH01-132",
+            "n": "1"
+        },
+        {
+            "id": "140",
+            "label": "SH01-140",
+            "n": "1"
+        },
+        {
+            "id": "141",
+            "label": "SH01-141",
+            "n": "1"
+        },
+        {
+            "id": "142",
+            "label": "SH01-142",
+            "n": "1"
+        },
+        {
+            "id": "150",
+            "label": "SH01-150",
+            "n": "0"
+        },
+        {
+            "id": "160",
+            "label": "SH01-160",
+            "n": "0"
+        },
+        {
+            "id": "170",
+            "label": "SH01-170",
+            "n": "1"
+        },
+        {
+            "id": "171",
+            "label": "SH01-171",
+            "n": "0"
+        },
+        {
+            "id": "172",
+            "label": "SH01-172",
+            "n": "0"
+        },
+        {
+            "id": "173",
+            "label": "SH01-173",
+            "n": "1"
+        },
+        {
+            "id": "180",
+            "label": "SH01-180",
+            "n": "0"
+        },
+        {
+            "id": "190",
+            "label": "SH01-190",
+            "n": "1"
+        },
+        {
+            "id": "191",
+            "label": "SH01-191",
+            "n": "0"
+        },
+        {
+            "id": "192",
+            "label": "SH01-192",
+            "n": "1"
+        },
+        {
+            "id": "193",
+            "label": "SH01-193",
+            "n": "1"
+        },
+        {
+            "id": "194",
+            "label": "SH01-194",
+            "n": "0"
+        }
+    ],
+    "seed_rows_unchanged": true,
+    "new_artificial_rows": 25,
+    "grants": [
+        {
+            "Grants for msmsh01lab@%": "GRANT USAGE ON *.* TO `msmsh01lab`@`%`"
+        },
+        {
+            "Grants for msmsh01lab@%": "GRANT SELECT, INSERT, UPDATE, DELETE ON `msmsh01lab`.* TO `msmsh01lab`@`%`"
+        }
+    ],
+    "performance_schema_select_errno": 1142,
+    "trace": [
+        {
+            "case": "preflight",
+            "handle": "connection-1",
+            "actor": "harness",
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+            "result": [
+                {
+                    "db": "msmsh01lab",
+                    "account": "msmsh01lab@%",
+                    "version": "8.4.13"
+                }
+            ]
+        },
+        {
+            "case": "preflight",
+            "handle": "connection-1",
+            "actor": "harness",
+            "sql": "SELECT id,label,n FROM probe ORDER BY id",
+            "result": [
+                {
+                    "id": "1",
+                    "label": "isolated-counter",
+                    "n": "0"
+                },
+                {
+                    "id": "2",
+                    "label": "isolation-counter",
+                    "n": "0"
+                },
+                {
+                    "id": "102",
+                    "label": "SH01-102",
+                    "n": "0"
+                },
+                {
+                    "id": "110",
+                    "label": "SH01-110",
+                    "n": "1"
+                },
+                {
+                    "id": "111",
+                    "label": "SH01-111",
+                    "n": "0"
+                },
+                {
+                    "id": "120",
+                    "label": "SH01-120",
+                    "n": "1"
+                },
+                {
+                    "id": "121",
+                    "label": "SH01-121",
+                    "n": "0"
+                },
+                {
+                    "id": "122",
+                    "label": "SH01-122",
+                    "n": "1"
+                },
+                {
+                    "id": "123",
+                    "label": "SH01-123",
+                    "n": "1"
+                },
+                {
+                    "id": "130",
+                    "label": "SH01-130",
+                    "n": "0"
+                },
+                {
+                    "id": "131",
+                    "label": "SH01-131",
+                    "n": "0"
+                },
+                {
+                    "id": "132",
+                    "label": "SH01-132",
+                    "n": "1"
+                },
+                {
+                    "id": "140",
+                    "label": "SH01-140",
+                    "n": "1"
+                },
+                {
+                    "id": "141",
+                    "label": "SH01-141",
+                    "n": "1"
+                },
+                {
+                    "id": "142",
+                    "label": "SH01-142",
+                    "n": "1"
+                },
+                {
+                    "id": "150",
+                    "label": "SH01-150",
+                    "n": "0"
+                },
+                {
+                    "id": "160",
+                    "label": "SH01-160",
+                    "n": "0"
+                },
+                {
+                    "id": "170",
+                    "label": "SH01-170",
+                    "n": "1"
+                },
+                {
+                    "id": "171",
+                    "label": "SH01-171",
+                    "n": "0"
+                },
+                {
+                    "id": "172",
+                    "label": "SH01-172",
+                    "n": "0"
+                },
+                {
+                    "id": "173",
+                    "label": "SH01-173",
+                    "n": "1"
+                },
+                {
+                    "id": "180",
+                    "label": "SH01-180",
+                    "n": "0"
+                },
+                {
+                    "id": "190",
+                    "label": "SH01-190",
+                    "n": "1"
+                },
+                {
+                    "id": "191",
+                    "label": "SH01-191",
+                    "n": "0"
+                },
+                {
+                    "id": "192",
+                    "label": "SH01-192",
+                    "n": "1"
+                },
+                {
+                    "id": "193",
+                    "label": "SH01-193",
+                    "n": "1"
+                },
+                {
+                    "id": "194",
+                    "label": "SH01-194",
+                    "n": "0"
+                }
+            ]
+        },
+        {
+            "case": "preflight",
+            "handle": "connection-1",
+            "actor": "harness",
+            "sql": "SHOW GRANTS",
+            "result": [
+                {
+                    "Grants for msmsh01lab@%": "GRANT USAGE ON *.* TO `msmsh01lab`@`%`"
+                },
+                {
+                    "Grants for msmsh01lab@%": "GRANT SELECT, INSERT, UPDATE, DELETE ON `msmsh01lab`.* TO `msmsh01lab`@`%`"
+                }
+            ]
+        },
+        {
+            "case": "preflight",
+            "handle": "connection-1",
+            "actor": "harness",
+            "sql": "SELECT THREAD_ID FROM performance_schema.events_transactions_current WHERE 1=0",
+            "error_class": "mysqli_sql_exception",
+            "errno": 1142
+        }
+    ],
+    "existing_Dolibarr_database_audit": "NOT EXECUTED; no test-worker SQL targets it"
+}

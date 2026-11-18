@@ -1,0 +1,184 @@
+{
+  "analysis_base": "a74edb29ba6ca49af46c389f98c4bfd86cf161b6",
+  "facts": {
+    "mandatory_groups": 11,
+    "native_measurements": 28,
+    "core_source_tags": 15,
+    "existing_synthetic_assertions": 188,
+    "actual_Core_business_integration": "NOT EXECUTED",
+    "recommendation": "NO-GO for tested construction / SH-02; pending independent architecture review and Owner decision"
+  },
+  "files": [
+    {
+      "path": "docs/sh01-mysql-restricted-feasibility.md",
+      "bytes": 20457,
+      "sha256": "2a72ef0e1d75a12a9d9eec3adc2b7479b0194cece9b986e3de6c7ac9383f633d"
+    },
+    {
+      "path": "experiments/sh01/README.md",
+      "bytes": 6610,
+      "sha256": "02d040f44b5bb1a0b407567e992612a4e359fa0783fd2b491485dfbd9c5192dc"
+    },
+    {
+      "path": "experiments/sh01/evidence/EVIDENCE-ORIGINS.json",
+      "bytes": 3997,
+      "sha256": "d603605fa9c4ea3c674d59c8581f47aefa8a2bfa8c419beba0fe773b1d9f03bf"
+    },
+    {
+      "path": "experiments/sh01/evidence/TEST-MATRIX.json",
+      "bytes": 132760,
+      "sha256": "309b1ef9b496fc82d7e20ba95e2d22124e491660f5b3b1c79eb9142af2fcb27a"
+    },
+    {
+      "path": "experiments/sh01/evidence/existing-database-synthetic.log",
+      "bytes": 89,
+      "sha256": "0995f765fd6b5527ece216d792fd0f3b0d06dba86766d45c5e7b7704b410b4b7"
+    },
+    {
+      "path": "experiments/sh01/evidence/final-lab-read.json",
+      "bytes": 8483,
+      "sha256": "ee260b7521f0dd2a005a3b6e18306d79e65b734e0f31605de0708298874ed6a1"
+    },
+    {
+      "path": "experiments/sh01/evidence/inspect-final.json",
+      "bytes": 568,
+      "sha256": "18351d47774f2583b775a81590486a8933fbf70a3633797ef892077a26cdd967"
+    },
+    {
+      "path": "experiments/sh01/evidence/isolation-ordering.json",
+      "bytes": 11536,
+      "sha256": "0f6d96ef97b6976a68ffec6181cd1950be817c5ba02134f0d9ec198551417c9c"
+    },
+    {
+      "path": "experiments/sh01/evidence/issue21-contract-snapshot.md",
+      "bytes": 2580,
+      "sha256": "0720322ca047869cca03c8751275bda908c1c47b0ebac90a9b990cb0294ef396"
+    },
+    {
+      "path": "experiments/sh01/evidence/lost-ack-COMMIT.json",
+      "bytes": 4443,
+      "sha256": "b4065ed77edfbb3de1959e0addfd943722c2d7cae326b9472697fba3c62d060e"
+    },
+    {
+      "path": "experiments/sh01/evidence/lost-ack-ROLLBACK.json",
+      "bytes": 4477,
+      "sha256": "f8ffa12dd1bed3da3dbe94c9a2e1e26388e7166ad50103f3bc11c5744f938579"
+    },
+    {
+      "path": "experiments/sh01/evidence/native.json",
+      "bytes": 125414,
+      "sha256": "fd5c61a7ff1c1ed4f5463c55ef2afb7f48e6cb5d82f1b101c5aa3b2b48f1eb2a"
+    },
+    {
+      "path": "experiments/sh01/evidence/owner-provision-result.json",
+      "bytes": 434,
+      "sha256": "97f82d6c4676dbda626ed9ca04a1b4f9ad5a760570640778588ba05ff3f10089"
+    },
+    {
+      "path": "experiments/sh01/evidence/reference.json",
+      "bytes": 362,
+      "sha256": "01cb826944218d2fd6c60c7f7fa073da523119d04659958d4addbd33ae5a90ed"
+    },
+    {
+      "path": "experiments/sh01/evidence/rollback-to.json",
+      "bytes": 3837,
+      "sha256": "53b3fb146dcbed09db2cf57e215e5cafb5493481e93a53b618d20cdb7da881a9"
+    },
+    {
+      "path": "experiments/sh01/evidence/session-diagnostics-initial.php.txt",
+      "bytes": 2399,
+      "sha256": "cdda9e3a97eaf195cf51e11eb6d485656d1f33228fc7a3efb9ce90ec4c5f794a"
+    },
+    {
+      "path": "experiments/sh01/evidence/session-diagnostics-reconciled.json",
+      "bytes": 785,
+      "sha256": "7b691b4fbe51034786956a772f09af7528bc6ec263e04f3d9039e217cc793cb5"
+    },
+    {
+      "path": "experiments/sh01/evidence/session-diagnostics.json",
+      "bytes": 4260,
+      "sha256": "09227cc03c9840d8c19be8bf93e7a04a7b5dd8b79d41b757a4c2ddd46f1eda1d"
+    },
+    {
+      "path": "experiments/sh01/evidence/source-audit.json",
+      "bytes": 15796,
+      "sha256": "cb1cfb250a3452a586810c020cda0683bc29e13456d19697dce4bfb2b0c7d582"
+    },
+    {
+      "path": "experiments/sh01/export-evidence.py",
+      "bytes": 4564,
+      "sha256": "8093371a84d7d5996a217a082a9ab391a426acb050b43a544f364e8d630130bd"
+    },
+    {
+      "path": "experiments/sh01/final-lab-read.php",
+      "bytes": 1195,
+      "sha256": "91e2538dc804954a4528498c815b77132162e1d8b064ec3c55921fa6dc153e0c"
+    },
+    {
+      "path": "experiments/sh01/inspect.php",
+      "bytes": 1754,
+      "sha256": "e5880a883b0795104663256eac7ef18e8abbd163bac618d0687e8dec44a82215"
+    },
+    {
+      "path": "experiments/sh01/isolation-ordering.php",
+      "bytes": 1834,
+      "sha256": "299cddd4f47851b9f926bf47474393ca6e9c6d66315274aecd18d04386d8076f"
+    },
+    {
+      "path": "experiments/sh01/lab.php",
+      "bytes": 5564,
+      "sha256": "e3cd9ed8753b2abae520d46568582460fa2078bc7411d1f93b33e8c4f44abefe"
+    },
+    {
+      "path": "experiments/sh01/lost-ack.php",
+      "bytes": 2194,
+      "sha256": "7f13f370e9b25d35355a571960e681679ce8988b244f3f51e007f9d227630496"
+    },
+    {
+      "path": "experiments/sh01/lost-ack.py",
+      "bytes": 4510,
+      "sha256": "7e2e31c3312276b6b75840b77e4d4f690836e680fdda0fabe40690f70f922348"
+    },
+    {
+      "path": "experiments/sh01/owner-provision.py",
+      "bytes": 4272,
+      "sha256": "165c6406b5a4993d07dfd69bcd1998b0f937b9a202b7108e667ffeaea88a8c95"
+    },
+    {
+      "path": "experiments/sh01/reconcile-diagnostics.py",
+      "bytes": 1750,
+      "sha256": "cb9129ea67e5a9e17a0af4b0c18bf40d5c5b74ae3223b1d94419e41351bb6dd0"
+    },
+    {
+      "path": "experiments/sh01/reference-read.py",
+      "bytes": 1170,
+      "sha256": "897503b20ccbae3ff057ee1600ae0010f5b385f3b07655d4b3cb8155cdd3ffa2"
+    },
+    {
+      "path": "experiments/sh01/rollback-to.php",
+      "bytes": 1441,
+      "sha256": "5b6387e154d00ebbb31268f370774a89dfe69a8bda3e66d93b25a6aea1845827"
+    },
+    {
+      "path": "experiments/sh01/run.php",
+      "bytes": 13699,
+      "sha256": "cae2d025a38f7d525069603c611c37056afedb2124953bec7968656c964ee7a7"
+    },
+    {
+      "path": "experiments/sh01/session-diagnostics.php",
+      "bytes": 2515,
+      "sha256": "c833297167a4bbd066de23f912936e9d03f2fc333d8106712cc1305a75dde583"
+    },
+    {
+      "path": "experiments/sh01/source-audit.py",
+      "bytes": 3108,
+      "sha256": "62303842abfc6a2e54755acf341dd8a48cc6aad7de6619c7a927f454969facfb"
+    },
+    {
+      "path": "experiments/sh01/verify-evidence.py",
+      "bytes": 6058,
+      "sha256": "04cecc62b269e622722796ab22fccba6b928bd5a44726d37c9ab369e238083e4"
+    }
+  ],
+  "scope": "Study/source + sanitized artificial evidence; not release package or independent security approval"
+}

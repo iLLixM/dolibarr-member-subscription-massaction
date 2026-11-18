@@ -1,0 +1,172 @@
+{
+  "id": "POC-10-wire-ROLLBACK",
+  "measurement": "PASS",
+  "precondition": "Dedicated restricted lab connection through one-shot loopback response-loss proxy",
+  "action": "Forward exactly one ROLLBACK; proxy consumes its server OK then closes only this connection",
+  "expected": "Native client connection error; UNKNOWN/STOP; no follow-up DML/rollback",
+  "actual": {
+    "client_errno": 2006,
+    "observer_result": "UNKNOWN/STOP",
+    "guarded_write_blocked": true,
+    "extra_observer_sql": 0,
+    "independent_n": 0,
+    "fixture_id": 191
+  },
+  "security_contract": "Real reply loss; independent lab postcondition does not redeem missing acknowledgement in production",
+  "trace": [
+    {
+      "case": "POC-10-wire-ROLLBACK",
+      "handle": "connection-1",
+      "actor": "harness",
+      "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+      "result": [
+        {
+          "db": "msmsh01lab",
+          "account": "msmsh01lab@%",
+          "version": "8.4.13"
+        }
+      ]
+    },
+    {
+      "case": "POC-10-wire-ROLLBACK",
+      "handle": "connection-1",
+      "actor": "harness",
+      "sql": "INSERT INTO probe VALUES (191,'SH01-191',0)",
+      "result": {
+        "ack": true,
+        "affected_rows": 1
+      }
+    },
+    {
+      "case": "POC-10-wire-ROLLBACK",
+      "handle": "connection-2",
+      "actor": "harness",
+      "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+      "result": [
+        {
+          "db": "msmsh01lab",
+          "account": "msmsh01lab@%",
+          "version": "8.4.13"
+        }
+      ]
+    },
+    {
+      "case": "POC-10-wire-ROLLBACK",
+      "handle": "connection-2",
+      "actor": "hypothesis",
+      "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+      "result": [
+        {
+          "cid": "76",
+          "ac": "1",
+          "session_isolation": "REPEATABLE-READ"
+        }
+      ]
+    },
+    {
+      "case": "POC-10-wire-ROLLBACK",
+      "handle": "connection-2",
+      "actor": "hypothesis",
+      "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+      "result": {
+        "ack": true,
+        "affected_rows": 0
+      }
+    },
+    {
+      "case": "POC-10-wire-ROLLBACK",
+      "handle": "connection-2",
+      "actor": "harness",
+      "sql": "BEGIN",
+      "result": {
+        "ack": true,
+        "affected_rows": 0
+      }
+    },
+    {
+      "case": "POC-10-wire-ROLLBACK",
+      "handle": "connection-2",
+      "actor": "hypothesis",
+      "sql": "SAVEPOINT sh01_REDACTED_MARKER_055",
+      "result": {
+        "ack": true,
+        "affected_rows": 0
+      }
+    },
+    {
+      "case": "POC-10-wire-ROLLBACK",
+      "handle": "connection-2",
+      "actor": "hypothesis",
+      "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_055",
+      "result": {
+        "ack": true,
+        "affected_rows": 0
+      }
+    },
+    {
+      "case": "POC-10-wire-ROLLBACK",
+      "handle": "connection-2",
+      "actor": "hypothesis",
+      "sql": "SAVEPOINT sh01_REDACTED_MARKER_056",
+      "result": {
+        "ack": true,
+        "affected_rows": 0
+      }
+    },
+    {
+      "case": "POC-10-wire-ROLLBACK",
+      "handle": "connection-2",
+      "actor": "harness",
+      "sql": "UPDATE probe SET n=1 WHERE id=191",
+      "result": {
+        "ack": true,
+        "affected_rows": 1
+      }
+    },
+    {
+      "case": "POC-10-wire-ROLLBACK",
+      "handle": "connection-2",
+      "actor": "hypothesis",
+      "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_056",
+      "result": {
+        "ack": true,
+        "affected_rows": 0
+      }
+    },
+    {
+      "case": "POC-10-wire-ROLLBACK",
+      "handle": "connection-2",
+      "actor": "hypothesis",
+      "sql": "SAVEPOINT sh01_REDACTED_MARKER_057",
+      "result": {
+        "ack": true,
+        "affected_rows": 0
+      }
+    },
+    {
+      "case": "POC-10-wire-ROLLBACK",
+      "handle": "connection-2",
+      "actor": "harness",
+      "sql": "ROLLBACK",
+      "error_class": "mysqli_sql_exception",
+      "errno": 2006
+    },
+    {
+      "case": "POC-10-wire-ROLLBACK",
+      "handle": "connection-1",
+      "actor": "independent-reader",
+      "sql": "SELECT n FROM probe WHERE id=191",
+      "result": [
+        {
+          "n": "0"
+        }
+      ]
+    }
+  ],
+  "proxy": {
+    "forwarded_target": 1,
+    "server_ok_discarded": 1,
+    "raw_packets_logged": 0,
+    "scope": "one dedicated loopback client; no KILL or server restart"
+  }
+}

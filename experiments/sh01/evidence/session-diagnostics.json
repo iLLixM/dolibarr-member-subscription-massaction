@@ -1,0 +1,143 @@
+{
+    "status": "STOP",
+    "failure": {
+        "class": "LogicException",
+        "errno": 0,
+        "assertion": "Diagnostics profile unexpected"
+    },
+    "trace": [
+        {
+            "case": "SESSION-DIAGNOSTICS",
+            "handle": "connection-1",
+            "actor": "harness",
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+            "result": [
+                {
+                    "db": "msmsh01lab",
+                    "account": "msmsh01lab@%",
+                    "version": "8.4.13"
+                }
+            ]
+        },
+        {
+            "case": "SESSION-DIAGNOSTICS",
+            "handle": "connection-1",
+            "actor": "harness",
+            "sql": "SET SESSION session_track_transaction_info='CHARACTERISTICS'",
+            "result": {
+                "ack": true,
+                "affected_rows": 0
+            }
+        },
+        {
+            "case": "SESSION-DIAGNOSTICS",
+            "handle": "connection-1",
+            "actor": "harness",
+            "sql": "SELECT @@session.session_track_transaction_info AS tracking",
+            "result": [
+                {
+                    "tracking": "CHARACTERISTICS"
+                }
+            ]
+        },
+        {
+            "case": "SESSION-DIAGNOSTICS",
+            "handle": "connection-1",
+            "actor": "harness",
+            "sql": "SHOW SESSION STATUS LIKE 'Com_commit'",
+            "result": [
+                {
+                    "Variable_name": "Com_commit",
+                    "Value": "0"
+                }
+            ]
+        },
+        {
+            "case": "SESSION-DIAGNOSTICS",
+            "handle": "connection-1",
+            "actor": "harness",
+            "sql": "COMMIT",
+            "result": {
+                "ack": true,
+                "affected_rows": 0
+            }
+        },
+        {
+            "case": "SESSION-DIAGNOSTICS",
+            "handle": "connection-1",
+            "actor": "harness",
+            "sql": "SHOW SESSION STATUS LIKE 'Com_commit'",
+            "result": [
+                {
+                    "Variable_name": "Com_commit",
+                    "Value": "1"
+                }
+            ]
+        },
+        {
+            "case": "SESSION-DIAGNOSTICS",
+            "handle": "connection-1",
+            "actor": "harness",
+            "sql": "BEGIN",
+            "result": {
+                "ack": true,
+                "affected_rows": 0
+            }
+        },
+        {
+            "case": "SESSION-DIAGNOSTICS",
+            "handle": "connection-1",
+            "actor": "harness",
+            "sql": "COMMIT",
+            "result": {
+                "ack": true,
+                "affected_rows": 0
+            }
+        },
+        {
+            "case": "SESSION-DIAGNOSTICS",
+            "handle": "connection-1",
+            "actor": "harness",
+            "sql": "SHOW SESSION STATUS LIKE 'Com_commit'",
+            "result": [
+                {
+                    "Variable_name": "Com_commit",
+                    "Value": "2"
+                }
+            ]
+        },
+        {
+            "case": "SESSION-DIAGNOSTICS",
+            "handle": "connection-1",
+            "actor": "harness",
+            "sql": "SAVEPOINT sh01_outside",
+            "result": {
+                "ack": true,
+                "affected_rows": 0
+            }
+        },
+        {
+            "case": "SESSION-DIAGNOSTICS",
+            "handle": "connection-1",
+            "actor": "harness",
+            "sql": "RELEASE SAVEPOINT sh01_outside",
+            "error_class": "mysqli_sql_exception",
+            "errno": 1305
+        },
+        {
+            "case": "SESSION-DIAGNOSTICS",
+            "handle": "connection-1",
+            "actor": "harness",
+            "sql": "SELECT trx_id FROM information_schema.innodb_trx WHERE trx_mysql_thread_id=CONNECTION_ID()",
+            "error_class": "mysqli_sql_exception",
+            "errno": 1227
+        },
+        {
+            "case": "SESSION-DIAGNOSTICS",
+            "handle": "connection-1",
+            "actor": "harness",
+            "sql": "SELECT VARIABLE_VALUE FROM performance_schema.session_status WHERE VARIABLE_NAME='Com_commit'",
+            "result": []
+        }
+    ]
+}

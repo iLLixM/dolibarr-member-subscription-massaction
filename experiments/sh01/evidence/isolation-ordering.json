@@ -1,0 +1,359 @@
+{
+    "tests": [
+        {
+            "id": "POC-07-prefix-engine-metadata",
+            "measurement": "PASS (observation, not safety acceptance)",
+            "fixture": 192,
+            "session_default": "READ-COMMITTED",
+            "first": 0,
+            "second": 1,
+            "repeatable_read_behavior": false,
+            "prefix": "engine-metadata",
+            "scope": "SQL-shape Core prefix model, not a bootstrapped Dolibarr integration"
+        },
+        {
+            "id": "POC-07-prefix-ordinary-InnoDB-read",
+            "measurement": "PASS (observation, not safety acceptance)",
+            "fixture": 193,
+            "session_default": "READ-COMMITTED",
+            "first": 0,
+            "second": 1,
+            "repeatable_read_behavior": false,
+            "prefix": "ordinary-InnoDB-read",
+            "scope": "SQL-shape Core prefix model, not a bootstrapped Dolibarr integration"
+        }
+    ],
+    "failure": null,
+    "trace": [
+        {
+            "case": "POC-07-prefix-engine-metadata",
+            "handle": "connection-1",
+            "actor": "harness",
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+            "result": [
+                {
+                    "db": "msmsh01lab",
+                    "account": "msmsh01lab@%",
+                    "version": "8.4.13"
+                }
+            ]
+        },
+        {
+            "case": "POC-07-prefix-engine-metadata",
+            "handle": "connection-1",
+            "actor": "harness",
+            "sql": "INSERT INTO probe VALUES (192,'SH01-192',0)",
+            "result": {
+                "ack": true,
+                "affected_rows": 1
+            }
+        },
+        {
+            "case": "POC-07-prefix-engine-metadata",
+            "handle": "connection-2",
+            "actor": "harness",
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+            "result": [
+                {
+                    "db": "msmsh01lab",
+                    "account": "msmsh01lab@%",
+                    "version": "8.4.13"
+                }
+            ]
+        },
+        {
+            "case": "POC-07-prefix-engine-metadata",
+            "handle": "connection-2",
+            "actor": "harness",
+            "sql": "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED",
+            "result": {
+                "ack": true,
+                "affected_rows": 0
+            }
+        },
+        {
+            "case": "POC-07-prefix-engine-metadata",
+            "handle": "connection-2",
+            "actor": "hypothesis",
+            "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+            "result": [
+                {
+                    "cid": "78",
+                    "ac": "1",
+                    "session_isolation": "READ-COMMITTED"
+                }
+            ]
+        },
+        {
+            "case": "POC-07-prefix-engine-metadata",
+            "handle": "connection-2",
+            "actor": "hypothesis",
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "result": {
+                "ack": true,
+                "affected_rows": 0
+            }
+        },
+        {
+            "case": "POC-07-prefix-engine-metadata",
+            "handle": "connection-2",
+            "actor": "core-prefix-model",
+            "sql": "SELECT ENGINE AS engine FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "result": [
+                {
+                    "engine": "InnoDB"
+                }
+            ]
+        },
+        {
+            "case": "POC-07-prefix-engine-metadata",
+            "handle": "connection-2",
+            "actor": "harness",
+            "sql": "BEGIN",
+            "result": {
+                "ack": true,
+                "affected_rows": 0
+            }
+        },
+        {
+            "case": "POC-07-prefix-engine-metadata",
+            "handle": "connection-2",
+            "actor": "hypothesis",
+            "sql": "SAVEPOINT sh01_REDACTED_MARKER_058",
+            "result": {
+                "ack": true,
+                "affected_rows": 0
+            }
+        },
+        {
+            "case": "POC-07-prefix-engine-metadata",
+            "handle": "connection-2",
+            "actor": "hypothesis",
+            "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_058",
+            "result": {
+                "ack": true,
+                "affected_rows": 0
+            }
+        },
+        {
+            "case": "POC-07-prefix-engine-metadata",
+            "handle": "connection-2",
+            "actor": "hypothesis",
+            "sql": "SAVEPOINT sh01_REDACTED_MARKER_059",
+            "result": {
+                "ack": true,
+                "affected_rows": 0
+            }
+        },
+        {
+            "case": "POC-07-prefix-engine-metadata",
+            "handle": "connection-2",
+            "actor": "independent-reader",
+            "sql": "SELECT n FROM probe WHERE id=192",
+            "result": [
+                {
+                    "n": "0"
+                }
+            ]
+        },
+        {
+            "case": "POC-07-prefix-engine-metadata",
+            "handle": "connection-1",
+            "actor": "independent-writer",
+            "sql": "UPDATE probe SET n=1 WHERE id=192",
+            "result": {
+                "ack": true,
+                "affected_rows": 1
+            }
+        },
+        {
+            "case": "POC-07-prefix-engine-metadata",
+            "handle": "connection-2",
+            "actor": "independent-reader",
+            "sql": "SELECT n FROM probe WHERE id=192",
+            "result": [
+                {
+                    "n": "1"
+                }
+            ]
+        },
+        {
+            "case": "POC-07-prefix-engine-metadata",
+            "handle": "connection-2",
+            "actor": "hypothesis",
+            "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+            "result": [
+                {
+                    "cid": "78",
+                    "ac": "1",
+                    "session_isolation": "READ-COMMITTED"
+                }
+            ]
+        },
+        {
+            "case": "POC-07-prefix-ordinary-InnoDB-read",
+            "handle": "connection-3",
+            "actor": "harness",
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+            "result": [
+                {
+                    "db": "msmsh01lab",
+                    "account": "msmsh01lab@%",
+                    "version": "8.4.13"
+                }
+            ]
+        },
+        {
+            "case": "POC-07-prefix-ordinary-InnoDB-read",
+            "handle": "connection-3",
+            "actor": "harness",
+            "sql": "INSERT INTO probe VALUES (193,'SH01-193',0)",
+            "result": {
+                "ack": true,
+                "affected_rows": 1
+            }
+        },
+        {
+            "case": "POC-07-prefix-ordinary-InnoDB-read",
+            "handle": "connection-4",
+            "actor": "harness",
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+            "result": [
+                {
+                    "db": "msmsh01lab",
+                    "account": "msmsh01lab@%",
+                    "version": "8.4.13"
+                }
+            ]
+        },
+        {
+            "case": "POC-07-prefix-ordinary-InnoDB-read",
+            "handle": "connection-4",
+            "actor": "harness",
+            "sql": "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED",
+            "result": {
+                "ack": true,
+                "affected_rows": 0
+            }
+        },
+        {
+            "case": "POC-07-prefix-ordinary-InnoDB-read",
+            "handle": "connection-4",
+            "actor": "hypothesis",
+            "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+            "result": [
+                {
+                    "cid": "80",
+                    "ac": "1",
+                    "session_isolation": "READ-COMMITTED"
+                }
+            ]
+        },
+        {
+            "case": "POC-07-prefix-ordinary-InnoDB-read",
+            "handle": "connection-4",
+            "actor": "hypothesis",
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "result": {
+                "ack": true,
+                "affected_rows": 0
+            }
+        },
+        {
+            "case": "POC-07-prefix-ordinary-InnoDB-read",
+            "handle": "connection-4",
+            "actor": "core-prefix-control",
+            "sql": "SELECT n FROM probe WHERE id=193",
+            "result": [
+                {
+                    "n": "0"
+                }
+            ]
+        },
+        {
+            "case": "POC-07-prefix-ordinary-InnoDB-read",
+            "handle": "connection-4",
+            "actor": "harness",
+            "sql": "BEGIN",
+            "result": {
+                "ack": true,
+                "affected_rows": 0
+            }
+        },
+        {
+            "case": "POC-07-prefix-ordinary-InnoDB-read",
+            "handle": "connection-4",
+            "actor": "hypothesis",
+            "sql": "SAVEPOINT sh01_REDACTED_MARKER_060",
+            "result": {
+                "ack": true,
+                "affected_rows": 0
+            }
+        },
+        {
+            "case": "POC-07-prefix-ordinary-InnoDB-read",
+            "handle": "connection-4",
+            "actor": "hypothesis",
+            "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_060",
+            "result": {
+                "ack": true,
+                "affected_rows": 0
+            }
+        },
+        {
+            "case": "POC-07-prefix-ordinary-InnoDB-read",
+            "handle": "connection-4",
+            "actor": "hypothesis",
+            "sql": "SAVEPOINT sh01_REDACTED_MARKER_061",
+            "result": {
+                "ack": true,
+                "affected_rows": 0
+            }
+        },
+        {
+            "case": "POC-07-prefix-ordinary-InnoDB-read",
+            "handle": "connection-4",
+            "actor": "independent-reader",
+            "sql": "SELECT n FROM probe WHERE id=193",
+            "result": [
+                {
+                    "n": "0"
+                }
+            ]
+        },
+        {
+            "case": "POC-07-prefix-ordinary-InnoDB-read",
+            "handle": "connection-3",
+            "actor": "independent-writer",
+            "sql": "UPDATE probe SET n=1 WHERE id=193",
+            "result": {
+                "ack": true,
+                "affected_rows": 1
+            }
+        },
+        {
+            "case": "POC-07-prefix-ordinary-InnoDB-read",
+            "handle": "connection-4",
+            "actor": "independent-reader",
+            "sql": "SELECT n FROM probe WHERE id=193",
+            "result": [
+                {
+                    "n": "1"
+                }
+            ]
+        },
+        {
+            "case": "POC-07-prefix-ordinary-InnoDB-read",
+            "handle": "connection-4",
+            "actor": "hypothesis",
+            "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+            "result": [
+                {
+                    "cid": "80",
+                    "ac": "1",
+                    "session_isolation": "READ-COMMITTED"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,15 @@
+{
+  "configured_url": "http://i105-v24.localhost:8091/",
+  "authenticated": false,
+  "business_requests": 0,
+  "database_before_after_audit": "NOT EXECUTED",
+  "configured_name": {
+    "error_class": "URLError",
+    "reason_class": "gaierror"
+  },
+  "loopback_with_host": {
+    "status": 200,
+    "Dolibarr_marker": true,
+    "version_24_0_3_marker": true
+  }
+}

@@ -1,0 +1,133 @@
+{
+    "id": "POC-06-rollback-to",
+    "measurement": "PASS",
+    "expected": "ROLLBACK TO preserves marker usability but undoes work since it",
+    "actual": {
+        "before": 1,
+        "after": 0,
+        "independent_final": 0,
+        "fixture": 194
+    },
+    "security_contract": "Not an acceptable non-destructive observer after business DML",
+    "trace": [
+        {
+            "case": "POC-06-rollback-to",
+            "handle": "connection-1",
+            "actor": "harness",
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+            "result": [
+                {
+                    "db": "msmsh01lab",
+                    "account": "msmsh01lab@%",
+                    "version": "8.4.13"
+                }
+            ]
+        },
+        {
+            "case": "POC-06-rollback-to",
+            "handle": "connection-1",
+            "actor": "harness",
+            "sql": "INSERT INTO probe VALUES (194,'SH01-194',0)",
+            "result": {
+                "ack": true,
+                "affected_rows": 1
+            }
+        },
+        {
+            "case": "POC-06-rollback-to",
+            "handle": "connection-2",
+            "actor": "harness",
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+            "result": [
+                {
+                    "db": "msmsh01lab",
+                    "account": "msmsh01lab@%",
+                    "version": "8.4.13"
+                }
+            ]
+        },
+        {
+            "case": "POC-06-rollback-to",
+            "handle": "connection-2",
+            "actor": "harness",
+            "sql": "BEGIN",
+            "result": {
+                "ack": true,
+                "affected_rows": 0
+            }
+        },
+        {
+            "case": "POC-06-rollback-to",
+            "handle": "connection-2",
+            "actor": "harness",
+            "sql": "SAVEPOINT sh01_start",
+            "result": {
+                "ack": true,
+                "affected_rows": 0
+            }
+        },
+        {
+            "case": "POC-06-rollback-to",
+            "handle": "connection-2",
+            "actor": "harness",
+            "sql": "UPDATE probe SET n=1 WHERE id=194",
+            "result": {
+                "ack": true,
+                "affected_rows": 1
+            }
+        },
+        {
+            "case": "POC-06-rollback-to",
+            "handle": "connection-2",
+            "actor": "independent-reader",
+            "sql": "SELECT n FROM probe WHERE id=194",
+            "result": [
+                {
+                    "n": "1"
+                }
+            ]
+        },
+        {
+            "case": "POC-06-rollback-to",
+            "handle": "connection-2",
+            "actor": "hypothesis-alternative",
+            "sql": "ROLLBACK TO SAVEPOINT sh01_start",
+            "result": {
+                "ack": true,
+                "affected_rows": 0
+            }
+        },
+        {
+            "case": "POC-06-rollback-to",
+            "handle": "connection-2",
+            "actor": "independent-reader",
+            "sql": "SELECT n FROM probe WHERE id=194",
+            "result": [
+                {
+                    "n": "0"
+                }
+            ]
+        },
+        {
+            "case": "POC-06-rollback-to",
+            "handle": "connection-2",
+            "actor": "harness",
+            "sql": "COMMIT",
+            "result": {
+                "ack": true,
+                "affected_rows": 0
+            }
+        },
+        {
+            "case": "POC-06-rollback-to",
+            "handle": "connection-1",
+            "actor": "independent-reader",
+            "sql": "SELECT n FROM probe WHERE id=194",
+            "result": [
+                {
+                    "n": "0"
+                }
+            ]
+        }
+    ]
+}

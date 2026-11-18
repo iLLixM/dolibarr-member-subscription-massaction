@@ -1,0 +1,86 @@
+{
+  "sources": [
+    {
+      "file": "native.json",
+      "raw_sha256": "fde140639dc6e63b0bff01ea33433ee0d6056f3d1687946112f923b7952f234c",
+      "review_sha256": "fd5c61a7ff1c1ed4f5463c55ef2afb7f48e6cb5d82f1b101c5aa3b2b48f1eb2a",
+      "transform": "Experimental savepoint nonce identifiers normalized; all other fields preserved"
+    },
+    {
+      "file": "lost-ack-COMMIT.json",
+      "raw_sha256": "e708df20c5c6a10b15b0910f155983f8b07cc23d44116bcf07cd107a7847d88d",
+      "review_sha256": "b4065ed77edfbb3de1959e0addfd943722c2d7cae326b9472697fba3c62d060e",
+      "transform": "Experimental savepoint nonce identifiers normalized; all other fields preserved"
+    },
+    {
+      "file": "lost-ack-ROLLBACK.json",
+      "raw_sha256": "ea8b22a8109762fbb4240ba916ce4adf9de1c80e962cb728358c352ef2a8014e",
+      "review_sha256": "f8ffa12dd1bed3da3dbe94c9a2e1e26388e7166ad50103f3bc11c5744f938579",
+      "transform": "Experimental savepoint nonce identifiers normalized; all other fields preserved"
+    },
+    {
+      "file": "isolation-ordering.json",
+      "raw_sha256": "0ca464d8f4ef477c0d299a8f61ebcf581407fccb35de99d8484611b95c3938c1",
+      "review_sha256": "0f6d96ef97b6976a68ffec6181cd1950be817c5ba02134f0d9ec198551417c9c",
+      "transform": "Experimental savepoint nonce identifiers normalized; all other fields preserved"
+    },
+    {
+      "file": "rollback-to.json",
+      "raw_sha256": "53b3fb146dcbed09db2cf57e215e5cafb5493481e93a53b618d20cdb7da881a9",
+      "review_sha256": "53b3fb146dcbed09db2cf57e215e5cafb5493481e93a53b618d20cdb7da881a9",
+      "transform": "byte-identical"
+    },
+    {
+      "file": "session-diagnostics.json",
+      "raw_sha256": "09227cc03c9840d8c19be8bf93e7a04a7b5dd8b79d41b757a4c2ddd46f1eda1d",
+      "review_sha256": "09227cc03c9840d8c19be8bf93e7a04a7b5dd8b79d41b757a4c2ddd46f1eda1d",
+      "transform": "byte-identical"
+    },
+    {
+      "file": "session-diagnostics-reconciled.json",
+      "raw_sha256": "7b691b4fbe51034786956a772f09af7528bc6ec263e04f3d9039e217cc793cb5",
+      "review_sha256": "7b691b4fbe51034786956a772f09af7528bc6ec263e04f3d9039e217cc793cb5",
+      "transform": "byte-identical"
+    },
+    {
+      "file": "source-audit.json",
+      "raw_sha256": "cb1cfb250a3452a586810c020cda0683bc29e13456d19697dce4bfb2b0c7d582",
+      "review_sha256": "cb1cfb250a3452a586810c020cda0683bc29e13456d19697dce4bfb2b0c7d582",
+      "transform": "byte-identical"
+    },
+    {
+      "file": "inspect-final.json",
+      "raw_sha256": "18351d47774f2583b775a81590486a8933fbf70a3633797ef892077a26cdd967",
+      "review_sha256": "18351d47774f2583b775a81590486a8933fbf70a3633797ef892077a26cdd967",
+      "transform": "byte-identical"
+    },
+    {
+      "file": "reference.json",
+      "raw_sha256": "01cb826944218d2fd6c60c7f7fa073da523119d04659958d4addbd33ae5a90ed",
+      "review_sha256": "01cb826944218d2fd6c60c7f7fa073da523119d04659958d4addbd33ae5a90ed",
+      "transform": "byte-identical"
+    },
+    {
+      "file": "final-lab-read.json",
+      "raw_sha256": "ee260b7521f0dd2a005a3b6e18306d79e65b734e0f31605de0708298874ed6a1",
+      "review_sha256": "ee260b7521f0dd2a005a3b6e18306d79e65b734e0f31605de0708298874ed6a1",
+      "transform": "byte-identical"
+    },
+    {
+      "file": "existing-database-synthetic.log",
+      "raw_sha256": "0995f765fd6b5527ece216d792fd0f3b0d06dba86766d45c5e7b7704b410b4b7",
+      "review_sha256": "0995f765fd6b5527ece216d792fd0f3b0d06dba86766d45c5e7b7704b410b4b7",
+      "transform": "byte-identical"
+    },
+    {
+      "file": "owner-provision-result.json",
+      "raw_sha256": "97f82d6c4676dbda626ed9ca04a1b4f9ad5a760570640778588ba05ff3f10089",
+      "review_sha256": "97f82d6c4676dbda626ed9ca04a1b4f9ad5a760570640778588ba05ff3f10089",
+      "transform": "byte-identical Owner-executed provisioning report; not an independent global DB audit"
+    }
+  ],
+  "raw_directory": "build-output/sh01-evidence (local, ignored)",
+  "credential_exports": 0,
+  "session_or_auth_packet_exports": 0,
+  "marker_identifiers_redacted": 61
+}

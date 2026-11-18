@@ -1,0 +1,17 @@
+{
+  "status": "RECONCILED MEASUREMENT",
+  "source_sha256": "09227cc03c9840d8c19be8bf93e7a04a7b5dd8b79d41b757a4c2ddd46f1eda1d",
+  "original_STOP_preserved": true,
+  "sql_reexecution": false,
+  "mistake": "Original helper incorrectly required errno1142 for P_S session_status; actual query succeeded with no matching rows.",
+  "actual": {
+    "session_tracking_setting": "CHARACTERISTICS",
+    "idle_commit_counter_increment": 1,
+    "active_commit_counter_increment": 1,
+    "outside_savepoint_create_ack": true,
+    "outside_release_errno": 1305,
+    "innodb_trx_errno": 1227,
+    "ps_session_status_rows": []
+  },
+  "scope": "This does not grant access to events_transactions_current; its denial1142 was separately verified. No physical transaction identity or isolation obtained."
+}

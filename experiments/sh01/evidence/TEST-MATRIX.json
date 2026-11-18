@@ -1,0 +1,4488 @@
+{
+  "decision": "NO-GO for SH-02 based on the tested construction under unchanged safety contracts; no universal impossibility theorem",
+  "native_measurements": 28,
+  "mandatory_groups": 11,
+  "actual_Core_business_integration": "NOT EXECUTED",
+  "synthetic_regression": "188 existing observer assertions PASS; counter nesting explicitly modeled",
+  "diagnostics": "Original expectation STOP retained, reconciled from recorded trace without SQL rerun",
+  "cases": [
+    {
+      "id": "POC-01",
+      "precondition": "Restricted MySQL8.4.13 / isolated msmsh01lab / fresh dedicated connection",
+      "actions": [
+        {
+          "case": "POC-01",
+          "handle": "connection-2",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-01",
+          "handle": "connection-2",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "27",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-01",
+          "handle": "connection-2",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-01",
+          "handle": "connection-2",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "27",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        }
+      ],
+      "expected": "One-shot SET succeeds only before an active explicit transaction in this profile",
+      "actual": {
+        "prepare": true,
+        "meta": {
+          "cid": "27",
+          "ac": "1",
+          "session_isolation": "REPEATABLE-READ"
+        }
+      },
+      "measurement": "PASS",
+      "security_assessment": "Conditional idle admission primitive; not a completed-transaction identity proof",
+      "evidence": "native.json"
+    },
+    {
+      "id": "POC-02",
+      "precondition": "Restricted MySQL8.4.13 / isolated msmsh01lab / fresh dedicated connection",
+      "actions": [
+        {
+          "case": "POC-02",
+          "handle": "connection-3",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-02",
+          "handle": "connection-3",
+          "actor": "harness",
+          "sql": "INSERT INTO probe VALUES (102,'SH01-102',0)",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-02",
+          "handle": "connection-4",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-02",
+          "handle": "connection-4",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "29",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-02",
+          "handle": "connection-4",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-02",
+          "handle": "connection-4",
+          "actor": "harness",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-02",
+          "handle": "connection-4",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_001",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-02",
+          "handle": "connection-4",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_001",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-02",
+          "handle": "connection-4",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_002",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-02",
+          "handle": "connection-4",
+          "actor": "harness",
+          "sql": "UPDATE probe SET n=1 WHERE id=102",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-02",
+          "handle": "connection-3",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=102",
+          "result": [
+            {
+              "n": "0"
+            }
+          ]
+        },
+        {
+          "case": "POC-02",
+          "handle": "connection-4",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_002",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-02",
+          "handle": "connection-4",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_003",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-02",
+          "handle": "connection-4",
+          "actor": "harness",
+          "sql": "ROLLBACK",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-02",
+          "handle": "connection-3",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=102",
+          "result": [
+            {
+              "n": "0"
+            }
+          ]
+        }
+      ],
+      "expected": "Marker validity and independent visibility across own BEGIN/DML/ROLLBACK",
+      "actual": {
+        "checkpoint_accepted": true,
+        "reader_before": 0,
+        "reader_after_rollback": 0
+      },
+      "measurement": "PASS",
+      "security_assessment": "Actual SQL transaction exercised; marker acceptance is not unique physical transaction identity",
+      "evidence": "native.json"
+    },
+    {
+      "id": "POC-03-explicit",
+      "precondition": "Restricted MySQL8.4.13 / isolated msmsh01lab / fresh dedicated connection",
+      "actions": [
+        {
+          "case": "POC-03-explicit",
+          "handle": "connection-5",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-03-explicit",
+          "handle": "connection-5",
+          "actor": "fault",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-03-explicit",
+          "handle": "connection-5",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "30",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-03-explicit",
+          "handle": "connection-5",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "error_class": "mysqli_sql_exception",
+          "errno": 1568
+        }
+      ],
+      "expected": "Refuse already-active/counter-hidden or implicit-transaction mode",
+      "actual": {
+        "accepted": false,
+        "reason": "prepare errno 1568"
+      },
+      "measurement": "PASS",
+      "security_assessment": "Refused before guarded DML; no observer rollback of foreign context",
+      "evidence": "native.json"
+    },
+    {
+      "id": "POC-03-autocommit-off",
+      "precondition": "Restricted MySQL8.4.13 / isolated msmsh01lab / fresh dedicated connection",
+      "actions": [
+        {
+          "case": "POC-03-autocommit-off",
+          "handle": "connection-6",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-03-autocommit-off",
+          "handle": "connection-6",
+          "actor": "fault",
+          "sql": "SET autocommit=0",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-03-autocommit-off",
+          "handle": "connection-6",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "31",
+              "ac": "0",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        }
+      ],
+      "expected": "Refuse already-active/counter-hidden or implicit-transaction mode",
+      "actual": {
+        "accepted": false,
+        "reason": "identity/autocommit"
+      },
+      "measurement": "PASS",
+      "security_assessment": "Refused before guarded DML; no observer rollback of foreign context",
+      "evidence": "native.json"
+    },
+    {
+      "id": "POC-04-COMMIT",
+      "precondition": "Restricted MySQL8.4.13 / isolated msmsh01lab / fresh dedicated connection",
+      "actions": [
+        {
+          "case": "POC-04-COMMIT",
+          "handle": "connection-7",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-04-COMMIT",
+          "handle": "connection-7",
+          "actor": "harness",
+          "sql": "INSERT INTO probe VALUES (110,'SH01-110',0)",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-04-COMMIT",
+          "handle": "connection-8",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-04-COMMIT",
+          "handle": "connection-8",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "33",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-04-COMMIT",
+          "handle": "connection-8",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-04-COMMIT",
+          "handle": "connection-8",
+          "actor": "harness",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-04-COMMIT",
+          "handle": "connection-8",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_004",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-04-COMMIT",
+          "handle": "connection-8",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_004",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-04-COMMIT",
+          "handle": "connection-8",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_005",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-04-COMMIT",
+          "handle": "connection-8",
+          "actor": "harness",
+          "sql": "UPDATE probe SET n=1 WHERE id=110",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-04-COMMIT",
+          "handle": "connection-8",
+          "actor": "fault",
+          "sql": "COMMIT",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-04-COMMIT",
+          "handle": "connection-8",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_005",
+          "error_class": "mysqli_sql_exception",
+          "errno": 1305
+        },
+        {
+          "case": "POC-04-COMMIT",
+          "handle": "connection-7",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=110",
+          "result": [
+            {
+              "n": "1"
+            }
+          ]
+        }
+      ],
+      "expected": "Unexpected completion removes retained marker",
+      "actual": {
+        "accepted": false,
+        "reason": "checkpoint errno 1305",
+        "independent_n": 1
+      },
+      "measurement": "PASS",
+      "security_assessment": "Missing marker detects these changes at next checkpoint",
+      "evidence": "native.json"
+    },
+    {
+      "id": "POC-04-ROLLBACK",
+      "precondition": "Restricted MySQL8.4.13 / isolated msmsh01lab / fresh dedicated connection",
+      "actions": [
+        {
+          "case": "POC-04-ROLLBACK",
+          "handle": "connection-9",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-04-ROLLBACK",
+          "handle": "connection-9",
+          "actor": "harness",
+          "sql": "INSERT INTO probe VALUES (111,'SH01-111',0)",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-04-ROLLBACK",
+          "handle": "connection-10",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-04-ROLLBACK",
+          "handle": "connection-10",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "35",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-04-ROLLBACK",
+          "handle": "connection-10",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-04-ROLLBACK",
+          "handle": "connection-10",
+          "actor": "harness",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-04-ROLLBACK",
+          "handle": "connection-10",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_006",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-04-ROLLBACK",
+          "handle": "connection-10",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_006",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-04-ROLLBACK",
+          "handle": "connection-10",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_007",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-04-ROLLBACK",
+          "handle": "connection-10",
+          "actor": "harness",
+          "sql": "UPDATE probe SET n=1 WHERE id=111",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-04-ROLLBACK",
+          "handle": "connection-10",
+          "actor": "fault",
+          "sql": "ROLLBACK",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-04-ROLLBACK",
+          "handle": "connection-10",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_007",
+          "error_class": "mysqli_sql_exception",
+          "errno": 1305
+        },
+        {
+          "case": "POC-04-ROLLBACK",
+          "handle": "connection-9",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=111",
+          "result": [
+            {
+              "n": "0"
+            }
+          ]
+        }
+      ],
+      "expected": "Unexpected completion removes retained marker",
+      "actual": {
+        "accepted": false,
+        "reason": "checkpoint errno 1305",
+        "independent_n": 0
+      },
+      "measurement": "PASS",
+      "security_assessment": "Missing marker detects these changes at next checkpoint",
+      "evidence": "native.json"
+    },
+    {
+      "id": "POC-05-COMMIT_BEGIN",
+      "precondition": "Restricted MySQL8.4.13 / isolated msmsh01lab / fresh dedicated connection",
+      "actions": [
+        {
+          "case": "POC-05-COMMIT_BEGIN",
+          "handle": "connection-11",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-05-COMMIT_BEGIN",
+          "handle": "connection-11",
+          "actor": "harness",
+          "sql": "INSERT INTO probe VALUES (120,'SH01-120',0)",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-05-COMMIT_BEGIN",
+          "handle": "connection-12",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-05-COMMIT_BEGIN",
+          "handle": "connection-12",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "37",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-05-COMMIT_BEGIN",
+          "handle": "connection-12",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-COMMIT_BEGIN",
+          "handle": "connection-12",
+          "actor": "harness",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-COMMIT_BEGIN",
+          "handle": "connection-12",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_008",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-COMMIT_BEGIN",
+          "handle": "connection-12",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_008",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-COMMIT_BEGIN",
+          "handle": "connection-12",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_009",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-COMMIT_BEGIN",
+          "handle": "connection-12",
+          "actor": "harness",
+          "sql": "UPDATE probe SET n=1 WHERE id=120",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-05-COMMIT_BEGIN",
+          "handle": "connection-12",
+          "actor": "fault",
+          "sql": "COMMIT",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-COMMIT_BEGIN",
+          "handle": "connection-12",
+          "actor": "fault",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-COMMIT_BEGIN",
+          "handle": "connection-12",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_009",
+          "error_class": "mysqli_sql_exception",
+          "errno": 1305
+        },
+        {
+          "case": "POC-05-COMMIT_BEGIN",
+          "handle": "connection-11",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=120",
+          "result": [
+            {
+              "n": "1"
+            }
+          ]
+        }
+      ],
+      "expected": "Replacement/implicit completion on same handle loses old marker",
+      "actual": {
+        "accepted": false,
+        "connection_unchanged": true,
+        "reason": "checkpoint errno 1305",
+        "independent_n": 1
+      },
+      "measurement": "PASS",
+      "security_assessment": "Detected only while original marker remains retained; not an event identity",
+      "evidence": "native.json"
+    },
+    {
+      "id": "POC-05-ROLLBACK_BEGIN",
+      "precondition": "Restricted MySQL8.4.13 / isolated msmsh01lab / fresh dedicated connection",
+      "actions": [
+        {
+          "case": "POC-05-ROLLBACK_BEGIN",
+          "handle": "connection-13",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-05-ROLLBACK_BEGIN",
+          "handle": "connection-13",
+          "actor": "harness",
+          "sql": "INSERT INTO probe VALUES (121,'SH01-121',0)",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-05-ROLLBACK_BEGIN",
+          "handle": "connection-14",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-05-ROLLBACK_BEGIN",
+          "handle": "connection-14",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "39",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-05-ROLLBACK_BEGIN",
+          "handle": "connection-14",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-ROLLBACK_BEGIN",
+          "handle": "connection-14",
+          "actor": "harness",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-ROLLBACK_BEGIN",
+          "handle": "connection-14",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_010",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-ROLLBACK_BEGIN",
+          "handle": "connection-14",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_010",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-ROLLBACK_BEGIN",
+          "handle": "connection-14",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_011",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-ROLLBACK_BEGIN",
+          "handle": "connection-14",
+          "actor": "harness",
+          "sql": "UPDATE probe SET n=1 WHERE id=121",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-05-ROLLBACK_BEGIN",
+          "handle": "connection-14",
+          "actor": "fault",
+          "sql": "ROLLBACK",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-ROLLBACK_BEGIN",
+          "handle": "connection-14",
+          "actor": "fault",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-ROLLBACK_BEGIN",
+          "handle": "connection-14",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_011",
+          "error_class": "mysqli_sql_exception",
+          "errno": 1305
+        },
+        {
+          "case": "POC-05-ROLLBACK_BEGIN",
+          "handle": "connection-13",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=121",
+          "result": [
+            {
+              "n": "0"
+            }
+          ]
+        }
+      ],
+      "expected": "Replacement/implicit completion on same handle loses old marker",
+      "actual": {
+        "accepted": false,
+        "connection_unchanged": true,
+        "reason": "checkpoint errno 1305",
+        "independent_n": 0
+      },
+      "measurement": "PASS",
+      "security_assessment": "Detected only while original marker remains retained; not an event identity",
+      "evidence": "native.json"
+    },
+    {
+      "id": "POC-05-BEGIN_IMPLICIT",
+      "precondition": "Restricted MySQL8.4.13 / isolated msmsh01lab / fresh dedicated connection",
+      "actions": [
+        {
+          "case": "POC-05-BEGIN_IMPLICIT",
+          "handle": "connection-15",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-05-BEGIN_IMPLICIT",
+          "handle": "connection-15",
+          "actor": "harness",
+          "sql": "INSERT INTO probe VALUES (122,'SH01-122',0)",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-05-BEGIN_IMPLICIT",
+          "handle": "connection-16",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-05-BEGIN_IMPLICIT",
+          "handle": "connection-16",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "41",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-05-BEGIN_IMPLICIT",
+          "handle": "connection-16",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-BEGIN_IMPLICIT",
+          "handle": "connection-16",
+          "actor": "harness",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-BEGIN_IMPLICIT",
+          "handle": "connection-16",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_012",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-BEGIN_IMPLICIT",
+          "handle": "connection-16",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_012",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-BEGIN_IMPLICIT",
+          "handle": "connection-16",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_013",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-BEGIN_IMPLICIT",
+          "handle": "connection-16",
+          "actor": "harness",
+          "sql": "UPDATE probe SET n=1 WHERE id=122",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-05-BEGIN_IMPLICIT",
+          "handle": "connection-16",
+          "actor": "fault",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-BEGIN_IMPLICIT",
+          "handle": "connection-16",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_013",
+          "error_class": "mysqli_sql_exception",
+          "errno": 1305
+        },
+        {
+          "case": "POC-05-BEGIN_IMPLICIT",
+          "handle": "connection-15",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=122",
+          "result": [
+            {
+              "n": "1"
+            }
+          ]
+        }
+      ],
+      "expected": "Replacement/implicit completion on same handle loses old marker",
+      "actual": {
+        "accepted": false,
+        "connection_unchanged": true,
+        "reason": "checkpoint errno 1305",
+        "independent_n": 1
+      },
+      "measurement": "PASS",
+      "security_assessment": "Detected only while original marker remains retained; not an event identity",
+      "evidence": "native.json"
+    },
+    {
+      "id": "POC-05-AUTOCOMMIT_IMPLICIT",
+      "precondition": "Restricted MySQL8.4.13 / isolated msmsh01lab / fresh dedicated connection",
+      "actions": [
+        {
+          "case": "POC-05-AUTOCOMMIT_IMPLICIT",
+          "handle": "connection-17",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-05-AUTOCOMMIT_IMPLICIT",
+          "handle": "connection-17",
+          "actor": "harness",
+          "sql": "INSERT INTO probe VALUES (123,'SH01-123',0)",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-05-AUTOCOMMIT_IMPLICIT",
+          "handle": "connection-18",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-05-AUTOCOMMIT_IMPLICIT",
+          "handle": "connection-18",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "43",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-05-AUTOCOMMIT_IMPLICIT",
+          "handle": "connection-18",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-AUTOCOMMIT_IMPLICIT",
+          "handle": "connection-18",
+          "actor": "harness",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-AUTOCOMMIT_IMPLICIT",
+          "handle": "connection-18",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_014",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-AUTOCOMMIT_IMPLICIT",
+          "handle": "connection-18",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_014",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-AUTOCOMMIT_IMPLICIT",
+          "handle": "connection-18",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_015",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-AUTOCOMMIT_IMPLICIT",
+          "handle": "connection-18",
+          "actor": "harness",
+          "sql": "UPDATE probe SET n=1 WHERE id=123",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-05-AUTOCOMMIT_IMPLICIT",
+          "handle": "connection-18",
+          "actor": "fault",
+          "sql": "SET autocommit=0",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-AUTOCOMMIT_IMPLICIT",
+          "handle": "connection-18",
+          "actor": "fault",
+          "sql": "SET autocommit=1",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-05-AUTOCOMMIT_IMPLICIT",
+          "handle": "connection-18",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_015",
+          "error_class": "mysqli_sql_exception",
+          "errno": 1305
+        },
+        {
+          "case": "POC-05-AUTOCOMMIT_IMPLICIT",
+          "handle": "connection-17",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=123",
+          "result": [
+            {
+              "n": "1"
+            }
+          ]
+        }
+      ],
+      "expected": "Replacement/implicit completion on same handle loses old marker",
+      "actual": {
+        "accepted": false,
+        "connection_unchanged": true,
+        "reason": "checkpoint errno 1305",
+        "independent_n": 1
+      },
+      "measurement": "PASS",
+      "security_assessment": "Detected only while original marker remains retained; not an event identity",
+      "evidence": "native.json"
+    },
+    {
+      "id": "POC-06-removed",
+      "precondition": "Restricted MySQL8.4.13 / isolated msmsh01lab / fresh dedicated connection",
+      "actions": [
+        {
+          "case": "POC-06-removed",
+          "handle": "connection-19",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-06-removed",
+          "handle": "connection-19",
+          "actor": "harness",
+          "sql": "INSERT INTO probe VALUES (130,'SH01-130',0)",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-06-removed",
+          "handle": "connection-20",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-06-removed",
+          "handle": "connection-20",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "45",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-06-removed",
+          "handle": "connection-20",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-removed",
+          "handle": "connection-20",
+          "actor": "harness",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-removed",
+          "handle": "connection-20",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_016",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-removed",
+          "handle": "connection-20",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_016",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-removed",
+          "handle": "connection-20",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_017",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-removed",
+          "handle": "connection-20",
+          "actor": "fault",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_017",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-removed",
+          "handle": "connection-20",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_017",
+          "error_class": "mysqli_sql_exception",
+          "errno": 1305
+        }
+      ],
+      "expected": "Deleted marker rejected",
+      "actual": {
+        "accepted": false,
+        "reason": "checkpoint errno 1305"
+      },
+      "measurement": "PASS",
+      "security_assessment": "Detected",
+      "evidence": "native.json"
+    },
+    {
+      "id": "POC-06-recreated",
+      "precondition": "Restricted MySQL8.4.13 / isolated msmsh01lab / fresh dedicated connection",
+      "actions": [
+        {
+          "case": "POC-06-recreated",
+          "handle": "connection-21",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-06-recreated",
+          "handle": "connection-21",
+          "actor": "harness",
+          "sql": "INSERT INTO probe VALUES (131,'SH01-131',0)",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-06-recreated",
+          "handle": "connection-22",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-06-recreated",
+          "handle": "connection-22",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "47",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-06-recreated",
+          "handle": "connection-22",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-recreated",
+          "handle": "connection-22",
+          "actor": "harness",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-recreated",
+          "handle": "connection-22",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_018",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-recreated",
+          "handle": "connection-22",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_018",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-recreated",
+          "handle": "connection-22",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_019",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-recreated",
+          "handle": "connection-22",
+          "actor": "fault",
+          "sql": "COMMIT",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-recreated",
+          "handle": "connection-22",
+          "actor": "fault",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-recreated",
+          "handle": "connection-22",
+          "actor": "fault",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_019",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-recreated",
+          "handle": "connection-22",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_019",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-recreated",
+          "handle": "connection-22",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_020",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        }
+      ],
+      "expected": "Measure same-name marker replay in replacement transaction",
+      "actual": {
+        "accepted": true,
+        "replacement_transaction": true,
+        "fault_knows_marker": true
+      },
+      "measurement": "PASS",
+      "security_assessment": "COUNTEREXAMPLE: name confidentiality would be an additional unproved assumption; no server-owned event identity",
+      "evidence": "native.json"
+    },
+    {
+      "id": "POC-06-rotation-gap",
+      "precondition": "Restricted MySQL8.4.13 / isolated msmsh01lab / fresh dedicated connection",
+      "actions": [
+        {
+          "case": "POC-06-rotation-gap",
+          "handle": "connection-23",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-06-rotation-gap",
+          "handle": "connection-23",
+          "actor": "harness",
+          "sql": "INSERT INTO probe VALUES (132,'SH01-132',0)",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-06-rotation-gap",
+          "handle": "connection-24",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-06-rotation-gap",
+          "handle": "connection-24",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "49",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-06-rotation-gap",
+          "handle": "connection-24",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-rotation-gap",
+          "handle": "connection-24",
+          "actor": "harness",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-rotation-gap",
+          "handle": "connection-24",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_021",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-rotation-gap",
+          "handle": "connection-24",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_021",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-rotation-gap",
+          "handle": "connection-24",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_022",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-rotation-gap",
+          "handle": "connection-24",
+          "actor": "harness",
+          "sql": "UPDATE probe SET n=1 WHERE id=132",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-06-rotation-gap",
+          "handle": "connection-24",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_022",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-rotation-gap",
+          "handle": "connection-24",
+          "actor": "fault",
+          "sql": "COMMIT",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-rotation-gap",
+          "handle": "connection-24",
+          "actor": "fault",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-rotation-gap",
+          "handle": "connection-24",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_023",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-rotation-gap",
+          "handle": "connection-24",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_023",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-rotation-gap",
+          "handle": "connection-24",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_024",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-rotation-gap",
+          "handle": "connection-23",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=132",
+          "result": [
+            {
+              "n": "1"
+            }
+          ]
+        }
+      ],
+      "expected": "Inject same-connection COMMIT/BEGIN between release and re-creation (no nonce knowledge)",
+      "actual": {
+        "first_accepted": true,
+        "next_accepted": true,
+        "early_committed_n": 1
+      },
+      "measurement": "PASS",
+      "security_assessment": "COUNTEREXAMPLE under inter-call SQL injection: destructive marker renewal has a blind interval; requires stronger serialization assumption than existing event checks",
+      "evidence": "native.json"
+    },
+    {
+      "id": "POC-07-session-RC-force-RR",
+      "precondition": "Restricted MySQL8.4.13 / isolated msmsh01lab / fresh dedicated connection",
+      "actions": [
+        {
+          "case": "POC-07-session-RC-force-RR",
+          "handle": "connection-25",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-session-RC-force-RR",
+          "handle": "connection-25",
+          "actor": "harness",
+          "sql": "INSERT INTO probe VALUES (140,'SH01-140',0)",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-07-session-RC-force-RR",
+          "handle": "connection-26",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-session-RC-force-RR",
+          "handle": "connection-26",
+          "actor": "harness",
+          "sql": "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-session-RC-force-RR",
+          "handle": "connection-26",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "51",
+              "ac": "1",
+              "session_isolation": "READ-COMMITTED"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-session-RC-force-RR",
+          "handle": "connection-26",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-session-RC-force-RR",
+          "handle": "connection-26",
+          "actor": "harness",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-session-RC-force-RR",
+          "handle": "connection-26",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_025",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-session-RC-force-RR",
+          "handle": "connection-26",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_025",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-session-RC-force-RR",
+          "handle": "connection-26",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_026",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-session-RC-force-RR",
+          "handle": "connection-26",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=140",
+          "result": [
+            {
+              "n": "0"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-session-RC-force-RR",
+          "handle": "connection-25",
+          "actor": "independent-writer",
+          "sql": "UPDATE probe SET n=1 WHERE id=140",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-07-session-RC-force-RR",
+          "handle": "connection-26",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=140",
+          "result": [
+            {
+              "n": "0"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-session-RC-force-RR",
+          "handle": "connection-26",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "51",
+              "ac": "1",
+              "session_isolation": "READ-COMMITTED"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-session-RC-force-RR",
+          "handle": "connection-26",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "error_class": "mysqli_sql_exception",
+          "errno": 1568
+        }
+      ],
+      "expected": "Compare stable/changeable consistent reads with independent committed writer",
+      "actual": {
+        "accepted": true,
+        "first": 0,
+        "second": 0,
+        "session_default": "READ-COMMITTED",
+        "active_set_transaction_errno": 1568
+      },
+      "measurement": "PASS",
+      "security_assessment": "Controlled SET-before-BEGIN enforces observed RR behavior, independent of old defaults/override; conditional on exact Core ordering",
+      "evidence": "native.json"
+    },
+    {
+      "id": "POC-07-oneshot-RC-force-RR",
+      "precondition": "Restricted MySQL8.4.13 / isolated msmsh01lab / fresh dedicated connection",
+      "actions": [
+        {
+          "case": "POC-07-oneshot-RC-force-RR",
+          "handle": "connection-27",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-oneshot-RC-force-RR",
+          "handle": "connection-27",
+          "actor": "harness",
+          "sql": "INSERT INTO probe VALUES (141,'SH01-141',0)",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-07-oneshot-RC-force-RR",
+          "handle": "connection-28",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-oneshot-RC-force-RR",
+          "handle": "connection-28",
+          "actor": "harness",
+          "sql": "SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-oneshot-RC-force-RR",
+          "handle": "connection-28",
+          "actor": "fault",
+          "sql": "SET TRANSACTION ISOLATION LEVEL READ COMMITTED",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-oneshot-RC-force-RR",
+          "handle": "connection-28",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "53",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-oneshot-RC-force-RR",
+          "handle": "connection-28",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-oneshot-RC-force-RR",
+          "handle": "connection-28",
+          "actor": "harness",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-oneshot-RC-force-RR",
+          "handle": "connection-28",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_027",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-oneshot-RC-force-RR",
+          "handle": "connection-28",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_027",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-oneshot-RC-force-RR",
+          "handle": "connection-28",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_028",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-oneshot-RC-force-RR",
+          "handle": "connection-28",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=141",
+          "result": [
+            {
+              "n": "0"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-oneshot-RC-force-RR",
+          "handle": "connection-27",
+          "actor": "independent-writer",
+          "sql": "UPDATE probe SET n=1 WHERE id=141",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-07-oneshot-RC-force-RR",
+          "handle": "connection-28",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=141",
+          "result": [
+            {
+              "n": "0"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-oneshot-RC-force-RR",
+          "handle": "connection-28",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "53",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-oneshot-RC-force-RR",
+          "handle": "connection-28",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "error_class": "mysqli_sql_exception",
+          "errno": 1568
+        }
+      ],
+      "expected": "Compare stable/changeable consistent reads with independent committed writer",
+      "actual": {
+        "accepted": true,
+        "first": 0,
+        "second": 0,
+        "session_default": "REPEATABLE-READ",
+        "active_set_transaction_errno": 1568
+      },
+      "measurement": "PASS",
+      "security_assessment": "Controlled SET-before-BEGIN enforces observed RR behavior, independent of old defaults/override; conditional on exact Core ordering",
+      "evidence": "native.json"
+    },
+    {
+      "id": "POC-07-override-after-prepare",
+      "precondition": "Restricted MySQL8.4.13 / isolated msmsh01lab / fresh dedicated connection",
+      "actions": [
+        {
+          "case": "POC-07-override-after-prepare",
+          "handle": "connection-29",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-override-after-prepare",
+          "handle": "connection-29",
+          "actor": "harness",
+          "sql": "INSERT INTO probe VALUES (142,'SH01-142',0)",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-07-override-after-prepare",
+          "handle": "connection-30",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-override-after-prepare",
+          "handle": "connection-30",
+          "actor": "harness",
+          "sql": "SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-override-after-prepare",
+          "handle": "connection-30",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "55",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-override-after-prepare",
+          "handle": "connection-30",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-override-after-prepare",
+          "handle": "connection-30",
+          "actor": "fault",
+          "sql": "SET TRANSACTION ISOLATION LEVEL READ COMMITTED",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-override-after-prepare",
+          "handle": "connection-30",
+          "actor": "harness",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-override-after-prepare",
+          "handle": "connection-30",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_029",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-override-after-prepare",
+          "handle": "connection-30",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_029",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-override-after-prepare",
+          "handle": "connection-30",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_030",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-override-after-prepare",
+          "handle": "connection-30",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=142",
+          "result": [
+            {
+              "n": "0"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-override-after-prepare",
+          "handle": "connection-29",
+          "actor": "independent-writer",
+          "sql": "UPDATE probe SET n=1 WHERE id=142",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-07-override-after-prepare",
+          "handle": "connection-30",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=142",
+          "result": [
+            {
+              "n": "1"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-override-after-prepare",
+          "handle": "connection-30",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "55",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-override-after-prepare",
+          "handle": "connection-30",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "error_class": "mysqli_sql_exception",
+          "errno": 1568
+        }
+      ],
+      "expected": "Compare stable/changeable consistent reads with independent committed writer",
+      "actual": {
+        "accepted": true,
+        "first": 0,
+        "second": 1,
+        "session_default": "REPEATABLE-READ",
+        "active_set_transaction_errno": 1568
+      },
+      "measurement": "PASS",
+      "security_assessment": "COUNTEREXAMPLE if a one-shot override can intervene: marker valid with actual READ COMMITTED; SET/snapshot alone cannot attest active RR",
+      "evidence": "native.json"
+    },
+    {
+      "id": "POC-08-model",
+      "precondition": "Restricted MySQL8.4.13 / isolated msmsh01lab / fresh dedicated connection",
+      "actions": [
+        {
+          "case": "POC-08-model",
+          "handle": "connection-31",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-08-model",
+          "handle": "connection-31",
+          "actor": "harness",
+          "sql": "INSERT INTO probe VALUES (150,'SH01-150',0)",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-08-model",
+          "handle": "connection-32",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-08-model",
+          "handle": "connection-32",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "57",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-08-model",
+          "handle": "connection-32",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-08-model",
+          "handle": "connection-32",
+          "actor": "harness",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-08-model",
+          "handle": "connection-32",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_031",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-08-model",
+          "handle": "connection-32",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_031",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-08-model",
+          "handle": "connection-32",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_032",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-08-model",
+          "handle": "connection-32",
+          "actor": "harness",
+          "sql": "ROLLBACK",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-08-model",
+          "handle": "connection-32",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "57",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-08-model",
+          "handle": "connection-32",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-08-model",
+          "handle": "connection-32",
+          "actor": "counter-model",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-08-model",
+          "handle": "connection-32",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_033",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-08-model",
+          "handle": "connection-32",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_033",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-08-model",
+          "handle": "connection-32",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_034",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-08-model",
+          "handle": "connection-32",
+          "actor": "counter-model",
+          "sql": "UPDATE probe SET n=1 WHERE id=150",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-08-model",
+          "handle": "connection-32",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_034",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-08-model",
+          "handle": "connection-32",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_035",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-08-model",
+          "handle": "connection-31",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=150",
+          "result": [
+            {
+              "n": "0"
+            }
+          ]
+        },
+        {
+          "case": "POC-08-model",
+          "handle": "connection-32",
+          "actor": "counter-model",
+          "sql": "ROLLBACK",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-08-model",
+          "handle": "connection-31",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=150",
+          "result": [
+            {
+              "n": "0"
+            }
+          ]
+        }
+      ],
+      "expected": "Nested counter calls issue only one physical outer BEGIN/ROLLBACK; inner rollback does not roll back SQL",
+      "actual": {
+        "checkpoint": true,
+        "depth_after_outer_rollback": 0,
+        "independent_n": 0
+      },
+      "measurement": "PASS",
+      "security_assessment": "Source-compatible MODEL plus real MySQL; NOT actual loaded Dolibarr Core integration",
+      "evidence": "native.json"
+    },
+    {
+      "id": "POC-09-reconnect",
+      "precondition": "Restricted MySQL8.4.13 / isolated msmsh01lab / fresh dedicated connection",
+      "actions": [
+        {
+          "case": "POC-09-reconnect",
+          "handle": "connection-33",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-09-reconnect",
+          "handle": "connection-33",
+          "actor": "harness",
+          "sql": "INSERT INTO probe VALUES (160,'SH01-160',0)",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-09-reconnect",
+          "handle": "connection-34",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-09-reconnect",
+          "handle": "connection-34",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "59",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-09-reconnect",
+          "handle": "connection-34",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-09-reconnect",
+          "handle": "connection-34",
+          "actor": "harness",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-09-reconnect",
+          "handle": "connection-34",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_036",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-09-reconnect",
+          "handle": "connection-34",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_036",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-09-reconnect",
+          "handle": "connection-34",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_037",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-09-reconnect",
+          "handle": "connection-35",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        }
+      ],
+      "expected": "Replacement handle/connection must not inherit state",
+      "actual": {
+        "accepted": false,
+        "new_cid": "60",
+        "old_cid": "59",
+        "reason": "native handle/connection changed"
+      },
+      "measurement": "PASS",
+      "security_assessment": "UNKNOWN latched; no transparent reconnect",
+      "evidence": "native.json"
+    },
+    {
+      "id": "POC-10-COMMIT-normal",
+      "precondition": "Restricted MySQL8.4.13 / isolated msmsh01lab / fresh dedicated connection",
+      "actions": [
+        {
+          "case": "POC-10-COMMIT-normal",
+          "handle": "connection-36",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-10-COMMIT-normal",
+          "handle": "connection-36",
+          "actor": "harness",
+          "sql": "INSERT INTO probe VALUES (170,'SH01-170',0)",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-10-COMMIT-normal",
+          "handle": "connection-37",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-10-COMMIT-normal",
+          "handle": "connection-37",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "62",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-10-COMMIT-normal",
+          "handle": "connection-37",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-COMMIT-normal",
+          "handle": "connection-37",
+          "actor": "harness",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-COMMIT-normal",
+          "handle": "connection-37",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_038",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-COMMIT-normal",
+          "handle": "connection-37",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_038",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-COMMIT-normal",
+          "handle": "connection-37",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_039",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-COMMIT-normal",
+          "handle": "connection-37",
+          "actor": "harness",
+          "sql": "UPDATE probe SET n=1 WHERE id=170",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-10-COMMIT-normal",
+          "handle": "connection-37",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_039",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-COMMIT-normal",
+          "handle": "connection-37",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_040",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-COMMIT-normal",
+          "handle": "connection-37",
+          "actor": "harness",
+          "sql": "COMMIT",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-COMMIT-normal",
+          "handle": "connection-37",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_040",
+          "error_class": "mysqli_sql_exception",
+          "errno": 1305
+        },
+        {
+          "case": "POC-10-COMMIT-normal",
+          "handle": "connection-37",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "62",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-10-COMMIT-normal",
+          "handle": "connection-36",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=170",
+          "result": [
+            {
+              "n": "1"
+            }
+          ]
+        }
+      ],
+      "expected": "Compare acknowledged completion/no-op after premature opposite completion",
+      "actual": {
+        "signature": {
+          "ack": true,
+          "marker_error": 1305,
+          "ac": "1"
+        },
+        "independent_n": 1,
+        "guard_result": "UNKNOWN/STOP"
+      },
+      "measurement": "PASS",
+      "security_assessment": "UNPROVEN completion: same chosen endpoint evidence, different data outcome; refuse confirmation without exact-ended-event proof",
+      "evidence": "native.json"
+    },
+    {
+      "id": "POC-10-COMMIT-premature-opposite",
+      "precondition": "Restricted MySQL8.4.13 / isolated msmsh01lab / fresh dedicated connection",
+      "actions": [
+        {
+          "case": "POC-10-COMMIT-premature-opposite",
+          "handle": "connection-38",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-10-COMMIT-premature-opposite",
+          "handle": "connection-38",
+          "actor": "harness",
+          "sql": "INSERT INTO probe VALUES (171,'SH01-171',0)",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-10-COMMIT-premature-opposite",
+          "handle": "connection-39",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-10-COMMIT-premature-opposite",
+          "handle": "connection-39",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "64",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-10-COMMIT-premature-opposite",
+          "handle": "connection-39",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-COMMIT-premature-opposite",
+          "handle": "connection-39",
+          "actor": "harness",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-COMMIT-premature-opposite",
+          "handle": "connection-39",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_041",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-COMMIT-premature-opposite",
+          "handle": "connection-39",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_041",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-COMMIT-premature-opposite",
+          "handle": "connection-39",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_042",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-COMMIT-premature-opposite",
+          "handle": "connection-39",
+          "actor": "harness",
+          "sql": "UPDATE probe SET n=1 WHERE id=171",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-10-COMMIT-premature-opposite",
+          "handle": "connection-39",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_042",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-COMMIT-premature-opposite",
+          "handle": "connection-39",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_043",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-COMMIT-premature-opposite",
+          "handle": "connection-39",
+          "actor": "fault",
+          "sql": "ROLLBACK",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-COMMIT-premature-opposite",
+          "handle": "connection-39",
+          "actor": "harness",
+          "sql": "COMMIT",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-COMMIT-premature-opposite",
+          "handle": "connection-39",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_043",
+          "error_class": "mysqli_sql_exception",
+          "errno": 1305
+        },
+        {
+          "case": "POC-10-COMMIT-premature-opposite",
+          "handle": "connection-39",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "64",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-10-COMMIT-premature-opposite",
+          "handle": "connection-38",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=171",
+          "result": [
+            {
+              "n": "0"
+            }
+          ]
+        }
+      ],
+      "expected": "Compare acknowledged completion/no-op after premature opposite completion",
+      "actual": {
+        "signature": {
+          "ack": true,
+          "marker_error": 1305,
+          "ac": "1"
+        },
+        "independent_n": 0,
+        "guard_result": "UNKNOWN/STOP"
+      },
+      "measurement": "PASS",
+      "security_assessment": "UNPROVEN completion: same chosen endpoint evidence, different data outcome; refuse confirmation without exact-ended-event proof",
+      "evidence": "native.json"
+    },
+    {
+      "id": "POC-10-ROLLBACK-normal",
+      "precondition": "Restricted MySQL8.4.13 / isolated msmsh01lab / fresh dedicated connection",
+      "actions": [
+        {
+          "case": "POC-10-ROLLBACK-normal",
+          "handle": "connection-40",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-10-ROLLBACK-normal",
+          "handle": "connection-40",
+          "actor": "harness",
+          "sql": "INSERT INTO probe VALUES (172,'SH01-172',0)",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-10-ROLLBACK-normal",
+          "handle": "connection-41",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-10-ROLLBACK-normal",
+          "handle": "connection-41",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "66",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-10-ROLLBACK-normal",
+          "handle": "connection-41",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-ROLLBACK-normal",
+          "handle": "connection-41",
+          "actor": "harness",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-ROLLBACK-normal",
+          "handle": "connection-41",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_044",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-ROLLBACK-normal",
+          "handle": "connection-41",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_044",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-ROLLBACK-normal",
+          "handle": "connection-41",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_045",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-ROLLBACK-normal",
+          "handle": "connection-41",
+          "actor": "harness",
+          "sql": "UPDATE probe SET n=1 WHERE id=172",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-10-ROLLBACK-normal",
+          "handle": "connection-41",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_045",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-ROLLBACK-normal",
+          "handle": "connection-41",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_046",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-ROLLBACK-normal",
+          "handle": "connection-41",
+          "actor": "harness",
+          "sql": "ROLLBACK",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-ROLLBACK-normal",
+          "handle": "connection-41",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_046",
+          "error_class": "mysqli_sql_exception",
+          "errno": 1305
+        },
+        {
+          "case": "POC-10-ROLLBACK-normal",
+          "handle": "connection-41",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "66",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-10-ROLLBACK-normal",
+          "handle": "connection-40",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=172",
+          "result": [
+            {
+              "n": "0"
+            }
+          ]
+        }
+      ],
+      "expected": "Compare acknowledged completion/no-op after premature opposite completion",
+      "actual": {
+        "signature": {
+          "ack": true,
+          "marker_error": 1305,
+          "ac": "1"
+        },
+        "independent_n": 0,
+        "guard_result": "UNKNOWN/STOP"
+      },
+      "measurement": "PASS",
+      "security_assessment": "UNPROVEN completion: same chosen endpoint evidence, different data outcome; refuse confirmation without exact-ended-event proof",
+      "evidence": "native.json"
+    },
+    {
+      "id": "POC-10-ROLLBACK-premature-opposite",
+      "precondition": "Restricted MySQL8.4.13 / isolated msmsh01lab / fresh dedicated connection",
+      "actions": [
+        {
+          "case": "POC-10-ROLLBACK-premature-opposite",
+          "handle": "connection-42",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-10-ROLLBACK-premature-opposite",
+          "handle": "connection-42",
+          "actor": "harness",
+          "sql": "INSERT INTO probe VALUES (173,'SH01-173',0)",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-10-ROLLBACK-premature-opposite",
+          "handle": "connection-43",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-10-ROLLBACK-premature-opposite",
+          "handle": "connection-43",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "68",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-10-ROLLBACK-premature-opposite",
+          "handle": "connection-43",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-ROLLBACK-premature-opposite",
+          "handle": "connection-43",
+          "actor": "harness",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-ROLLBACK-premature-opposite",
+          "handle": "connection-43",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_047",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-ROLLBACK-premature-opposite",
+          "handle": "connection-43",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_047",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-ROLLBACK-premature-opposite",
+          "handle": "connection-43",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_048",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-ROLLBACK-premature-opposite",
+          "handle": "connection-43",
+          "actor": "harness",
+          "sql": "UPDATE probe SET n=1 WHERE id=173",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-10-ROLLBACK-premature-opposite",
+          "handle": "connection-43",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_048",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-ROLLBACK-premature-opposite",
+          "handle": "connection-43",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_049",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-ROLLBACK-premature-opposite",
+          "handle": "connection-43",
+          "actor": "fault",
+          "sql": "COMMIT",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-ROLLBACK-premature-opposite",
+          "handle": "connection-43",
+          "actor": "harness",
+          "sql": "ROLLBACK",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-ROLLBACK-premature-opposite",
+          "handle": "connection-43",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_049",
+          "error_class": "mysqli_sql_exception",
+          "errno": 1305
+        },
+        {
+          "case": "POC-10-ROLLBACK-premature-opposite",
+          "handle": "connection-43",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "68",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-10-ROLLBACK-premature-opposite",
+          "handle": "connection-42",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=173",
+          "result": [
+            {
+              "n": "1"
+            }
+          ]
+        }
+      ],
+      "expected": "Compare acknowledged completion/no-op after premature opposite completion",
+      "actual": {
+        "signature": {
+          "ack": true,
+          "marker_error": 1305,
+          "ac": "1"
+        },
+        "independent_n": 1,
+        "guard_result": "UNKNOWN/STOP"
+      },
+      "measurement": "PASS",
+      "security_assessment": "UNPROVEN completion: same chosen endpoint evidence, different data outcome; refuse confirmation without exact-ended-event proof",
+      "evidence": "native.json"
+    },
+    {
+      "id": "POC-11-latch",
+      "precondition": "Restricted MySQL8.4.13 / isolated msmsh01lab / fresh dedicated connection",
+      "actions": [
+        {
+          "case": "POC-11-latch",
+          "handle": "connection-44",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-11-latch",
+          "handle": "connection-44",
+          "actor": "harness",
+          "sql": "INSERT INTO probe VALUES (180,'SH01-180',0)",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-11-latch",
+          "handle": "connection-45",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-11-latch",
+          "handle": "connection-45",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "70",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-11-latch",
+          "handle": "connection-45",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-11-latch",
+          "handle": "connection-45",
+          "actor": "harness",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-11-latch",
+          "handle": "connection-45",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_050",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-11-latch",
+          "handle": "connection-45",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_050",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-11-latch",
+          "handle": "connection-45",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_051",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-11-latch",
+          "handle": "connection-45",
+          "actor": "fault",
+          "sql": "ROLLBACK",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-11-latch",
+          "handle": "connection-45",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_051",
+          "error_class": "mysqli_sql_exception",
+          "errno": 1305
+        }
+      ],
+      "expected": "No guarded DML, further probing or rollback after latched uncertainty",
+      "actual": {
+        "write_blocked": true,
+        "additional_observer_sql": 0,
+        "result": "UNKNOWN/STOP"
+      },
+      "measurement": "PASS",
+      "security_assessment": "PASS fail-closed policy; it cannot turn the unproved primitives into a functional approved observer",
+      "evidence": "native.json"
+    },
+    {
+      "id": "POC-10-wire-COMMIT",
+      "precondition": "Dedicated restricted lab connection through one-shot loopback response-loss proxy",
+      "actions": [
+        {
+          "case": "POC-10-wire-COMMIT",
+          "handle": "connection-1",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-10-wire-COMMIT",
+          "handle": "connection-1",
+          "actor": "harness",
+          "sql": "INSERT INTO probe VALUES (190,'SH01-190',0)",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-10-wire-COMMIT",
+          "handle": "connection-2",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-10-wire-COMMIT",
+          "handle": "connection-2",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "74",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-10-wire-COMMIT",
+          "handle": "connection-2",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-wire-COMMIT",
+          "handle": "connection-2",
+          "actor": "harness",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-wire-COMMIT",
+          "handle": "connection-2",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_052",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-wire-COMMIT",
+          "handle": "connection-2",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_052",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-wire-COMMIT",
+          "handle": "connection-2",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_053",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-wire-COMMIT",
+          "handle": "connection-2",
+          "actor": "harness",
+          "sql": "UPDATE probe SET n=1 WHERE id=190",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-10-wire-COMMIT",
+          "handle": "connection-2",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_053",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-wire-COMMIT",
+          "handle": "connection-2",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_054",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-wire-COMMIT",
+          "handle": "connection-2",
+          "actor": "harness",
+          "sql": "COMMIT",
+          "error_class": "mysqli_sql_exception",
+          "errno": 2006
+        },
+        {
+          "case": "POC-10-wire-COMMIT",
+          "handle": "connection-1",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=190",
+          "result": [
+            {
+              "n": "1"
+            }
+          ]
+        }
+      ],
+      "expected": "Native client connection error; UNKNOWN/STOP; no follow-up DML/rollback",
+      "actual": {
+        "client_errno": 2006,
+        "observer_result": "UNKNOWN/STOP",
+        "guarded_write_blocked": true,
+        "extra_observer_sql": 0,
+        "independent_n": 1,
+        "fixture_id": 190
+      },
+      "measurement": "PASS",
+      "security_assessment": "Real reply loss; independent lab postcondition does not redeem missing acknowledgement in production",
+      "evidence": "lost-ack-COMMIT.json"
+    },
+    {
+      "id": "POC-10-wire-ROLLBACK",
+      "precondition": "Dedicated restricted lab connection through one-shot loopback response-loss proxy",
+      "actions": [
+        {
+          "case": "POC-10-wire-ROLLBACK",
+          "handle": "connection-1",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-10-wire-ROLLBACK",
+          "handle": "connection-1",
+          "actor": "harness",
+          "sql": "INSERT INTO probe VALUES (191,'SH01-191',0)",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-10-wire-ROLLBACK",
+          "handle": "connection-2",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-10-wire-ROLLBACK",
+          "handle": "connection-2",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "76",
+              "ac": "1",
+              "session_isolation": "REPEATABLE-READ"
+            }
+          ]
+        },
+        {
+          "case": "POC-10-wire-ROLLBACK",
+          "handle": "connection-2",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-wire-ROLLBACK",
+          "handle": "connection-2",
+          "actor": "harness",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-wire-ROLLBACK",
+          "handle": "connection-2",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_055",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-wire-ROLLBACK",
+          "handle": "connection-2",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_055",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-wire-ROLLBACK",
+          "handle": "connection-2",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_056",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-wire-ROLLBACK",
+          "handle": "connection-2",
+          "actor": "harness",
+          "sql": "UPDATE probe SET n=1 WHERE id=191",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-10-wire-ROLLBACK",
+          "handle": "connection-2",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_056",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-wire-ROLLBACK",
+          "handle": "connection-2",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_057",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-10-wire-ROLLBACK",
+          "handle": "connection-2",
+          "actor": "harness",
+          "sql": "ROLLBACK",
+          "error_class": "mysqli_sql_exception",
+          "errno": 2006
+        },
+        {
+          "case": "POC-10-wire-ROLLBACK",
+          "handle": "connection-1",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=191",
+          "result": [
+            {
+              "n": "0"
+            }
+          ]
+        }
+      ],
+      "expected": "Native client connection error; UNKNOWN/STOP; no follow-up DML/rollback",
+      "actual": {
+        "client_errno": 2006,
+        "observer_result": "UNKNOWN/STOP",
+        "guarded_write_blocked": true,
+        "extra_observer_sql": 0,
+        "independent_n": 0,
+        "fixture_id": 191
+      },
+      "measurement": "PASS",
+      "security_assessment": "Real reply loss; independent lab postcondition does not redeem missing acknowledgement in production",
+      "evidence": "lost-ack-ROLLBACK.json"
+    },
+    {
+      "id": "POC-06-rollback-to",
+      "precondition": "Fresh dedicated connection, restricted artificial lab",
+      "actions": [
+        {
+          "case": "POC-06-rollback-to",
+          "handle": "connection-1",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-06-rollback-to",
+          "handle": "connection-1",
+          "actor": "harness",
+          "sql": "INSERT INTO probe VALUES (194,'SH01-194',0)",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-06-rollback-to",
+          "handle": "connection-2",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-06-rollback-to",
+          "handle": "connection-2",
+          "actor": "harness",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-rollback-to",
+          "handle": "connection-2",
+          "actor": "harness",
+          "sql": "SAVEPOINT sh01_start",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-rollback-to",
+          "handle": "connection-2",
+          "actor": "harness",
+          "sql": "UPDATE probe SET n=1 WHERE id=194",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-06-rollback-to",
+          "handle": "connection-2",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=194",
+          "result": [
+            {
+              "n": "1"
+            }
+          ]
+        },
+        {
+          "case": "POC-06-rollback-to",
+          "handle": "connection-2",
+          "actor": "hypothesis-alternative",
+          "sql": "ROLLBACK TO SAVEPOINT sh01_start",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-rollback-to",
+          "handle": "connection-2",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=194",
+          "result": [
+            {
+              "n": "0"
+            }
+          ]
+        },
+        {
+          "case": "POC-06-rollback-to",
+          "handle": "connection-2",
+          "actor": "harness",
+          "sql": "COMMIT",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-06-rollback-to",
+          "handle": "connection-1",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=194",
+          "result": [
+            {
+              "n": "0"
+            }
+          ]
+        }
+      ],
+      "expected": "ROLLBACK TO preserves marker usability but undoes work since it",
+      "actual": {
+        "before": 1,
+        "after": 0,
+        "independent_final": 0,
+        "fixture": 194
+      },
+      "measurement": "PASS",
+      "security_assessment": "Not an acceptable non-destructive observer after business DML",
+      "evidence": "rollback-to.json"
+    },
+    {
+      "id": "POC-07-prefix-engine-metadata",
+      "precondition": "Fresh restricted connection; session default READ COMMITTED; one-shot RR before tested prefix",
+      "actions": [
+        {
+          "case": "POC-07-prefix-engine-metadata",
+          "handle": "connection-1",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-prefix-engine-metadata",
+          "handle": "connection-1",
+          "actor": "harness",
+          "sql": "INSERT INTO probe VALUES (192,'SH01-192',0)",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-07-prefix-engine-metadata",
+          "handle": "connection-2",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-prefix-engine-metadata",
+          "handle": "connection-2",
+          "actor": "harness",
+          "sql": "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-prefix-engine-metadata",
+          "handle": "connection-2",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "78",
+              "ac": "1",
+              "session_isolation": "READ-COMMITTED"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-prefix-engine-metadata",
+          "handle": "connection-2",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-prefix-engine-metadata",
+          "handle": "connection-2",
+          "actor": "core-prefix-model",
+          "sql": "SELECT ENGINE AS engine FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+          "result": [
+            {
+              "engine": "InnoDB"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-prefix-engine-metadata",
+          "handle": "connection-2",
+          "actor": "harness",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-prefix-engine-metadata",
+          "handle": "connection-2",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_058",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-prefix-engine-metadata",
+          "handle": "connection-2",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_058",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-prefix-engine-metadata",
+          "handle": "connection-2",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_059",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-prefix-engine-metadata",
+          "handle": "connection-2",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=192",
+          "result": [
+            {
+              "n": "0"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-prefix-engine-metadata",
+          "handle": "connection-1",
+          "actor": "independent-writer",
+          "sql": "UPDATE probe SET n=1 WHERE id=192",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-07-prefix-engine-metadata",
+          "handle": "connection-2",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=192",
+          "result": [
+            {
+              "n": "1"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-prefix-engine-metadata",
+          "handle": "connection-2",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "78",
+              "ac": "1",
+              "session_isolation": "READ-COMMITTED"
+            }
+          ]
+        }
+      ],
+      "expected": "Measure RR persistence across the pre-BEGIN query, not assume it",
+      "actual": {
+        "id": "POC-07-prefix-engine-metadata",
+        "measurement": "PASS (observation, not safety acceptance)",
+        "fixture": 192,
+        "session_default": "READ-COMMITTED",
+        "first": 0,
+        "second": 1,
+        "repeatable_read_behavior": false,
+        "prefix": "engine-metadata",
+        "scope": "SQL-shape Core prefix model, not a bootstrapped Dolibarr integration"
+      },
+      "measurement": "PASS (measurement only)",
+      "security_assessment": "FAIL for this insertion point: second consistent read changes after independent commit; not RR behavior",
+      "evidence": "isolation-ordering.json"
+    },
+    {
+      "id": "POC-07-prefix-ordinary-InnoDB-read",
+      "precondition": "Fresh restricted connection; session default READ COMMITTED; one-shot RR before tested prefix",
+      "actions": [
+        {
+          "case": "POC-07-prefix-ordinary-InnoDB-read",
+          "handle": "connection-3",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-prefix-ordinary-InnoDB-read",
+          "handle": "connection-3",
+          "actor": "harness",
+          "sql": "INSERT INTO probe VALUES (193,'SH01-193',0)",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-07-prefix-ordinary-InnoDB-read",
+          "handle": "connection-4",
+          "actor": "harness",
+          "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version",
+          "result": [
+            {
+              "db": "msmsh01lab",
+              "account": "msmsh01lab@%",
+              "version": "8.4.13"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-prefix-ordinary-InnoDB-read",
+          "handle": "connection-4",
+          "actor": "harness",
+          "sql": "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-prefix-ordinary-InnoDB-read",
+          "handle": "connection-4",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "80",
+              "ac": "1",
+              "session_isolation": "READ-COMMITTED"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-prefix-ordinary-InnoDB-read",
+          "handle": "connection-4",
+          "actor": "hypothesis",
+          "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-prefix-ordinary-InnoDB-read",
+          "handle": "connection-4",
+          "actor": "core-prefix-control",
+          "sql": "SELECT n FROM probe WHERE id=193",
+          "result": [
+            {
+              "n": "0"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-prefix-ordinary-InnoDB-read",
+          "handle": "connection-4",
+          "actor": "harness",
+          "sql": "BEGIN",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-prefix-ordinary-InnoDB-read",
+          "handle": "connection-4",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_060",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-prefix-ordinary-InnoDB-read",
+          "handle": "connection-4",
+          "actor": "hypothesis",
+          "sql": "RELEASE SAVEPOINT sh01_REDACTED_MARKER_060",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-prefix-ordinary-InnoDB-read",
+          "handle": "connection-4",
+          "actor": "hypothesis",
+          "sql": "SAVEPOINT sh01_REDACTED_MARKER_061",
+          "result": {
+            "ack": true,
+            "affected_rows": 0
+          }
+        },
+        {
+          "case": "POC-07-prefix-ordinary-InnoDB-read",
+          "handle": "connection-4",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=193",
+          "result": [
+            {
+              "n": "0"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-prefix-ordinary-InnoDB-read",
+          "handle": "connection-3",
+          "actor": "independent-writer",
+          "sql": "UPDATE probe SET n=1 WHERE id=193",
+          "result": {
+            "ack": true,
+            "affected_rows": 1
+          }
+        },
+        {
+          "case": "POC-07-prefix-ordinary-InnoDB-read",
+          "handle": "connection-4",
+          "actor": "independent-reader",
+          "sql": "SELECT n FROM probe WHERE id=193",
+          "result": [
+            {
+              "n": "1"
+            }
+          ]
+        },
+        {
+          "case": "POC-07-prefix-ordinary-InnoDB-read",
+          "handle": "connection-4",
+          "actor": "hypothesis",
+          "sql": "SELECT CONNECTION_ID() AS cid,@@autocommit AS ac,@@transaction_isolation AS session_isolation",
+          "result": [
+            {
+              "cid": "80",
+              "ac": "1",
+              "session_isolation": "READ-COMMITTED"
+            }
+          ]
+        }
+      ],
+      "expected": "Measure RR persistence across the pre-BEGIN query, not assume it",
+      "actual": {
+        "id": "POC-07-prefix-ordinary-InnoDB-read",
+        "measurement": "PASS (observation, not safety acceptance)",
+        "fixture": 193,
+        "session_default": "READ-COMMITTED",
+        "first": 0,
+        "second": 1,
+        "repeatable_read_behavior": false,
+        "prefix": "ordinary-InnoDB-read",
+        "scope": "SQL-shape Core prefix model, not a bootstrapped Dolibarr integration"
+      },
+      "measurement": "PASS (measurement only)",
+      "security_assessment": "FAIL for this insertion point: second consistent read changes after independent commit; not RR behavior",
+      "evidence": "isolation-ordering.json"
+    }
+  ]
+}

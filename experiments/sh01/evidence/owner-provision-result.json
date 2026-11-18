@@ -1,0 +1,13 @@
+{
+  "scope": "New SH-01 schema/account only; existing PoC and Dolibarr data unchanged",
+  "schema": "msmsh01lab",
+  "account": "msmsh01lab",
+  "status": "PASS",
+  "version": "8.4.13",
+  "privileges": "SELECT,INSERT,UPDATE,DELETE on msmsh01lab.* only",
+  "performance_schema_grant": false,
+  "existing_accounts_changed": false,
+  "synthetic_tables": 1,
+  "synthetic_seed_rows": 2,
+  "application_config_written_without_output": true
+}

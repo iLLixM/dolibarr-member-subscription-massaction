@@ -1,0 +1,337 @@
+{
+  "module_source_base": "a74edb29ba6ca49af46c389f98c4bfd86cf161b6",
+  "core_versions": [
+    {
+      "version": "22.0.0",
+      "pin": "49b9a6d19f3deb6d410c0e9b3310e95be4ea7710",
+      "methods": {
+        "begin": {
+          "line": 216,
+          "sha256": "4a5bcd0a70468f9dcd6d72753ef8f68d4864eee13e102912c6980664448b6cc4",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/49b9a6d19f3deb6d410c0e9b3310e95be4ea7710/htdocs/core/db/DoliDB.class.php#L216"
+        },
+        "commit": {
+          "line": 241,
+          "sha256": "9b1cbac806544c6501520ede42997dff6261753d7c676752858edf8e822ce610",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/49b9a6d19f3deb6d410c0e9b3310e95be4ea7710/htdocs/core/db/DoliDB.class.php#L241"
+        },
+        "rollback": {
+          "line": 265,
+          "sha256": "fb39cd6a7d9aeb85509cf3ca7e775f07e974e5c49576b105d707a866981aa060",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/49b9a6d19f3deb6d410c0e9b3310e95be4ea7710/htdocs/core/db/DoliDB.class.php#L265"
+        }
+      }
+    },
+    {
+      "version": "22.0.1",
+      "pin": "dc00877d940da8326216e51263a85b0a4a418f22",
+      "methods": {
+        "begin": {
+          "line": 216,
+          "sha256": "4a5bcd0a70468f9dcd6d72753ef8f68d4864eee13e102912c6980664448b6cc4",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/dc00877d940da8326216e51263a85b0a4a418f22/htdocs/core/db/DoliDB.class.php#L216"
+        },
+        "commit": {
+          "line": 241,
+          "sha256": "9b1cbac806544c6501520ede42997dff6261753d7c676752858edf8e822ce610",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/dc00877d940da8326216e51263a85b0a4a418f22/htdocs/core/db/DoliDB.class.php#L241"
+        },
+        "rollback": {
+          "line": 265,
+          "sha256": "fb39cd6a7d9aeb85509cf3ca7e775f07e974e5c49576b105d707a866981aa060",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/dc00877d940da8326216e51263a85b0a4a418f22/htdocs/core/db/DoliDB.class.php#L265"
+        }
+      }
+    },
+    {
+      "version": "22.0.2",
+      "pin": "f70b6b43ecfcebc69264bc008aafcb9b9de2b23c",
+      "methods": {
+        "begin": {
+          "line": 216,
+          "sha256": "4a5bcd0a70468f9dcd6d72753ef8f68d4864eee13e102912c6980664448b6cc4",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/f70b6b43ecfcebc69264bc008aafcb9b9de2b23c/htdocs/core/db/DoliDB.class.php#L216"
+        },
+        "commit": {
+          "line": 241,
+          "sha256": "9b1cbac806544c6501520ede42997dff6261753d7c676752858edf8e822ce610",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/f70b6b43ecfcebc69264bc008aafcb9b9de2b23c/htdocs/core/db/DoliDB.class.php#L241"
+        },
+        "rollback": {
+          "line": 265,
+          "sha256": "fb39cd6a7d9aeb85509cf3ca7e775f07e974e5c49576b105d707a866981aa060",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/f70b6b43ecfcebc69264bc008aafcb9b9de2b23c/htdocs/core/db/DoliDB.class.php#L265"
+        }
+      }
+    },
+    {
+      "version": "22.0.3",
+      "pin": "e57703a6b69ad6da5876692d73defd7e754bb5c6",
+      "methods": {
+        "begin": {
+          "line": 216,
+          "sha256": "4a5bcd0a70468f9dcd6d72753ef8f68d4864eee13e102912c6980664448b6cc4",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/e57703a6b69ad6da5876692d73defd7e754bb5c6/htdocs/core/db/DoliDB.class.php#L216"
+        },
+        "commit": {
+          "line": 241,
+          "sha256": "9b1cbac806544c6501520ede42997dff6261753d7c676752858edf8e822ce610",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/e57703a6b69ad6da5876692d73defd7e754bb5c6/htdocs/core/db/DoliDB.class.php#L241"
+        },
+        "rollback": {
+          "line": 265,
+          "sha256": "fb39cd6a7d9aeb85509cf3ca7e775f07e974e5c49576b105d707a866981aa060",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/e57703a6b69ad6da5876692d73defd7e754bb5c6/htdocs/core/db/DoliDB.class.php#L265"
+        }
+      }
+    },
+    {
+      "version": "22.0.4",
+      "pin": "4f6e636e7e2aea1abde2c2b6f6ac4ffd34429f7f",
+      "methods": {
+        "begin": {
+          "line": 216,
+          "sha256": "4a5bcd0a70468f9dcd6d72753ef8f68d4864eee13e102912c6980664448b6cc4",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/4f6e636e7e2aea1abde2c2b6f6ac4ffd34429f7f/htdocs/core/db/DoliDB.class.php#L216"
+        },
+        "commit": {
+          "line": 241,
+          "sha256": "9b1cbac806544c6501520ede42997dff6261753d7c676752858edf8e822ce610",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/4f6e636e7e2aea1abde2c2b6f6ac4ffd34429f7f/htdocs/core/db/DoliDB.class.php#L241"
+        },
+        "rollback": {
+          "line": 265,
+          "sha256": "fb39cd6a7d9aeb85509cf3ca7e775f07e974e5c49576b105d707a866981aa060",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/4f6e636e7e2aea1abde2c2b6f6ac4ffd34429f7f/htdocs/core/db/DoliDB.class.php#L265"
+        }
+      }
+    },
+    {
+      "version": "22.0.5",
+      "pin": "88ad132763be45e9620128c1830e41493e1cdd05",
+      "methods": {
+        "begin": {
+          "line": 216,
+          "sha256": "4a5bcd0a70468f9dcd6d72753ef8f68d4864eee13e102912c6980664448b6cc4",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/88ad132763be45e9620128c1830e41493e1cdd05/htdocs/core/db/DoliDB.class.php#L216"
+        },
+        "commit": {
+          "line": 241,
+          "sha256": "9b1cbac806544c6501520ede42997dff6261753d7c676752858edf8e822ce610",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/88ad132763be45e9620128c1830e41493e1cdd05/htdocs/core/db/DoliDB.class.php#L241"
+        },
+        "rollback": {
+          "line": 265,
+          "sha256": "fb39cd6a7d9aeb85509cf3ca7e775f07e974e5c49576b105d707a866981aa060",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/88ad132763be45e9620128c1830e41493e1cdd05/htdocs/core/db/DoliDB.class.php#L265"
+        }
+      }
+    },
+    {
+      "version": "23.0.0",
+      "pin": "57a1f05d490a7a80944a8232e9c613e6556d2704",
+      "methods": {
+        "begin": {
+          "line": 216,
+          "sha256": "4a5bcd0a70468f9dcd6d72753ef8f68d4864eee13e102912c6980664448b6cc4",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/57a1f05d490a7a80944a8232e9c613e6556d2704/htdocs/core/db/DoliDB.class.php#L216"
+        },
+        "commit": {
+          "line": 241,
+          "sha256": "9b1cbac806544c6501520ede42997dff6261753d7c676752858edf8e822ce610",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/57a1f05d490a7a80944a8232e9c613e6556d2704/htdocs/core/db/DoliDB.class.php#L241"
+        },
+        "rollback": {
+          "line": 265,
+          "sha256": "fb39cd6a7d9aeb85509cf3ca7e775f07e974e5c49576b105d707a866981aa060",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/57a1f05d490a7a80944a8232e9c613e6556d2704/htdocs/core/db/DoliDB.class.php#L265"
+        }
+      }
+    },
+    {
+      "version": "23.0.1",
+      "pin": "b9f5895c68a9707e5b5616ef279bd7fe83760de6",
+      "methods": {
+        "begin": {
+          "line": 216,
+          "sha256": "4a5bcd0a70468f9dcd6d72753ef8f68d4864eee13e102912c6980664448b6cc4",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/b9f5895c68a9707e5b5616ef279bd7fe83760de6/htdocs/core/db/DoliDB.class.php#L216"
+        },
+        "commit": {
+          "line": 241,
+          "sha256": "9b1cbac806544c6501520ede42997dff6261753d7c676752858edf8e822ce610",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/b9f5895c68a9707e5b5616ef279bd7fe83760de6/htdocs/core/db/DoliDB.class.php#L241"
+        },
+        "rollback": {
+          "line": 265,
+          "sha256": "fb39cd6a7d9aeb85509cf3ca7e775f07e974e5c49576b105d707a866981aa060",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/b9f5895c68a9707e5b5616ef279bd7fe83760de6/htdocs/core/db/DoliDB.class.php#L265"
+        }
+      }
+    },
+    {
+      "version": "23.0.2",
+      "pin": "ccef1102e6850b7545be7bad91cf0cc4c74ac6ea",
+      "methods": {
+        "begin": {
+          "line": 216,
+          "sha256": "4a5bcd0a70468f9dcd6d72753ef8f68d4864eee13e102912c6980664448b6cc4",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/ccef1102e6850b7545be7bad91cf0cc4c74ac6ea/htdocs/core/db/DoliDB.class.php#L216"
+        },
+        "commit": {
+          "line": 241,
+          "sha256": "9b1cbac806544c6501520ede42997dff6261753d7c676752858edf8e822ce610",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/ccef1102e6850b7545be7bad91cf0cc4c74ac6ea/htdocs/core/db/DoliDB.class.php#L241"
+        },
+        "rollback": {
+          "line": 265,
+          "sha256": "fb39cd6a7d9aeb85509cf3ca7e775f07e974e5c49576b105d707a866981aa060",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/ccef1102e6850b7545be7bad91cf0cc4c74ac6ea/htdocs/core/db/DoliDB.class.php#L265"
+        }
+      }
+    },
+    {
+      "version": "23.0.3",
+      "pin": "57d0be7dc97140d7d47e826875ba9256ec3b6357",
+      "methods": {
+        "begin": {
+          "line": 216,
+          "sha256": "4a5bcd0a70468f9dcd6d72753ef8f68d4864eee13e102912c6980664448b6cc4",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/57d0be7dc97140d7d47e826875ba9256ec3b6357/htdocs/core/db/DoliDB.class.php#L216"
+        },
+        "commit": {
+          "line": 241,
+          "sha256": "9b1cbac806544c6501520ede42997dff6261753d7c676752858edf8e822ce610",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/57d0be7dc97140d7d47e826875ba9256ec3b6357/htdocs/core/db/DoliDB.class.php#L241"
+        },
+        "rollback": {
+          "line": 265,
+          "sha256": "fb39cd6a7d9aeb85509cf3ca7e775f07e974e5c49576b105d707a866981aa060",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/57d0be7dc97140d7d47e826875ba9256ec3b6357/htdocs/core/db/DoliDB.class.php#L265"
+        }
+      }
+    },
+    {
+      "version": "23.0.4",
+      "pin": "cb82037066c1c71f7c867482e9e92975222dfc14",
+      "methods": {
+        "begin": {
+          "line": 216,
+          "sha256": "4a5bcd0a70468f9dcd6d72753ef8f68d4864eee13e102912c6980664448b6cc4",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/cb82037066c1c71f7c867482e9e92975222dfc14/htdocs/core/db/DoliDB.class.php#L216"
+        },
+        "commit": {
+          "line": 241,
+          "sha256": "9b1cbac806544c6501520ede42997dff6261753d7c676752858edf8e822ce610",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/cb82037066c1c71f7c867482e9e92975222dfc14/htdocs/core/db/DoliDB.class.php#L241"
+        },
+        "rollback": {
+          "line": 265,
+          "sha256": "fb39cd6a7d9aeb85509cf3ca7e775f07e974e5c49576b105d707a866981aa060",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/cb82037066c1c71f7c867482e9e92975222dfc14/htdocs/core/db/DoliDB.class.php#L265"
+        }
+      }
+    },
+    {
+      "version": "24.0.0",
+      "pin": "769c7db907099643558e77d7002c109cfda919e5",
+      "methods": {
+        "begin": {
+          "line": 216,
+          "sha256": "4a5bcd0a70468f9dcd6d72753ef8f68d4864eee13e102912c6980664448b6cc4",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/769c7db907099643558e77d7002c109cfda919e5/htdocs/core/db/DoliDB.class.php#L216"
+        },
+        "commit": {
+          "line": 241,
+          "sha256": "9b1cbac806544c6501520ede42997dff6261753d7c676752858edf8e822ce610",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/769c7db907099643558e77d7002c109cfda919e5/htdocs/core/db/DoliDB.class.php#L241"
+        },
+        "rollback": {
+          "line": 265,
+          "sha256": "fb39cd6a7d9aeb85509cf3ca7e775f07e974e5c49576b105d707a866981aa060",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/769c7db907099643558e77d7002c109cfda919e5/htdocs/core/db/DoliDB.class.php#L265"
+        }
+      }
+    },
+    {
+      "version": "24.0.1",
+      "pin": "b7958385f00a92219f76a4dfea67dae93df97a25",
+      "methods": {
+        "begin": {
+          "line": 216,
+          "sha256": "4a5bcd0a70468f9dcd6d72753ef8f68d4864eee13e102912c6980664448b6cc4",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/b7958385f00a92219f76a4dfea67dae93df97a25/htdocs/core/db/DoliDB.class.php#L216"
+        },
+        "commit": {
+          "line": 241,
+          "sha256": "9b1cbac806544c6501520ede42997dff6261753d7c676752858edf8e822ce610",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/b7958385f00a92219f76a4dfea67dae93df97a25/htdocs/core/db/DoliDB.class.php#L241"
+        },
+        "rollback": {
+          "line": 265,
+          "sha256": "fb39cd6a7d9aeb85509cf3ca7e775f07e974e5c49576b105d707a866981aa060",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/b7958385f00a92219f76a4dfea67dae93df97a25/htdocs/core/db/DoliDB.class.php#L265"
+        }
+      }
+    },
+    {
+      "version": "24.0.2",
+      "pin": "7e927764767343334aaa067ca5ec054cfea0a26b",
+      "methods": {
+        "begin": {
+          "line": 216,
+          "sha256": "4a5bcd0a70468f9dcd6d72753ef8f68d4864eee13e102912c6980664448b6cc4",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/7e927764767343334aaa067ca5ec054cfea0a26b/htdocs/core/db/DoliDB.class.php#L216"
+        },
+        "commit": {
+          "line": 241,
+          "sha256": "9b1cbac806544c6501520ede42997dff6261753d7c676752858edf8e822ce610",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/7e927764767343334aaa067ca5ec054cfea0a26b/htdocs/core/db/DoliDB.class.php#L241"
+        },
+        "rollback": {
+          "line": 265,
+          "sha256": "fb39cd6a7d9aeb85509cf3ca7e775f07e974e5c49576b105d707a866981aa060",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/7e927764767343334aaa067ca5ec054cfea0a26b/htdocs/core/db/DoliDB.class.php#L265"
+        }
+      }
+    },
+    {
+      "version": "24.0.3",
+      "pin": "5c6c7ff6a5112413b1c27221c8d11750afad56f8",
+      "methods": {
+        "begin": {
+          "line": 216,
+          "sha256": "4a5bcd0a70468f9dcd6d72753ef8f68d4864eee13e102912c6980664448b6cc4",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/5c6c7ff6a5112413b1c27221c8d11750afad56f8/htdocs/core/db/DoliDB.class.php#L216"
+        },
+        "commit": {
+          "line": 241,
+          "sha256": "9b1cbac806544c6501520ede42997dff6261753d7c676752858edf8e822ce610",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/5c6c7ff6a5112413b1c27221c8d11750afad56f8/htdocs/core/db/DoliDB.class.php#L241"
+        },
+        "rollback": {
+          "line": 265,
+          "sha256": "fb39cd6a7d9aeb85509cf3ca7e775f07e974e5c49576b105d707a866981aa060",
+          "url": "https://github.com/Dolibarr/dolibarr/blob/5c6c7ff6a5112413b1c27221c8d11750afad56f8/htdocs/core/db/DoliDB.class.php#L265"
+        }
+      }
+    }
+  ],
+  "all_fifteen_core_transaction_method_hashes_identical": true,
+  "module_file_hashes": {
+    "class/databasestate.class.php": "a68021449bed754ede8fa94671d8366ceab81316c17ab0c536cda8f79ff782c0",
+    "class/booking.class.php": "2b81d549510140a7b4045464f12e507b30d4c27d923fa9025acc3c5bf34a8fcf",
+    "lib/booking.lib.php": "3217f79bbaba817a4501336a0f35a872652a4da35627f308a578890a869a04cf",
+    "subscription.php": "79900c85be8172d3f778217667730a8c75c348c26cda1e55264860d5fa6fe443",
+    "test/fixtures/database_state.php": "70e63de2fc2c8f02578854752d231c034744ed4cc2e95838e374d94a60a15219",
+    "test/unit/database.php": "c428fc0a41b5cb52d13590ab1508be66dd80e16091b307cd983beb7c6060459f"
+  },
+  "reference_source_metadata": {
+    "core_pin": "5c6c7ff6a5112413b1c27221c8d11750afad56f8",
+    "module_symlink_target": "/home/marcel/dolibarr-member-subscription-massaction-i105-v24-mysql",
+    "module_pin": "0999efb4aafca43d90ce12e38d370662ad0c63a1",
+    "observer_bytes_equal_analysis_base": true,
+    "database_bootstrap_or_business_checks": "NOT EXECUTED; source metadata only"
+  },
+  "scope": "Source comparison, NOT runtime Core integration; live SQL uses the explicitly labeled counter MODEL"
+}

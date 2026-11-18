@@ -1,0 +1,7 @@
+<?php
+/* Measurement of destructive marker validation on one new artificial row. */
+require __DIR__.'/lab.php';
+if(PHP_SAPI!=='cli'||($argv[1]??'')!=='--run-approved'||empty($argv[2])||file_exists($argv[2]))exit(77);
+$l=new ShLab();$l->case='POC-06-rollback-to';$failure=null;
+try{$reader=$l->connect();$l->fixture($reader,194);$d=$l->connect();$l->q($d,'BEGIN');$l->q($d,'SAVEPOINT sh01_start');$l->q($d,'UPDATE probe SET n=1 WHERE id=194');$before=$l->value($d,194);$l->q($d,'ROLLBACK TO SAVEPOINT sh01_start','hypothesis-alternative');$after=$l->value($d,194);$l->q($d,'COMMIT');$outside=$l->value($reader,194);$l->require($before===1&&$after===0&&$outside===0,'Rollback-to measurement changed');$result=array('id'=>$l->case,'measurement'=>'PASS','expected'=>'ROLLBACK TO preserves marker usability but undoes work since it','actual'=>array('before'=>$before,'after'=>$after,'independent_final'=>$outside,'fixture'=>194),'security_contract'=>'Not an acceptable non-destructive observer after business DML');$l->close($d);$l->close($reader);}catch(Throwable $e){$failure=array('class'=>get_class($e),'errno'=>$e->getCode(),'assertion'=>$e instanceof LogicException?$e->getMessage():null);$result=array('status'=>'STOP','failure'=>$failure);}
+$result['trace']=$l->trace;file_put_contents($argv[2],json_encode($result,JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES)."\n");unset($result['trace']);echo json_encode($result)."\n";exit($failure?1:0);
