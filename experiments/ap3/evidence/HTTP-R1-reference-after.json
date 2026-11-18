@@ -1,0 +1,115 @@
+{
+  "status": "PASS",
+  "reference_business_rows_equal": true,
+  "reference_before": {
+    "adherent": {
+      "rows": 55,
+      "sha256": "002b30be49fcd36eee37b1b8015393db33906e7881ab3179388b1acf413565db"
+    },
+    "subscription": {
+      "rows": 60,
+      "sha256": "f5321c14bfcceb706fe686dfcbbc69f22addebfba5d12e9dafd3530f46b9055f"
+    },
+    "societe": {
+      "rows": 11,
+      "sha256": "e88d4e04f4b7ebc1716f6ae21f70860c8a761b2b08f9ff9f65cc35fe61e921c6"
+    },
+    "socpeople": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "facture": {
+      "rows": 18,
+      "sha256": "f80f91a6c7045c903c654cd5aec73333eb0ce94ef79ddaeb7c25b5786b95ab80"
+    },
+    "facturedet": {
+      "rows": 18,
+      "sha256": "fb0cd599a2885c8c6b8cbafe438ce6806f588ae35a343e54008d9ad3a124fbee"
+    },
+    "actioncomm": {
+      "rows": 92,
+      "sha256": "155688691590f3beb68318a8153cf2ddb77d1505000037a25566edeb70e57802"
+    },
+    "actioncomm_resources": {
+      "rows": 92,
+      "sha256": "b5f1d5a695c9fd839a5ee07b3204151f12f8179d952f429cc6164b639aad5654"
+    },
+    "element_element": {
+      "rows": 18,
+      "sha256": "94cc5fa2739e10b733a124b5f65473149be068faa5145be533962f4d1dd7fe11"
+    },
+    "ecm_files": {
+      "rows": 15,
+      "sha256": "aa296972cf2d632cc38f90ef272126ad6359ad8b925e465d0910291517c873b6"
+    },
+    "paiement": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "bank": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "product": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "reference_after": {
+    "adherent": {
+      "rows": 55,
+      "sha256": "002b30be49fcd36eee37b1b8015393db33906e7881ab3179388b1acf413565db"
+    },
+    "subscription": {
+      "rows": 60,
+      "sha256": "f5321c14bfcceb706fe686dfcbbc69f22addebfba5d12e9dafd3530f46b9055f"
+    },
+    "societe": {
+      "rows": 11,
+      "sha256": "e88d4e04f4b7ebc1716f6ae21f70860c8a761b2b08f9ff9f65cc35fe61e921c6"
+    },
+    "socpeople": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "facture": {
+      "rows": 18,
+      "sha256": "f80f91a6c7045c903c654cd5aec73333eb0ce94ef79ddaeb7c25b5786b95ab80"
+    },
+    "facturedet": {
+      "rows": 18,
+      "sha256": "fb0cd599a2885c8c6b8cbafe438ce6806f588ae35a343e54008d9ad3a124fbee"
+    },
+    "actioncomm": {
+      "rows": 92,
+      "sha256": "155688691590f3beb68318a8153cf2ddb77d1505000037a25566edeb70e57802"
+    },
+    "actioncomm_resources": {
+      "rows": 92,
+      "sha256": "b5f1d5a695c9fd839a5ee07b3204151f12f8179d952f429cc6164b639aad5654"
+    },
+    "element_element": {
+      "rows": 18,
+      "sha256": "94cc5fa2739e10b733a124b5f65473149be068faa5145be533962f4d1dd7fe11"
+    },
+    "ecm_files": {
+      "rows": 15,
+      "sha256": "aa296972cf2d632cc38f90ef272126ad6359ad8b925e465d0910291517c873b6"
+    },
+    "paiement": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "bank": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "product": {
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "auth_scope": "normal login/session/audit state may change; these13 business tables only",
+  "server_terminated": true,
+  "runtime_retained": "/tmp/dolibarr-ap3-www-1779e4608d931d33d3be"
+}

@@ -1,0 +1,393 @@
+{
+  "status": "PASS",
+  "cases": [
+    {
+      "id": "HTTP_NO_CHAIN_COMMIT",
+      "status": "PASS",
+      "first_member": "SUCCESS",
+      "batch": "CONTINUE",
+      "readback": {
+        "phase": "done",
+        "consumed": true,
+        "results": {
+          "6200": {
+            "fixture": 6200,
+            "operation": "commit",
+            "member": "SUCCESS",
+            "batch": "CONTINUE",
+            "end_ack": true,
+            "Core_return": 1,
+            "Core_depth": 0,
+            "native_errno": 0,
+            "exception": null,
+            "classification": [
+              "NO_CHAIN",
+              "NO_CHAIN"
+            ],
+            "checkpoint": null
+          },
+          "6201": {
+            "fixture": 6201,
+            "operation": "commit",
+            "member": "SUCCESS",
+            "batch": "CONTINUE",
+            "end_ack": true,
+            "Core_return": 1,
+            "Core_depth": 0,
+            "native_errno": 0,
+            "exception": null,
+            "classification": [
+              "NO_CHAIN",
+              "NO_CHAIN"
+            ],
+            "checkpoint": null
+          },
+          "6202": {
+            "fixture": 6202,
+            "operation": "commit",
+            "member": "SUCCESS",
+            "batch": "CONTINUE",
+            "end_ack": true,
+            "Core_return": 1,
+            "Core_depth": 0,
+            "native_errno": 0,
+            "exception": null,
+            "classification": [
+              "NO_CHAIN",
+              "NO_CHAIN"
+            ],
+            "checkpoint": null
+          }
+        },
+        "case": "HTTP_NO_CHAIN_COMMIT",
+        "batch": "CONTINUE"
+      },
+      "replay_rejected_before_lab": true
+    },
+    {
+      "id": "HTTP_NO_CHAIN_ROLLBACK",
+      "status": "PASS",
+      "first_member": "ROLLBACK_ACKNOWLEDGED",
+      "batch": "CONTINUE",
+      "readback": {
+        "phase": "done",
+        "consumed": true,
+        "results": {
+          "6203": {
+            "fixture": 6203,
+            "operation": "rollback",
+            "member": "ROLLBACK_ACKNOWLEDGED",
+            "batch": "CONTINUE",
+            "end_ack": true,
+            "Core_return": true,
+            "Core_depth": 0,
+            "native_errno": 0,
+            "exception": null,
+            "classification": [
+              "NO_CHAIN",
+              "NO_CHAIN"
+            ],
+            "checkpoint": null
+          },
+          "6204": {
+            "fixture": 6204,
+            "operation": "commit",
+            "member": "SUCCESS",
+            "batch": "CONTINUE",
+            "end_ack": true,
+            "Core_return": 1,
+            "Core_depth": 0,
+            "native_errno": 0,
+            "exception": null,
+            "classification": [
+              "NO_CHAIN",
+              "NO_CHAIN"
+            ],
+            "checkpoint": null
+          },
+          "6205": {
+            "fixture": 6205,
+            "operation": "commit",
+            "member": "SUCCESS",
+            "batch": "CONTINUE",
+            "end_ack": true,
+            "Core_return": 1,
+            "Core_depth": 0,
+            "native_errno": 0,
+            "exception": null,
+            "classification": [
+              "NO_CHAIN",
+              "NO_CHAIN"
+            ],
+            "checkpoint": null
+          }
+        },
+        "case": "HTTP_NO_CHAIN_ROLLBACK",
+        "batch": "CONTINUE"
+      },
+      "replay_rejected_before_lab": true
+    },
+    {
+      "id": "HTTP_CHAIN_COMMIT",
+      "status": "PASS",
+      "first_member": "SUCCESS",
+      "batch": "STOP",
+      "readback": {
+        "phase": "done",
+        "consumed": true,
+        "results": {
+          "6206": {
+            "fixture": 6206,
+            "operation": "commit",
+            "member": "SUCCESS",
+            "batch": "STOP",
+            "end_ack": true,
+            "Core_return": 1,
+            "Core_depth": 0,
+            "native_errno": 0,
+            "exception": null,
+            "classification": [
+              "CHAIN",
+              "CHAIN"
+            ],
+            "checkpoint": null
+          },
+          "6207": {
+            "member": "NOT_PROCESSED",
+            "reason": "terminal_batch"
+          },
+          "6208": {
+            "member": "NOT_PROCESSED",
+            "reason": "terminal_batch"
+          }
+        },
+        "case": "HTTP_CHAIN_COMMIT",
+        "batch": "STOP"
+      },
+      "replay_rejected_before_lab": true
+    },
+    {
+      "id": "HTTP_CHAIN_ROLLBACK",
+      "status": "PASS",
+      "first_member": "ROLLBACK_ACKNOWLEDGED",
+      "batch": "STOP",
+      "readback": {
+        "phase": "done",
+        "consumed": true,
+        "results": {
+          "6209": {
+            "fixture": 6209,
+            "operation": "rollback",
+            "member": "ROLLBACK_ACKNOWLEDGED",
+            "batch": "STOP",
+            "end_ack": true,
+            "Core_return": true,
+            "Core_depth": 0,
+            "native_errno": 0,
+            "exception": null,
+            "classification": [
+              "CHAIN",
+              "CHAIN"
+            ],
+            "checkpoint": null
+          },
+          "6210": {
+            "member": "NOT_PROCESSED",
+            "reason": "terminal_batch"
+          },
+          "6211": {
+            "member": "NOT_PROCESSED",
+            "reason": "terminal_batch"
+          }
+        },
+        "case": "HTTP_CHAIN_ROLLBACK",
+        "batch": "STOP"
+      },
+      "replay_rejected_before_lab": true
+    },
+    {
+      "id": "HTTP_RELEASE_COMMIT",
+      "status": "PASS",
+      "first_member": "SUCCESS",
+      "batch": "STOP",
+      "readback": {
+        "phase": "done",
+        "consumed": true,
+        "results": {
+          "6212": {
+            "fixture": 6212,
+            "operation": "commit",
+            "member": "SUCCESS",
+            "batch": "STOP",
+            "end_ack": true,
+            "Core_return": 1,
+            "Core_depth": 0,
+            "native_errno": 0,
+            "exception": null,
+            "classification": [
+              "RELEASE",
+              "RELEASE"
+            ],
+            "checkpoint": null
+          },
+          "6213": {
+            "member": "NOT_PROCESSED",
+            "reason": "terminal_batch"
+          },
+          "6214": {
+            "member": "NOT_PROCESSED",
+            "reason": "terminal_batch"
+          }
+        },
+        "case": "HTTP_RELEASE_COMMIT",
+        "batch": "STOP"
+      },
+      "replay_rejected_before_lab": true
+    },
+    {
+      "id": "HTTP_RELEASE_ROLLBACK",
+      "status": "PASS",
+      "first_member": "ROLLBACK_ACKNOWLEDGED",
+      "batch": "STOP",
+      "readback": {
+        "phase": "done",
+        "consumed": true,
+        "results": {
+          "6215": {
+            "fixture": 6215,
+            "operation": "rollback",
+            "member": "ROLLBACK_ACKNOWLEDGED",
+            "batch": "STOP",
+            "end_ack": true,
+            "Core_return": true,
+            "Core_depth": 0,
+            "native_errno": 0,
+            "exception": null,
+            "classification": [
+              "RELEASE",
+              "RELEASE"
+            ],
+            "checkpoint": null
+          },
+          "6216": {
+            "member": "NOT_PROCESSED",
+            "reason": "terminal_batch"
+          },
+          "6217": {
+            "member": "NOT_PROCESSED",
+            "reason": "terminal_batch"
+          }
+        },
+        "case": "HTTP_RELEASE_ROLLBACK",
+        "batch": "STOP"
+      },
+      "replay_rejected_before_lab": true
+    },
+    {
+      "id": "HTTP_CHECKPOINT_FAILURE",
+      "status": "PASS",
+      "first_member": "SUCCESS",
+      "batch": "STOP",
+      "readback": {
+        "phase": "processing",
+        "consumed": true,
+        "results": {
+          "6220": {
+            "member": "PENDING_RESULT_RECORD"
+          },
+          "6221": {
+            "member": "PENDING_RESULT_RECORD"
+          },
+          "6222": {
+            "member": "PENDING_RESULT_RECORD"
+          }
+        },
+        "case": "HTTP_CHECKPOINT_FAILURE"
+      },
+      "replay_rejected_before_lab": true
+    },
+    {
+      "id": "HTTP_UNKNOWN_CLOSE",
+      "status": "PASS",
+      "first_member": "UNKNOWN",
+      "batch": "STOP",
+      "readback": {
+        "phase": "done",
+        "consumed": true,
+        "results": {
+          "6223": {
+            "fixture": 6223,
+            "operation": "commit",
+            "member": "UNKNOWN",
+            "batch": "STOP",
+            "end_ack": false,
+            "Core_return": null,
+            "Core_depth": 1,
+            "native_errno": null,
+            "exception": "Error",
+            "classification": [
+              "NO_CHAIN",
+              "NO_CHAIN"
+            ],
+            "checkpoint": null
+          },
+          "6224": {
+            "member": "NOT_PROCESSED",
+            "reason": "terminal_batch"
+          },
+          "6225": {
+            "member": "NOT_PROCESSED",
+            "reason": "terminal_batch"
+          }
+        },
+        "case": "HTTP_UNKNOWN_CLOSE",
+        "batch": "STOP"
+      },
+      "replay_rejected_before_lab": true
+    },
+    {
+      "id": "HTTP_UNREADABLE",
+      "status": "PASS",
+      "first_member": "SUCCESS",
+      "batch": "STOP",
+      "readback": {
+        "phase": "done",
+        "consumed": true,
+        "results": {
+          "6226": {
+            "fixture": 6226,
+            "operation": "commit",
+            "member": "SUCCESS",
+            "batch": "STOP",
+            "end_ack": true,
+            "Core_return": 1,
+            "Core_depth": 0,
+            "native_errno": 0,
+            "exception": null,
+            "classification": [
+              null,
+              null
+            ],
+            "checkpoint": null
+          },
+          "6227": {
+            "member": "NOT_PROCESSED",
+            "reason": "terminal_batch"
+          },
+          "6228": {
+            "member": "NOT_PROCESSED",
+            "reason": "terminal_batch"
+          }
+        },
+        "case": "HTTP_UNREADABLE",
+        "batch": "STOP"
+      },
+      "replay_rejected_before_lab": true
+    }
+  ],
+  "failure": null,
+  "session_tokens_logged": false,
+  "real_business_operations": 0,
+  "reference_business_equal": true,
+  "temporary_server_stopped": true
+}

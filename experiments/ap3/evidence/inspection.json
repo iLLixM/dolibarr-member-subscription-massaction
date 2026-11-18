@@ -1,0 +1,114 @@
+{
+    "status": "PASS",
+    "php": "8.2.35",
+    "driver": "mysqlnd 8.2.35",
+    "mysql": "8.4.13",
+    "dolibarr": "24.0.3",
+    "Core": "5c6c7ff6a5112413b1c27221c8d11750afad56f8",
+    "base": "c79830976a5f1e1bd57d51005ff34c10c424e36f",
+    "logger": {
+        "supported": true,
+        "classes": [
+            {
+                "class": "mod_syslog_file",
+                "source": "core/modules/syslog/mod_syslog_file.php",
+                "sha256": "3b7c6fa701b5a094003ef1ecbd195f4e93fc8539ba13108910bad800bd521b1a"
+            }
+        ],
+        "level": 7,
+        "syslog_enabled": true,
+        "scope": "Exact pinned standard file logger only; no blanket third-party logger qualification"
+    },
+    "logger_profile": "CLI explicit standard file logger/DEBUG; actual HTTP configuration remains separate",
+    "grants": [
+        "GRANT USAGE ON *.* TO `msmsh01lab`@`%`",
+        "GRANT SELECT, INSERT, UPDATE, DELETE ON `msmsh01lab`.* TO `msmsh01lab`@`%`"
+    ],
+    "P_S_denied": 1142,
+    "baseline_rows": 81,
+    "baseline_sha256": "a365f100865c3f9451d2982e56e1eb416672dc728a505e6ebb537d42d2a0327e",
+    "core_sha256": {
+        "core/db/DoliDB.class.php": "fff88cb62729ee68784530c832ba73dc13d7103d16bebb0a41c2a4eaedb99c97",
+        "core/db/mysqli.class.php": "828853c0f252b81529e0eb829a7460e73edf88c4ed1b7ea49ba475a8122d1d3e",
+        "core/lib/functions.lib.php": "b88b148fda12377d71b6324b03b11fa97043ef9eba9ef2d890c8a3d05834c1d1",
+        "core/modules/syslog/mod_syslog_file.php": "3b7c6fa701b5a094003ef1ecbd195f4e93fc8539ba13108910bad800bd521b1a"
+    },
+    "trace": [
+        {
+            "case": "inspect",
+            "event": "sql",
+            "time": 1795043708.202885,
+            "role": "independent",
+            "connection": 160,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "started": 1795043708.19911,
+            "ok": true,
+            "errno": 0
+        },
+        {
+            "case": "inspect",
+            "event": "sql",
+            "time": 1795043708.209354,
+            "role": "independent",
+            "connection": 160,
+            "sql": "SELECT id,label,n FROM probe ORDER BY id",
+            "started": 1795043708.205363,
+            "ok": true,
+            "errno": 0
+        },
+        {
+            "case": "inspect",
+            "event": "sql",
+            "time": 1795043708.211981,
+            "role": "independent",
+            "connection": 160,
+            "sql": "SHOW GRANTS",
+            "started": 1795043708.210048,
+            "ok": true,
+            "errno": 0
+        },
+        {
+            "case": "inspect",
+            "event": "sql",
+            "time": 1795043708.214683,
+            "role": "independent",
+            "connection": 160,
+            "sql": "SELECT THREAD_ID FROM performance_schema.events_transactions_current WHERE 1=0",
+            "started": 1795043708.212261,
+            "ok": false,
+            "errno": 1142
+        }
+    ],
+    "monitor": [
+        {
+            "function": "dol_syslog",
+            "source": "core/db/mysqli.class.php",
+            "line": 235
+        },
+        {
+            "function": "dol_syslog",
+            "source": "core/db/mysqli.class.php",
+            "line": 345
+        },
+        {
+            "function": "dol_syslog",
+            "source": "core/db/mysqli.class.php",
+            "line": 345
+        },
+        {
+            "function": "dol_syslog",
+            "source": "core/db/mysqli.class.php",
+            "line": 345
+        },
+        {
+            "function": "dol_syslog",
+            "source": "core/db/mysqli.class.php",
+            "line": 345
+        },
+        {
+            "function": "dol_syslog",
+            "source": "core/db/mysqli.class.php",
+            "line": 377
+        }
+    ]
+}

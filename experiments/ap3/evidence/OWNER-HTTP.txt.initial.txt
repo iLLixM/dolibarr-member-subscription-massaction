@@ -1,0 +1,55 @@
+AP3 Owner-only protected HTTP/session qualification (one invocation; no rerun)
+
+Source checkout: /tmp/dolibarr-ap3-completion-gate
+Invocation as marcel (do NOT put sudo before Python):
+
+python3 /tmp/dolibarr-ap3-completion-gate/experiments/ap3/owner-http.py --run-approved
+
+Read owner-http.py, owner-server.php, http-router.php, completion.php and core.php.
+The Python controller first asks, without echo, for the existing I105 Dolibarr
+password of synthetic user msm-i105. Do not send that password or any cookie/token
+to the agent. It then invokes sudo -u www-data PHP; enter sudo's password locally.
+No root PHP, admin SQL or new grant is used. Agent marcel cannot read the protected
+I105 conf/session path; that is the reason this invocation remains with the Owner.
+
+The bridge checks pinned Core source hashes and reads only hashes/counts from13
+I105 business tables. It starts a temporary PHP8.2 loopback-only HTTP server with
+actual I105 conf.php/main.inc.php authentication and the Apache-configured existing
+file-session path; session.save_handler=files. It does not edit Core, Apache config,
+module symlinks or PHP ini files. This is cli-server SAPI mirroring the relevant
+I105 session/transport settings, not an Apache-SAPI claim. Normal authentication
+can update this synthetic user's login/session/security-audit state. Business rows
+are independently compared before/after and must stay unchanged.
+
+Lab credentials are handed privately through stdin and an anonymous seekable FD;
+never argv, environment, Git, stdout shown to the Owner, or a persistent credential
+file. The random routing capability, password, cookies and CSRF are in memory only.
+Never run owner-server.php alone or print its first PRIVATE IPC response. Runtime
+and sanitized result files are retained under a new private www-data /tmp path.
+
+Only new artificial probe rows6200..6228 in restricted msmsh01lab are written.
+No existing SH-01/D-01/CLI-AP3 fixtures are reused. No membership, customer, invoice,
+PDF, SMTP, KILL, DDL, global setting, existing-user privilege or Core transaction
+method is changed. NO_CHAIN/CHAIN/RELEASE are set once per newly opened lab test
+connection only as the separately approved initial test stimulus. The adapter has
+no session normalization. PHP external-mail/network transport functions are fenced.
+
+Cases: all6 completion/end pairs; real files-handler checkpoint reopen failure
+using an exclusively new inaccessible directory for that one request; own lab
+connection closed before COMMIT; unreadable-classification fault injection. GET
+readback checks actual durable session results. A consumed-case replay must return
+before opening any lab connection. Unknown classification does not invalidate an
+acknowledged member end; it causes STOP. For checkpoint failure, the durable consumed
+state remains PENDING_RESULT_RECORD (not a false claim of unprocessed/rolled-back
+work), while the HTTP/evidence result records acknowledged COMMIT and STOP/E15.
+
+Core shutdown close/logger calls are captured after the response calculation.
+Only exact pinned standard file logging is accepted; other handler paths are not
+invoked by the experiment and remain unqualified. The bridge stops its own temporary
+server in finally and compares reference business hashes. No service reload/restart.
+
+On STOP/timeout/interruption DO NOT REPEAT. Send only the sanitized terminal summary
+and the evidence path. Do not paste passwords, raw HTML, cookies, session files,
+private route capabilities or protected Dolibarr logs. The controller preserves
+partial results; no automatic test/book/rollback retry or compensation occurs.
+The independent completion gate is not closed by running this program.

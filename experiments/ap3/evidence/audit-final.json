@@ -1,0 +1,409 @@
+{
+    "status": "PASS",
+    "scope": "independent read-only; not completion rescue",
+    "historical_rows": 81,
+    "historical_sha256": "a365f100865c3f9451d2982e56e1eb416672dc728a505e6ebb537d42d2a0327e",
+    "historical_unchanged": true,
+    "new_rows": [
+        {
+            "id": "6000",
+            "label": "AP3-AP3-CLI-NO-CHAIN-commit",
+            "n": "1"
+        },
+        {
+            "id": "6001",
+            "label": "AP3-AP3-CLI-NO-CHAIN-commit",
+            "n": "1"
+        },
+        {
+            "id": "6002",
+            "label": "AP3-AP3-CLI-NO-CHAIN-commit",
+            "n": "1"
+        },
+        {
+            "id": "6003",
+            "label": "AP3-AP3-CLI-NO-CHAIN-rollback",
+            "n": "0"
+        },
+        {
+            "id": "6004",
+            "label": "AP3-AP3-CLI-NO-CHAIN-rollback",
+            "n": "1"
+        },
+        {
+            "id": "6005",
+            "label": "AP3-AP3-CLI-NO-CHAIN-rollback",
+            "n": "1"
+        },
+        {
+            "id": "6006",
+            "label": "AP3-AP3-CLI-CHAIN-commit",
+            "n": "1"
+        },
+        {
+            "id": "6007",
+            "label": "AP3-AP3-CLI-CHAIN-commit",
+            "n": "0"
+        },
+        {
+            "id": "6008",
+            "label": "AP3-AP3-CLI-CHAIN-commit",
+            "n": "0"
+        },
+        {
+            "id": "6009",
+            "label": "AP3-AP3-CLI-CHAIN-rollback",
+            "n": "0"
+        },
+        {
+            "id": "6010",
+            "label": "AP3-AP3-CLI-CHAIN-rollback",
+            "n": "0"
+        },
+        {
+            "id": "6011",
+            "label": "AP3-AP3-CLI-CHAIN-rollback",
+            "n": "0"
+        },
+        {
+            "id": "6012",
+            "label": "AP3-AP3-CLI-RELEASE-commit",
+            "n": "1"
+        },
+        {
+            "id": "6013",
+            "label": "AP3-AP3-CLI-RELEASE-commit",
+            "n": "0"
+        },
+        {
+            "id": "6014",
+            "label": "AP3-AP3-CLI-RELEASE-commit",
+            "n": "0"
+        },
+        {
+            "id": "6015",
+            "label": "AP3-AP3-CLI-RELEASE-rollback",
+            "n": "0"
+        },
+        {
+            "id": "6016",
+            "label": "AP3-AP3-CLI-RELEASE-rollback",
+            "n": "0"
+        },
+        {
+            "id": "6017",
+            "label": "AP3-AP3-CLI-RELEASE-rollback",
+            "n": "0"
+        },
+        {
+            "id": "6018",
+            "label": "AP3-AP3-CLI-NO-CHAIN-commit-unreadable",
+            "n": "1"
+        },
+        {
+            "id": "6019",
+            "label": "AP3-AP3-CLI-NO-CHAIN-commit-unreadable",
+            "n": "0"
+        },
+        {
+            "id": "6020",
+            "label": "AP3-AP3-CLI-NO-CHAIN-commit-unreadable",
+            "n": "0"
+        },
+        {
+            "id": "6021",
+            "label": "AP3-AP3-CLI-NO-CHAIN-commit-malformed",
+            "n": "1"
+        },
+        {
+            "id": "6022",
+            "label": "AP3-AP3-CLI-NO-CHAIN-commit-malformed",
+            "n": "0"
+        },
+        {
+            "id": "6023",
+            "label": "AP3-AP3-CLI-NO-CHAIN-commit-malformed",
+            "n": "0"
+        },
+        {
+            "id": "6024",
+            "label": "AP3-AP3-CLI-CHAIN-commit-inconsistent",
+            "n": "1"
+        },
+        {
+            "id": "6025",
+            "label": "AP3-AP3-CLI-CHAIN-commit-inconsistent",
+            "n": "0"
+        },
+        {
+            "id": "6026",
+            "label": "AP3-AP3-CLI-CHAIN-commit-inconsistent",
+            "n": "0"
+        },
+        {
+            "id": "6027",
+            "label": "AP3-AP3-CLI-NO-CHAIN-commit-close-before-end",
+            "n": "0"
+        },
+        {
+            "id": "6028",
+            "label": "AP3-AP3-CLI-NO-CHAIN-commit-close-before-end",
+            "n": "0"
+        },
+        {
+            "id": "6029",
+            "label": "AP3-AP3-CLI-NO-CHAIN-commit-close-before-end",
+            "n": "0"
+        },
+        {
+            "id": "6030",
+            "label": "AP3-unsupported-logger",
+            "n": "0"
+        },
+        {
+            "id": "6031",
+            "label": "AP3-unsupported-logger",
+            "n": "0"
+        },
+        {
+            "id": "6032",
+            "label": "AP3-unsupported-logger",
+            "n": "0"
+        },
+        {
+            "id": "6033",
+            "label": "AP3-unsupported-session",
+            "n": "0"
+        },
+        {
+            "id": "6034",
+            "label": "AP3-unsupported-session",
+            "n": "0"
+        },
+        {
+            "id": "6035",
+            "label": "AP3-unsupported-session",
+            "n": "0"
+        },
+        {
+            "id": "6036",
+            "label": "AP3-foreign",
+            "n": "0"
+        },
+        {
+            "id": "6200",
+            "label": "AP3-HTTP-NO-CHAIN-COMMIT",
+            "n": "1"
+        },
+        {
+            "id": "6201",
+            "label": "AP3-HTTP-NO-CHAIN-COMMIT",
+            "n": "1"
+        },
+        {
+            "id": "6202",
+            "label": "AP3-HTTP-NO-CHAIN-COMMIT",
+            "n": "1"
+        },
+        {
+            "id": "6203",
+            "label": "AP3-HTTP-NO-CHAIN-ROLLBACK",
+            "n": "0"
+        },
+        {
+            "id": "6204",
+            "label": "AP3-HTTP-NO-CHAIN-ROLLBACK",
+            "n": "1"
+        },
+        {
+            "id": "6205",
+            "label": "AP3-HTTP-NO-CHAIN-ROLLBACK",
+            "n": "1"
+        },
+        {
+            "id": "6206",
+            "label": "AP3-HTTP-CHAIN-COMMIT",
+            "n": "1"
+        },
+        {
+            "id": "6207",
+            "label": "AP3-HTTP-CHAIN-COMMIT",
+            "n": "0"
+        },
+        {
+            "id": "6208",
+            "label": "AP3-HTTP-CHAIN-COMMIT",
+            "n": "0"
+        },
+        {
+            "id": "6209",
+            "label": "AP3-HTTP-CHAIN-ROLLBACK",
+            "n": "0"
+        },
+        {
+            "id": "6210",
+            "label": "AP3-HTTP-CHAIN-ROLLBACK",
+            "n": "0"
+        },
+        {
+            "id": "6211",
+            "label": "AP3-HTTP-CHAIN-ROLLBACK",
+            "n": "0"
+        },
+        {
+            "id": "6212",
+            "label": "AP3-HTTP-RELEASE-COMMIT",
+            "n": "1"
+        },
+        {
+            "id": "6213",
+            "label": "AP3-HTTP-RELEASE-COMMIT",
+            "n": "0"
+        },
+        {
+            "id": "6214",
+            "label": "AP3-HTTP-RELEASE-COMMIT",
+            "n": "0"
+        },
+        {
+            "id": "6215",
+            "label": "AP3-HTTP-RELEASE-ROLLBACK",
+            "n": "0"
+        },
+        {
+            "id": "6216",
+            "label": "AP3-HTTP-RELEASE-ROLLBACK",
+            "n": "0"
+        },
+        {
+            "id": "6217",
+            "label": "AP3-HTTP-RELEASE-ROLLBACK",
+            "n": "0"
+        },
+        {
+            "id": "6220",
+            "label": "AP3-HTTP-CHECKPOINT-FAILURE",
+            "n": "1"
+        },
+        {
+            "id": "6221",
+            "label": "AP3-HTTP-CHECKPOINT-FAILURE",
+            "n": "0"
+        },
+        {
+            "id": "6222",
+            "label": "AP3-HTTP-CHECKPOINT-FAILURE",
+            "n": "0"
+        },
+        {
+            "id": "6223",
+            "label": "AP3-HTTP-UNKNOWN-CLOSE",
+            "n": "0"
+        },
+        {
+            "id": "6224",
+            "label": "AP3-HTTP-UNKNOWN-CLOSE",
+            "n": "0"
+        },
+        {
+            "id": "6225",
+            "label": "AP3-HTTP-UNKNOWN-CLOSE",
+            "n": "0"
+        },
+        {
+            "id": "6226",
+            "label": "AP3-HTTP-UNREADABLE",
+            "n": "1"
+        },
+        {
+            "id": "6227",
+            "label": "AP3-HTTP-UNREADABLE",
+            "n": "0"
+        },
+        {
+            "id": "6228",
+            "label": "AP3-HTTP-UNREADABLE",
+            "n": "0"
+        },
+        {
+            "id": "6400",
+            "label": "AP3-lost-COMMIT",
+            "n": "1"
+        },
+        {
+            "id": "6401",
+            "label": "AP3-lost-COMMIT",
+            "n": "0"
+        },
+        {
+            "id": "6402",
+            "label": "AP3-lost-COMMIT",
+            "n": "0"
+        },
+        {
+            "id": "6403",
+            "label": "AP3-lost-ROLLBACK",
+            "n": "0"
+        },
+        {
+            "id": "6404",
+            "label": "AP3-lost-ROLLBACK",
+            "n": "0"
+        },
+        {
+            "id": "6405",
+            "label": "AP3-lost-ROLLBACK",
+            "n": "0"
+        }
+    ],
+    "new_rows_count": 70,
+    "grants_unchanged": true,
+    "P_S_denied": 1142,
+    "Core_pins_unchanged": true,
+    "trace": [
+        {
+            "case": "inspect",
+            "event": "sql",
+            "time": 1795044952.326686,
+            "role": "independent",
+            "connection": 259,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "started": 1795044952.325121,
+            "ok": true,
+            "errno": 0
+        },
+        {
+            "case": "inspect",
+            "event": "sql",
+            "time": 1795044952.329486,
+            "role": "independent",
+            "connection": 259,
+            "sql": "SELECT id,label,n FROM probe ORDER BY id",
+            "started": 1795044952.326773,
+            "ok": true,
+            "errno": 0
+        },
+        {
+            "case": "inspect",
+            "event": "sql",
+            "time": 1795044952.33127,
+            "role": "independent",
+            "connection": 259,
+            "sql": "SHOW GRANTS",
+            "started": 1795044952.329624,
+            "ok": true,
+            "errno": 0
+        },
+        {
+            "case": "inspect",
+            "event": "sql",
+            "time": 1795044952.333417,
+            "role": "independent",
+            "connection": 259,
+            "sql": "SELECT THREAD_ID FROM performance_schema.events_transactions_current WHERE 1=0",
+            "started": 1795044952.331309,
+            "ok": false,
+            "errno": 1142
+        }
+    ]
+}

@@ -1,0 +1,418 @@
+{
+  "status": "PASS",
+  "kind": "COMMIT",
+  "fixtures": [
+    6400,
+    6401,
+    6402
+  ],
+  "result": {
+    "results": {
+      "6400": {
+        "fixture": 6400,
+        "operation": "commit",
+        "member": "UNKNOWN",
+        "batch": "STOP",
+        "end_ack": false,
+        "Core_return": 0,
+        "Core_depth": 1,
+        "native_errno": 2006,
+        "exception": null,
+        "classification": [
+          "NO_CHAIN",
+          "NO_CHAIN"
+        ],
+        "checkpoint": true
+      },
+      "6401": {
+        "member": "NOT_PROCESSED",
+        "batch": "STOP",
+        "reason": "terminal_batch"
+      },
+      "6402": {
+        "member": "NOT_PROCESSED",
+        "batch": "STOP",
+        "reason": "terminal_batch"
+      }
+    },
+    "batch": "STOP",
+    "next_preflight_calls": 1,
+    "mail_calls": 0,
+    "pdf_calls": 0,
+    "fault": ""
+  },
+  "Core_return": 0,
+  "persisted": 1,
+  "values": {
+    "6400": 1,
+    "6401": 0,
+    "6402": 0
+  },
+  "monitor": [
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "mod_syslog_file->export",
+      "source": "core/lib/functions.lib.php",
+      "line": 2903
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "mod_syslog_file->export",
+      "source": "core/lib/functions.lib.php",
+      "line": 2903
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "mod_syslog_file->export",
+      "source": "core/lib/functions.lib.php",
+      "line": 2903
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 222
+    },
+    {
+      "function": "mod_syslog_file->export",
+      "source": "core/lib/functions.lib.php",
+      "line": 2903
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 223
+    },
+    {
+      "function": "LogHandler->setIdent",
+      "source": "core/lib/functions.lib.php",
+      "line": 2910
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "mod_syslog_file->export",
+      "source": "core/lib/functions.lib.php",
+      "line": 2903
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "mod_syslog_file->export",
+      "source": "core/lib/functions.lib.php",
+      "line": 2903
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "mod_syslog_file->export",
+      "source": "core/lib/functions.lib.php",
+      "line": 2903
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 243
+    },
+    {
+      "function": "LogHandler->setIdent",
+      "source": "core/lib/functions.lib.php",
+      "line": 2779
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "mod_syslog_file->export",
+      "source": "core/lib/functions.lib.php",
+      "line": 2903
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "mod_syslog_file->export",
+      "source": "core/lib/functions.lib.php",
+      "line": 2903
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "mod_syslog_file->export",
+      "source": "core/lib/functions.lib.php",
+      "line": 2903
+    },
+    {
+      "function": "DoliDBMysqli->close",
+      "source": "lost-ack.php",
+      "line": 14
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 311
+    },
+    {
+      "function": "mod_syslog_file->export",
+      "source": "core/lib/functions.lib.php",
+      "line": 2903
+    },
+    {
+      "function": "Ap3Native->close",
+      "source": "core/db/mysqli.class.php",
+      "line": 314
+    }
+  ],
+  "trace": [
+    {
+      "case": "AP3-LOST-COMMIT",
+      "event": "sql",
+      "time": 1795044444.215386,
+      "role": "independent",
+      "connection": 176,
+      "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+      "started": 1795044444.212937,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "AP3-LOST-COMMIT",
+      "event": "sql",
+      "time": 1795044444.229561,
+      "role": "independent",
+      "connection": 176,
+      "sql": "INSERT INTO probe VALUES (6400,'AP3-lost-COMMIT',0)",
+      "started": 1795044444.215751,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "AP3-LOST-COMMIT",
+      "event": "sql",
+      "time": 1795044444.245124,
+      "role": "independent",
+      "connection": 176,
+      "sql": "INSERT INTO probe VALUES (6401,'AP3-lost-COMMIT',0)",
+      "started": 1795044444.229895,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "AP3-LOST-COMMIT",
+      "event": "sql",
+      "time": 1795044444.25802,
+      "role": "independent",
+      "connection": 176,
+      "sql": "INSERT INTO probe VALUES (6402,'AP3-lost-COMMIT',0)",
+      "started": 1795044444.246395,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "AP3-LOST-COMMIT",
+      "event": "sql",
+      "time": 1795044444.366019,
+      "role": "lab",
+      "connection": 177,
+      "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+      "started": 1795044444.316859,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "AP3-LOST-COMMIT",
+      "event": "member_preflight",
+      "time": 1795044444.366436,
+      "fixture": 6400
+    },
+    {
+      "case": "AP3-LOST-COMMIT",
+      "event": "sql",
+      "time": 1795044444.416175,
+      "role": "lab",
+      "connection": 177,
+      "sql": "SELECT n FROM probe WHERE id=6400",
+      "started": 1795044444.366723,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "AP3-LOST-COMMIT",
+      "event": "sql",
+      "time": 1795044444.466278,
+      "role": "lab",
+      "connection": 177,
+      "sql": "SELECT @@SESSION.completion_type AS completion",
+      "started": 1795044444.416689,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "AP3-LOST-COMMIT",
+      "event": "sql",
+      "time": 1795044444.469387,
+      "role": "lab",
+      "connection": 177,
+      "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+      "started": 1795044444.467237,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "AP3-LOST-COMMIT",
+      "event": "sql",
+      "time": 1795044444.47126,
+      "role": "lab",
+      "connection": 177,
+      "sql": "BEGIN",
+      "started": 1795044444.469427,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "AP3-LOST-COMMIT",
+      "event": "sql",
+      "time": 1795044444.515811,
+      "role": "lab",
+      "connection": 177,
+      "sql": "SELECT n FROM probe WHERE id=6400 FOR UPDATE",
+      "started": 1795044444.471597,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "AP3-LOST-COMMIT",
+      "event": "sql",
+      "time": 1795044444.519283,
+      "role": "lab",
+      "connection": 177,
+      "sql": "UPDATE probe SET n=1 WHERE id=6400",
+      "started": 1795044444.516076,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "AP3-LOST-COMMIT",
+      "event": "sql",
+      "time": 1795044444.563909,
+      "role": "lab",
+      "connection": 177,
+      "sql": "SELECT @@SESSION.completion_type AS completion",
+      "started": 1795044444.519517,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "AP3-LOST-COMMIT",
+      "event": "pre_end_plan",
+      "time": 1795044444.563952,
+      "connection": 177,
+      "initial": "NO_CHAIN",
+      "last": "NO_CHAIN",
+      "continue": true,
+      "fault": ""
+    },
+    {
+      "case": "AP3-LOST-COMMIT",
+      "event": "sql",
+      "time": 1795044444.577609,
+      "role": "lab",
+      "connection": 177,
+      "sql": "COMMIT",
+      "started": 1795044444.564,
+      "ok": false,
+      "errno": 2006
+    },
+    {
+      "case": "AP3-LOST-COMMIT",
+      "event": "end_decision",
+      "time": 1795044444.577638,
+      "member": "UNKNOWN",
+      "batch": "STOP",
+      "ack": false,
+      "connection": 177
+    },
+    {
+      "case": "AP3-LOST-COMMIT",
+      "event": "checkpoint_result",
+      "time": 1795044444.578174,
+      "ok": true,
+      "member": "UNKNOWN",
+      "batch": "STOP"
+    },
+    {
+      "case": "AP3-LOST-COMMIT",
+      "event": "sql",
+      "time": 1795044444.579227,
+      "role": "independent",
+      "connection": 176,
+      "sql": "SELECT n FROM probe WHERE id=6400",
+      "started": 1795044444.578441,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "AP3-LOST-COMMIT",
+      "event": "sql",
+      "time": 1795044444.58009,
+      "role": "independent",
+      "connection": 176,
+      "sql": "SELECT n FROM probe WHERE id=6401",
+      "started": 1795044444.579451,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "AP3-LOST-COMMIT",
+      "event": "sql",
+      "time": 1795044444.581104,
+      "role": "independent",
+      "connection": 176,
+      "sql": "SELECT n FROM probe WHERE id=6402",
+      "started": 1795044444.580425,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "AP3-LOST-COMMIT",
+      "event": "native_close",
+      "time": 1795044444.581396,
+      "role": "lab",
+      "connection": 177
+    }
+  ],
+  "classification": "UNKNOWN/STOP; independent readback is diagnostic only, no rescue/retry/compensation",
+  "proxy": {
+    "forwarded_target": 1,
+    "server_ok_discarded": 1,
+    "raw_packets_logged": 0,
+    "scope": "one dedicated loopback client; no KILL or server restart"
+  }
+}

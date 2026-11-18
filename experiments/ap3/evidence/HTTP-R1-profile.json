@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "profile": {
+    "php": "8.2.35",
+    "sapi": "cli-server",
+    "dolibarr": "24.0.3",
+    "session_handler": "files",
+    "session_path_is_I105": true,
+    "logger": {
+      "supported": true,
+      "classes": [
+        {
+          "class": "mod_syslog_file",
+          "source": "core/modules/syslog/mod_syslog_file.php",
+          "sha256": "3b7c6fa701b5a094003ef1ecbd195f4e93fc8539ba13108910bad800bd521b1a"
+        }
+      ],
+      "level": 4,
+      "syslog_enabled": true,
+      "scope": "Exact pinned standard file logger only; no blanket third-party logger qualification"
+    },
+    "actor": 2,
+    "business_bootstrap": "genuine authenticated main.inc.php; no business API called"
+  },
+  "auth": "genuine protected main.inc.php; credential/cookie/token not retained",
+  "transport": "ephemeral loopback PHP cli-server; Apache I105 session path mirrored; not Apache request SAPI"
+}

@@ -1,0 +1,13 @@
+{
+  "status": "STOP",
+  "cases": [],
+  "failure": {
+    "stage": "genuine-authentication",
+    "class": "Stop",
+    "reason": "Core login form not found; no test POST executed"
+  },
+  "session_tokens_logged": false,
+  "real_business_operations": 0,
+  "reference_business_equal": null,
+  "temporary_server_stopped": null
+}

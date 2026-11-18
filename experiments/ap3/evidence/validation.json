@@ -1,0 +1,17 @@
+{
+  "PHP_lint": {
+    "files": 10,
+    "status": "PASS",
+    "scope": "all AP3 PHP helpers only"
+  },
+  "Python_parse": "PASS; all four AP3 Python helpers",
+  "product_tests": "NOT RUN locally; no product changes; regular CI recorded in Draft-PR",
+  "language_parity": "not affected; no translation changes",
+  "independent_gate_acceptance": "PENDING",
+  "security_review": {
+    "credential_value_scan": "PASS; restricted app password compared in memory; no matches",
+    "JSON_payload_review": "PASS; no cookies/tokens/passwords/route capability; authorization fields are fixed Owner-scope notes",
+    "published_scope": "sanitized traces, synthetic probe rows, hashes/counts only; no dumps/config/session files"
+  },
+  "Markdown_local_links": "PASS"
+}

@@ -1,0 +1,23 @@
+AP3 controlled HTTP continuation R1 (one invocation, no rerun)
+
+Read OWNER-HTTP.txt for the unchanged scope, plus these corrections:
+- The original attempt reached no test POST and no lab insert. Its evidence and
+  source versions are retained. audit-before-http-r1.json confirms the reserved
+  HTTP range is empty and all81 prior SH-01/D-01 rows unchanged.
+- php://fd/3 was inaccessible in cli-server. R1 uses ephemeral Unix shared memory,
+  mode0600, accessible to www-data only. Credentials stay out of files, argv,
+  environment and published evidence; only the random memory locator is inherited.
+  The bridge overwrites and removes this memory in finally. This transport was
+  tested with public dummy content on two separate HTTP requests.
+- An empty evidence collection is now an object, so cleanup still runs. R1 stops
+  only a stranded same-UID server running the exact initial AP3 router, if present;
+  no Apache, container, database or other service is stopped. It refuses a failed
+  cleanup. No unconditional kill or restart.
+
+Run as marcel (Python asks for existing msm-i105 password, then sudo locally):
+python3 /tmp/dolibarr-ap3-completion-gate/experiments/ap3/owner-http-r1.py --run-approved
+
+No new permission scope: isolated rows6200..6228, initial new-connection Completion
+stimuli as already Owner-approved; same actual Core/session/logger proof; no business
+Core DML, mail or PDF. Do not run the original starter again. On STOP send only the
+sanitized output and preserve state. Core-Guarded/CF02 is not approved by execution.
