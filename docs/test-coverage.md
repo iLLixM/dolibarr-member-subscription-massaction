@@ -281,6 +281,15 @@ section for exact metrics and CLI-versus-Apache boundaries. No blanket performan
 
 ### PR #16 independent review and later Owner acceptance
 
+**Historical pre-merge acceptance record:** PR #16 is now merged at `48d196c` and
+Issue #8 is closed; post-merge CI44199084049 passed 21/21. Draft/merge/issue-open
+wording below describes the earlier checkpoint. See the
+[current closure](phase4-implementation-validation.md#r0-release-preparation-and-pr-16-post-merge-closure--2026-11-18).
+R0 updates 53 obsolete implementation-status review markers and the corresponding
+coverage-gap review markers, retaining 71 IDs/18 columns, the first ten historical
+columns and all test/evidence assignments. No new real test or per-row PASS follows.
+R0-04/R0-07 remain separate unexecuted release gates.
+
 See the [current finding statuses and evidence separation](phase4-implementation-validation.md#pr-16-documentation-follow-up--2026-11-18).
 Independent review of `5f71102cc631c619496d0d6f2e002b97073ae644` completed:
 **APPROVED FOR MERGE WITH DOCUMENTED SCOPE**. The new documentation follow-up is

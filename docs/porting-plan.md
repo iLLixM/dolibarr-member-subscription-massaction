@@ -1,5 +1,13 @@
 # Functional porting baseline
 
+**Historical porting plan:** the Phase 1/3A/3B deferred-function statements below
+are preserved at their original stages. Optional customer/invoice/PDF/mail and
+later Core/database compatibility development were subsequently delivered and
+reviewed; see [current validation](phase4-implementation-validation.md).
+R0 prepares v0.1.0 with the [documented compatibility limits](compatibility.md),
+not a claim that all originally planned V22–V25 scenarios were executed.
+R0-04 integration and R0-07 release review remain pending.
+
 Phase 1 revision 2 is the accepted architecture: an independent wizard entered through
 `memberlist` / `addMoreMassActions` / `doMassActions`. The future result notice uses
 `printFieldPreListTitle` when needed. No core hooks are patched. Phase 3B adds a module-owned Adherent subclass solely to observe update_end_date failures (R16).

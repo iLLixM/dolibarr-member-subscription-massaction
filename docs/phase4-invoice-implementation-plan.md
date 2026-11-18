@@ -1,5 +1,28 @@
 # Phase 4 — Invoice implementation and validation plan
 
+## Historical plan and implemented-phase mapping — R0, 2026-11-18
+
+This is the **historical 2026-11-10 implementation plan**, not the current work queue
+or execution authority. Original O1–O7, risks and planned test demands below remain
+intact. Subsequent development/independent reviews and merges are complete in their
+bounded profiles; final ZIP integration (R0-04) and release review (R0-07) remain pending.
+
+| Planned phase | Delivered components | Actual evidence / limits |
+| --- | --- | --- |
+| 4B preflight/confirmed state | `class/invoiceprofile.class.php`, preview and confirmed-state helpers | [4B validation](phase4-implementation-validation.md#4b--preflight-and-confirmed-state), synthetic profile/state contracts; no blanket tax/configuration qualification. |
+| 4C transaction | `class/booking.class.php`, `class/invoice.class.php`, shared database observer | [4C](phase4-implementation-validation.md#4c--transactional-database-workflow), G2 plus later MySQL FIX01/I107 and MDB-TEST-01; one transaction per member, not arbitrary-hook atomicity. |
+| 4D document/delivery | `class/invoicepdf.class.php`, `class/mail.class.php`, post-commit orchestration | [4D](phase4-implementation-validation.md#4d--post-commit-pdf-and-mail), G3/C3; separate PDF/SMTP/receipt scope and uncertainty. |
+| 4E UI/acceptance | `subscription.php`, preview/booking renderers, JS | [4E](phase4-implementation-validation.md#4e--user-flow-and-results), G4 Owner manual acceptance and later bounded V24 browser evidence. |
+
+The original plan's “not implemented”, future gate and V24.0.0 observations describe
+that historical baseline. V24.0.3 was later qualified separately; see the
+[current validation](phase4-implementation-validation.md) and
+[release compatibility](compatibility.md). R0 retains module ID 584620 under the
+explicit Owner exception rather than requiring reservation now. No old test demand
+is considered executed merely because its implementation phase was merged.
+
+## Original Phase 4A plan — 2026-11-10
+
 Status: **PHASE 4A FINALIZED – OWNER DECISIONS INCORPORATED – READY FOR PHASE 4B PLANNING**, design only, 2026-11-10. Previous architecture commit: `b28e5f9`.
 Baseline: `5c511b7a2c6dee6d810ffc0c1469d1539d7e5a1c`.
 Read with [architecture and source evidence](phase4-invoice-architecture.md), [71-row authoritative matrix](requirements.csv) and [test strategy](test-strategy.md).

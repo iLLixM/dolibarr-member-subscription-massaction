@@ -15,5 +15,7 @@ Use synthetic fixtures and test mail sinks; never commit credentials, real membe
 records, database dumps, documents, sessions or local configuration.
 
 Preserve source attribution and GPL-3.0-or-later licensing. Document borrowed code
-with its source commit. Resolve the temporary module ID before a public release.
+with its source commit. Retain ID 584620 under the explicit R0-02 Owner exception;
+document its unreserved collision risk and require local checking before installation. Final ZIP integration
+and independent release review remain mandatory before a release decision.
 Do not treat upstream community inclusion as guaranteed.

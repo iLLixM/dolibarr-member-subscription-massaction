@@ -14,6 +14,21 @@
   applicable validation documents.
 - Do not create a parallel architecture, requirement matrix, test strategy, or evidence history.
 
+## R0 release-preparation context
+
+- Prepare version 0.1.0, not a tag/release approval. PR #16 merged as `48d196c`;
+  Issue #8 closed; post-merge CI passed 21/21. Earlier evidence stays historical.
+- R0-01 intended release scope is Core V22–V24, MariaDB>=10.11/MySQL>=8.4, PHP>=7.4;
+  technical admission and exact synthetic/real qualifications remain separate.
+  Use `docs/compatibility.md` as current compatibility overview. No new version locks.
+- R0-02 explicitly retains unreserved ID584620 with collision risk and a mandatory
+  local pre-install collision check; do not reserve/replace IDs or rights silently.
+- R0-05 retains session/checkpoints and bounded risk acceptance, with no journal,
+  module tables, automatic retry/resume/rebooking/reinvoicing/PDF regeneration/mail
+  redelivery. Follow `docs/operations.md` for manual reconciliation.
+- R0-04 final-ZIP integration and R0-07 independent release review remain pending.
+  No production/public-release approval follows from metadata or packaging.
+
 ## Architecture and compatibility
 
 - P2 admission is >=21.0.0 with no upper bound or exact patch/SHA allowlist.

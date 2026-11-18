@@ -1,6 +1,6 @@
 {
   "name": "illixm/dolibarr-member-subscription-massaction",
-  "description": "Read-only interactive member subscription preview for Dolibarr",
+  "description": "Bulk member subscription preview, confirmation and booking with optional Core invoices, PDF and email for Dolibarr",
   "type": "dolibarr-module",
   "license": "GPL-3.0-or-later",
   "require": {
@@ -9,5 +9,6 @@
   "scripts": {
     "test": "php test/unit/run.php",
     "test:preview": "php test/unit/preview.php"
-  }
+  },
+  "version": "0.1.0"
 }

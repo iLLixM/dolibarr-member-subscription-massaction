@@ -2,6 +2,31 @@
 
 ## Unreleased
 
+### v0.1.0 release candidate preparation — 2026-11-18
+
+- Prepare descriptor/Composer version 0.1.0 and current DE/EN display/status text;
+  retain technical PHP7.4/Core>=21 admission without new runtime version guards.
+- Adopt user-facing README, compatibility, installation, operation/reconciliation
+  and release notes; preserve the former README and dated plans as history.
+- Retain unreserved module ID584620 by explicit Owner exception; require local
+  collision checking. Intended release scope: Core V22–V24, MariaDB>=10.11 or
+  Oracle MySQL>=8.4; actual synthetic/real profiles remain explicitly separate.
+- Record PR #16 merge `48d196c`, Issue #8 closure and post-merge 21/21 CI PASS;
+  keep F16-01 accepted, F16-02 scoped Owner HTTP100 and F16-03/04/05 P3 limits.
+  Update 53 obsolete requirement implementation-review statuses without changing
+  historic requirement/evidence fields or promoting unexecuted scenarios to PASS.
+- Add deterministic allowlisted Dolibarr candidate ZIP build, manifest and SHA-256.
+  No business logic, test, CI, runtime configuration or database changes.
+- R0-05 accepts the existing session/checkpoint risk within the limited intended
+  scope; no journal or automatic retry/resume/redelivery is introduced. R0-04
+  final ZIP integration and R0-07 independent release review remain pending;
+  no final tag, release, production or general load approval.
+
+### Historical development changes and review checkpoints
+
+Entries below retain their original pre-merge/0.1.0-dev status wording where
+applicable; current PR #16 and release-preparation status is recorded above.
+
 - Issue #8: replace the fixed 50-member booking cap with configurable
   `MEMBERSUBSCRIPTIONMASSACTION_MAX_MEMBERS_PER_BATCH`, default 100 even for
   existing activations, capped by `MAIN_LIMIT_FOR_MASS_ACTIONS`. Reject oversized

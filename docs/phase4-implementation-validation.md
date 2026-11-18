@@ -1,6 +1,52 @@
 # Phase 4 implementation validation
 
+## R0 release preparation and PR #16 post-merge closure — 2026-11-18
+
+**Current development baseline:** PR #16 is MERGED as
+`48d196cfb04421d775ab4e6757083f6a755121df`; Issue #8 is CLOSED.
+[Post-merge CI 44199084049](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44199084049)
+completed **21/21 PASS** on that merge. Documentation HEAD
+`831f3a47ec8403f3ba3b19115c82aec6d29f0cec` also passed separate
+[PR CI](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44198188515)
+and [push CI](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44198180491),
+each **21/21 PASS**. The independently reviewed implementation/evidence HEAD remains
+`5f71102cc631c619496d0d6f2e002b97073ae644`; external conclusion:
+**APPROVED FOR MERGE WITH DOCUMENTED SCOPE**, not a formal GitHub review vote.
+
+- F16-01: **CLOSED – OWNER ACCEPTED**; actual MariaDB target accepted, no I105 rerun.
+- F16-02: **RESOLVED WITH DOCUMENTED SCOPE – OWNER-CONFIRMED HTTP TEST**; later
+  manual authenticated 100/100 contribution-only booking, about 6 seconds from
+  confirmation to results. No invoice/email or new independently reproduced traces.
+- F16-03/04/05 remain P3, non-merge-blocking; original details/limits below are retained.
+
+**R0 Owner decisions:** target metadata 0.1.0; retain unreserved ID 584620 by
+explicit collision-risk exception with a local pre-install check. This supersedes
+historical mandatory reservation/replacement statements below. Keep PHP >=7.4,
+technical Core admission >=21, intended release Core scope V22–V24 and deployment
+minimums MariaDB10.11/MySQL8.4; PostgreSQL unsupported. No new numeric DB/Core
+version guards or business logic changes. The [compatibility matrix](compatibility.md)
+separates policy, admission, synthetic CI and exact real reference profiles.
+
+R0-05 accepts existing session/checkpoint risks for the limited intended release
+scope: no journal/new tables, automatic retry/resume/rebooking/reinvoicing/PDF
+regeneration/email redelivery. [Operations](operations.md) defines manual
+reconciliation. It is not general production or load approval. The 71-row matrix
+only updates obsolete development-review status cells; historical test evidence,
+original ten columns, row/column order and all NOT EXECUTED/NOT QUALIFIED limits
+remain intact. No new per-requirement PASS or DB evidence is added.
+
+R0-04 final-ZIP integration and R0-07 independent release review are **NOT EXECUTED /
+PENDING**. This R0 task prepares metadata, docs and deterministic packaging with
+synthetic regression; it does not install/activate a module or run business tests.
+Production/public release remains **NOT QUALIFIED / NOT APPROVED**.
+See [release notes](release-notes-v0.1.0.md) and [build procedure](release-build.md).
+All dated sections below retain their historical gates, SHAs and evidence scope.
+
 ## PR #16 documentation follow-up — 2026-11-18
+
+**Historical pre-merge checkpoint:** Draft/Issue-open and CI-to-be-recorded statements
+in this section describe the earlier documentation follow-up. The post-merge closure
+above is current; the finding details and evidence provenance remain unchanged.
 
 **Current review status: APPROVED FOR MERGE WITH DOCUMENTED SCOPE.** The external
 independent implementation/regression/evidence review of

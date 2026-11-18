@@ -1,5 +1,11 @@
 # P3 synthetic qualification and evidence guide
 
+**Historical synthetic gate:** pending follow-up/merge and 0.1.0-dev statements
+below describe the P3-era checkpoint. Later independent reviews/development merges
+are recorded in [current validation](phase4-implementation-validation.md).
+R0 prepares metadata 0.1.0; it does not rerun or extend this historical evidence.
+Final ZIP integration and independent release review remain pending.
+
 Owner decision, 2026-11-15: **P3 SYNTHETIC CROSS-VERSION QUALIFICATION – ACCEPTED
 WITH DOCUMENTED LIMITATIONS**. P3 is formally closed. No confirmed implementation
 defect or additional real P4 test need was identified for the bounded synthetic scope.

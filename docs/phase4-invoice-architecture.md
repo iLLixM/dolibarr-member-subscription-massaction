@@ -1,6 +1,16 @@
 # Phase 4 — Optional invoice integration architecture
 
-## Current implementation context — 2026-11-14
+## Current release-preparation context — 2026-11-18
+
+The development implementation/reviews and PR #6/#13/#16 merges are complete only
+in their [documented profiles](phase4-implementation-validation.md). R0 prepares
+0.1.0 metadata and retains ID 584620 by explicit Owner exception; final ZIP
+integration and independent release review remain pending. [Compatibility](compatibility.md)
+and [operations](operations.md) are the current user-facing prerequisites.
+The design, future-tense contracts and 2026-11-14 pending review below are historical;
+O1–O7 remain binding and original sources/risk demands remain intact.
+
+## Historical implementation context — 2026-11-14
 
 Phase 4 is implemented. The historical bounded V22 G2/G3/G4 approvals and the
 completed real V24.0.3 C3 campaign are recorded in
