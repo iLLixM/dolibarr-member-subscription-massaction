@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Phase A v0.1.0 package finalization — 2026-11-18
+
+- Resolve F19-01: timeless v0.1.0 user documentation, DE/EN status text and manifest;
+  move time-bound release qualification progress to the non-shipped validation record.
+- Resolve F19-02: relative in-package links and version-tag references for source-only
+  documentation; no final documentation dependency on the temporary release branch.
+- Confirm compatibility with Dolibarr V22, V23 and V24; retain five synthetic V23
+  pairs without asserting real V23 integration or adding a new campaign.
+- Fully rebuild the distribution under build-output/v0.1.0/ with unchanged allowlist,
+  deterministic metadata and new SHA-256. Earlier preparation artifacts below are
+  historical. No business logic, tests, CI, database or deployment change.
+- Exact-package R0-04 integration and R0-07 independent release review remain pending;
+  package naming does not constitute final release approval or publication.
+
 ### v0.1.0 release candidate preparation — 2026-11-18
 
 - Prepare descriptor/Composer version 0.1.0 and current DE/EN display/status text;

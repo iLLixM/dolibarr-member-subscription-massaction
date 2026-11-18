@@ -1,21 +1,22 @@
 # v0.1.0 compatibility and operating prerequisites
 
-Status: **release candidate preparation; R0-04 and R0-07 pending**.
-This is the single current compatibility overview. The original campaigns and
-source pins remain in the repository's
-[validation history](https://github.com/iLLixM/dolibarr-member-subscription-massaction/blob/release/prepare-v0.1.0/docs/phase4-implementation-validation.md) and
-[P3 synthetic evidence guide](https://github.com/iLLixM/dolibarr-member-subscription-massaction/blob/release/prepare-v0.1.0/docs/p3-qualification-summary.md); those historical
-qualifications do not assert a test of the final v0.1.0 ZIP.
+**Compatible with Dolibarr V22, V23 and V24.**
+
+This is the v0.1.0 compatibility overview. The compatibility statement is the
+Owner-confirmed release scope; synthetic and real evidence are distinguished below.
+The original campaigns and source pins remain in the repository's
+[validation history](https://github.com/iLLixM/dolibarr-member-subscription-massaction/blob/v0.1.0/docs/phase4-implementation-validation.md) and
+[P3 synthetic evidence guide](https://github.com/iLLixM/dolibarr-member-subscription-massaction/blob/v0.1.0/docs/p3-qualification-summary.md); those historical
+qualifications apply to the recorded source versions and profile-specific tests.
 
 ## Policy, admission and evidence are different
 
 | Layer | Scope | What it does not mean |
 | --- | --- | --- |
-| Owner's intended release scope | Dolibarr V22–V24; MariaDB >=10.11 or Oracle MySQL >=8.4; PHP >=7.4 | Not every patch, server edition or configuration has real evidence. |
+| Owner-confirmed compatibility | Dolibarr V22, V23 and V24; MariaDB >=10.11 or Oracle MySQL >=8.4; PHP >=7.4 | Not every patch, server edition or configuration has real evidence. V23 has the synthetic coverage below; no real V23 integration is claimed. |
 | Existing technical admission | Core >=21.0.0, no upper-version allowlist; runtime capability/profile checks | V21, future Cores and every accepted backend version are not automatically supported/qualified. No new version locks were added for R0. |
 | Synthetic CI | 21 pinned PHP/Core pairs below | No live DB, installer, SMTP, PDF-model or full browser/load qualification. |
-| Real integration | Only the exact historical profiles below and each campaign's tested portions | Not a final ZIP installation test or blanket production certification. |
-| Final release gates | R0-04 integration and R0-07 independent release review: NOT EXECUTED in R0 | Metadata `0.1.0` and a structurally valid ZIP are not release approval. |
+| Real integration | Only the exact historical profiles below and each campaign's tested portions | No blanket production certification or extrapolation to untested profiles. |
 
 Database minimums are Owner deployment requirements, not new numeric version
 checks in the product. Administrators must enforce them. Existing capability,
@@ -36,7 +37,7 @@ No V23 live integration or V24/PHP-7.4 CI run is claimed.
 Respect the chosen Core's own PHP requirements; the module minimum does not lower
 Core's minimum.
 
-## Real reference profiles (historical integration, not final ZIP)
+## Real reference profiles (historical integration evidence)
 
 | Core / PHP / backend | Completed evidence | Limits |
 | --- | --- | --- |
@@ -45,8 +46,8 @@ Core's minimum.
 | V24.0.3 / PHP 8.2.35 / Oracle MySQL Community 8.4.13, direct mysqli, InnoDB, REPEATABLE READ | I1-05 historical failure; FIX01 20/20 PASS; targeted I107 hardening and positive independent follow-up; I107-F01/F02/F03 closed | Only the instrumented isolated profile; historical PDF/mail evidence is separate. No inference to other MySQL versions, editions, proxies or connection pools. |
 
 The independently reviewed development baseline was merged through PR #13 and
-PR #16; see the validation history. R0 changes metadata/documentation/build tooling,
-not those business paths. R0-04 must test the exact packaged candidate separately.
+PR #16; see the validation history for exact source attribution. Synthetic source
+compatibility, real integration outcomes and per-profile restrictions remain separate.
 
 ## Required database contracts
 
@@ -72,7 +73,8 @@ not those business paths. R0-04 must test the exact packaged candidate separatel
   freshness or ownership stop new work safely; do not bypass the gate.
 
 These are administrator prerequisites, not authorization for automatic grants,
-engine changes, isolation changes or seeding. R0 makes none of those changes.
+engine changes, isolation changes or seeding. The package builder performs none
+of those operations.
 
 ## Invoice, document and delivery limits
 

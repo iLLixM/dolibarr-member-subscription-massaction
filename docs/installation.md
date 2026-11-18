@@ -1,8 +1,7 @@
-# Installation and configuration — v0.1.0 candidate
+# Installation and configuration — v0.1.0
 
-**R0-04 installation/integration is still required.** These are instructions for
-an explicitly approved, compatible test environment, not a claim that the final ZIP
-has already been imported or that production deployment is approved.
+Install on a compatible Dolibarr environment with the documented database and
+PHP prerequisites. Assess the site's configuration and operating limits before use.
 
 ## Before installing
 
@@ -20,19 +19,17 @@ has already been imported or that production deployment is approved.
 3. Preserve existing installation data and follow the site's approved deployment
    procedure. This guide does not order backup/restore tests or overwrite an
    existing module tree. Module activation/deactivation is an explicit admin action.
-4. Obtain the candidate ZIP, its `.sha256` and `PACKAGE-MANIFEST.json` from the
-   same approved preparation. Verify the ZIP SHA-256 locally before import.
+4. Obtain the v0.1.0 ZIP, its `.sha256` and `PACKAGE-MANIFEST.json` from the
+   same distribution. Verify the ZIP SHA-256 locally before import.
 
 ## ZIP import or manual extraction
 
-The candidate lives in `build-output/v0.1.0-rc1/` in the source checkout:
-`module_membersubscriptionmassaction-0.1.0.zip`. The directory and embedded manifest
-mark it **RELEASE CANDIDATE**; the numeric filename is intentional because the
-Dolibarr external-module installer rejects a `-rc1` suffix in the version part.
-Do not rename the module prefix/root. A checksum is an integrity check, not a
-release signature or independent trust decision.
+The package filename is `module_membersubscriptionmassaction-0.1.0.zip`.
+A source build writes it and its manifest/checksum to `build-output/v0.1.0/`.
+Keep the numeric filename and module root for the Dolibarr external-module installer.
+A checksum is an integrity check, not a release signature or independent trust decision.
 
-On an approved test instance, use Setup → Modules/Applications → external module
+In Dolibarr, use Setup → Modules/Applications → external module
 installation and upload the verified ZIP. If the site disables ZIP upload, extract
 the single root folder `membersubscriptionmassaction/` into `htdocs/custom/`.
 The result must include:
@@ -84,6 +81,6 @@ Inspect all per-member outcomes. PDF/mail failures and `unknown/stop` need diffe
 handling; see [operations](operations.md).
 
 Disabling the module removes its registration/list action without deleting Core
-subscriptions, customers or invoices. Test import, activation/deactivation,
-permissions and packaged operation under **R0-04** before any release decision.
-No such admin or business operation is executed by the package builder.
+subscriptions, customers or invoices. Verify the site's module detection,
+permissions and intended workflow with synthetic members before routine use.
+The package builder itself performs no admin or business operation.

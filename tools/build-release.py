@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build and verify the allowlisted Dolibarr v0.1.0 release candidate (no bootstrap)."""
+"""Build and verify the allowlisted Dolibarr v0.1.0 distribution package (no bootstrap)."""
 # Copyright (C) 2026 iLLixM <iLLixM@proton.me>
 # SPDX-License-Identifier: GPL-3.0-or-later
 import hashlib
@@ -13,7 +13,6 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 MODULE = 'membersubscriptionmassaction'
 VERSION = '0.1.0'
-CANDIDATE = 'rc1'
 PREFIX = MODULE + '/'
 EPOCH = (1980, 1, 1, 0, 0, 0)
 
@@ -80,8 +79,7 @@ def build():
     for name in ['README.md', 'docs/release-notes-v0.1.0.md']:
         require(b'v0.1.0' in files[name], 'User documentation version missing')
     manifest = {
-        'module': MODULE, 'version': VERSION, 'candidate': CANDIDATE,
-        'status': 'RELEASE CANDIDATE; R0-04 integration and R0-07 release review pending',
+        'module': MODULE, 'version': VERSION,
         'module_id': 584620, 'development_baseline': '48d196cfb04421d775ab4e6757083f6a755121df',
         'format': 'ZIP_STORED; fixed 1980-01-01 UTC-like ZIP timestamp; Unix regular files 0644; sorted paths',
         'files': [{'path': n, 'bytes': len(files[n]), 'sha256': digest(files[n])} for n in names],
@@ -103,7 +101,7 @@ def build():
         require(archive.testzip() is None, 'Archive CRC failure')
         require(archive.namelist() == sorted(payload), 'Duplicate/missing archive entries')
         require(all(archive.read(n) == b for n, b in payload.items()), 'Payload changed')
-    output = ROOT / 'build-output' / ('v' + VERSION + '-' + CANDIDATE)
+    output = ROOT / 'build-output' / ('v' + VERSION)
     require(not (ROOT / 'build-output').is_symlink() and not output.is_symlink(), 'Unsafe output directory')
     output.mkdir(parents=True, exist_ok=True)
     filename = f'module_{MODULE}-{VERSION}.zip'
@@ -114,7 +112,7 @@ def build():
         target = output / name
         require(not target.is_symlink(), 'Output symlink not allowed')
         target.write_bytes(content)
-    print(json.dumps({'status': 'STRUCTURAL PASS; NOT an import test', 'candidate': CANDIDATE,
+    print(json.dumps({'status': 'STRUCTURAL PASS; NOT an import test', 'version': VERSION,
                       'zip': str(output / filename), 'payload_files': len(files),
                       'archive_entries': len(payload), 'sha256': digest(data)}))
 

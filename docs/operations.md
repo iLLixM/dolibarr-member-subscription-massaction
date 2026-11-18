@@ -1,8 +1,8 @@
 # Operation, errors and manual reconciliation
 
-Applies to the [bounded compatibility profiles](compatibility.md), with v0.1.0
-release integration/review still pending. The Owner's R0-05 decision accepts the
-existing session/checkpoint residual risks for the limited intended release scope;
+Applies to the [bounded v0.1.0 compatibility profiles](compatibility.md).
+The Owner's R0-05 decision accepts the existing session/checkpoint residual risks
+for the documented limited scope;
 it does not grant general production, throughput or third-party-hook approval.
 
 ## Before and during a run
@@ -90,5 +90,5 @@ foreign-writer and extended compatibility cases remain unqualified.
   orchestration admission can leave a safely stopped `processing` run before DML.
   Do not automatically reopen/retry it; reconcile first.
 
-These remain documented observations, not broadened test passes. Development
-merge acceptance and Owner risk acceptance do not replace R0-04/R0-07.
+These remain documented observations, not broadened test passes or guarantees
+for untested installation profiles.

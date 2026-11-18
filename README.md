@@ -5,9 +5,10 @@ Review each member's contribution, dates and warnings before confirming the run;
 then see a separate result for every member. The module extends the member list
 without modifying Dolibarr Core.
 
-**v0.1.0 release candidate preparation:** metadata and an installable ZIP are being
-prepared. Final ZIP integration (R0-04) and independent release review (R0-07) are
-still required. This is not a published release or general production approval.
+**MemberSubscriptionMassaction v0.1.0**
+
+**Compatible with Dolibarr V22, V23 and V24.** See the compatibility matrix for
+technical prerequisites, synthetic coverage and the exact real integration profiles.
 
 ## What you can do
 
@@ -56,9 +57,9 @@ not an HTTP timeout, parallel-load, PDF or SMTP throughput guarantee.
 
 ## Requirements and compatibility
 
-| Component | Intended v0.1.0 scope and evidence boundary |
+| Component | v0.1.0 compatibility and evidence boundary |
 | --- | --- |
-| Dolibarr | Intended release scope V22–V24. Technical admission starts at V21; V21/future versions are not thereby qualified. |
+| Dolibarr | Compatible with Dolibarr V22, V23 and V24. Technical admission starts at V21; V21/future versions are not thereby qualified. |
 | PHP | Technical minimum 7.4; real reference runs used PHP 8.2.35. |
 | MariaDB | Owner-required minimum 10.11; exact V24 reference: 10.11.19. |
 | Oracle MySQL | Owner-required minimum 8.4; exact V24 reference: Community 8.4.13, with the required Performance Schema setup. |
@@ -73,7 +74,7 @@ for local collisions before installation. Do not install over a conflicting modu
 ## Installation and use
 
 1. Check the compatibility profile and local module-ID collision prerequisites.
-2. On a separately approved test installation, import the candidate ZIP through
+2. On a compatible Dolibarr installation, import the v0.1.0 ZIP through
    Dolibarr's external module installer or extract its `membersubscriptionmassaction/`
    folder into `htdocs/custom/`. Do not overwrite a working installation blindly.
 3. Enable Members, then MemberSubscriptionMassaction. Give internal users the
@@ -83,7 +84,7 @@ for local collisions before installation. Do not install over a conflicting modu
    then submit the booking once. Inspect every result before leaving the page.
 
 See [installation and configuration](docs/installation.md) for ZIP verification,
-rights, settings, invoice/email prerequisites and the separate R0-04 acceptance.
+rights, settings and invoice/email prerequisites.
 
 ## Safe operation and known limits
 
@@ -101,13 +102,13 @@ smartphone interface or general accessibility/browser qualification.
 
 Read [operations and reconciliation](docs/operations.md) and
 [release notes v0.1.0](docs/release-notes-v0.1.0.md) for accepted residual risks,
-known P3 observations and the outstanding release gates.
+known P3 observations and operating limits.
 
 ## License and project sources
 
 GPL-3.0-or-later; see [COPYING](COPYING). Derived from the design of
 [Dolibarr PR #42620](https://github.com/Dolibarr/dolibarr/pull/42620), with source
-attribution retained. No Core patches, KSeF or FacturX code are included.
+attribution retained. The module does not modify Dolibarr Core.
 Development history, test provenance and the authoritative requirements are kept
 in the [source repository](https://github.com/iLLixM/dolibarr-member-subscription-massaction),
 separately from the user-facing package documentation.
