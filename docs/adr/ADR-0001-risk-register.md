@@ -12,6 +12,69 @@ CF-00; decisions, risk boundaries and unexecuted technical gates remain preserve
 CF-01 implementation status is recorded in the central validation; no Core-Guarded
 booking, real D-01 integration or release approval follows from this closure.
 
+## D-01 completion risk addendum — 2026-11-18
+
+Owner evidence acceptance: **ACCEPTED WITH DOCUMENTED LIMITS**. Option A:
+**CONDITIONALLY APPROVED**, technically unqualified pending the mandatory
+completion/session-checkpoint/logger gate **before CF-02 contribution DML**.
+Authority and complete decision: [PR #25 review/Owner record](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/25#issuecomment-6993488134).
+The [ADR Owner addendum](ADR-0001-core-first-transaction-profiles.md#d-01-owner-addendum--2026-11-18)
+is the current scoped contract for the existing risks below; this adds no new
+risk model and does not change EnhancedMySQL/MariaDB evidence or guarantees.
+
+- **R01/R07 — Entry versus completion.** The real restricted MySQL8.4.13/V24.0.3
+  library experiment supports ordered SET RR → Core BEGIN and behavioral RR/1568,
+  not durable physical identity or actual-event isolation. Six completion cases
+  show CHAIN/RELEASE effects despite pre-entry autocommit1: next SET1568/2006.
+  Waiting for that next SET would allow unsafe earlier SQL. Preserve preflight
+  classification plus immediate terminal STOP, without post-end SQL probes,
+  completion whitelist or session/global normalization. Classification stability
+  across the supported Core/Agenda path remains **U/G**, not proven by a settings read.
+- **R05/R06 — Acknowledged end versus lost ACK.** Member result and batch continuation
+  are independent. Acknowledged CHAIN/RELEASE commit keeps SUCCESS while the batch
+  stops; acknowledged rollback keeps its business failed/skipped result and stops.
+  NO_CHAIN continuation under E10/E12 additionally needs qualified post-end context
+  and checkpoint. Core false rollback can reset depth0; failed ends may leave stale
+  Core error fields. Lost/unacknowledged/uncertain ends remain UNKNOWN/STOP without
+  retry, compensation, another rollback or readback-based success. Checkpoint failure
+  after accepted COMMIT is E15: preserve DB outcome, mark result persistence uncertain
+  and stop. No claim of original physical completion or crash-safe recovery.
+- **R11 — Core/logging and forbidden post-processing.** Core `dol_syslog()` after
+  commit/rollback may run before the adapter receives the acknowledged return.
+  Prove the actual selected logger path cannot already query a chained/released
+  context. Terminal STOP must precede any additional module SQL, profile/config
+  read, mail/PDF or next member. Finish standard Agenda/business postconditions
+  before end. Unknown extensions/loggers retain the bounded compatibility
+  reservation, not a new universal inventory/certification obligation.
+- **R12 — Checkpoint/HTTP handler dependency.** Qualify durable, readable result
+  persistence and request teardown independent of the terminal DB context. Do not
+  assume every configured PHP session handler is file-based. A checkpoint in the
+  chained context could report success then disappear at connection release; a
+  RELEASE connection cannot serve DB-backed persistence. Only proved independent
+  checkpoint/HTTP-result actions may follow terminal end; failure stops and never
+  reopens/resumes consumed consent. Test both acknowledged outcomes, E15 and lost ACK.
+- **R09/R13/R15 — Scope, partial batches and rollout.** The Owner provisionally accepts
+  controlled CHAIN/RELEASE partial processing (normally one transactionally processed
+  member). Clearly distinguish unprocessed selections from success/failure/unknown.
+  Safe multi-member operation remains the target; permanent support and Option C
+  await separate decisions. No general qualification follows from the37 completed
+  measurements/controls,1 PARTIAL or synthetic CI. No silent profile downgrade,
+  new transaction manager, general P_S prerequisite or release approval.
+
+The evidence is **A** only for the bounded measured library/driver conditions;
+Option A's implementation, session/logger and HTTP guarantees remain **U/G**. Required
+new proof: actual pre-end classification/no intervening SET→BEGIN SQL; all three
+completion modes; supported Core/standard-Agenda/logger call path; independent
+session checkpoints and controlled response/end; no terminal follow-on actions;
+lost ACK and checkpoint failure. Independent assessment must close this gate before
+contribution DML; **NOT EXECUTED** in AP2. Later CF-03 and release gates remain open.
+
+[Historical experiment](../d01-loaded-core-feasibility-v1.md) retains D-01 CHANGES
+REQUIRED, instrumentation/factory scope limits, raw synthetic traces, checksums and
+PARTIAL. The original CF-00 register and time-specific pending/NOT EXECUTED statements
+below are preserved; apply this dated addendum to current completion/continuation
+risk handling. Owner risk acceptance is not technical implementation approval.
+
 **Historical drafting/review context:**
 
 Companion to the [ADR](ADR-0001-core-first-transaction-profiles.md) and

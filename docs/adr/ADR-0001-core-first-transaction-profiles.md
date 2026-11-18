@@ -12,6 +12,106 @@ CF-00; decisions, risk boundaries and unexecuted technical gates remain preserve
 CF-01 implementation status is recorded in the central validation; no Core-Guarded
 booking, real D-01 integration or release approval follows from this closure.
 
+## D-01 Owner addendum — 2026-11-18
+
+**Evidence ACCEPTED WITH DOCUMENTED LIMITS; Option A — Bounded STOP CONDITIONALLY
+APPROVED. Completion/session-checkpoint/logger gate OPEN / NOT EXECUTED.**
+
+Authority: the Owner's D-01 AP1/AP2 decision and complete supplied independent
+review, recorded in the [permanent PR #25 review/Owner record](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/25#issuecomment-6993488134)
+and [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22).
+External verdicts: **D-01 EVIDENCE ACCEPTED WITH DOCUMENTED LIMITS** and
+**OPTION A VIABLE WITH CONSTRAINTS**. PR #25 merged as
+`3bc9e4653778cdc870d79e2f5b7e025bc9ca036a`; reviewed source
+`abb1b5cfea17a744840a744991c4425e639c2376`. The
+[immutable experiment report](../d01-loaded-core-feasibility-v1.md) retains its
+historical **D-01 CHANGES REQUIRED**, traces, hashes and PARTIAL case. This addendum
+records a subsequent bounded Owner decision, not a retrospective technical PASS.
+
+### Member completion and batch continuation
+
+Regular Core transaction methods and the D-01 entry order remain mandatory.
+Member outcome and permission to continue the batch are **independent** states:
+
+| Acknowledged Core outcome | Member outcome | Batch / permitted next action |
+| --- | --- | --- |
+| COMMIT, qualified nonterminal NO_CHAIN context | SUCCESS under the existing application-level contract | Continue only after a successful qualified checkpoint, suitable post-end context and fresh next-member admission; separately permitted post-processing remains feature-gated. |
+| ROLLBACK, qualified nonterminal NO_CHAIN context | Existing FAILED/SKIPPED business result, Core-acknowledged rollback | E10 continuation only after the qualified checkpoint/post-end conditions and unchanged per-member policy. |
+| COMMIT, known terminal CHAIN/RELEASE | SUCCESS remains recognized | Immediate terminal STOP; only the proved connection-independent result checkpoint/HTTP response and controlled request end may follow. |
+| ROLLBACK, known terminal CHAIN/RELEASE | Acknowledged rollback and FAILED/SKIPPED remain recognized | Same immediate terminal STOP; do not process another member. |
+| End unacknowledged/uncertain, including lost ACK | UNKNOWN | STOP; no retry, compensation, foreign end or readback redemption. |
+| Checkpoint fails after an acknowledged member end | Preserve that acknowledged DB outcome; result persistence is uncertain | STOP / E15 for acknowledged COMMIT; manual reconciliation, no rebooking/resume to reconstruct results. |
+
+For E10/E12 (and E04/E05/E07 paths through E10), **an acknowledged end/depth0 alone
+never permits continuation**. The suitable, qualified post-end state above is an
+additional condition. E11/E13 remain UNKNOWN/STOP; E15 must not turn an accepted
+COMMIT into unknown DB completion or an assumed rollback merely because saving its
+result failed. A later expected RELEASE disconnect does not undo an already
+acknowledged COMMIT; distinguish it from an unacknowledged end.
+
+### Immediate terminal boundary
+
+Classify the expected completion effect **before** the Core end. A bounded method
+may read `@@SESSION.completion_type` during preflight, before the final SET RR;
+it is continuation planning, **not a value whitelist**. Prove that the selected
+Core/standard-Agenda path does not change the classified effect before completion.
+The exact handling of unavailable/inconsistent classification must be defined and
+independently assessed by the gate; this addendum invents no new admission bypass.
+
+For known terminal CHAIN/RELEASE, latch STOP **on the acknowledged Core return**,
+not at the next failed SET. **Before any further module SQL**, including next-member
+profile/configuration reads, no subsequent DML, mail service, PDF processing or
+next-member preflight is allowed. No post-end SELECT/ping to diagnose or redeem a
+chained/released context. All required business/Agenda DML and postconditions finish
+before end. The actual Core post-end `dol_syslog()` call occurs inside the Core end
+path and therefore must itself be proved non-endangering; an adapter-side STOP
+cannot retroactively protect against SQL already executed by that logger.
+
+Only the qualified connection-independent result/session checkpoint and controlled
+HTTP-result/request-end path may follow terminal completion. Do not assume all
+session handlers are file-based or independent of the same DB context. A DB-backed
+checkpoint could appear saved while joining CHAIN work later lost on disconnect.
+Never clean the chained transaction with another Core rollback/BEGIN, drain counters,
+or normalize session/global settings. Ordinary connection release at request end
+is distinct from an explicit foreign-transaction cleanup attempt and must use the
+qualified teardown/logger path. No general third-party/logger certification duty
+is added; unknown extension behavior retains the existing compatibility reservation.
+
+### Provisional partial processing and mandatory gate
+
+The Owner explicitly accepts **controlled partial processing** provisionally: under
+CHAIN/RELEASE normally at most one transactionally processed member per batch.
+Clearly show the acknowledged member result and which selections were **not
+processed**; do not label those as successful, unknown or generically failed.
+Concrete UI/status representation is a later implementation duty, not a new enum
+implemented here. A new attempt needs a new user action, fresh preview/eligibility
+and confirmation; never automatically resume the consumed batch.
+
+Safe multi-member booking across MySQL hosting configurations remains the goal.
+Permanent CHAIN/RELEASE support/partial-processing acceptance and **Option C** require
+later separate Owner decisions and qualification. Option C is not an approved
+fallback. No own COMMIT/ROLLBACK commands alongside Core, second transaction manager,
+completion whitelist, session/global normalization, extra rights or general P_S
+prerequisite are authorized. EnhancedMySQL/MariaDB contracts and ADR-01–ADR-12/D-02
+remain unchanged; Core-Guarded is not equivalent to Enhanced.
+
+**Before CF-02 contribution DML**, successfully complete a focused independently
+assessed completion/session-checkpoint/logger proof for **NO_CHAIN, CHAIN and
+RELEASE**: pre-end classification stability; actual Core/logger end path; immediate
+SQL-free terminal decision; independently safe durable result checkpoint and HTTP
+readback/controlled end; acknowledged commit/rollback versus lost ACK; checkpoint
+failure/E15; no next-member/profile SQL, mail/PDF or automatic retry after STOP.
+Use approved isolated synthetic objects. This is a new bounded gate, not a repeat
+of the old D-01 campaign or permission to execute tests in AP2. It is **NOT EXECUTED**.
+CF-03 business/Agenda ON/OFF, HTTP replay, concurrency, cross-version and Enhanced/
+MariaDB regression, exact-artifact and independent release/Owner-GO gates remain
+open. Core-Guarded booking remains disabled; this documentary addendum is submitted
+for independent documentation review and separate Owner acceptance before AP2 merge.
+
+The following original CF-00 drafting text, historical NOT EXECUTED statements and
+E01–E15 matrix are retained. This dated addendum narrows their completion/continuation
+permission; it does not rewrite past evidence or alter unrelated contracts.
+
 **Historical drafting/review context:**
 
 Decision owner: repository Owner, 2026-11-18. Detailed design author: Codex;

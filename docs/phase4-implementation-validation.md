@@ -1,5 +1,80 @@
 # Phase 4 implementation validation
 
+## D-01 evidence and conditional Option A closure — 2026-11-18
+
+AP2 documentary base: accepted main `3bc9e4653778cdc870d79e2f5b7e025bc9ca036a`,
+normal merge of [PR #25](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/25).
+Parents: accepted CF-01 `e357e93bea7f4b18730596245484a6ab02c6c634` and unchanged D-01
+review HEAD `abb1b5cfea17a744840a744991c4425e639c2376`. Exactly32 additive evidence
+files, no product changes/rebase. All30 payload hashes plus original manifest and
+checksum bytes preserved. Reviewed push/PR CI:21/21 PASS each; [post-merge main CI](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44412022686):
+**21/21 PASS**. CI is synthetic evidence, not completion/session/logger qualification.
+
+The supplied independent review concludes **D-01 EVIDENCE ACCEPTED WITH DOCUMENTED
+LIMITS** and **OPTION A VIABLE WITH CONSTRAINTS**; it independently checked all31
+SHA-256 entries, sizes and matrix consistency. Owner acceptance is **ACCEPTED WITH
+DOCUMENTED LIMITS**; Option A — Bounded STOP is **CONDITIONALLY APPROVED**, per the
+[complete durable review/Owner record](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/25#issuecomment-6993488134)
+and [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22).
+F-D01-01 is conditionally decided architecturally, not technically qualified.
+F-D01-02 keeps unacknowledged/uncertain ends at **UNKNOWN/STOP**. This records the
+external review rather than a formal GitHub vote. The immutable
+[experiment report](d01-loaded-core-feasibility-v1.md), **D-01 CHANGES REQUIRED**,
+traces, matrix, hashes and PARTIAL classification are unchanged historical evidence.
+
+### Actual D-01 evidence and limits
+
+Real loaded V24.0.3 Core `5c6c7ff6a5112413b1c27221c8d11750afad56f8` database libraries,
+PHP8.2.35/mysqli/mysqlnd8.2.35, MySQL Community8.4.13, InnoDB and restricted
+`msmsh01lab` DML-only account (P_S SELECT denied1142):37 completed measurements/
+controls plus1 PARTIAL. Ordered SET RR → genuine Core BEGIN works;16 behavioral
+isolation combinations,1568 foreign refusal,2 coordinated locking/read-view cases,
+6 completion cases and real lost COMMIT/ROLLBACK replies are documented. There are
+54 new retained synthetic rows and27 unchanged historical lab rows.
+
+Most cases instrument native mysqli while inheriting actual Core transaction/query
+methods. The2 exact factory/driver/native controls cover ordinary entry/end only,
+**not all completion variants**. PARTIAL lacks a fully retained exception/return;
+read-only reconciliation does not turn it into PASS. No full main.inc.php,
+authenticated business/HTTP/session, real Agenda or configured DB logger integration
+was qualified. Same-connection replacements can remain invisible; no Enhanced
+identity/isolation/completion equivalence follows. Historical SH-01 NO-GO stands.
+
+### New pre-DML gate — OPEN / NOT EXECUTED
+
+Apply the [ADR Owner addendum](adr/ADR-0001-core-first-transaction-profiles.md#d-01-owner-addendum--2026-11-18)
+and [risk addendum](adr/ADR-0001-risk-register.md#d-01-completion-risk-addendum--2026-11-18):
+classify completion before end, then terminal STOP immediately after acknowledged
+CHAIN/RELEASE, **before further module SQL, mail/PDF or another member**. Preserve
+acknowledged member result independently of batch STOP; visibly identify unprocessed
+selections. Only qualified connection-independent checkpoint/HTTP-result/end steps
+may follow. Controlled partial processing is provisionally accepted, not a guarantee
+of full multi-member operation on every hosting configuration. E10/E12 continuation
+needs a suitable qualified post-end state; E11/E13 remain UNKNOWN/STOP and E15
+preserves accepted DB outcome despite checkpoint uncertainty.
+
+**Mandatory before CF-02 contribution DML:** focused synthetic and approved isolated
+real completion/session-checkpoint/logger proof for NO_CHAIN/CHAIN/RELEASE, independently
+assessed. Prove pre-classification stability, actual Core post-end logging, SQL-free
+terminal decision, configured independent durable checkpoints/result display and
+controlled HTTP teardown; lost ACK, checkpoint failure and zero forbidden follow-on
+SQL/member/mail/PDF. No dangerous post-end SQL diagnosis, retry, compensation,
+foreign rollback, completion whitelist, session/global normalization or new
+transaction manager. This task executes **no new real test**; the gate is still
+**NOT EXECUTED**, not closed by architecture acceptance or CI.
+
+CF-03 contributions/standard Agenda ON/OFF/HTTP replay/concurrency/V22/V23 and
+EnhancedMySQL/MariaDB regressions, later exact artifact/security/release/Owner GO
+remain open. CF-01 itself was independently/Owner-accepted and merged in PR #24;
+its real DB/HTTP/CAS persistence/negative and new-source Enhanced/MariaDB evidence
+remains NOT EXECUTED. Core-Guarded booking stays disabled; AP2 is a separate
+unmerged documentation proposal pending independent review and Owner acceptance.
+
+All earlier dated CF-00/CF-01/other campaign pending or NOT EXECUTED statements below
+are preserved as their original checkpoints; this addendum records subsequent
+bounded evidence/acceptance without retroactive qualification or remapping the71
+requirements. No historical experiment or requirement matrix changes.
+
 ## CF-01 profile selection and preview boundaries — 2026-11-18
 
 Base: fetched `origin/main` exactly `6247704815cf532ec632616011133c646aa00005`
