@@ -1,0 +1,118 @@
+{
+  "status": "PASS",
+  "kind": "COMMIT",
+  "fixture": 4080,
+  "entry": {
+    "begin": 1,
+    "depth": 1,
+    "sql_indices": [
+      3,
+      4
+    ],
+    "connection": 150
+  },
+  "Core_return": 0,
+  "native_errno": 2006,
+  "Core_errno": null,
+  "Core_depth": 1,
+  "persisted": 9,
+  "classification": "UNKNOWN/STOP regardless of independent readback; no retry or compensating rollback",
+  "trace": [
+    {
+      "case": "D01-LOST-COMMIT",
+      "connection": 149,
+      "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+      "start": 1795026172.24655,
+      "end": 1795026172.247716,
+      "ok": true,
+      "errno": 0,
+      "rows": 1
+    },
+    {
+      "case": "D01-LOST-COMMIT",
+      "connection": 149,
+      "sql": "INSERT INTO probe VALUES (4080,'D01-lost-commit',0)",
+      "start": 1795026172.247939,
+      "end": 1795026172.286609,
+      "ok": true,
+      "errno": 0,
+      "rows": 1
+    },
+    {
+      "case": "D01-LOST-COMMIT",
+      "connection": 150,
+      "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+      "start": 1795026172.377842,
+      "end": 1795026172.431454,
+      "ok": true,
+      "errno": 0,
+      "rows": 1
+    },
+    {
+      "case": "D01-LOST-COMMIT",
+      "connection": 150,
+      "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+      "start": 1795026172.431555,
+      "end": 1795026172.435112,
+      "ok": true,
+      "errno": 0,
+      "rows": 0
+    },
+    {
+      "case": "D01-LOST-COMMIT",
+      "connection": 150,
+      "sql": "BEGIN",
+      "start": 1795026172.435645,
+      "end": 1795026172.436602,
+      "ok": true,
+      "errno": 0,
+      "rows": 0
+    },
+    {
+      "case": "D01-LOST-COMMIT",
+      "connection": 150,
+      "sql": "SELECT n FROM probe WHERE id=4080 FOR UPDATE",
+      "start": 1795026172.436667,
+      "end": 1795026172.483348,
+      "ok": true,
+      "errno": 0,
+      "rows": 1
+    },
+    {
+      "case": "D01-LOST-COMMIT",
+      "connection": 150,
+      "sql": "UPDATE probe SET n=9 WHERE id=4080",
+      "start": 1795026172.483576,
+      "end": 1795026172.486392,
+      "ok": true,
+      "errno": 0,
+      "rows": 1
+    },
+    {
+      "case": "D01-LOST-COMMIT",
+      "connection": 150,
+      "sql": "COMMIT",
+      "start": 1795026172.486445,
+      "end": 1795026172.50709,
+      "ok": false,
+      "errno": 2006,
+      "rows": -1
+    },
+    {
+      "case": "D01-LOST-COMMIT",
+      "connection": 149,
+      "sql": "SELECT n FROM probe WHERE id=4080",
+      "start": 1795026172.507131,
+      "end": 1795026172.509443,
+      "ok": true,
+      "errno": 0,
+      "rows": 1
+    }
+  ],
+  "proxy": {
+    "forwarded_target": 1,
+    "server_ok_discarded": 1,
+    "raw_packets_logged": 0,
+    "scope": "one dedicated loopback client; no KILL or server restart"
+  }
+}

@@ -1,0 +1,428 @@
+{
+    "status": "PASS",
+    "cases": [
+        {
+            "fixture": 4060,
+            "mode": "correct",
+            "A_entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    3,
+                    4
+                ],
+                "connection": 145
+            },
+            "A_commit_window": [
+                1795026120.060708,
+                1795026120.077343
+            ],
+            "B_pending_before_A_commit": true,
+            "B": {
+                "status": "PASS",
+                "mode": "correct",
+                "entry": {
+                    "begin": 1,
+                    "depth": 1,
+                    "sql_indices": [
+                        2,
+                        3
+                    ],
+                    "connection": 146
+                },
+                "lock_start": 1795026119.609014,
+                "lock_end": 1795026120.077323,
+                "lock_seconds": 0.4683089256286621,
+                "locked": 1,
+                "consistent": 1,
+                "rollback": true,
+                "trace": [
+                    {
+                        "case": "D01-LOCK-B-correct",
+                        "connection": 146,
+                        "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+                        "start": 1795026119.598875,
+                        "end": 1795026119.600546,
+                        "ok": true,
+                        "errno": 0,
+                        "rows": 1
+                    },
+                    {
+                        "case": "D01-LOCK-B-correct",
+                        "connection": 146,
+                        "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+                        "start": 1795026119.600634,
+                        "end": 1795026119.605398,
+                        "ok": true,
+                        "errno": 0,
+                        "rows": 1
+                    },
+                    {
+                        "case": "D01-LOCK-B-correct",
+                        "connection": 146,
+                        "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+                        "start": 1795026119.605442,
+                        "end": 1795026119.607937,
+                        "ok": true,
+                        "errno": 0,
+                        "rows": 0
+                    },
+                    {
+                        "case": "D01-LOCK-B-correct",
+                        "connection": 146,
+                        "sql": "BEGIN",
+                        "start": 1795026119.607962,
+                        "end": 1795026119.608407,
+                        "ok": true,
+                        "errno": 0,
+                        "rows": 0
+                    },
+                    {
+                        "case": "D01-LOCK-B-correct",
+                        "connection": 146,
+                        "sql": "SELECT n FROM probe WHERE id=4060 FOR UPDATE",
+                        "start": 1795026119.609039,
+                        "end": 1795026120.077293,
+                        "ok": true,
+                        "errno": 0,
+                        "rows": 1
+                    },
+                    {
+                        "case": "D01-LOCK-B-correct",
+                        "connection": 146,
+                        "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+                        "start": 1795026120.077347,
+                        "end": 1795026120.080712,
+                        "ok": true,
+                        "errno": 0,
+                        "rows": 1
+                    },
+                    {
+                        "case": "D01-LOCK-B-correct",
+                        "connection": 146,
+                        "sql": "SELECT n FROM probe WHERE id=4060",
+                        "start": 1795026120.080762,
+                        "end": 1795026120.082837,
+                        "ok": true,
+                        "errno": 0,
+                        "rows": 1
+                    },
+                    {
+                        "case": "D01-LOCK-B-correct",
+                        "connection": 146,
+                        "sql": "ROLLBACK",
+                        "start": 1795026120.082888,
+                        "end": 1795026120.084493,
+                        "ok": true,
+                        "errno": 0,
+                        "rows": 0
+                    }
+                ]
+            },
+            "assessment": "Fresh read after lock and metadata"
+        },
+        {
+            "fixture": 4061,
+            "mode": "prelock-metadata",
+            "A_entry": {
+                "begin": 1,
+                "depth": 1,
+                "sql_indices": [
+                    11,
+                    12
+                ],
+                "connection": 147
+            },
+            "A_commit_window": [
+                1795026120.686648,
+                1795026120.706705
+            ],
+            "B_pending_before_A_commit": true,
+            "B": {
+                "status": "PASS",
+                "mode": "prelock-metadata",
+                "entry": {
+                    "begin": 1,
+                    "depth": 1,
+                    "sql_indices": [
+                        2,
+                        3
+                    ],
+                    "connection": 148
+                },
+                "lock_start": 1795026120.235973,
+                "lock_end": 1795026120.706518,
+                "lock_seconds": 0.47054505348205566,
+                "locked": 1,
+                "consistent": 0,
+                "rollback": true,
+                "trace": [
+                    {
+                        "case": "D01-LOCK-B-prelock-metadata",
+                        "connection": 148,
+                        "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+                        "start": 1795026120.223213,
+                        "end": 1795026120.225713,
+                        "ok": true,
+                        "errno": 0,
+                        "rows": 1
+                    },
+                    {
+                        "case": "D01-LOCK-B-prelock-metadata",
+                        "connection": 148,
+                        "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+                        "start": 1795026120.225836,
+                        "end": 1795026120.230396,
+                        "ok": true,
+                        "errno": 0,
+                        "rows": 1
+                    },
+                    {
+                        "case": "D01-LOCK-B-prelock-metadata",
+                        "connection": 148,
+                        "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+                        "start": 1795026120.230455,
+                        "end": 1795026120.23178,
+                        "ok": true,
+                        "errno": 0,
+                        "rows": 0
+                    },
+                    {
+                        "case": "D01-LOCK-B-prelock-metadata",
+                        "connection": 148,
+                        "sql": "BEGIN",
+                        "start": 1795026120.231814,
+                        "end": 1795026120.232503,
+                        "ok": true,
+                        "errno": 0,
+                        "rows": 0
+                    },
+                    {
+                        "case": "D01-LOCK-B-prelock-metadata",
+                        "connection": 148,
+                        "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+                        "start": 1795026120.232537,
+                        "end": 1795026120.235343,
+                        "ok": true,
+                        "errno": 0,
+                        "rows": 1
+                    },
+                    {
+                        "case": "D01-LOCK-B-prelock-metadata",
+                        "connection": 148,
+                        "sql": "SELECT n FROM probe WHERE id=4061 FOR UPDATE",
+                        "start": 1795026120.235999,
+                        "end": 1795026120.706491,
+                        "ok": true,
+                        "errno": 0,
+                        "rows": 1
+                    },
+                    {
+                        "case": "D01-LOCK-B-prelock-metadata",
+                        "connection": 148,
+                        "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+                        "start": 1795026120.706542,
+                        "end": 1795026120.708262,
+                        "ok": true,
+                        "errno": 0,
+                        "rows": 1
+                    },
+                    {
+                        "case": "D01-LOCK-B-prelock-metadata",
+                        "connection": 148,
+                        "sql": "SELECT n FROM probe WHERE id=4061",
+                        "start": 1795026120.708301,
+                        "end": 1795026120.709707,
+                        "ok": true,
+                        "errno": 0,
+                        "rows": 1
+                    },
+                    {
+                        "case": "D01-LOCK-B-prelock-metadata",
+                        "connection": 148,
+                        "sql": "ROLLBACK",
+                        "start": 1795026120.709795,
+                        "end": 1795026120.712239,
+                        "ok": true,
+                        "errno": 0,
+                        "rows": 0
+                    }
+                ]
+            },
+            "assessment": "EXPECTED COUNTEREXAMPLE: pre-lock ENGINE SELECT establishes stale consistent read; ordering is required"
+        }
+    ],
+    "failure": null,
+    "trace": [
+        {
+            "case": "inspect",
+            "connection": 144,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026119.448159,
+            "end": 1795026119.449513,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-LOCK-A-correct",
+            "connection": 144,
+            "sql": "INSERT INTO probe VALUES (4060,'D01-lock-correct',0)",
+            "start": 1795026119.449634,
+            "end": 1795026119.471367,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-LOCK-A-correct",
+            "connection": 145,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026119.481953,
+            "end": 1795026119.483955,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-LOCK-A-correct",
+            "connection": 145,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026119.483998,
+            "end": 1795026119.485088,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-LOCK-A-correct",
+            "connection": 145,
+            "sql": "BEGIN",
+            "start": 1795026119.485107,
+            "end": 1795026119.486342,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-LOCK-A-correct",
+            "connection": 145,
+            "sql": "SELECT n FROM probe WHERE id=4060 FOR UPDATE",
+            "start": 1795026119.486377,
+            "end": 1795026119.488288,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-LOCK-A-correct",
+            "connection": 145,
+            "sql": "UPDATE probe SET n=1 WHERE id=4060",
+            "start": 1795026119.48833,
+            "end": 1795026119.491264,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-LOCK-A-correct",
+            "connection": 145,
+            "sql": "COMMIT",
+            "start": 1795026120.060869,
+            "end": 1795026120.0773,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-LOCK-A-correct",
+            "connection": 144,
+            "sql": "SELECT n FROM probe WHERE id=4060",
+            "start": 1795026120.093493,
+            "end": 1795026120.096271,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-LOCK-A-prelock-metadata",
+            "connection": 144,
+            "sql": "INSERT INTO probe VALUES (4061,'D01-lock-prelock-metadata',0)",
+            "start": 1795026120.096709,
+            "end": 1795026120.115653,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-LOCK-A-prelock-metadata",
+            "connection": 147,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795026120.123644,
+            "end": 1795026120.124874,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-LOCK-A-prelock-metadata",
+            "connection": 147,
+            "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+            "start": 1795026120.124939,
+            "end": 1795026120.12702,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-LOCK-A-prelock-metadata",
+            "connection": 147,
+            "sql": "BEGIN",
+            "start": 1795026120.127236,
+            "end": 1795026120.128709,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-LOCK-A-prelock-metadata",
+            "connection": 147,
+            "sql": "SELECT n FROM probe WHERE id=4061 FOR UPDATE",
+            "start": 1795026120.128755,
+            "end": 1795026120.13019,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-LOCK-A-prelock-metadata",
+            "connection": 147,
+            "sql": "UPDATE probe SET n=1 WHERE id=4061",
+            "start": 1795026120.130247,
+            "end": 1795026120.131833,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "D01-LOCK-A-prelock-metadata",
+            "connection": 147,
+            "sql": "COMMIT",
+            "start": 1795026120.68671,
+            "end": 1795026120.706679,
+            "ok": true,
+            "errno": 0,
+            "rows": 0
+        },
+        {
+            "case": "D01-LOCK-A-prelock-metadata",
+            "connection": 144,
+            "sql": "SELECT n FROM probe WHERE id=4061",
+            "start": 1795026120.724063,
+            "end": 1795026120.725158,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        }
+    ]
+}

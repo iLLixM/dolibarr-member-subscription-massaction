@@ -1,0 +1,124 @@
+{
+    "mode": "Read-only genuine loaded Core driver/library inspection; no main.inc.php/business bootstrap",
+    "dolibarr": "24.0.3",
+    "core_commit": "5c6c7ff6a5112413b1c27221c8d11750afad56f8",
+    "module_baseline": "6247704815cf532ec632616011133c646aa00005",
+    "reference_module_commit": "0999efb4aafca43d90ce12e38d370662ad0c63a1",
+    "php": "8.2.35",
+    "driver": "mysqlnd 8.2.35",
+    "server": {
+        "version": "8.4.13",
+        "edition": "MySQL Community Server - GPL",
+        "ac": "1",
+        "session_isolation": "REPEATABLE-READ",
+        "completion_type": "NO_CHAIN"
+    },
+    "grants": [
+        "GRANT USAGE ON *.* TO `msmsh01lab`@`%`",
+        "GRANT SELECT, INSERT, UPDATE, DELETE ON `msmsh01lab`.* TO `msmsh01lab`@`%`"
+    ],
+    "P_S_errno": 1142,
+    "engine": [
+        {
+            "ENGINE": "InnoDB"
+        }
+    ],
+    "methods": {
+        "__construct": {
+            "class": "DoliDBMysqli",
+            "source": "core/db/mysqli.class.php",
+            "line": 62
+        },
+        "query": {
+            "class": "DoliDBMysqli",
+            "source": "core/db/mysqli.class.php",
+            "line": 331
+        },
+        "begin": {
+            "class": "DoliDB",
+            "source": "core/db/DoliDB.class.php",
+            "line": 216
+        },
+        "commit": {
+            "class": "DoliDB",
+            "source": "core/db/DoliDB.class.php",
+            "line": 241
+        },
+        "rollback": {
+            "class": "DoliDB",
+            "source": "core/db/DoliDB.class.php",
+            "line": 265
+        }
+    },
+    "core_sha256": {
+        "core/db/DoliDB.class.php": "fff88cb62729ee68784530c832ba73dc13d7103d16bebb0a41c2a4eaedb99c97",
+        "core/db/mysqli.class.php": "828853c0f252b81529e0eb829a7460e73edf88c4ed1b7ea49ba475a8122d1d3e",
+        "core/lib/functions.lib.php": "b88b148fda12377d71b6324b03b11fa97043ef9eba9ef2d890c8a3d05834c1d1",
+        "core/class/conf.class.php": "7673bdb6a17ea16565c02093679d2d1345ff66db6a6a01058500a5ac29f851a4",
+        "core/class/translate.class.php": "d36f94c74121aaa39bb60a8ccf689f6134eb3cb4d11048be3cd2b41afa8a3713"
+    },
+    "historical_rows": 27,
+    "historical_sha256": "c3991963041eaece14192788a9423faa11ce527bf600b25f1655e7f8999a4cdc",
+    "trace": [
+        {
+            "case": "inspect",
+            "connection": 90,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "start": 1795025895.665722,
+            "end": 1795025895.667834,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "inspect",
+            "connection": 90,
+            "sql": "SHOW GRANTS",
+            "start": 1795025895.667915,
+            "end": 1795025895.669189,
+            "ok": true,
+            "errno": 0,
+            "rows": 2
+        },
+        {
+            "case": "inspect",
+            "connection": 90,
+            "sql": "SELECT THREAD_ID FROM performance_schema.events_transactions_current WHERE 1=0",
+            "start": 1795025895.66923,
+            "end": 1795025895.671444,
+            "ok": false,
+            "errno": 1142,
+            "rows": -1
+        },
+        {
+            "case": "inspect",
+            "connection": 90,
+            "sql": "SELECT VERSION() AS version,@@version_comment AS edition,@@autocommit AS ac,@@transaction_isolation AS session_isolation,@@completion_type AS completion_type",
+            "start": 1795025895.6715,
+            "end": 1795025895.674188,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "inspect",
+            "connection": 90,
+            "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='probe'",
+            "start": 1795025895.674241,
+            "end": 1795025895.683928,
+            "ok": true,
+            "errno": 0,
+            "rows": 1
+        },
+        {
+            "case": "inspect",
+            "connection": 90,
+            "sql": "SELECT id,label,n FROM probe ORDER BY id",
+            "start": 1795025895.683977,
+            "end": 1795025895.687493,
+            "ok": true,
+            "errno": 0,
+            "rows": 27
+        }
+    ]
+}
