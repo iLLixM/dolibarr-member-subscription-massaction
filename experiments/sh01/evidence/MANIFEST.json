@@ -51,8 +51,8 @@
     },
     {
       "path": "experiments/sh01/evidence/issue21-contract-snapshot.md",
-      "bytes": 2580,
-      "sha256": "0720322ca047869cca03c8751275bda908c1c47b0ebac90a9b990cb0294ef396"
+      "bytes": 2578,
+      "sha256": "68df78a43e1d670328ff202a0172674c6c54f5de8c235ee026a69acd3608f4f0"
     },
     {
       "path": "experiments/sh01/evidence/lost-ack-COMMIT.json",

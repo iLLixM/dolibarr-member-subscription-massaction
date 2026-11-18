@@ -14,5 +14,3 @@ Retrieved 2026-11-18. The following source section is retained verbatim.
 - Retain the existing qualified MariaDB and Performance-Schema-based MySQL code paths unchanged in behavior. Backend selection must be deterministic, explicitly documented and fixed **before** a business transaction; never switch backends mid-transaction or after uncertainty.
 - Support remains bounded: Dolibarr V22/V23/V24 is the Owner-confirmed release compatibility scope (V23 synthetic coverage must not be presented as real integration); Oracle MySQL >=8.4, MariaDB >=10.11; PostgreSQL remains out of scope.
 - Do not alter or merge Draft PR #19 or publish/tag v0.1.0 before the new backend, rebuilt ZIP, R0-04 integration and independent R0-07 review are complete. Implement in a separate focused branch/PR and rebase/rebuild the release package only after approval.
-
-
