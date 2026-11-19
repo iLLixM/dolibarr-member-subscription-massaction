@@ -171,3 +171,36 @@ credentials, private config, session files, raw packet payloads, HTML, cookies o
 CSRF tokens. `verify.py` checks completeness/hashes plus independent SQL/order,
 terminal-connection, persisted-values, HTTP/readback and historical-state
 consistency offline. Integrity verification is not independent architectural approval.
+
+## Erratum and independent follow-up — 2026-11-19 (F27-03)
+
+Independent review at `8c777340da4cdafae7b91bbe4366fc8aad525945`:
+**AP3 EVIDENCE ACCEPTED WITH DOCUMENTED LIMITS**;
+**COMPLETION GATE INCOMPLETE – TARGETED FOLLOW-UP REQUIRED**.
+This records the supplied external judgment, not a formal GitHub review vote.
+
+**E02 correction:** in `AP3-FOREIGN-1568`, the SET admission fails before
+Core-BEGIN and before any member DML. This known refusal means **ENTRY REFUSED /
+NOT_PROCESSED + STOP**, not an unknown booking outcome. The fault-originator's
+pre-existing physical transaction is untouched by admission. CF-02 must use that
+E02 classification only when the trace proves this pre-BEGIN/pre-DML boundary.
+Unconfirmed BEGIN/end or uncertain in-flight outcomes remain UNKNOWN/STOP under
+E11/E13; a later readback never rescues an unacknowledged end.
+
+The original harness returned UNKNOWN/STOP for this case. Its source, JSON,
+SQL trace, original STOPs and verifier assertions are preserved exactly; this
+erratum corrects their interpretation, not their measured contents. The original
+report SHA-256 was `f01a0e611aba1097a386014f89ddd18fdc2c4bd9a3aa85380a510b515e28c4e4`. Only this additive
+report correction and the corresponding manifest/hash entries change; the55
+payload paths and56 checksum entries remain complete.
+
+| Finding | Disposition and remaining obligation |
+| --- | --- |
+| F27-01 BLOCKER | Actual pinned contribution/standard-Agenda call-path stability remains a pre-DML obligation in the separate follow-up. |
+| F27-02 BLOCKER | Product batch terminal STOP/checkpoint/result distinction remains a separate non-DML patch and spy-test obligation. |
+| F27-03 MEDIUM | E02 interpretation corrected here; targeted independent verification pending. Historical output unchanged. |
+| F27-04 MEDIUM | Supported actual session/logger configuration must be enforced server-side before DML in the separate follow-up. |
+
+PR #27 remains Draft and requires separate Owner merge authorization. Its evidence
+acceptance does not close the Completion gate or authorize CF-02 contribution DML.
+Issue #22's six gate tasks, CF-02–CF-05 and release gates remain open.

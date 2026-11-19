@@ -13,8 +13,8 @@
   "files": [
     {
       "path": "docs/ap3-completion-gate-v1.md",
-      "bytes": 12159,
-      "sha256": "f01a0e611aba1097a386014f89ddd18fdc2c4bd9a3aa85380a510b515e28c4e4"
+      "bytes": 14333,
+      "sha256": "ea853bbd48639d32a043c6885d42df4c2a794eedfe94a78547fdf922934001df"
     },
     {
       "path": "experiments/ap3/OWNER-HTTP-R1.txt",
