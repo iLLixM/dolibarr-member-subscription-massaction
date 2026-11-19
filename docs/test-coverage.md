@@ -322,3 +322,20 @@ Real CF-01 setup/configuration/race/HTTP and live Enhanced/MariaDB regression re
 **NOT EXECUTED** pending a separately authorized environment. CoreGuarded booking
 and D-01 qualification remain disabled/deferred. No new assignment in the sole
 71-ID requirements matrix is made by this legend.
+
+## F27 pre-DML batch/runtime contracts (2026-11-19)
+
+`test/unit/terminal.php`, included by existing `postcommit.php`, uses the actual
+batch orchestrator, fake services/effect fences and local PHP file sessions.
+It covers terminal success/rollback/unknown, E02, E15, qualified continuation,
+missing classification, consumed replay, NOT_PROCESSED rendering and real runtime
+session/logger/callback refusal. Optional Xdebug monitoring records call order,
+never arguments. This is **synthetic service evidence plus real local session I/O**,
+not real Core business DML, authenticated HTTP or Apache qualification.
+
+The separate read-only source auditor and twelve pinned-source files document the
+bounded standard Core/Agenda path. Actual selected-runtime callback closure and
+new real contribution/Agenda tests are **NOT EXECUTED**. See the
+[F27 finding/gate matrix and independent delta-review assignment](phase4-implementation-validation.md#f27-pre-cf-02-dml-follow-up--2026-11-19).
+Historical AP3/D01 evidence is not rewritten; all six Issue22 gate tasks and
+CF02–CF05/release acceptance remain open. No change to the sole71-ID matrix.

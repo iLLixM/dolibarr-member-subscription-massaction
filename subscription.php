@@ -117,6 +117,10 @@ if ($method === 'POST') {
 				$_SESSION['msm_previews'][$key] = $updated;
 				if (!session_write_close()) { throw new RuntimeException('MSMSessionFailure'); }
 			};
+			if (($state['profile']['profile'] ?? '') === 'CoreGuarded') {
+				MsmFileBookingCheckpoint::requireRuntime();
+				$save = new MsmFileBookingCheckpoint($key);
+			}
 			$save($state); // Read back consumed state before the first database side effect.
 			$state = msmProcessBooking($state, $bookingService, new MsmSubscriptionMail($db), $user, $save, new MsmInvoicePdfService($db));
 		} elseif ($action === 'edit') {

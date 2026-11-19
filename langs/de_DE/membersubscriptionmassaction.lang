@@ -145,3 +145,11 @@ MSMProfileSaveConflict=Das Profil wurde gleichzeitig geändert oder konnte nicht
 MSMProfileSaved=Transaktionsprofil gespeichert. Bisherige Bestätigungen benötigen eine neue Vorschau.
 MSMProfilePreviewOnly=Die Vorschau ist schreibfrei. Profil und Transaktionsbereitschaft werden vor der Buchung erneut geprüft; die Vorschau erteilt keine Buchungsfreigabe.
 MSMProfileUsed=Verwendetes Transaktionsprofil: %s
+
+MSMStatus_not_processed=Nicht bearbeitet
+MSMMail_not_processed=Nicht versucht: Stapel nach Datenbankabschluss gestoppt.
+MSMPdfNotProcessed=Nicht erzeugt: Stapel nach Datenbankabschluss gestoppt.
+MSMNotProcessedTotal=Nicht bearbeitet: %s
+MSMTerminalBatchStop=Der Stapel wurde gestoppt. Bestätigte Datenbankergebnisse bleiben gültig. Übrige Mitglieder wurden nicht bearbeitet; es erfolgt keine automatische Wiederholung.
+MSMCoreGuardedSessionUnsupported=Core-Guarded benötigt einen unterstützten lokalen Datei-Session-Checkpoint. Die Buchung wird verweigert.
+MSMCoreGuardedLoggerUnsupported=Core-Guarded benötigt den unterstützten lokalen Standard-Dateilogger. Die Buchung wird verweigert.

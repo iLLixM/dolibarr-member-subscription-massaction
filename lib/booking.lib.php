@@ -4,6 +4,7 @@
  */
 require_once __DIR__.'/batch.lib.php';
 require_once __DIR__.'/profile.lib.php';
+require_once __DIR__.'/../class/filebookingcheckpoint.class.php';
 /** Readiness gates new operations, never the display of consumed session results. */
 function msmRequireBookingDatabase(array $state, $observer, $service, $profiles, $user)
 {
@@ -56,6 +57,12 @@ function msmConsumeConfirmation(array $state, array $post)
 function msmProcessBooking(array $state, $service, $mailer, $user, callable $save, $pdf = null)
 {
 	msmRequireBatchSize($state['ids']);
+	$coreGuarded = ($state['profile']['profile'] ?? '') === 'CoreGuarded';
+	if ($coreGuarded) {
+		MsmFileBookingCheckpoint::requireRuntime();
+		if (!($save instanceof MsmFileBookingCheckpoint)) { throw new RuntimeException('MSMCoreGuardedSessionUnsupported'); }
+		$save->requireBinding();
+	}
 	$stop = false;
 	foreach ($state['ids'] as $id) {
 		$row = $state['rows'][$id];
@@ -65,27 +72,64 @@ function msmProcessBooking(array $state, $service, $mailer, $user, callable $sav
 		}
 		$row['_profile'] = $state['profile'] ?? null;
 		$result = $service->book($id, $row, $state['options'], $user, !empty($state['overlap'][$id]));
+		$stop = !empty($result['stop']) || ($coreGuarded && (($result['completion'] ?? '') !== 'nonterminal_acknowledged'
+			|| !in_array($result['status'], array('success', 'failed', 'skipped'), true)
+			|| ($result['status'] !== 'success' && ($result['rollback'] ?? '') !== 'confirmed'))); // Decide before checkpoints or any post-completion effect.
+		if ($coreGuarded) { $result['stop'] = $stop; }
 		$member = $result['_member'] ?? null; unset($result['_member']);
-		if ($result['status'] === 'success' && $state['options']['sendmail']) { $result['mail'] = 'unknown'; }
+		if ($stop && $coreGuarded) {
+			$state['results'][$id] = $result;
+			if ($result['status'] === 'success') {
+				$state['results'][$id]['mail'] = 'not_processed';
+				if (!empty($result['invoice'])) { $state['results'][$id]['invoice']['pdf'] = array('status' => 'not_processed', 'message' => 'MSMPdfNotProcessed'); }
+			}
+			msmStopUnprocessed($state, $id); $state['phase'] = 'done';
+			msmSaveBookingCheckpoint($state, $save, true);
+			return $state; // Only the fixed DB-independent checkpoint may follow terminal completion.
+		}
+		if (!$stop && $result['status'] === 'success' && $state['options']['sendmail']) { $result['mail'] = 'unknown'; }
 		$state['results'][$id] = $result;
-		$save($state); // A crash from here must never rebook or resend automatically.
-		if ($result['status'] === 'success') {
+		if (!msmSaveBookingCheckpoint($state, $save, $coreGuarded)) { msmStopUnprocessed($state, $id); return $state; } // No automatic rebook/resend.
+		if (!$stop && $result['status'] === 'success') {
 			if (!empty($state['options']['invoice'])) {
 				$state['results'][$id]['invoice']['pdf'] = array('status' => 'unknown', 'message' => 'MSMPdfInterrupted');
-				$save($state);
+				if (!msmSaveBookingCheckpoint($state, $save, $coreGuarded)) { msmStopUnprocessed($state, $id); return $state; }
 				$state['results'][$id]['invoice']['pdf'] = $pdf !== null
 					? $pdf->generate($state['results'][$id]['invoice'], $user)
 					: array('status' => 'failed', 'message' => 'MSMPdfGenerationFailed');
-				$save($state);
+				if (!msmSaveBookingCheckpoint($state, $save, $coreGuarded)) { msmStopUnprocessed($state, $id); return $state; }
 			}
 			$invoice = $state['results'][$id]['invoice'] ?? null;
 			$state['results'][$id]['mail'] = $mailer->send($member, $row, $user, $state['options']['sendmail'], $invoice);
-			$save($state);
+			if (!msmSaveBookingCheckpoint($state, $save, $coreGuarded)) { msmStopUnprocessed($state, $id); return $state; }
 		}
-		$stop = $result['stop'];
 	}
-	$state['phase'] = 'done'; $save($state);
+	$state['phase'] = 'done'; msmSaveBookingCheckpoint($state, $save, $coreGuarded);
 	return $state;
+}
+
+/** Mark only following selected slots, preserving the acknowledged current result. */
+function msmStopUnprocessed(array &$state, $current)
+{
+	$after = false;
+	foreach ($state['ids'] as $id) {
+		if ($after) { $state['results'][$id] = array('status' => 'not_processed', 'message' => 'MSMBatchStopped', 'id' => 0, 'amount' => 0, 'mail' => 'not_selected', 'stop' => false); }
+		if ($id === $current) { $after = true; }
+	}
+	$state['batch_stop'] = true;
+}
+/** E15: failed persistence never changes an acknowledged DB result or permits retry. */
+function msmSaveBookingCheckpoint(array &$state, callable $save, $coreGuarded)
+{
+	try {
+		if ($save($state) === false) { throw new RuntimeException('MSMSessionFailure'); }
+		return true;
+	} catch (Throwable $e) {
+		if (!$coreGuarded) { throw $e; }
+		$state['phase'] = 'processing'; $state['batch_stop'] = true;
+		$state['checkpoint_failed'] = true; $state['flash'] = 'MSMSessionFailure';
+		return false;
+	}
 }
 
 /** Recheck object access for result links without changing the completed operation. */

@@ -2,6 +2,7 @@
 /* Copyright (C) 2026 iLLixM <iLLixM@proton.me>
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
+ob_start();
 require __DIR__.'/booking.php';
 $postBaseline = $passed;
 
@@ -76,3 +77,5 @@ foreach (array(false, true) as $ambiguous) {
 	if ($ambiguous) { verify($done['results'][2]['message'] === 'MSMBatchStopped' && count(array_keys($db->events, 'subscription', true)) === 1, 'unknown stops batch without retry or postcommit effects'); }
 }
 echo ($passed - $postBaseline)." post-commit assertions passed (synthetic checkpoints; no files, database or SMTP).\n";
+
+require_once __DIR__."/terminal.php";

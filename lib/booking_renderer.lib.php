@@ -23,7 +23,7 @@ function msmRenderBooking(array $state, $key, array $access = array())
 	$html .= '<div class="div-table-responsive" style="width:0;min-width:100%"><table class="noborder centpercent"><tr class="liste_titre">';
 	foreach (array('Member', 'Type', 'Amount', 'DateSubscription', 'DateEndSubscription', 'Label', 'Status') as $label) { $html .= '<th>'.msmText($label).'</th>'; }
 	$html .= '</tr>';
-	$counts = array('success' => 0, 'skipped' => 0, 'failed' => 0, 'unknown' => 0, 'transport' => 0, 'hook' => 0, 'mailwarning' => 0, 'invoice' => 0, 'pdf' => 0, 'pdfwarning' => 0, 'customer' => 0); $sum = 0;
+	$counts = array('success' => 0, 'not_processed' => 0, 'skipped' => 0, 'failed' => 0, 'unknown' => 0, 'transport' => 0, 'hook' => 0, 'mailwarning' => 0, 'invoice' => 0, 'pdf' => 0, 'pdfwarning' => 0, 'customer' => 0); $sum = 0;
 	foreach ($state['rows'] as $id => $row) {
 		$html .= '<tr><td>'.dol_escape_htmltag($row['member']).'</td><td>'.dol_escape_htmltag($row['type']).'</td><td>'.dol_escape_htmltag(price($row['amount']).' '.$conf->currency).'</td>';
 		foreach (array('start', 'end') as $field) { $html .= '<td>'.dol_escape_htmltag($row[$field] > 0 ? dol_print_date($row[$field], 'day') : '').'</td>'; }
@@ -63,7 +63,7 @@ function msmRenderBooking(array $state, $key, array $access = array())
 				}
 				$html .= '<div>'.msmText('MSMMail_'.$result['mail']).'</div>';
 				if (in_array($result['mail'], array('transport', 'hook'), true)) { $counts[$result['mail']]++; }
-				elseif ($result['mail'] !== 'not_selected') { $counts['mailwarning']++; }
+				elseif (!in_array($result['mail'], array('not_selected', 'not_processed'), true)) { $counts['mailwarning']++; }
 			} elseif (!empty($result['diagnostic'])) {
 				$html .= '<div>'.msmText('MSMRollbackStatus').': '.msmText(($result['rollback'] ?? '') === 'confirmed' ? 'MSMRollbackConfirmed' : 'MSMRollbackUnconfirmed').'</div>';
 				$html .= '<div>'.msmText('MSMDiagnosticStage').': '.dol_escape_htmltag($result['diagnostic']['stage']).'</div>';
@@ -76,6 +76,9 @@ function msmRenderBooking(array $state, $key, array $access = array())
 	}
 	$html .= '</table></div><p>'.msmText($confirm ? 'MSMConfirmTotals' : 'MSMResultTotals', $counts['success'], $counts['skipped'], $counts['failed'], $counts['unknown'], price($sum).' '.$conf->currency).'</p>';
 	if (!$confirm) {
+		$html .= '<p>'.msmText('MSMNotProcessedTotal', $counts['not_processed']).'</p>';
+		if (!empty($state['batch_stop'])) { $html .= '<div class="warning">'.msmText('MSMTerminalBatchStop').'</div>'; }
+		if (!empty($state['checkpoint_failed'])) { $html .= '<div class="error">'.msmText('MSMSessionFailure').'</div>'; }
 		$html .= '<p>'.msmText('MSMInvoiceTotals', $counts['invoice'], $counts['customer'], $counts['pdf'], $counts['pdfwarning']).'</p>';
 		$html .= '<p>'.msmText('MSMMailTotals', $counts['transport'], $counts['hook'], $counts['mailwarning']).'</p>';
 	}
