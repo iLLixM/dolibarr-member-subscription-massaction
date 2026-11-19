@@ -1,0 +1,214 @@
+{
+  "kind": "STATIC SOURCE AUDIT ONLY",
+  "Core": "5c6c7ff6a5112413b1c27221c8d11750afad56f8",
+  "dolibarr": "24.0.3",
+  "files": [
+    {
+      "path": "htdocs/adherents/class/adherent.class.php",
+      "bytes": 130703,
+      "sha256": "1f248364a70fadf65ea5349e4f8fde732edacacacccbdb46f1749cc9bfe9b8e3",
+      "methods": {
+        "subscription": {
+          "line": 1915,
+          "body_sha256": "12227a653c6bac54f50789eff135a536535f627964f6af3f650c94389c1f6053",
+          "direct_begin": 1,
+          "direct_commit": 1,
+          "direct_rollback": 2,
+          "completion_type_reference": false
+        },
+        "update_end_date": {
+          "line": 1074,
+          "body_sha256": "35f0c8230f23380d86d19f5c0e6265f54fe078e3f336a15c53a833cbd90c51ca",
+          "direct_begin": 1,
+          "direct_commit": 1,
+          "direct_rollback": 2,
+          "completion_type_reference": false
+        }
+      }
+    },
+    {
+      "path": "htdocs/adherents/class/subscription.class.php",
+      "bytes": 20864,
+      "sha256": "3d03d07acbfb528973d449e3e74698b90b7f22f83ce64026533875c94f431e9a",
+      "methods": {
+        "create": {
+          "line": 167,
+          "body_sha256": "05465704fe92933963f0fdcaf337a2f4a214253c4b8203bf409a63012f5d2c38",
+          "direct_begin": 1,
+          "direct_commit": 1,
+          "direct_rollback": 1,
+          "completion_type_reference": false
+        }
+      }
+    },
+    {
+      "path": "htdocs/core/class/commontrigger.class.php",
+      "bytes": 3948,
+      "sha256": "a192a15a82e29074e928e13461012258b2347df8146d0a20ebbb15743eb09e62",
+      "methods": {
+        "call_trigger": {
+          "line": 63,
+          "body_sha256": "ee76785b0cb7bb8e17c4aa1d7b28722daf5370ff271d405e2b87d542a7639417",
+          "direct_begin": 0,
+          "direct_commit": 0,
+          "direct_rollback": 0,
+          "completion_type_reference": false
+        }
+      }
+    },
+    {
+      "path": "htdocs/core/class/interfaces.class.php",
+      "bytes": 16901,
+      "sha256": "906cd1a4dd10e8e23b16df30cc94a091483cc3942aa29d05e11c50d92e1cfc2d",
+      "methods": {
+        "run_triggers": {
+          "line": 78,
+          "body_sha256": "ce146a0c0cd163a186b24a4afd0e6898fa7033b04c7cf9655e44b5ec587c4275",
+          "direct_begin": 0,
+          "direct_commit": 0,
+          "direct_rollback": 0,
+          "completion_type_reference": false
+        }
+      }
+    },
+    {
+      "path": "htdocs/core/triggers/interface_50_modAgenda_ActionsAuto.class.php",
+      "bytes": 74878,
+      "sha256": "4f9b4e554ee64da462a399fe96276739fa260e71b53c7b5df5ca56a58ee26365",
+      "methods": {
+        "runTrigger": {
+          "line": 80,
+          "body_sha256": "5dce02a23c15c5baa1acd9ebe2e37eba52b23e20ecd2722fa750366239152bb6",
+          "direct_begin": 0,
+          "direct_commit": 0,
+          "direct_rollback": 0,
+          "completion_type_reference": false
+        }
+      }
+    },
+    {
+      "path": "htdocs/comm/action/class/actioncomm.class.php",
+      "bytes": 113718,
+      "sha256": "af03f8442f81bcb5519697619883cba0ae88e0d6e4b933e9640d51e00ed81259",
+      "methods": {
+        "create": {
+          "line": 500,
+          "body_sha256": "b86a9f56f6dffa254e2fc2c8a769da5e2d73826b9ea4da5cf8717d30da2bc755",
+          "direct_begin": 1,
+          "direct_commit": 1,
+          "direct_rollback": 2,
+          "completion_type_reference": false
+        }
+      }
+    },
+    {
+      "path": "htdocs/core/class/commonobject.class.php",
+      "bytes": 459153,
+      "sha256": "4d3992e132f941910ac86ab74d8141b97176f3b7c4bec6697d4f661762c5159e",
+      "methods": {
+        "insertExtraFields": {
+          "line": 7005,
+          "body_sha256": "4b6ce9f3a28151ca30543f823b1ded9b985a2415646455f7ae60b0ac20888ca5",
+          "direct_begin": 1,
+          "direct_commit": 2,
+          "direct_rollback": 1,
+          "completion_type_reference": false
+        }
+      }
+    },
+    {
+      "path": "htdocs/core/triggers/interface_20_all_Logevents.class.php",
+      "bytes": 6198,
+      "sha256": "0efa4977ae6940faea936088139f2524b2275d52faf0b946a6b1590a61917a26",
+      "methods": {
+        "runTrigger": {
+          "line": 93,
+          "body_sha256": "c01b4400141173f6b97f5e630a59db7895ca156106474a2cb7c81f97ebf870ad",
+          "direct_begin": 0,
+          "direct_commit": 0,
+          "direct_rollback": 0,
+          "completion_type_reference": false
+        }
+      }
+    },
+    {
+      "path": "htdocs/core/triggers/interface_50_modNotification_Notification.class.php",
+      "bytes": 6847,
+      "sha256": "afb86c793dd70558a40c6f5234855c49dc7ec8e790b69f6c4a92041509d8b661",
+      "methods": {
+        "runTrigger": {
+          "line": 71,
+          "body_sha256": "dbcf21345e6876f8aff44a8efe5353728f9ffbbbac850e7622a86de58a2dbc55",
+          "direct_begin": 0,
+          "direct_commit": 0,
+          "direct_rollback": 0,
+          "completion_type_reference": false
+        }
+      }
+    },
+    {
+      "path": "htdocs/core/triggers/interface_99_modBlockedlog_ActionsBlockedLog.class.php",
+      "bytes": 13610,
+      "sha256": "b13c62559d3d89e4de90d2b73b69bf63d749689fe41dccc171a464b7edd19545",
+      "methods": {
+        "runTrigger": {
+          "line": 59,
+          "body_sha256": "58b3863f3958720aaddc59e9e2e3dcba5b6ed43cd40370da8d11e8f050a910dc",
+          "direct_begin": 0,
+          "direct_commit": 0,
+          "direct_rollback": 0,
+          "completion_type_reference": false
+        }
+      }
+    },
+    {
+      "path": "htdocs/core/db/DoliDB.class.php",
+      "bytes": 15221,
+      "sha256": "fff88cb62729ee68784530c832ba73dc13d7103d16bebb0a41c2a4eaedb99c97",
+      "methods": {
+        "begin": {
+          "line": 216,
+          "body_sha256": "406531007fcde3d511709f2b87366c88f934c64d630ac9cf88b8bae23b1431d5",
+          "direct_begin": 0,
+          "direct_commit": 0,
+          "direct_rollback": 0,
+          "completion_type_reference": false
+        },
+        "commit": {
+          "line": 241,
+          "body_sha256": "c06cf840f54fa024449b1a405a734c0466e66c51f185beac0a688cb851b5d74a",
+          "direct_begin": 0,
+          "direct_commit": 0,
+          "direct_rollback": 0,
+          "completion_type_reference": false
+        },
+        "rollback": {
+          "line": 265,
+          "body_sha256": "a5b1ec4bf6825764955d72d1eddc7c58a07c1ad8fa753ad05d7e9278748c9f69",
+          "direct_begin": 0,
+          "direct_commit": 0,
+          "direct_rollback": 0,
+          "completion_type_reference": false
+        }
+      }
+    },
+    {
+      "path": "htdocs/core/modules/syslog/mod_syslog_file.php",
+      "bytes": 5985,
+      "sha256": "3b7c6fa701b5a094003ef1ecbd195f4e93fc8539ba13108910bad800bd521b1a",
+      "methods": {
+        "export": {
+          "line": 167,
+          "body_sha256": "7a65e0783e4296e2365c619fd760e9822df740eab935046613ebc05e2daeb5db",
+          "direct_begin": 0,
+          "direct_commit": 0,
+          "direct_rollback": 0,
+          "completion_type_reference": false
+        }
+      }
+    }
+  ],
+  "runtime_configuration": "NOT INSPECTED",
+  "new_real_contribution_Agenda_test": "NOT EXECUTED",
+  "claim": "No direct completion_type reference in selected pinned methods. Dynamic callback closure requires the report configuration and independent review. No physical identity guarantee."
+}

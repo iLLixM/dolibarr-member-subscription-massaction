@@ -1,0 +1,99 @@
+{
+  "kind": "synthetic + local PHP file sessions, no business DB/HTTP",
+  "Core": "5c6c7ff6a5112413b1c27221c8d11750afad56f8",
+  "PHP": "8.2.35",
+  "runners": [
+    {
+      "runner": "run",
+      "exit": 0,
+      "summary": [
+        "141 assertions passed (synthetic contracts; no Dolibarr runtime).",
+        "Issue8 limit and early-hook contracts passed."
+      ]
+    },
+    {
+      "runner": "database",
+      "exit": 0,
+      "summary": [
+        "188 database observation assertions passed (synthetic protocol; no database or network)."
+      ]
+    },
+    {
+      "runner": "postcommit",
+      "exit": 0,
+      "summary": [
+        "369 booking/mail assertions passed (synthetic transactions and transports only).",
+        "18 post-commit assertions passed (synthetic checkpoints; no files, database or SMTP).",
+        "135 terminal-boundary assertions passed (actual orchestrator, fake services, local PHP sessions; no DB)."
+      ]
+    },
+    {
+      "runner": "profile",
+      "exit": 0,
+      "summary": [
+        "388 assertions passed (Core 24.0.3 calendar APIs, synthetic business data; no database connection).",
+        "369 booking/mail assertions passed (synthetic transactions and transports only).",
+        "86 CF01 profile/configuration/readiness assertions passed (synthetic only; no real DB/HTTP)."
+      ]
+    },
+    {
+      "runner": "request",
+      "exit": 0,
+      "summary": [
+        "Issue8 stale/reduced/oversized request contracts passed.",
+        "369 booking/mail assertions passed (synthetic transactions and transports only).",
+        "86 CF01 profile/configuration/readiness assertions passed (synthetic only; no real DB/HTTP)."
+      ]
+    },
+    {
+      "runner": "invoice",
+      "exit": 0,
+      "summary": [
+        "388 assertions passed (Core 24.0.3 calendar APIs, synthetic business data; no database connection).",
+        "369 booking/mail assertions passed (synthetic transactions and transports only).",
+        "236 invoice transaction assertions passed (synthetic Core API doubles; no database)."
+      ]
+    },
+    {
+      "runner": "invoicepdf",
+      "exit": 0,
+      "summary": [
+        "388 assertions passed (Core 24.0.3 calendar APIs, synthetic business data; no database connection).",
+        "369 booking/mail assertions passed (synthetic transactions and transports only).",
+        "16 invoice PDF assertions passed (isolated temporary files; no Dolibarr documents)."
+      ]
+    },
+    {
+      "runner": "maildelivery",
+      "exit": 0,
+      "summary": [
+        "17 mail adapter assertions passed (template/type/transport doubles; no SMTP)."
+      ]
+    },
+    {
+      "runner": "invoiceprofile",
+      "exit": 0,
+      "summary": [
+        "388 assertions passed (Core 24.0.3 calendar APIs, synthetic business data; no database connection).",
+        "50 invoice profile assertions passed (synthetic; no database)."
+      ]
+    },
+    {
+      "runner": "userreload",
+      "exit": 0,
+      "summary": [
+        "388 assertions passed (Core 24.0.3 calendar APIs, synthetic business data; no database connection).",
+        "46 user reload assertions passed (synthetic user double; pinned Core User contract in a subprocess)."
+      ]
+    },
+    {
+      "runner": "loading.js",
+      "exit": 0,
+      "summary": [
+        "6 loading indicator assertions passed (synthetic DOM; no browser)."
+      ]
+    }
+  ],
+  "final_delta": "Focused postcommit rerun with binding/rollback controls and per-case Xdebug slices:135 assertions. Optional-monitor-off mode also passed105 assertions. Other relevant runners passed before this isolated CoreGuarded-only delta.",
+  "Core_scope": "Pinned source used where runner requires Core; standalone contracts use their existing fixtures."
+}

@@ -322,3 +322,50 @@ Real CF-01 setup/configuration/race/HTTP and live Enhanced/MariaDB regression re
 **NOT EXECUTED** pending a separately authorized environment. CoreGuarded booking
 and D-01 qualification remain disabled/deferred. No new assignment in the sole
 71-ID requirements matrix is made by this legend.
+
+## F27 pre-DML batch/runtime contracts (2026-11-19)
+
+`test/unit/terminal.php`, included by existing `postcommit.php`, uses the actual
+batch orchestrator, fake services/effect fences and local PHP file sessions.
+It covers terminal success/rollback/unknown, E02, E15, qualified continuation,
+missing classification, consumed replay, NOT_PROCESSED rendering and real runtime
+session/logger/callback refusal. Optional Xdebug monitoring records call order,
+never arguments. This is **synthetic service evidence plus real local session I/O**,
+not real Core business DML, authenticated HTTP or Apache qualification.
+
+The separate read-only source auditor and twelve pinned-source files document the
+bounded standard Core/Agenda path. Actual selected-runtime callback closure and
+new real contribution/Agenda tests are **NOT EXECUTED**. See the
+[F27 finding/gate matrix and independent delta-review assignment](phase4-implementation-validation.md#f27-pre-cf-02-dml-follow-up--2026-11-19).
+Historical AP3/D01 evidence is not rewritten; all six Issue22 gate tasks and
+CF02–CF05/release acceptance remain open. No change to the sole71-ID matrix.
+
+### F28-01 actual-controller ordering (2026-11-19)
+
+The request runner includes `test/unit/controller-runtime.php`. Isolated workers
+execute the real controller body with synthetic bootstrap/admission/services,
+native local file sessions and layout/header observation. They test known runtime
+refusal before consumption, localized redirected errors, no false pre-DML UNKNOWN,
+post-close binding checks, consumed replay after possible DML, legacy profiles and
+CSRF/entity protection. A negative control reproduces the old75a531d9 ordering bug.
+These30 assertions and sanitized traces are **instrumented controller evidence**,
+not real authenticated HTTP/Core-Guarded business DML. See the dated F28-01 section
+in `phase4-implementation-validation.md`; independent final-HEAD review is pending.
+
+### F27-01 selected-runtime evidence addendum (2026-11-19)
+
+The earlier unexecuted-runtime statement describes the pre-addendum evidence.
+`docs/evidence/f27/f27-runtime-readonly.json` now records the actual protected
+configuration via seven SELECTs, without callback/business/session execution.
+Three selected callbacks match the pinned Core: Logevents, ActionsAuto and
+Societe ContactRoles. Five actual early-return guard calls use observed flags
+and a DB-rejecting spy with no native connection. The standard Agenda write path
+remains source-analyzed; no new contribution/Agenda transaction is claimed.
+
+See the [runtime-bound qualification addendum](phase4-implementation-validation.md#f27-01-runtime-bound-qualification-addendum--2026-11-19)
+for source pins, reproduction, configuration boundaries and the Stage-B decision:
+**NOT EXECUTED**, because this concrete snapshot/source assessment identifies no
+remaining concrete callback gap warranting a new lab run before independent
+sufficiency review. This assessment does not independently close F27-01 or the
+gate. `finalization-validation.json` records ten successful local regression
+runners; they are synthetic/controller/session checks, not new real DB/HTTP tests.

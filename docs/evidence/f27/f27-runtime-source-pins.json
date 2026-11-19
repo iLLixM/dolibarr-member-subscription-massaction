@@ -1,0 +1,12 @@
+{
+  "Core": "5c6c7ff6a5112413b1c27221c8d11750afad56f8",
+  "selected_callback_files": {
+    "htdocs/core/triggers/interface_20_all_Logevents.class.php": "0efa4977ae6940faea936088139f2524b2275d52faf0b946a6b1590a61917a26",
+    "htdocs/core/triggers/interface_50_modAgenda_ActionsAuto.class.php": "4f9b4e554ee64da462a399fe96276739fa260e71b53c7b5df5ca56a58ee26365",
+    "htdocs/core/triggers/interface_90_modSociete_ContactRoles.class.php": "5b1d04a8d44ae5e0a9684ab8afbff81903d6e66c58c3602e80e377a0803250db"
+  },
+  "config_dispatch_source_matches_pin": true,
+  "kind": "actual configuration plus source comparison, not executed callback trace",
+  "collector_source_sha256": "d6bd06089fb86e5de7032b15e09e6b026b4c6df0c167ef3e9a316de7fe14a7f9",
+  "guard_probe_source_sha256": "76058237dc47040fe676d8f99f6d25a88311652656f022bc2524ec346b09ac58"
+}

@@ -145,3 +145,11 @@ MSMProfileSaveConflict=The profile was changed concurrently or could not be save
 MSMProfileSaved=Transaction profile saved. Previous confirmations require a fresh preview.
 MSMProfilePreviewOnly=Preview is read-only. The profile and transaction readiness are checked again at booking; preview does not authorize a booking.
 MSMProfileUsed=Transaction profile used: %s
+
+MSMStatus_not_processed=Not processed
+MSMMail_not_processed=Not attempted: batch stopped after database completion.
+MSMPdfNotProcessed=Not generated: batch stopped after database completion.
+MSMNotProcessedTotal=Not processed: %s
+MSMTerminalBatchStop=The batch stopped. Confirmed database results remain valid. Remaining members were not processed; there is no automatic retry.
+MSMCoreGuardedSessionUnsupported=Core-Guarded requires a supported local file-session checkpoint. Booking is refused.
+MSMCoreGuardedLoggerUnsupported=Core-Guarded requires the supported standard local file logger. Booking is refused.

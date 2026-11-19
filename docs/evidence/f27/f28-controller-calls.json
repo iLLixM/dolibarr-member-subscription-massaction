@@ -1,0 +1,172 @@
+{
+    "kind": "actual controller with synthetic bootstrap\/admission\/services; local PHP sessions; no DB\/HTTP",
+    "cases": [
+        {
+            "case": "session",
+            "method": "POST",
+            "profile": "CoreGuarded",
+            "source_sha256": "2d9809ee00fc1a3ef67178e02a57b94029e96c2f2ff3544f0dbdf7f1005e3f82",
+            "phase": "confirm",
+            "revision": 5,
+            "initial_phase": "confirm",
+            "flash": "MSMCoreGuardedSessionUnsupported",
+            "result_status": null,
+            "book_calls": 0,
+            "events": [
+                "header",
+                "redirect:303"
+            ],
+            "visible_specific_error": false,
+            "has_confirmation_form": false
+        },
+        {
+            "case": "logger",
+            "method": "POST",
+            "profile": "CoreGuarded",
+            "source_sha256": "2d9809ee00fc1a3ef67178e02a57b94029e96c2f2ff3544f0dbdf7f1005e3f82",
+            "phase": "confirm",
+            "revision": 5,
+            "initial_phase": "confirm",
+            "flash": "MSMCoreGuardedLoggerUnsupported",
+            "result_status": null,
+            "book_calls": 0,
+            "events": [
+                "header",
+                "redirect:303"
+            ],
+            "visible_specific_error": false,
+            "has_confirmation_form": false
+        },
+        {
+            "case": "binding",
+            "method": "POST",
+            "profile": "CoreGuarded",
+            "source_sha256": "2d9809ee00fc1a3ef67178e02a57b94029e96c2f2ff3544f0dbdf7f1005e3f82",
+            "phase": "processing",
+            "revision": 6,
+            "initial_phase": "confirm",
+            "flash": null,
+            "result_status": "unknown",
+            "book_calls": 0,
+            "events": [
+                "header",
+                "admission_spy",
+                "tables_spy",
+                "session_closed",
+                "redirect:303"
+            ],
+            "visible_specific_error": false,
+            "has_confirmation_form": false
+        },
+        {
+            "case": "after_dml",
+            "method": "POST",
+            "profile": "CoreGuarded",
+            "source_sha256": "2d9809ee00fc1a3ef67178e02a57b94029e96c2f2ff3544f0dbdf7f1005e3f82",
+            "phase": "processing",
+            "revision": 6,
+            "initial_phase": "confirm",
+            "flash": null,
+            "result_status": "unknown",
+            "book_calls": 1,
+            "events": [
+                "header",
+                "admission_spy",
+                "tables_spy",
+                "session_closed",
+                "book_possible_DML_spy",
+                "redirect:303"
+            ],
+            "visible_specific_error": false,
+            "has_confirmation_form": false
+        },
+        {
+            "case": "logger",
+            "method": "POST",
+            "profile": "MariaDBSnapshot",
+            "source_sha256": "2d9809ee00fc1a3ef67178e02a57b94029e96c2f2ff3544f0dbdf7f1005e3f82",
+            "phase": "done",
+            "revision": 6,
+            "initial_phase": "confirm",
+            "flash": null,
+            "result_status": "success",
+            "book_calls": 1,
+            "events": [
+                "header",
+                "admission_spy",
+                "tables_spy",
+                "session_closed",
+                "session_closed",
+                "book_possible_DML_spy",
+                "session_closed",
+                "session_closed",
+                "session_closed",
+                "redirect:303"
+            ],
+            "visible_specific_error": false,
+            "has_confirmation_form": false
+        },
+        {
+            "case": "logger",
+            "method": "POST",
+            "profile": "EnhancedMySQL",
+            "source_sha256": "2d9809ee00fc1a3ef67178e02a57b94029e96c2f2ff3544f0dbdf7f1005e3f82",
+            "phase": "done",
+            "revision": 6,
+            "initial_phase": "confirm",
+            "flash": null,
+            "result_status": "success",
+            "book_calls": 1,
+            "events": [
+                "header",
+                "admission_spy",
+                "tables_spy",
+                "session_closed",
+                "session_closed",
+                "book_possible_DML_spy",
+                "session_closed",
+                "session_closed",
+                "session_closed",
+                "redirect:303"
+            ],
+            "visible_specific_error": false,
+            "has_confirmation_form": false
+        },
+        {
+            "case": "csrf",
+            "method": "POST",
+            "profile": "CoreGuarded",
+            "source_sha256": "2d9809ee00fc1a3ef67178e02a57b94029e96c2f2ff3544f0dbdf7f1005e3f82",
+            "phase": "confirm",
+            "revision": 5,
+            "initial_phase": "confirm",
+            "flash": null,
+            "result_status": null,
+            "book_calls": 0,
+            "events": [
+                "header",
+                "forbidden"
+            ],
+            "visible_specific_error": false,
+            "has_confirmation_form": false
+        },
+        {
+            "case": "entity",
+            "method": "POST",
+            "profile": "CoreGuarded",
+            "source_sha256": "2d9809ee00fc1a3ef67178e02a57b94029e96c2f2ff3544f0dbdf7f1005e3f82",
+            "phase": "confirm",
+            "revision": 5,
+            "initial_phase": "confirm",
+            "flash": null,
+            "result_status": null,
+            "book_calls": 0,
+            "events": [
+                "header",
+                "forbidden"
+            ],
+            "visible_specific_error": false,
+            "has_confirmation_form": false
+        }
+    ]
+}

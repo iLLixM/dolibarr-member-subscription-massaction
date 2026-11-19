@@ -121,3 +121,5 @@ $state=$base;$state['phase']='preview';$observer=new RequestObserver();$service=
 fails(static function()use($state,$observer,$service){msmRequireBookingDatabase($state,$observer,$service,new RequestProfiles(),new PreviewUser());},'MSMInvalidForm');
 verify(!$observer->calls&&!$service->tables,'CF01 preview never invokes transaction readiness');
 require __DIR__.'/profile.php';
+
+require __DIR__."/controller-runtime.php";

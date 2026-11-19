@@ -22,5 +22,5 @@ function msmSyncPreviewProfile(array $state, $profiles, $user)
 }
 function msmProfileError($message)
 {
-	return in_array($message, array('MSMProfileUnavailable', 'MSMProfileChanged', 'MSMProfileInvalid', 'MSMProfileSelectionRequired', 'MSMProfileFeatureUnavailable', 'MSMCoreGuardedPending', 'MSMEnhancedUnavailable', 'MSMProfileSaveConflict'), true);
+	return in_array($message, array('MSMProfileUnavailable', 'MSMProfileChanged', 'MSMProfileInvalid', 'MSMProfileSelectionRequired', 'MSMProfileFeatureUnavailable', 'MSMCoreGuardedPending', 'MSMEnhancedUnavailable', 'MSMCoreGuardedSessionUnsupported', 'MSMCoreGuardedLoggerUnsupported', 'MSMProfileSaveConflict'), true);
 }

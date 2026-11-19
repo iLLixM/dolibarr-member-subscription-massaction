@@ -1,7 +1,9 @@
 name: Module subscriptions
 on:
-  push:
   pull_request:
+  push:
+    branches:
+      - main
 permissions:
   contents: read
 jobs:
@@ -15,33 +17,6 @@ jobs:
           - php: '7.4'
             core: '22.0.0'
             core-ref: 49b9a6d19f3deb6d410c0e9b3310e95be4ea7710
-          - php: '8.2'
-            core: '22.0.0'
-            core-ref: 49b9a6d19f3deb6d410c0e9b3310e95be4ea7710
-          - php: '7.4'
-            core: '22.0.1'
-            core-ref: dc00877d940da8326216e51263a85b0a4a418f22
-          - php: '8.2'
-            core: '22.0.1'
-            core-ref: dc00877d940da8326216e51263a85b0a4a418f22
-          - php: '7.4'
-            core: '22.0.2'
-            core-ref: f70b6b43ecfcebc69264bc008aafcb9b9de2b23c
-          - php: '8.2'
-            core: '22.0.2'
-            core-ref: f70b6b43ecfcebc69264bc008aafcb9b9de2b23c
-          - php: '7.4'
-            core: '22.0.3'
-            core-ref: e57703a6b69ad6da5876692d73defd7e754bb5c6
-          - php: '8.2'
-            core: '22.0.3'
-            core-ref: e57703a6b69ad6da5876692d73defd7e754bb5c6
-          - php: '7.4'
-            core: '22.0.4'
-            core-ref: 4f6e636e7e2aea1abde2c2b6f6ac4ffd34429f7f
-          - php: '8.2'
-            core: '22.0.4'
-            core-ref: 4f6e636e7e2aea1abde2c2b6f6ac4ffd34429f7f
           - php: '7.4'
             core: '22.0.5'
             core-ref: 88ad132763be45e9620128c1830e41493e1cdd05
@@ -51,15 +26,6 @@ jobs:
           - php: '8.2'
             core: '23.0.0'
             core-ref: 57a1f05d490a7a80944a8232e9c613e6556d2704
-          - php: '8.2'
-            core: '23.0.1'
-            core-ref: b9f5895c68a9707e5b5616ef279bd7fe83760de6
-          - php: '8.2'
-            core: '23.0.2'
-            core-ref: ccef1102e6850b7545be7bad91cf0cc4c74ac6ea
-          - php: '8.2'
-            core: '23.0.3'
-            core-ref: 57d0be7dc97140d7d47e826875ba9256ec3b6357
           - php: '8.2'
             core: '23.0.4'
             core-ref: cb82037066c1c71f7c867482e9e92975222dfc14

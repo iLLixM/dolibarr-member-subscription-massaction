@@ -1495,3 +1495,372 @@ The unused module key was removed in EN/DE. Help text, placeholders, dates, inpu
 name/values/escaping and invoice processing remain unchanged. Targeted renderer
 checks read the actual Core translations with invoice off/on; this is a UI-only
 follow-up, with no new business operations or broader qualification.
+
+## F27 pre-CF-02-DML follow-up — 2026-11-19
+
+Historical preparation at75a531d9: the later Owner dispositions, F28 correction
+and actual runtime snapshot are recorded in the dated finalization sections below.
+
+**PRE-DML FOLLOW-UP PREPARED — INDEPENDENT GATE RE-REVIEW PENDING.**
+This section is an additive finding disposition, not CF-02 booking implementation,
+independent closure or a new requirements matrix. ADR-01–ADR-12, D-01/D-02 and
+E01–E15 remain binding. Core-Guarded's `current()` still returns booking/invoice/
+autocreate/sendmail disabled with `MSMCoreGuardedPending`; no transaction adapter,
+new DB rights, normalization, business SQL, real fixture or Core patch is added.
+
+Dependency: [Draft PR #27](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/27),
+original reviewed HEAD `8c777340da4cdafae7b91bbe4366fc8aad525945`, erratum HEAD
+`2e794a87c5b49929fd2c80026e08333619adaa5f`. External Owner-supplied review:
+**AP3 EVIDENCE ACCEPTED WITH DOCUMENTED LIMITS**;
+**COMPLETION GATE INCOMPLETE – TARGETED FOLLOW-UP REQUIRED**.
+The separate follow-up branch starts at current main
+`c79830976a5f1e1bd57d51005ff34c10c424e36f`, does not merge/cherry-pick AP3 or
+rewrite its sources/results/hashes, and records its own review HEAD/CI in its PR.
+Neither Draft has Owner merge authorization from this follow-up task.
+
+| Finding | Change and concrete evidence | Status for independent review |
+| --- | --- | --- |
+| F27-01 BLOCKER | Pinned call chain/configuration envelope below; `tools/audit-coreguarded-path.py` and `docs/evidence/f27/core-path-source.json` | Static boundary documented. Actual selected runtime callback closure/new real path test NOT EXECUTED; no self-closure. Reviewer must decide whether the bounded source/configuration argument suffices or require the limited lab follow-up. |
+| F27-02 BLOCKER | `msmProcessBooking()` in `lib/booking.lib.php`, fixed file checkpoint, renderer, `test/unit/terminal.php` | Non-DML patch and actual-orchestrator spy tests implemented; targeted independent verification pending. |
+| F27-03 MEDIUM | Dated E02 erratum in PR #27; original UNKNOWN JSON untouched | Interpretation corrected; independent erratum verification pending. No new Core-Guarded SET-entry adapter implemented here. |
+| F27-04 MEDIUM | `MsmFileBookingCheckpoint::requireRuntime()`, controller binding and actual-orchestrator admission | Server-side preparation enforced before service calls; negative tests pass. Scope: supported file session/logger only; no full Core-Guarded booking admission enabled. |
+
+### F27-01 — pinned standard contribution/Agenda path
+
+Source baseline: Dolibarr V24.0.3 at
+`5c6c7ff6a5112413b1c27221c8d11750afad56f8`. The read-only auditor compares12
+source files byte-for-byte to those Git objects and tokenizes selected methods as
+data. It does not include Core/config, inspect a live database or run business
+methods. The JSON records file/method hashes, source lines and direct nested
+transaction call counts. Absence of a direct `completion_type` reference is a
+source observation, **not a transitive proof for arbitrary dynamic callbacks**.
+
+| Pinned call boundary | State/side effect and selected-path constraint |
+| --- | --- |
+| Outer future adapter | D-01 preflight → SET RR → Core-BEGIN at depth1; locks before business reads. Only the outer completion may end the admitted member transaction. No adapter is supplied here. |
+| `Adherent::subscription()` (`adherent.class.php:1915`) | Nested depth2, creates a fresh Subscription on the same DoliDB; accountid0. No invoice/customer, payment/bank API or mail call in this method. |
+| `Subscription::create()` (`subscription.class.php:167`) | Nested depth3; subscription INSERT, then `Adherent::update_end_date()` at depth4, returning to3. Fresh object has no linked-object mutations in the bounded profile. |
+| `CommonTrigger::call_trigger()` (`commontrigger.class.php:63`) → `Interfaces::run_triggers()` (`interfaces.class.php:78`) | Dispatches MEMBER_SUBSCRIPTION_CREATE. Scans Core plus configured trigger directories, tests module activation and checks Core depth before/after callbacks. Counter balance cannot detect a foreign end/replacement returning to the same depth. |
+| `InterfaceActionsAuto::runTrigger()` (`interface_50_modAgenda_ActionsAuto.class.php:80`) | Agenda disabled or auto-event off: early return. Enabled MEMBER_SUBSCRIPTION_CREATE uses the fetched member context and creates the standard ActionComm. `ACTION_*` is excluded from Agenda recursion. |
+| `ActionComm::create()` (`actioncomm.class.php:500`) | Nested depth4; actioncomm/resource INSERTs, optional extrafields, ACTION_CREATE dispatch, then nested commit/rollback to3. Standard event association uses the member, not the subscription row. |
+| Return through Subscription / Adherent | Subscription returns depth3→2; Adherent repeats its own end-date update at depth3→2, then returns2→1. `MsmBookingMember` observes the parent R16 update; it does not replace its transaction control. |
+| Outer Core end (`DoliDB.class.php:241/265`) | At depth1, actual COMMIT/ROLLBACK, then Core logging. CHAIN/RELEASE affect this outer completion; stable nested counter calls do not emit physical end SQL. Uncertain returns are not redeemed by depth0. |
+
+The source argument for stable Completion is limited to this selected configuration:
+known standard same-connection methods; fresh Subscription/ActionComm objects;
+no supplied linked objects or populated/computed ActionComm extrafields; no automatic
+file copies (`MAIN_COPY_FILE_IN_EVENT_AUTO` off); no extension rewriting the session,
+connection or Core transaction depth. The standard Logevents trigger must either
+return early for both MEMBER_SUBSCRIPTION_CREATE/ACTION_CREATE (event flags off)
+or receive its own explicit path/engine qualification. This source envelope uses
+the early-return path. Notification/Blockedlog are **not silently included**:
+Notification can dispatch hooks/Notify delivery; Blockedlog explicitly handles
+MEMBER_SUBSCRIPTION_CREATE. Their active effects need separate consideration.
+
+Known incompatible interventions include native COMMIT/ROLLBACK/BEGIN inside a
+nested callback, DDL/implicit commits, changing completion_type after its observation,
+reconnecting/replacing DoliDB, draining counters and computed/third-party callbacks
+that do these things. For the selected pure standard path, nested counters remain
+above1 until the outer end; selected methods do not rewrite Completion. Outside
+that path, equal counters/two samples do not prove physical continuity. No universal
+extension inventory, whitelist or third-party certification is imposed: D-02's
+compatibility reservation remains, and known dangerous combinations are incompatible.
+
+**Configuration binding limitation:** the active protected I105 callback inventory
+was not read in this follow-up, and AP3's published HTTP profile does not contain
+it. No claim is made that the existing I105 installation matches every condition
+above. No new real contribution/Agenda ON/OFF, nested fault or rollback case was
+executed. Old AP3 probes are not repurposed as such evidence. If independent review
+finds this bounded static argument insufficient, retain F27-01 as a blocker and
+obtain a narrowly authorized **new isolated Core test copy and new fixtures**:
+standard Agenda OFF/ON, both outer ends under3 initial modes, nested error with
+counter-return checks, two Completion samples before outer end and forbidden
+post-end SQL/side-effect fences. No reuse of old AP3/SH-01/D-01 fixtures or writes
+to the existing I105 business database; no general campaign rerun.
+
+### F27-02/F27-04 — actual non-DML runtime and batch boundary
+
+The production orchestrator reads `stop` immediately after `book()`. All profiles
+skip PDF/mail for such a result. For Core-Guarded, only a service-supplied
+`completion=nonterminal_acknowledged` with SUCCESS/FAILED/SKIPPED and no STOP
+permits continuation. Missing/malformed classification or UNKNOWN always stops.
+This is an **internal outcome contract**, not a MySQL completion-value admission
+whitelist, physical event proof or request parameter. Its future adapter producer
+is still unimplemented and must be independently reviewed.
+
+At batch entry, Core-Guarded checks the actual PHP session module/path and actual
+logger objects/settings, then requires the **final** `MsmFileBookingCheckpoint`
+object as callback, checking its bound session ID/path before the first service call. Arbitrary closures/handlers cannot be designated qualified by
+a boolean. The controller selects this object for Core-Guarded; direct current
+booking service calls remain blocked by existing profile admission. No local lab
+path is hardcoded. Supported preparatory runtime:
+
+- PHP `files`, nonempty unchanged session ID, existing readable/writable absolute
+  flat local directory; wrappers, missing/unwritable paths, sharded syntax and user
+  handlers refused. No session/global setting is rewritten in production.
+- Enabled standard `mod_syslog_file` objects whose export implementation belongs
+  to the installed standard Core source path. No exporter is called by admission.
+  Only a local regular/default logfile with usable parent, no wrapper/symlink or
+  additional per-session/IP/suffix naming in this bounded profile. Unknown logger,
+  disabled/unsupported handler configuration or failed control refuses work.
+- These object/path checks are **not source-attestation of arbitrary modified Core**
+  or blanket cross-version qualification. The source argument is pinned V24.0.3;
+  normal CI across other tags is synthetic regression only.
+
+The fixed checkpoint contains no DB/service/logger/hook reference. It checks the
+same file-session path/ID, reopens once, verifies the consumed processing revision,
+saves the complete state and closes once. Session warnings are failures too; it
+never retries. After a terminal result the orchestrator marks all following slots
+`not_processed`, preserves the current result and performs only this checkpoint,
+then returns. No later service/profile/preflight, mail, PDF or arbitrary save is
+called. A failure retains the acknowledged result **in the returned state**, sets
+checkpoint-failed/processing/STOP, and makes no further persistence attempt. The
+last durable consumed record may remain UNKNOWN; it is not fabricated into durable
+success. Fresh consumed POST validation rejects replay. A later GET is a new
+request/connection; same-request unsafe SQL is not justified by a result link.
+
+Existing Enhanced/MariaDB service behavior and historical stored `skipped` results
+remain unchanged. Their legacy stopped followers retain the existing classification;
+Core-Guarded's new stopped followers use the explicit NOT_PROCESSED status. The
+renderer counts it separately and displays the terminal/persistence warning;
+unsent terminal mail/PDF are not reported as attempted failures. Actual business
+writers/observers and the 71 requirements/evidence mappings are untouched.
+
+| Contract | Precise preparatory behavior |
+| --- | --- |
+| E02 | Proven SET refusal1568 before BEGIN/DML = entry refused / NOT_PROCESSED + STOP. The AP3 original UNKNOWN label is historical; no foreign end or retry. Transport/entry ambiguity remains UNKNOWN. |
+| E10/E12 | Acknowledged nonterminal outcome plus the fixed successful checkpoint is required before continuation; STOP takes precedence even if the member result is success. |
+| E11/E13 | Unknown/unacknowledged result forces STOP, including an inconsistent service `stop=false`; no later readback/retry/compensation. |
+| E15 | Acknowledged COMMIT remains SUCCESS; checkpoint failure yields processing/persistence warning + STOP. Durable consumption remains closed; no automatic resume. |
+
+### Tests and evidence levels
+
+`test/unit/terminal.php` is included by the existing `postcommit.php` CI runner;
+workflow/matrix are unchanged. Actual `msmProcessBooking()` is exercised with spy
+services, effect fences and **real local PHP file-session checkpoints**. Cases:
+SUCCESS+STOP, acknowledged ROLLBACK+STOP, UNKNOWN+STOP, E02 NOT_PROCESSED, E15,
+explicit qualified SUCCESS/ROLLBACK continuation, missing classification and
+UNKNOWN with a contradictory continue marker. Tests assert one service call and
+no PDF/mail for terminal cases, fixed checkpoint/readback, non-resumable consumed
+state, local E15 versus durable uncertainty, output escaping/new counts/historical
+skipped rendering, custom callback/logger/session/path refusal before service calls.
+
+`docs/evidence/f27/terminal-calls.json` records sanitized function-monitor names,
+caller basenames/lines and spy-call order; no arguments, credentials or real
+business rows. Xdebug monitoring is optional in normal CI; service/effect/count
+assertions always run. `synthetic-validation.json` records11 successful local
+runners on PHP8.2.35, using pinned Core24.0.3 source where required by the runner. This is neither authenticated
+HTTP nor new real business integration. AP3's historical real proof remains distinct.
+
+### Mapping to Issue #22's six open Completion-gate checkboxes
+
+| Checkbox (in existing order) | Evidence and remaining condition |
+| --- | --- |
+| 1 Classification stable through actual Core/Agenda path | F27-01 source/configuration envelope established; selected runtime closure/new real path proof NOT EXECUTED; independent sufficiency decision open. |
+| 2 Actual Core end/logger, no forbidden SQL | Historical AP3 bounded file-logger evidence plus new server-side file-logger refusal; no arbitrary/custom logger certification. Independent acceptance open. |
+| 3 Durable independent session checkpoints | Historical AP3 HTTP/file-handler proof plus actual fixed production checkpoint tested locally; no new Apache/authenticated HTTP test, source/runtime integration review open. |
+| 4 STOP before SQL/next-member/delivery; clear untouched members | Actual orchestrator patch and call-order spies/fences, NOT_PROCESSED renderer; no productive CF02 adapter run. Independent delta verification open. |
+| 5 Lost ACK/E15, acknowledged result retained, no retry/foreign end | Historical real Lost-ACK/E15 plus new actual-orchestrator synthetic states/real local file failure controls; no new fault injection on a database. |
+| 6 Independent bounded gate assessment before CF02 DML | NOT COMPLETED. All six checkboxes remain open; neither Codex nor this draft closes findings or accepts the gate. |
+
+### Targeted independent delta-review assignment
+
+**Historical pre-F28 assignment; superseded by the single final common review
+request in PR28, which records the final exact HEAD.**
+
+Review the exact follow-up PR HEAD and PR #27's erratum HEAD separately, against
+base `c79830976a5f1e1bd57d51005ff34c10c424e36f`:
+
+1. Confirm F27-03's E02 interpretation and3-file hash update without rewriting any
+   original AP3 source, trace, output or STOP.
+2. Decide explicitly whether **F27-01** can close for the stated pinned source/
+   configuration envelope; if the missing selected-runtime closure prevents it,
+   name the minimal read-only configuration proof/new isolated lab case required.
+3. Assess **F27-02** against the actual orchestrator: early STOP, no terminal effects
+   or follower calls, single fixed checkpoint, acknowledgment preserved under E15,
+   consumed replay blocked and historical Enhanced/MariaDB behavior retained.
+4. Assess **F27-04**: actual files/logger checks and final callback identity are
+   enforceable before work, control failures stop, unknown exporters/user handlers
+   are never invoked, no lab path/Completion whitelist/normalization is introduced.
+5. Issue a separate decision for each finding and each of the six gate checkboxes.
+   No automatic CF02 contribution-DML/merge/release approval. If accepted, request
+   the separate Owner decision; otherwise list concrete remaining blockers.
+
+No merge, real destructive test, productive Core-Guarded contribution DML, CF03
+business/Agenda/HTTP/replay/concurrency/V22/V23/Enhanced/MariaDB regression, ZIP,
+tag or release is performed or qualified by this follow-up.
+
+## F28-01 controller ordering correction — 2026-11-19
+
+Owner's finalization task accepts the external review at PR27 `2e794a87` /
+PR28 `75a531d9`: F27-02 **CLOSED WITH DOCUMENTED LIMITS**, F27-03 **CLOSED**;
+F27-04's bounded file-session/file-logger support provisionally accepted, with
+**direct service admission still a CF02 duty**. F27-01 remains a pre-DML obligation.
+PR27 is normally merged as `56ab0784be05ab866769a9674c961bd4198588a9` with its
+reviewed tree unchanged; reviewed push/PR and post-merge CI each21/21 PASS.
+The earlier finding-status statements above are historical review stages.
+
+F28-01 now checks CoreGuarded's actual runtime while the original confirmation
+session is still active. `msmConsumeConfirmation()` first validates replay/request
+shape on a **copy**; no consumed state is assigned or saved yet. Known session/
+logger refusal therefore retains confirmation, revision and rows, with the precise
+localized error flash. Only after that check and normal profile/database admission
+does the controller persist processing state and close the session. The same
+checkpoint object, bound before close, then rechecks the actual ID/path after close.
+No catch path restores a consumed confirmation after close or possible member DML.
+CSRF/profile/revision/entity/permission checks and disabled CoreGuarded features
+are unchanged; Enhanced/MariaDB do not acquire the CoreGuarded runtime restriction.
+
+`test/fixtures/controller-runtime.php` executes the **actual subscription.php
+body** in isolated CLI requests. It instruments the bootstrap, three constructed
+admission/service objects, header/session-close observation and layout helpers;
+it preserves the controller's branches, state assignments, catch and exit. Its
+synthetic admission permits exercising the future CoreGuarded handoff only inside
+the test process, without changing production feature flags. Native local PHP
+sessions are reopened by a separate GET/request. No protected config, DB or HTTP
+transport is used. Actual module EN labels are used for the visible-error check.
+
+`test/unit/controller-runtime.php` runs from the existing request CI runner:
+unsupported session handler/logger retain confirm/revision5 without UNKNOWN or
+service calls; redirected GET displays the specific diagnosis. Changed binding
+after close and a service fault after possible DML retain processing/revision6;
+replay with even a current revision cannot invoke the service. Legacy MariaDB and
+Enhanced success, CSRF and entity rejection remain covered. The existing
+`75a531d9` controller is also executed as a negative control: its known logger
+refusal incorrectly persists processing/UNKNOWN with no specific flash; corrected
+source retains confirmation and the precise flash. Evidence:
+`docs/evidence/f27/f28-controller-calls.json` and `f28-controller-regression.json`.
+This is reliable controller instrumentation, **not authenticated HTTP or real
+business-DML qualification**. Targeted independent verification of the new HEAD
+is still required; F28-01 is not independently self-closed.
+
+## F27-01 runtime-bound qualification addendum — 2026-11-19
+
+**QUALIFICATION PREPARED; INDEPENDENT SUFFICIENCY VERDICT / OWNER GATE ACCEPTANCE
+PENDING.** This addendum supplies the previously missing concrete configuration
+binding; it does not relabel source inspection as a real contribution transaction.
+
+### Stage A — actual protected configuration, read-only
+
+The Owner executed `tools/f27-runtime-read.php --read-only` as www-data after the
+agent's noninteractive sudo preflight required a password. Sanitized original
+result: `docs/evidence/f27/f27-runtime-readonly.json`, observed
+`2026-11-19T10:04:33+00:00`. The reader loaded actual protected I105 configuration
+and genuine `Conf::setValues()` through a query-fenced native driver. It executed 7
+SELECTs, blocked 0 statements, changed 0 charset statements, started/read 0 sessions,
+called 0 business APIs/triggers and performed 0 SQL-trigger checks. No business
+rows, password, SMTP data, cookies, session files or configuration contents are
+published. Only the sanitized snapshot was created; no test fixture was written.
+The reader source exposes the query templates; the secret-bearing full Core
+constant/decryption SELECT is intentionally not exported as a raw SQL log.
+
+| Observation | Actual snapshot / consequence for the bounded path |
+| --- | --- |
+| Identity | Dolibarr24.0.3, Core `5c6c7ff6a5112413b1c27221c8d11750afad56f8`, PHP8.2.35, mysqlnd8.2.35, MySQL8.4.13, `dolibarr_i105_v24`; reader's fresh connection autocommit1 / NO_CHAIN. This is observation, not an admission whitelist. |
+| Agenda | Enabled; MEMBER_SUBSCRIPTION_CREATE automatic event on; automatic file copying off. Standard contribution dispatch therefore selects the known Agenda-create branch. |
+| Logevents | Both MEMBER_SUBSCRIPTION_CREATE and ACTION_CREATE flags off; the all-events trigger returns before event DML. |
+| Notification / Blockedlog / Workflow | Disabled; not selected by the current Core dispatcher. No claim that their enabled effects have been qualified. |
+| Extensions | Zero additional trigger directories. The real dispatcher selects exactly Logevents, ActionsAuto and Societe ContactRoles from Core. This examines the two relevant dispatches, not arbitrary installed modules. |
+| Extrafields |0 definitions and0 computed fields for adherent, subscription and actioncomm. No computed extension branch is introduced by this snapshot. |
+| Engines | All7 relevant inspected tables are InnoDB, including member/type/subscription, Agenda/resource, events and extrafields. No engine/schema modification. |
+| Logger | Enabled standard mod_syslog_file at level4; implementation hash equals AP3/pinned Core; local destination and writable parent. |
+| Session | Apache ini/VHost declares files and a local readable/writable existing path for www-data. No session is opened/read. This is a CLI reader of actual configuration/declarations, not a new Apache request or authenticated HTTP qualification. |
+
+`f27-runtime-source-pins.json` independently compares the three selected callback
+files plus Conf/dispatcher source with the pinned Git objects. The earlier 12-file
+analysis remains unchanged; ContactRoles is the one newly relevant selected file.
+The VHost source check in `f27-apache-declarations.json` records the relevant
+override-name/AllowOverride boundary without publishing unrelated settings. This
+is a point-in-time snapshot, not global Apache/process-environment attestation or
+continuous config monitoring. It must not be promoted to arbitrary future installs.
+
+### Selected and reached guards — source plus no-DML execution
+
+`tools/f27-callback-guards.php` checks the observed callback hashes, loads the actual
+pinned methods and supplies observed flags, ordinary synthetic objects and a
+DoliDB-typed **DB-rejecting spy with no native connection**. Its five recorded
+cases in `f27-callback-guards.json` each return 0 with 0 DB calls:
+
+- Logevents for MEMBER_SUBSCRIPTION_CREATE and ACTION_CREATE: flag-controlled early
+  return, exactly matching the two observed off flags.
+- ContactRoles for both actions: neither action matches its supported document/
+  project/ticket creation list (`runTrigger`, pinned file lines 78–140); its constructor
+  only stores the DB and metadata. No contact-role callback/DML is reached.
+- ActionsAuto for ACTION_CREATE: the explicit ACTION-prefix guard returns before
+  recursive Agenda creation.
+
+These are actual guard-method executions with observed inputs, **not a native DB
+or real contribution/Agenda-write run**. The remaining selected write branch is
+only the already analyzed standard MEMBER_SUBSCRIPTION_CREATE Agenda branch:
+Subscription → CommonTrigger/Interfaces → ActionsAuto → ActionComm → ACTION_CREATE.
+The logical depth path remains 1→2→3→4→3, Agenda4→3, Subscription3→2,
+Adherent end update3→2, Adherent2→1, then the outer Core end. No selected source
+method rewrites Completion, replaces the connection or drains the outer depth.
+The standard file-logger's Core-end behavior is separately established by AP3;
+this addendum neither repeats nor enlarges those historical measurements.
+
+### Stage B decision and residual risk
+
+For this **concrete snapshot**, the formerly unknown candidate/callback closure is
+now bounded: no extra directories, inactive side-effect modules, no computed fields,
+Logevents off for both events, the extra ContactRoles handler proven no-op, and the
+only active business branch is pinned standard Agenda. The technical assessment is
+that no remaining **concrete** callback/Completion-intervention gap justifies a new
+destructive Lab run before the independent sufficiency review. Stage B is therefore
+**NOT EXECUTED (not required by this snapshot/source assessment)**; no old/new
+business fixtures or existing I105 rows are touched, and no real contribution,
+Agenda ON/OFF, late-rewrite or new native COMMIT/ROLLBACK case is claimed.
+
+The external reviewer must explicitly accept or reject this bounded F27-01 argument.
+If a concrete gap remains, name the minimal new isolated-copy/fixture test; the
+Owner authorized such targeted tests, not a full campaign repeat or production DML.
+This is **not Codex closing F27-01 or accepting the Completion gate**.
+
+Limitations remain: two Completion observations cannot detect every later physical
+replacement; adversarial/unexamined hooks, changed config/source and additional
+Notification/Blockedlog/Logevents/extra-field effects are outside this snapshot.
+The source-bound assumption is that the selected standard code/configuration stays
+stable during the member operation. A future active CoreGuarded service still must
+perform its own admission and application-context checks before DML; F27-04's direct
+service requirement remains CF02 work. Known foreign ends, connection loss or
+uncertain ACK stay UNKNOWN/STOP without retry, compensation or foreign rollback.
+No general third-party inventory/certification/blocklist, completion whitelist,
+Performance-Schema requirement, session normalization or second transaction manager
+is introduced. CF03 real business/HTTP/Agenda/error/regression and release gates stay
+separate. Production CoreGuarded booking remains disabled.
+
+### Reproduction and current gate handoff
+
+The Stage-A reader was executed once with `sudo -u www-data php -d xdebug.mode=off`
+and external mail/network transport functions disabled. Its fixed destination
+refuses overwriting the preserved result. A deliberately new snapshot needs a new
+reviewed output destination; do not delete or silently replace the original. The
+reader may perform normal Core file logging but no business/configuration writes.
+Protected credentials remain only in process memory. To reproduce the no-DML
+guard probe against pinned source and the published observed flag inputs:
+
+```bash
+php -d xdebug.mode=off tools/f27-callback-guards.php --check /path/to/pinned-core /tmp/new-f27-guards.json
+```
+
+Current dispositions and six-checkbox mapping for the **single final independent
+review request in PR28** (it names the exact final HEAD; no self-referential source
+commit/hash in this sealed report):
+
+| Item | Current evidence / required independent decision |
+| --- | --- |
+| F28-01 | Controller correction and 30 actual-flow assertions; old-code failure reproduced. Independently verify the final HEAD before any PR28 merge. |
+| F27-01 / gate1 | Actual selected configuration + 13th ContactRoles source + 5 no-op guard checks bound the previously unknown closure. Decide whether this suffices for the supported standard path; no new native contribution/Agenda transaction is claimed. |
+| F27-02 / gates4–5 | Owner/external CLOSED WITH DOCUMENTED LIMITS; verify the early STOP/checkpoint/E15 result remains intact after the controller fix. |
+| F27-03 / gate5 | Owner/external CLOSED; normally merged PR27 retains the E02 erratum and original measured UNKNOWN label, without rewriting raw results. |
+| F27-04 / gates2–3 | Bounded files/file-logger support provisionally Owner-accepted; pre-consumption runtime refusal now corrected. Direct active-service admission is still CF02 work. |
+| gate6 | Final independent review and **separate formal Owner Completion-gate acceptance** pending. Conditional development-merge permission is not productive DML authorization. |
+
+All six Issue22 gate checkboxes stay open until documented independent assessment
+and Owner gate decision. The final reviewer must state F28-01 disposition, F27-01
+bounded sufficiency or the exact remaining concrete test, retained F27-02/F27-03
+closure, F27-04 limits and each gate result. A final positive independent review
+plus CI/scope permits the Owner-conditionally authorized development merge only.
+Without that review PR28 remains open for review; Codex cannot supply its own
+independent approval. No production CF02 adapter, invoice/customer extension,
+Enhanced/MariaDB observer change or release/ZIP/tag action is included.

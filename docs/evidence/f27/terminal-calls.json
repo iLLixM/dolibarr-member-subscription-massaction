@@ -1,0 +1,513 @@
+{
+    "scope": "synthetic actual batch orchestrator; no DB\/SMTP\/PDF",
+    "cases": [
+        {
+            "case": "success",
+            "calls": [
+                {
+                    "event": "service_preflight_and_DML_spy",
+                    "id": 1
+                }
+            ],
+            "mail_pdf_calls": 0,
+            "member": "success",
+            "follower": "not_processed",
+            "phase": "done",
+            "checkpoint_failed": false,
+            "function_monitor": [
+                {
+                    "function": "msmProcessBooking",
+                    "source": "terminal.php",
+                    "line": 60
+                },
+                {
+                    "function": "TerminalBookingSpy->book",
+                    "source": "booking.lib.php",
+                    "line": 74
+                },
+                {
+                    "function": "MsmFileBookingCheckpoint->__invoke",
+                    "source": "booking.lib.php",
+                    "line": 125
+                },
+                {
+                    "function": "session_start",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 54
+                },
+                {
+                    "function": "session_write_close",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 58
+                }
+            ]
+        },
+        {
+            "case": "rollback",
+            "calls": [
+                {
+                    "event": "service_preflight_and_DML_spy",
+                    "id": 1
+                }
+            ],
+            "mail_pdf_calls": 0,
+            "member": "failed",
+            "follower": "not_processed",
+            "phase": "done",
+            "checkpoint_failed": false,
+            "function_monitor": [
+                {
+                    "function": "msmProcessBooking",
+                    "source": "terminal.php",
+                    "line": 60
+                },
+                {
+                    "function": "TerminalBookingSpy->book",
+                    "source": "booking.lib.php",
+                    "line": 74
+                },
+                {
+                    "function": "MsmFileBookingCheckpoint->__invoke",
+                    "source": "booking.lib.php",
+                    "line": 125
+                },
+                {
+                    "function": "session_start",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 54
+                },
+                {
+                    "function": "session_write_close",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 58
+                }
+            ]
+        },
+        {
+            "case": "unknown",
+            "calls": [
+                {
+                    "event": "service_preflight_and_DML_spy",
+                    "id": 1
+                }
+            ],
+            "mail_pdf_calls": 0,
+            "member": "unknown",
+            "follower": "not_processed",
+            "phase": "done",
+            "checkpoint_failed": false,
+            "function_monitor": [
+                {
+                    "function": "msmProcessBooking",
+                    "source": "terminal.php",
+                    "line": 60
+                },
+                {
+                    "function": "TerminalBookingSpy->book",
+                    "source": "booking.lib.php",
+                    "line": 74
+                },
+                {
+                    "function": "MsmFileBookingCheckpoint->__invoke",
+                    "source": "booking.lib.php",
+                    "line": 125
+                },
+                {
+                    "function": "session_start",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 54
+                },
+                {
+                    "function": "session_write_close",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 58
+                }
+            ]
+        },
+        {
+            "case": "E02",
+            "calls": [
+                {
+                    "event": "service_preflight_and_DML_spy",
+                    "id": 1
+                }
+            ],
+            "mail_pdf_calls": 0,
+            "member": "not_processed",
+            "follower": "not_processed",
+            "phase": "done",
+            "checkpoint_failed": false,
+            "function_monitor": [
+                {
+                    "function": "msmProcessBooking",
+                    "source": "terminal.php",
+                    "line": 60
+                },
+                {
+                    "function": "TerminalBookingSpy->book",
+                    "source": "booking.lib.php",
+                    "line": 74
+                },
+                {
+                    "function": "MsmFileBookingCheckpoint->__invoke",
+                    "source": "booking.lib.php",
+                    "line": 125
+                },
+                {
+                    "function": "session_start",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 54
+                },
+                {
+                    "function": "session_write_close",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 58
+                }
+            ]
+        },
+        {
+            "case": "E15",
+            "calls": [
+                {
+                    "event": "service_preflight_and_DML_spy",
+                    "id": 1
+                }
+            ],
+            "mail_pdf_calls": 0,
+            "member": "success",
+            "follower": "not_processed",
+            "phase": "processing",
+            "checkpoint_failed": true,
+            "function_monitor": [
+                {
+                    "function": "msmProcessBooking",
+                    "source": "terminal.php",
+                    "line": 60
+                },
+                {
+                    "function": "TerminalBookingSpy->book",
+                    "source": "booking.lib.php",
+                    "line": 74
+                },
+                {
+                    "function": "MsmFileBookingCheckpoint->__invoke",
+                    "source": "booking.lib.php",
+                    "line": 125
+                }
+            ]
+        },
+        {
+            "case": "continue",
+            "calls": [
+                {
+                    "event": "service_preflight_and_DML_spy",
+                    "id": 1
+                },
+                {
+                    "event": "service_preflight_and_DML_spy",
+                    "id": 2
+                }
+            ],
+            "mail_pdf_calls": 0,
+            "member": "success",
+            "follower": "success",
+            "phase": "done",
+            "checkpoint_failed": false,
+            "function_monitor": [
+                {
+                    "function": "msmProcessBooking",
+                    "source": "terminal.php",
+                    "line": 60
+                },
+                {
+                    "function": "TerminalBookingSpy->book",
+                    "source": "booking.lib.php",
+                    "line": 74
+                },
+                {
+                    "function": "MsmFileBookingCheckpoint->__invoke",
+                    "source": "booking.lib.php",
+                    "line": 125
+                },
+                {
+                    "function": "session_start",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 54
+                },
+                {
+                    "function": "session_write_close",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 58
+                },
+                {
+                    "function": "MsmFileBookingCheckpoint->__invoke",
+                    "source": "booking.lib.php",
+                    "line": 125
+                },
+                {
+                    "function": "session_start",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 54
+                },
+                {
+                    "function": "session_write_close",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 58
+                },
+                {
+                    "function": "TerminalBookingSpy->book",
+                    "source": "booking.lib.php",
+                    "line": 74
+                },
+                {
+                    "function": "MsmFileBookingCheckpoint->__invoke",
+                    "source": "booking.lib.php",
+                    "line": 125
+                },
+                {
+                    "function": "session_start",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 54
+                },
+                {
+                    "function": "session_write_close",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 58
+                },
+                {
+                    "function": "MsmFileBookingCheckpoint->__invoke",
+                    "source": "booking.lib.php",
+                    "line": 125
+                },
+                {
+                    "function": "session_start",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 54
+                },
+                {
+                    "function": "session_write_close",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 58
+                },
+                {
+                    "function": "MsmFileBookingCheckpoint->__invoke",
+                    "source": "booking.lib.php",
+                    "line": 125
+                },
+                {
+                    "function": "session_start",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 54
+                },
+                {
+                    "function": "session_write_close",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 58
+                }
+            ]
+        },
+        {
+            "case": "rollback_continue",
+            "calls": [
+                {
+                    "event": "service_preflight_and_DML_spy",
+                    "id": 1
+                },
+                {
+                    "event": "service_preflight_and_DML_spy",
+                    "id": 2
+                }
+            ],
+            "mail_pdf_calls": 0,
+            "member": "failed",
+            "follower": "failed",
+            "phase": "done",
+            "checkpoint_failed": false,
+            "function_monitor": [
+                {
+                    "function": "msmProcessBooking",
+                    "source": "terminal.php",
+                    "line": 60
+                },
+                {
+                    "function": "TerminalBookingSpy->book",
+                    "source": "booking.lib.php",
+                    "line": 74
+                },
+                {
+                    "function": "MsmFileBookingCheckpoint->__invoke",
+                    "source": "booking.lib.php",
+                    "line": 125
+                },
+                {
+                    "function": "session_start",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 54
+                },
+                {
+                    "function": "session_write_close",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 58
+                },
+                {
+                    "function": "TerminalBookingSpy->book",
+                    "source": "booking.lib.php",
+                    "line": 74
+                },
+                {
+                    "function": "MsmFileBookingCheckpoint->__invoke",
+                    "source": "booking.lib.php",
+                    "line": 125
+                },
+                {
+                    "function": "session_start",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 54
+                },
+                {
+                    "function": "session_write_close",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 58
+                },
+                {
+                    "function": "MsmFileBookingCheckpoint->__invoke",
+                    "source": "booking.lib.php",
+                    "line": 125
+                },
+                {
+                    "function": "session_start",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 54
+                },
+                {
+                    "function": "session_write_close",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 58
+                }
+            ]
+        },
+        {
+            "case": "rollback_wrong_continue",
+            "calls": [
+                {
+                    "event": "service_preflight_and_DML_spy",
+                    "id": 1
+                }
+            ],
+            "mail_pdf_calls": 0,
+            "member": "failed",
+            "follower": "not_processed",
+            "phase": "done",
+            "checkpoint_failed": false,
+            "function_monitor": [
+                {
+                    "function": "msmProcessBooking",
+                    "source": "terminal.php",
+                    "line": 60
+                },
+                {
+                    "function": "TerminalBookingSpy->book",
+                    "source": "booking.lib.php",
+                    "line": 74
+                },
+                {
+                    "function": "MsmFileBookingCheckpoint->__invoke",
+                    "source": "booking.lib.php",
+                    "line": 125
+                },
+                {
+                    "function": "session_start",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 54
+                },
+                {
+                    "function": "session_write_close",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 58
+                }
+            ]
+        },
+        {
+            "case": "missing_completion",
+            "calls": [
+                {
+                    "event": "service_preflight_and_DML_spy",
+                    "id": 1
+                }
+            ],
+            "mail_pdf_calls": 0,
+            "member": "success",
+            "follower": "not_processed",
+            "phase": "done",
+            "checkpoint_failed": false,
+            "function_monitor": [
+                {
+                    "function": "msmProcessBooking",
+                    "source": "terminal.php",
+                    "line": 60
+                },
+                {
+                    "function": "TerminalBookingSpy->book",
+                    "source": "booking.lib.php",
+                    "line": 74
+                },
+                {
+                    "function": "MsmFileBookingCheckpoint->__invoke",
+                    "source": "booking.lib.php",
+                    "line": 125
+                },
+                {
+                    "function": "session_start",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 54
+                },
+                {
+                    "function": "session_write_close",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 58
+                }
+            ]
+        },
+        {
+            "case": "unknown_wrong_continue",
+            "calls": [
+                {
+                    "event": "service_preflight_and_DML_spy",
+                    "id": 1
+                }
+            ],
+            "mail_pdf_calls": 0,
+            "member": "unknown",
+            "follower": "not_processed",
+            "phase": "done",
+            "checkpoint_failed": false,
+            "function_monitor": [
+                {
+                    "function": "msmProcessBooking",
+                    "source": "terminal.php",
+                    "line": 60
+                },
+                {
+                    "function": "TerminalBookingSpy->book",
+                    "source": "booking.lib.php",
+                    "line": 74
+                },
+                {
+                    "function": "MsmFileBookingCheckpoint->__invoke",
+                    "source": "booking.lib.php",
+                    "line": 125
+                },
+                {
+                    "function": "session_start",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 54
+                },
+                {
+                    "function": "session_write_close",
+                    "source": "filebookingcheckpoint.class.php",
+                    "line": 58
+                }
+            ]
+        }
+    ]
+}

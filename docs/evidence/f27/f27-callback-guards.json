@@ -1,0 +1,39 @@
+{
+    "kind": "Pinned actual Core guard methods, observed flag inputs, synthetic objects/DB-rejecting spy; no native DB",
+    "Core": "5c6c7ff6a5112413b1c27221c8d11750afad56f8",
+    "cases": [
+        {
+            "class": "InterfaceLogevents",
+            "action": "MEMBER_SUBSCRIPTION_CREATE",
+            "return": 0,
+            "DB_calls": []
+        },
+        {
+            "class": "InterfaceLogevents",
+            "action": "ACTION_CREATE",
+            "return": 0,
+            "DB_calls": []
+        },
+        {
+            "class": "InterfaceContactRoles",
+            "action": "MEMBER_SUBSCRIPTION_CREATE",
+            "return": 0,
+            "DB_calls": []
+        },
+        {
+            "class": "InterfaceContactRoles",
+            "action": "ACTION_CREATE",
+            "return": 0,
+            "DB_calls": []
+        },
+        {
+            "class": "InterfaceActionsAuto",
+            "action": "ACTION_CREATE",
+            "return": 0,
+            "DB_calls": []
+        }
+    ],
+    "native_DB_connections": 0,
+    "business_DML": 0,
+    "Agenda_MEMBER_SUBSCRIPTION_CREATE": "NOT EXECUTED; it is the bounded write path, reviewed statically"
+}
