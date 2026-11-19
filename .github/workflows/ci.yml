@@ -33,6 +33,12 @@ jobs:
             core: '24.0.0'
             core-ref: 769c7db907099643558e77d7002c109cfda919e5
           - php: '8.2'
+            core: '24.0.1'
+            core-ref: b7958385f00a92219f76a4dfea67dae93df97a25
+          - php: '8.2'
+            core: '24.0.2'
+            core-ref: 7e927764767343334aaa067ca5ec054cfea0a26b
+          - php: '8.2'
             core: '24.0.3'
             core-ref: 5c6c7ff6a5112413b1c27221c8d11750afad56f8
     steps:
