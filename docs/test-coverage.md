@@ -351,3 +351,21 @@ CSRF/entity protection. A negative control reproduces the old75a531d9 ordering b
 These30 assertions and sanitized traces are **instrumented controller evidence**,
 not real authenticated HTTP/Core-Guarded business DML. See the dated F28-01 section
 in `phase4-implementation-validation.md`; independent final-HEAD review is pending.
+
+### F27-01 selected-runtime evidence addendum (2026-11-19)
+
+The earlier unexecuted-runtime statement describes the pre-addendum evidence.
+`docs/evidence/f27/f27-runtime-readonly.json` now records the actual protected
+configuration via seven SELECTs, without callback/business/session execution.
+Three selected callbacks match the pinned Core: Logevents, ActionsAuto and
+Societe ContactRoles. Five actual early-return guard calls use observed flags
+and a DB-rejecting spy with no native connection. The standard Agenda write path
+remains source-analyzed; no new contribution/Agenda transaction is claimed.
+
+See the [runtime-bound qualification addendum](phase4-implementation-validation.md#f27-01-runtime-bound-qualification-addendum--2026-11-19)
+for source pins, reproduction, configuration boundaries and the Stage-B decision:
+**NOT EXECUTED**, because this concrete snapshot/source assessment identifies no
+remaining concrete callback gap warranting a new lab run before independent
+sufficiency review. This assessment does not independently close F27-01 or the
+gate. `finalization-validation.json` records ten successful local regression
+runners; they are synthetic/controller/session checks, not new real DB/HTTP tests.

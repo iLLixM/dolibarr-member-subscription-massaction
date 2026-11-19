@@ -1,0 +1,8 @@
+{
+  "kind": "Selected VHost declaration source check, not an HTTP request",
+  "vhost_file": "dolibarr-i105-mysql.conf",
+  "sha256": "bb67707679317a81562256fee0ba37d00a39c9b916ef345c234caccfe7baaefb",
+  "relevant_DOLIBARR_override_names": [],
+  "allow_override_none_declared": true,
+  "scope": "No global Apache/process-env attestation or arbitrary third-module inventory. Runtime reader CLI and Apache declaration boundaries retained."
+}

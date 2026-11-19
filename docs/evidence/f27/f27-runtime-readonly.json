@@ -1,0 +1,134 @@
+{
+    "kind": "READ-ONLY LIVE CONFIGURATION; callbacks selected, not executed",
+    "time": "2026-11-19T10:04:33+00:00",
+    "status": "PASS",
+    "identity": {
+        "db": "dolibarr_i105_v24",
+        "version": "8.4.13",
+        "autocommit": "1",
+        "completion_type": "NO_CHAIN"
+    },
+    "php": "8.2.35",
+    "driver": "mysqlnd 8.2.35",
+    "flags": {
+        "MAIN_AGENDA_ACTIONAUTO_MEMBER_SUBSCRIPTION_CREATE": true,
+        "MAIN_LOGEVENTS_MEMBER_SUBSCRIPTION_CREATE": false,
+        "MAIN_LOGEVENTS_ACTION_CREATE": false,
+        "MAIN_LOGEVENTS_DISABLE_ALL": false,
+        "MAIN_COPY_FILE_IN_EVENT_AUTO": false,
+        "MAIN_STORE_COMPUTED_EXTRAFIELDS": false,
+        "MAIN_EXTRAFIELDS_DISABLED": false
+    },
+    "modules": {
+        "agenda": true,
+        "notification": false,
+        "blockedlog": false,
+        "workflow": false,
+        "syslog": true,
+        "societe": true
+    },
+    "selected_callbacks": [
+        {
+            "file": "interface_20_all_Logevents.class.php",
+            "module": "all",
+            "sha256": "0efa4977ae6940faea936088139f2524b2275d52faf0b946a6b1590a61917a26",
+            "standard_core": true,
+            "selection": "actual dispatcher candidate for both actions; action guard evaluated by source review, not executed"
+        },
+        {
+            "file": "interface_50_modAgenda_ActionsAuto.class.php",
+            "module": "agenda",
+            "sha256": "4f9b4e554ee64da462a399fe96276739fa260e71b53c7b5df5ca56a58ee26365",
+            "standard_core": true,
+            "selection": "actual dispatcher candidate for both actions; action guard evaluated by source review, not executed"
+        },
+        {
+            "file": "interface_90_modSociete_ContactRoles.class.php",
+            "module": "societe",
+            "sha256": "5b1d04a8d44ae5e0a9684ab8afbff81903d6e66c58c3602e80e377a0803250db",
+            "standard_core": true,
+            "selection": "actual dispatcher candidate for both actions; action guard evaluated by source review, not executed"
+        }
+    ],
+    "extra_trigger_directory_count": 0,
+    "extrafields": {
+        "adherent": {
+            "definitions": 0,
+            "computed": 0
+        },
+        "subscription": {
+            "definitions": 0,
+            "computed": 0
+        },
+        "actioncomm": {
+            "definitions": 0,
+            "computed": 0
+        }
+    },
+    "engines": [
+        {
+            "name": "llx_actioncomm",
+            "engine": "InnoDB"
+        },
+        {
+            "name": "llx_actioncomm_resources",
+            "engine": "InnoDB"
+        },
+        {
+            "name": "llx_adherent",
+            "engine": "InnoDB"
+        },
+        {
+            "name": "llx_adherent_type",
+            "engine": "InnoDB"
+        },
+        {
+            "name": "llx_events",
+            "engine": "InnoDB"
+        },
+        {
+            "name": "llx_extrafields",
+            "engine": "InnoDB"
+        },
+        {
+            "name": "llx_subscription",
+            "engine": "InnoDB"
+        }
+    ],
+    "logger": {
+        "enabled": true,
+        "level": 4,
+        "classes": [
+            {
+                "class": "mod_syslog_file",
+                "source": "mod_syslog_file.php",
+                "sha256": "3b7c6fa701b5a094003ef1ecbd195f4e93fc8539ba13108910bad800bd521b1a"
+            }
+        ],
+        "local_file": true,
+        "parent_writable": true
+    },
+    "session": {
+        "apache_declared_handler": "files",
+        "vhost_path_present": true,
+        "path_local": true,
+        "path_readable": true,
+        "path_writable": true,
+        "session_started": false,
+        "observation": "Apache ini/vhost declaration and www-data filesystem access; reader SAPI is CLI, not an Apache request"
+    },
+    "core_sources": {
+        "core/class/conf.class.php": "7673bdb6a17ea16565c02093679d2d1345ff66db6a6a01058500a5ac29f851a4",
+        "core/class/interfaces.class.php": "906cd1a4dd10e8e23b16df30cc94a091483cc3942aa29d05e11c50d92e1cfc2d",
+        "core/triggers/interface_50_modAgenda_ActionsAuto.class.php": "4f9b4e554ee64da462a399fe96276739fa260e71b53c7b5df5ca56a58ee26365"
+    },
+    "readonly": {
+        "read_queries": 7,
+        "blocked_statements": 0,
+        "initial_driver_charset_statements": 0,
+        "business_APIs_called": 0,
+        "trigger_callbacks_executed": 0,
+        "session_reads": 0,
+        "SQL_trigger_checks": 0
+    }
+}
