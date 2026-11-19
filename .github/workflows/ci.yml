@@ -2,7 +2,7 @@ name: Module subscriptions
 on:
   pull_request:
   push:
-    branch:
+    branches:
       - main
 permissions:
   contents: read
