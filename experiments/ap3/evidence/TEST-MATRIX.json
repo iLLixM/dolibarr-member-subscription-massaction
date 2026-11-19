@@ -1,0 +1,229 @@
+{
+  "scope": "AP3 experiment; no independent gate acceptance or CF02 approval",
+  "base": "c79830976a5f1e1bd57d51005ff34c10c424e36f",
+  "groups": [
+    {
+      "id": "G1",
+      "status": "PARTIAL",
+      "evidence": [
+        "cli-r1.json",
+        "HTTP_NO_CHAIN_COMMIT.json",
+        "HTTP_NO_CHAIN_ROLLBACK.json",
+        "HTTP_CHAIN_COMMIT.json",
+        "HTTP_CHAIN_ROLLBACK.json",
+        "HTTP_RELEASE_COMMIT.json",
+        "HTTP_RELEASE_ROLLBACK.json"
+      ],
+      "observed": "Six actual modes/end pairs in CLI and authenticated HTTP; pre-end samples stable; immediate terminal STOP. Unreadable/malformed/inconsistent observations explicitly injected in real Core execution.",
+      "not_executed": "An actual mid-transaction session rewrite or an unobserved change after the last completion sample; only initial test-mode assignments were authorized."
+    },
+    {
+      "id": "G2",
+      "status": "PASS",
+      "evidence": [
+        "cli-r1.json",
+        "HTTP_CHAIN_COMMIT.json",
+        "HTTP_RELEASE_ROLLBACK.json"
+      ],
+      "observed": "Inherited Core completion and genuine dol_syslog/file export at CLI DEBUG7; actual HTTP logger level4. Zero attempted post-terminal SQL including actual HTTP shutdown. Unknown profile denied before transaction.",
+      "limits": "Pinned standard file logger only; unsupported-profile negative is declared/injected, no arbitrary third-party exporter was run."
+    },
+    {
+      "id": "G3",
+      "status": "PASS",
+      "evidence": [
+        "HTTP-OWNER-R1-result.json",
+        "HTTP-R1-profile.json",
+        "HTTP-R1-reference-after.json",
+        "HTTP_CHECKPOINT_FAILURE.json"
+      ],
+      "observed": "Nine authenticated HTTP cases; actual I105 files session path; fresh GET result readbacks and consumed replay refusals; real files-handler reopen failure; temporary server ended.",
+      "limits": "Temporary PHP cli-server with genuine main.inc.php, not Apache SAPI. E15 consumption remains durable, result persistence explicitly uncertain; arbitrary handlers not qualified."
+    },
+    {
+      "id": "G4",
+      "status": "PASS",
+      "evidence": [
+        "cli-r1.json",
+        "HTTP-OWNER-R1-result.json",
+        "lost-COMMIT.json",
+        "lost-ROLLBACK.json"
+      ],
+      "observed": "SUCCESS/CONTINUE; SUCCESS/STOP; acknowledged rollback/STOP; UNKNOWN/STOP; acknowledged COMMIT + checkpoint failure/STOP. Followers NOT_PROCESSED in measured result.",
+      "limits": "Synthetic member slots/probe DML, no product booking orchestrator. E15 durable PENDING_RESULT_RECORD avoids a false persisted result claim."
+    },
+    {
+      "id": "G5",
+      "status": "PASS",
+      "evidence": [
+        "cli-r1.json",
+        "HTTP_CHAIN_COMMIT.json",
+        "HTTP_RELEASE_ROLLBACK.json",
+        "lost-COMMIT.json"
+      ],
+      "observed": "No attempted terminal lab SQL, next-member preflight, follower DML, compensation or retry; zero mail/PDF calls in isolated orchestrator. Independent auditor connection is explicitly distinct.",
+      "limits": "Only initial new-connection Completion assignments per separate Owner permission; no adapter normalization. Artificial mail/PDF paths are absent, existing product paths remain unqualified."
+    },
+    {
+      "id": "G6",
+      "status": "PARTIAL",
+      "evidence": [
+        "lost-COMMIT.json",
+        "lost-ROLLBACK.json",
+        "cli-r1.json",
+        "HTTP_UNKNOWN_CLOSE.json",
+        "HTTP_CHECKPOINT_FAILURE.json"
+      ],
+      "observed": "Real discarded COMMIT/ROLLBACK server OK => UNKNOWN/STOP with errno2006; real foreign1568; own connection close; real session failure; unsupported declared profiles refused.",
+      "not_executed": "Actual unsupported custom DB session/logger handlers and actual late Completion rewrite; contradictory classification observations are injection, not proof of detecting every physical change."
+    }
+  ],
+  "cases": [
+    {
+      "id": "AP3-CLI-NO_CHAIN-commit",
+      "status": "PASS",
+      "kind": "real loaded Core/DB and actual file logging",
+      "file": "cli-r1.json"
+    },
+    {
+      "id": "AP3-CLI-NO_CHAIN-rollback",
+      "status": "PASS",
+      "kind": "real loaded Core/DB and actual file logging",
+      "file": "cli-r1.json"
+    },
+    {
+      "id": "AP3-CLI-CHAIN-commit",
+      "status": "PASS",
+      "kind": "real loaded Core/DB and actual file logging",
+      "file": "cli-r1.json"
+    },
+    {
+      "id": "AP3-CLI-CHAIN-rollback",
+      "status": "PASS",
+      "kind": "real loaded Core/DB and actual file logging",
+      "file": "cli-r1.json"
+    },
+    {
+      "id": "AP3-CLI-RELEASE-commit",
+      "status": "PASS",
+      "kind": "real loaded Core/DB and actual file logging",
+      "file": "cli-r1.json"
+    },
+    {
+      "id": "AP3-CLI-RELEASE-rollback",
+      "status": "PASS",
+      "kind": "real loaded Core/DB and actual file logging",
+      "file": "cli-r1.json"
+    },
+    {
+      "id": "AP3-CLI-NO_CHAIN-commit-unreadable",
+      "status": "PASS",
+      "kind": "real Core/DB plus explicitly fault-injected classification observation",
+      "file": "cli-r1.json"
+    },
+    {
+      "id": "AP3-CLI-NO_CHAIN-commit-malformed",
+      "status": "PASS",
+      "kind": "real Core/DB plus explicitly fault-injected classification observation",
+      "file": "cli-r1.json"
+    },
+    {
+      "id": "AP3-CLI-CHAIN-commit-inconsistent",
+      "status": "PASS",
+      "kind": "real Core/DB plus explicitly fault-injected classification observation",
+      "file": "cli-r1.json"
+    },
+    {
+      "id": "AP3-CLI-NO_CHAIN-commit-close_before_end",
+      "status": "PASS",
+      "kind": "real loaded Core/DB and actual file logging",
+      "file": "cli-r1.json"
+    },
+    {
+      "id": "AP3-UNQUALIFIED-logger",
+      "status": "PASS",
+      "kind": "synthetic unsupported-profile declaration; actual lab connection unused",
+      "file": "cli-r1.json"
+    },
+    {
+      "id": "AP3-UNQUALIFIED-session",
+      "status": "PASS",
+      "kind": "synthetic unsupported-profile declaration; actual lab connection unused",
+      "file": "cli-r1.json"
+    },
+    {
+      "id": "AP3-FOREIGN-1568",
+      "status": "PASS",
+      "kind": "real foreign physical transaction, Core logical0",
+      "file": "cli-r1.json"
+    },
+    {
+      "id": "AP3-LOST-COMMIT",
+      "status": "PASS",
+      "kind": "real MySQL server reply discarded by isolated proxy",
+      "file": "lost-COMMIT.json"
+    },
+    {
+      "id": "AP3-LOST-ROLLBACK",
+      "status": "PASS",
+      "kind": "real MySQL server reply discarded by isolated proxy",
+      "file": "lost-ROLLBACK.json"
+    },
+    {
+      "id": "HTTP_NO_CHAIN_COMMIT",
+      "status": "PASS",
+      "kind": "real authenticated HTTP/Core/session with restricted artificial lab DML; fault annotations in case",
+      "file": "HTTP_NO_CHAIN_COMMIT.json"
+    },
+    {
+      "id": "HTTP_NO_CHAIN_ROLLBACK",
+      "status": "PASS",
+      "kind": "real authenticated HTTP/Core/session with restricted artificial lab DML; fault annotations in case",
+      "file": "HTTP_NO_CHAIN_ROLLBACK.json"
+    },
+    {
+      "id": "HTTP_CHAIN_COMMIT",
+      "status": "PASS",
+      "kind": "real authenticated HTTP/Core/session with restricted artificial lab DML; fault annotations in case",
+      "file": "HTTP_CHAIN_COMMIT.json"
+    },
+    {
+      "id": "HTTP_CHAIN_ROLLBACK",
+      "status": "PASS",
+      "kind": "real authenticated HTTP/Core/session with restricted artificial lab DML; fault annotations in case",
+      "file": "HTTP_CHAIN_ROLLBACK.json"
+    },
+    {
+      "id": "HTTP_RELEASE_COMMIT",
+      "status": "PASS",
+      "kind": "real authenticated HTTP/Core/session with restricted artificial lab DML; fault annotations in case",
+      "file": "HTTP_RELEASE_COMMIT.json"
+    },
+    {
+      "id": "HTTP_RELEASE_ROLLBACK",
+      "status": "PASS",
+      "kind": "real authenticated HTTP/Core/session with restricted artificial lab DML; fault annotations in case",
+      "file": "HTTP_RELEASE_ROLLBACK.json"
+    },
+    {
+      "id": "HTTP_CHECKPOINT_FAILURE",
+      "status": "PASS",
+      "kind": "real authenticated HTTP/Core/session with restricted artificial lab DML; fault annotations in case",
+      "file": "HTTP_CHECKPOINT_FAILURE.json"
+    },
+    {
+      "id": "HTTP_UNKNOWN_CLOSE",
+      "status": "PASS",
+      "kind": "real authenticated HTTP/Core/session with restricted artificial lab DML; fault annotations in case",
+      "file": "HTTP_UNKNOWN_CLOSE.json"
+    },
+    {
+      "id": "HTTP_UNREADABLE",
+      "status": "PASS",
+      "kind": "real authenticated HTTP/Core/session with restricted artificial lab DML; fault annotations in case",
+      "file": "HTTP_UNREADABLE.json"
+    }
+  ],
+  "independent_gate_acceptance": "PENDING",
+  "CF02_contribution_DML": "NOT AUTHORIZED"
+}

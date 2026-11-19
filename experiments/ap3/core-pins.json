@@ -1,0 +1,14 @@
+{
+  "main.inc.php": "b08e91a5f916f464a2b2f481042196ca120f9c503cb4ecba2db810c3f394e034",
+  "filefunc.inc.php": "254bcfc82a50133b120e42a3dbe0bc978280de012a58bec6807efb183116d629",
+  "master.inc.php": "da7360e0c006c47f26785c81a7a14360bdd6a189cfd7bd69c6bd2ca894794fea",
+  "core/db/DoliDB.class.php": "fff88cb62729ee68784530c832ba73dc13d7103d16bebb0a41c2a4eaedb99c97",
+  "core/db/mysqli.class.php": "828853c0f252b81529e0eb829a7460e73edf88c4ed1b7ea49ba475a8122d1d3e",
+  "core/lib/functions.lib.php": "b88b148fda12377d71b6324b03b11fa97043ef9eba9ef2d890c8a3d05834c1d1",
+  "core/lib/date.lib.php": "ab2cab2c0a4cb0387d7b589fa5d89fb3c30c827443b668061261b970be3537b0",
+  "core/lib/files.lib.php": "1d6040fda9c03428fa32e8f9f93d6ccc5062e509fd4789f350ff7acf30476137",
+  "core/class/conf.class.php": "7673bdb6a17ea16565c02093679d2d1345ff66db6a6a01058500a5ac29f851a4",
+  "core/class/translate.class.php": "d36f94c74121aaa39bb60a8ccf689f6134eb3cb4d11048be3cd2b41afa8a3713",
+  "core/modules/syslog/logHandler.php": "020617f7761cc3a6b9dbf0ff2da001f53d499ea26234dd2565102ece49db0ff2",
+  "core/modules/syslog/mod_syslog_file.php": "3b7c6fa701b5a094003ef1ecbd195f4e93fc8539ba13108910bad800bd521b1a"
+}

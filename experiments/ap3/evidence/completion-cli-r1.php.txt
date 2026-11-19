@@ -1,0 +1,60 @@
+<?php
+/* SPDX-License-Identifier: GPL-3.0-or-later; experimental policy/orchestration only. */
+require_once __DIR__.'/core.php';
+class Ap3Completion
+{
+ private $sample=0;private $db;private $fault;
+ public function __construct($db,$fault='') {$this->db=$db;$this->fault=$fault;}
+ private function observe()
+ {
+  $this->sample++;$r=$this->db->query('SELECT @@SESSION.completion_type AS completion');
+  if(!$r)return null;$row=$this->db->fetch_object($r);$this->db->free($r);$v=$row->completion??null;
+  // Classification-only fault stimuli; never SET/rewrite session configuration.
+  if($this->fault==='unreadable')$v=null;
+  if($this->fault==='malformed')$v='unsupported-observation';
+  if($this->fault==='inconsistent'&&$this->sample===1)$v='NO_CHAIN';
+  return in_array($v,array('NO_CHAIN','CHAIN','RELEASE'),true)?$v:null;
+ }
+ public function member($id,$end,callable $checkpoint)
+ {
+  $d=$this->db;$logger=ap3LoggerProfile();
+  if(!$logger['supported'])return array('member'=>'NOT_PROCESSED','batch'=>'STOP','reason'=>'unqualified_logger','end_ack'=>false);
+  $first=$this->observe();$native=$d->db;$identity=$native->connectionId;
+  if($d->transaction_opened!==0)return array('member'=>'NOT_PROCESSED','batch'=>'STOP','reason'=>'foreign_logical_depth','end_ack'=>false);
+  // Preflight is complete; no SQL or callback between successful SET and Core BEGIN.
+  $set=$d->query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ');$errno=$native->errno;
+  if(!$set)return array('member'=>'UNKNOWN','batch'=>'STOP','reason'=>'entry_failure','native_errno'=>$errno,'end_ack'=>false);
+  $begin=$d->begin();
+  if($begin!==1||$d->transaction_opened!==1||$native!==$d->db||$identity!==$native->connectionId)return array('member'=>'UNKNOWN','batch'=>'STOP','reason'=>'begin_uncertain','end_ack'=>false);
+  ap3Rows($d,'SELECT n FROM probe WHERE id='.$id.' FOR UPDATE');ap3Q($d,'UPDATE probe SET n=1 WHERE id='.$id);
+  $last=$this->observe();$continue=$first==='NO_CHAIN'&&$last==='NO_CHAIN';
+  Ap3Trace::event('pre_end_plan',array('connection'=>$identity,'initial'=>$first,'last'=>$last,'continue'=>$continue,'fault'=>$this->fault));
+  $ret=null;$exception=null;$nativeError=null;
+  if($this->fault==='close_before_end'){$native->close();$d->connected=false;}
+  try{$ret=$d->$end();$nativeError=$native->errno;}catch(Throwable $e){$exception=get_class($e);}
+  $acked=(bool)$ret&&$exception===null&&$d->transaction_opened===0;
+  $member=$acked?($end==='commit'?'SUCCESS':'ROLLBACK_ACKNOWLEDGED'):'UNKNOWN';
+  $state=array('fixture'=>$id,'operation'=>$end,'member'=>$member,'batch'=>$acked&&$continue?'CONTINUE':'STOP','end_ack'=>$acked,'Core_return'=>$ret,'Core_depth'=>$d->transaction_opened,'native_errno'=>$nativeError,'exception'=>$exception,'classification'=>array($first,$last),'checkpoint'=>null);
+  // Local-only state decision IMMEDIATELY on Core return, before any callback/SQL.
+  Ap3Trace::event('end_decision',array('member'=>$member,'batch'=>$state['batch'],'ack'=>$acked,'connection'=>$identity));
+  $saved=false;try{$saved=$checkpoint($state);}catch(Throwable $e){$state['checkpoint_error']=get_class($e);}
+  $state['checkpoint']=(bool)$saved;
+  if(!$saved){$state['batch']='STOP';$state['reason']='checkpoint_failure_DB_outcome_preserved';}
+  Ap3Trace::event('checkpoint_result',array('ok'=>(bool)$saved,'member'=>$member,'batch'=>$state['batch']));
+  if($state['batch']==='CONTINUE'){$native->allowNext=true;$native->afterEnd=false;}
+  return $state;
+ }
+}
+function ap3Batch($d,array $ids,$firstEnd,callable $checkpoint,$fault='',$sessionQualified=true)
+{
+ $results=array();$stopped=false;$policy=new Ap3Completion($d,$fault);
+ if(!$sessionQualified||!ap3LoggerProfile()['supported']){foreach($ids as $id)$results[$id]=array('member'=>'NOT_PROCESSED','batch'=>'STOP','reason'=>!$sessionQualified?'unqualified_session':'unqualified_logger');return array('results'=>$results,'batch'=>'STOP','next_preflight_calls'=>0,'mail_calls'=>0,'pdf_calls'=>0);}
+ $calls=0;
+ foreach($ids as $i=>$id){
+  if($stopped){$results[$id]=array('member'=>'NOT_PROCESSED','batch'=>'STOP','reason'=>'terminal_batch');continue;}
+  $calls++;Ap3Trace::event('member_preflight',array('fixture'=>$id));
+  ap3Rows($d,'SELECT n FROM probe WHERE id='.$id); // Surrogate next-member/config preflight, not a product profile query.
+  $result=$policy->member($id,$i===0?$firstEnd:'commit',$checkpoint);$results[$id]=$result;$stopped=$result['batch']==='STOP';
+ }
+ return array('results'=>$results,'batch'=>$stopped?'STOP':'CONTINUE','next_preflight_calls'=>$calls,'mail_calls'=>0,'pdf_calls'=>0,'fault'=>$fault);
+}

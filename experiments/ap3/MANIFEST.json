@@ -1,0 +1,290 @@
+{
+  "schema": 1,
+  "base": "c79830976a5f1e1bd57d51005ff34c10c424e36f",
+  "status": "AP3 EVIDENCE PREPARED; INDEPENDENT COMPLETION GATE REVIEW PENDING",
+  "groups": {
+    "G1": "PARTIAL",
+    "G2": "PASS",
+    "G3": "PASS",
+    "G4": "PASS",
+    "G5": "PASS",
+    "G6": "PARTIAL"
+  },
+  "files": [
+    {
+      "path": "docs/ap3-completion-gate-v1.md",
+      "bytes": 14333,
+      "sha256": "ea853bbd48639d32a043c6885d42df4c2a794eedfe94a78547fdf922934001df"
+    },
+    {
+      "path": "experiments/ap3/OWNER-HTTP-R1.txt",
+      "bytes": 1549,
+      "sha256": "53b0ffb8d89ad3ffec0d7cb6b707cc47af7ff01a4d940d0708c2730e7bea5c16"
+    },
+    {
+      "path": "experiments/ap3/OWNER-HTTP.txt",
+      "bytes": 3696,
+      "sha256": "2ac88521b42f9cdc5c94748a434e59362931ade8be91f59f2bc51a1df68f2050"
+    },
+    {
+      "path": "experiments/ap3/README.md",
+      "bytes": 3999,
+      "sha256": "7c6c27bff095612dcbcbadc70373013860082010e9e132b282f4cc492c54d109"
+    },
+    {
+      "path": "experiments/ap3/audit.php",
+      "bytes": 1545,
+      "sha256": "57be792a5615b7e522bf93a312e4823e1d59a8f8ca5c6b31752ce055c50dd1e1"
+    },
+    {
+      "path": "experiments/ap3/cli.php",
+      "bytes": 6442,
+      "sha256": "d6996704c23dc658e48566703413cd876e2681758c83231147d960a63c001686"
+    },
+    {
+      "path": "experiments/ap3/completion.php",
+      "bytes": 4648,
+      "sha256": "bf32acaf250925fef004c2363f969a87f130fa2cb790bf0438e693478aadff47"
+    },
+    {
+      "path": "experiments/ap3/core-pins.json",
+      "bytes": 1178,
+      "sha256": "5581b073c2478ee0ef355128bc413fbd876424da6caa8b70b2aa7e39074dc291"
+    },
+    {
+      "path": "experiments/ap3/core.php",
+      "bytes": 7910,
+      "sha256": "d5a74614d1ea68ab27c849b4f099c29c3062f0b252800a3139631ac9ee9eb39e"
+    },
+    {
+      "path": "experiments/ap3/evidence/HTTP-OWNER-R1-result.json",
+      "bytes": 10218,
+      "sha256": "2f4e064b48b31df81fec7fd99e1eee0234adeb8faa4ecd09ee37dbe3714dd1b8"
+    },
+    {
+      "path": "experiments/ap3/evidence/HTTP-OWNER-R1.started",
+      "bytes": 96,
+      "sha256": "a448a39d9a2f0cfdea4feea0a906d1970156d447eb5d403c2d7628b53020d085"
+    },
+    {
+      "path": "experiments/ap3/evidence/HTTP-OWNER-result.json",
+      "bytes": 322,
+      "sha256": "3b378235cc5f8f2b6fe8855bb21b2397993ef5f7e0fd116d89256660584dc90d"
+    },
+    {
+      "path": "experiments/ap3/evidence/HTTP-OWNER.started",
+      "bytes": 96,
+      "sha256": "a448a39d9a2f0cfdea4feea0a906d1970156d447eb5d403c2d7628b53020d085"
+    },
+    {
+      "path": "experiments/ap3/evidence/HTTP-R1-profile.json",
+      "bytes": 912,
+      "sha256": "d0a186b6c480497e3948b87e49b770b3708bb259a0d605159ec99991f6fefe98"
+    },
+    {
+      "path": "experiments/ap3/evidence/HTTP-R1-reference-after.json",
+      "bytes": 3621,
+      "sha256": "48e40f1651d17a6e4b10ddf8036ba5cedcea13a7e3a2c0d5f92893dc9ea5f8e0"
+    },
+    {
+      "path": "experiments/ap3/evidence/HTTP_CHAIN_COMMIT.json",
+      "bytes": 20959,
+      "sha256": "c7cbceb00ffc0d96e2f9b14765fab0a74637a7e4ac3cb8eef4767058127da968"
+    },
+    {
+      "path": "experiments/ap3/evidence/HTTP_CHAIN_ROLLBACK.json",
+      "bytes": 21162,
+      "sha256": "9083fb48f3a090baef6758a6c9f4fd7191bc5f8651ae62405eb52211ff5abac3"
+    },
+    {
+      "path": "experiments/ap3/evidence/HTTP_CHECKPOINT_FAILURE.json",
+      "bytes": 21182,
+      "sha256": "43c88fc90b803efa6ae5cdd91a9fa67d67859616ec53dba9babbbc991217fc0c"
+    },
+    {
+      "path": "experiments/ap3/evidence/HTTP_NO_CHAIN_COMMIT.json",
+      "bytes": 41220,
+      "sha256": "0a1e2f24a11d9a57fa62c917148327a80397124656163d224c766859b3ac6090"
+    },
+    {
+      "path": "experiments/ap3/evidence/HTTP_NO_CHAIN_ROLLBACK.json",
+      "bytes": 41531,
+      "sha256": "2403c1e1a00a7cdc9aa55490a61d8b7a125b07a063e09bd382b125a57f4d8c24"
+    },
+    {
+      "path": "experiments/ap3/evidence/HTTP_RELEASE_COMMIT.json",
+      "bytes": 21105,
+      "sha256": "6eec7c9008d7637a0ed42f43361233febad19be5fc07c087579374515bd9ee9c"
+    },
+    {
+      "path": "experiments/ap3/evidence/HTTP_RELEASE_ROLLBACK.json",
+      "bytes": 21302,
+      "sha256": "dbe2504d4f7f1c8d0537ff83554a1f4076808228c9d578619434639e97943d3b"
+    },
+    {
+      "path": "experiments/ap3/evidence/HTTP_UNKNOWN_CLOSE.json",
+      "bytes": 22221,
+      "sha256": "275eac02a8167152788414b0397cc3771b22933e7cc0ba1f622a0b0f233b2066"
+    },
+    {
+      "path": "experiments/ap3/evidence/HTTP_UNREADABLE.json",
+      "bytes": 20880,
+      "sha256": "f3ee22120981e733f05544324deb0cf2bf3b965053356a4854bcb926da482362"
+    },
+    {
+      "path": "experiments/ap3/evidence/OWNER-HTTP.txt.initial.txt",
+      "bytes": 3696,
+      "sha256": "2ac88521b42f9cdc5c94748a434e59362931ade8be91f59f2bc51a1df68f2050"
+    },
+    {
+      "path": "experiments/ap3/evidence/TEST-MATRIX.json",
+      "bytes": 8726,
+      "sha256": "a40635a3cf2c5869c3bad1ff9030cd443dda6bd727e8c1f5ebe6e59c99eb3b1d"
+    },
+    {
+      "path": "experiments/ap3/evidence/audit-before-http-r1.json",
+      "bytes": 6996,
+      "sha256": "bed4c2a32a38154642509ae03e9cb6e2460973bfaf8e97c37e7fced2891bac04"
+    },
+    {
+      "path": "experiments/ap3/evidence/audit-final.json",
+      "bytes": 10137,
+      "sha256": "aad0c5a062a32db11917dcb0796cd2bf604238c8a1ba8e16817a80519f5fcc92"
+    },
+    {
+      "path": "experiments/ap3/evidence/cli-r1.json",
+      "bytes": 807078,
+      "sha256": "26312d1645138356e92ebf631fe59c3c9503318cd58a7570b4c45e888a921083"
+    },
+    {
+      "path": "experiments/ap3/evidence/cli-r1.json.started",
+      "bytes": 72,
+      "sha256": "c43ae1f2ac131e8f228b09e152518b3dc55ff4906d9ec572a4ede984e167eed4"
+    },
+    {
+      "path": "experiments/ap3/evidence/cli.json",
+      "bytes": 1466,
+      "sha256": "d4ee0ef44bb6bf91a8ab6441bf91d12de461e09caf3bd24faf2e9b4eaae25d58"
+    },
+    {
+      "path": "experiments/ap3/evidence/cli.json.started",
+      "bytes": 72,
+      "sha256": "c43ae1f2ac131e8f228b09e152518b3dc55ff4906d9ec572a4ede984e167eed4"
+    },
+    {
+      "path": "experiments/ap3/evidence/completion-cli-r1.php.txt",
+      "bytes": 4584,
+      "sha256": "606a9ac9f5229930f44fd8e07d5163a7c3c9b0b9a4de7192879225c83b79cb51"
+    },
+    {
+      "path": "experiments/ap3/evidence/core-before-monitor-fix.php.txt",
+      "bytes": 7579,
+      "sha256": "32f1a147f528ee31f5780ce665f7c85400223c42009beeb437d8bb5ad10fdf63"
+    },
+    {
+      "path": "experiments/ap3/evidence/core-cli-r1.php.txt",
+      "bytes": 7643,
+      "sha256": "ddc4a1cedc5b665f93f327b197dac2ca172c448bbfdb6713d01b3985b9b5c50e"
+    },
+    {
+      "path": "experiments/ap3/evidence/http-router.php.initial.txt",
+      "bytes": 7338,
+      "sha256": "74e6523aba1364146ca6e26d3ada3ffdd5e29ae2af7cc404c6409dcdbe48ef74"
+    },
+    {
+      "path": "experiments/ap3/evidence/inspection.json",
+      "bytes": 3828,
+      "sha256": "3ccd5f9047a46f0f6d34289e60d3c3cbefcea53e208ba16760ff945f738dde6a"
+    },
+    {
+      "path": "experiments/ap3/evidence/lost-COMMIT.json",
+      "bytes": 9896,
+      "sha256": "e0f8d5f080a1d32879bb18925250129d0a714cec28222e8d7017d02b169ebabc"
+    },
+    {
+      "path": "experiments/ap3/evidence/lost-COMMIT.json.started",
+      "bytes": 67,
+      "sha256": "79e10fa586727c0bc2721d5080236e1686eaf4ef704ca0ed4cf8e2fe7189cd32"
+    },
+    {
+      "path": "experiments/ap3/evidence/lost-ROLLBACK.json",
+      "bytes": 9964,
+      "sha256": "23c9be7b85123bc8a13c81e74d1c86f17ecb04b64b7a02e8c6c8d3ff3ad593ea"
+    },
+    {
+      "path": "experiments/ap3/evidence/lost-ROLLBACK.json.started",
+      "bytes": 69,
+      "sha256": "24e40ebeb6899c7a58235653ab65b8a378cb169ad7d47c45d8cf437cf9c649d9"
+    },
+    {
+      "path": "experiments/ap3/evidence/owner-http-r1.py.executed.txt",
+      "bytes": 9677,
+      "sha256": "293141893c33c37d7e37ddab7869ccc1399224cb68ea755abecc69f01de27bce"
+    },
+    {
+      "path": "experiments/ap3/evidence/owner-http.py.initial.txt",
+      "bytes": 9090,
+      "sha256": "a20605780d13747233fdf1a357df598dd4427b072232bdbb0be1bd9be4673e23"
+    },
+    {
+      "path": "experiments/ap3/evidence/owner-server.php.initial.txt",
+      "bytes": 5424,
+      "sha256": "214c09f450f0762577f2d285bac0b44b6ea29d9829fc11f7845c14ffbdc1cbb6"
+    },
+    {
+      "path": "experiments/ap3/evidence/validation.json",
+      "bytes": 755,
+      "sha256": "ebbe84bdcfa34870aea3f92a3fef56c28d3c3a2d8c9cba1474c58ef6d0948f7a"
+    },
+    {
+      "path": "experiments/ap3/http-router-r1.php",
+      "bytes": 7359,
+      "sha256": "e8159a901e17099f87ca9d26169456d177a2694631e17206a249fecb10eb2397"
+    },
+    {
+      "path": "experiments/ap3/http-router.php",
+      "bytes": 7338,
+      "sha256": "74e6523aba1364146ca6e26d3ada3ffdd5e29ae2af7cc404c6409dcdbe48ef74"
+    },
+    {
+      "path": "experiments/ap3/inspect.php",
+      "bytes": 2083,
+      "sha256": "f54236be83db67b9f1965b227f444b5d9367bbad112001b36b91d6a361dcae45"
+    },
+    {
+      "path": "experiments/ap3/lost-ack.php",
+      "bytes": 2275,
+      "sha256": "90c51f532eaaf8607aada50b211131dffe6313059d9a662c456fa9cfd8918a5d"
+    },
+    {
+      "path": "experiments/ap3/lost-ack.py",
+      "bytes": 4755,
+      "sha256": "66dd78a57e54083b868dec96ef1804f466b21435621529402ff040309ac2e346"
+    },
+    {
+      "path": "experiments/ap3/owner-http-r1.py",
+      "bytes": 9680,
+      "sha256": "a1c7e880f9ee2413ac5ef12eec5a031b545e8c64a81880343218189b1586dfd3"
+    },
+    {
+      "path": "experiments/ap3/owner-http.py",
+      "bytes": 9090,
+      "sha256": "a20605780d13747233fdf1a357df598dd4427b072232bdbb0be1bd9be4673e23"
+    },
+    {
+      "path": "experiments/ap3/owner-server-r1.php",
+      "bytes": 6283,
+      "sha256": "8cadff4f8e9b9c257e17b0eb75ba7dceb1dfd50b1cfb83eb9efcc23b3f11e131"
+    },
+    {
+      "path": "experiments/ap3/owner-server.php",
+      "bytes": 5424,
+      "sha256": "214c09f450f0762577f2d285bac0b44b6ea29d9829fc11f7845c14ffbdc1cbb6"
+    },
+    {
+      "path": "experiments/ap3/verify.py",
+      "bytes": 7438,
+      "sha256": "66fc18a44bd346fef04dc4eb508fdba54b9fae714cc3f91cd7ae00b531e9ef01"
+    }
+  ]
+}

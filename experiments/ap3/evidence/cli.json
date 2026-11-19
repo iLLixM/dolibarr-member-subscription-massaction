@@ -1,0 +1,50 @@
+{
+    "status": "STOP",
+    "cases": [],
+    "failure": {
+        "class": "LogicException",
+        "reason": "Bad synthetic fixture"
+    },
+    "historical_rows_preserved": false,
+    "new_fixture_range": [
+        6000,
+        6002
+    ],
+    "logger_profile": {
+        "supported": true,
+        "classes": [
+            {
+                "class": "mod_syslog_file",
+                "source": "core/modules/syslog/mod_syslog_file.php",
+                "sha256": "3b7c6fa701b5a094003ef1ecbd195f4e93fc8539ba13108910bad800bd521b1a"
+            }
+        ],
+        "level": 7,
+        "syslog_enabled": true,
+        "scope": "Exact pinned standard file logger only; no blanket third-party logger qualification"
+    },
+    "trace": [
+        {
+            "case": "inspect",
+            "event": "sql",
+            "time": 1795043829.375982,
+            "role": "independent",
+            "connection": 161,
+            "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+            "started": 1795043829.374193,
+            "ok": true,
+            "errno": 0
+        },
+        {
+            "case": "inspect",
+            "event": "sql",
+            "time": 1795043829.37796,
+            "role": "independent",
+            "connection": 161,
+            "sql": "SELECT id,label,n FROM probe ORDER BY id",
+            "started": 1795043829.376283,
+            "ok": true,
+            "errno": 0
+        }
+    ]
+}

@@ -1,0 +1,1723 @@
+{
+  "case": "HTTP_NO_CHAIN_ROLLBACK",
+  "status": "MEASURED",
+  "profile": {
+    "php": "8.2.35",
+    "sapi": "cli-server",
+    "dolibarr": "24.0.3",
+    "session_handler": "files",
+    "session_path_is_I105": true,
+    "logger": {
+      "supported": true,
+      "classes": [
+        {
+          "class": "mod_syslog_file",
+          "source": "core/modules/syslog/mod_syslog_file.php",
+          "sha256": "3b7c6fa701b5a094003ef1ecbd195f4e93fc8539ba13108910bad800bd521b1a"
+        }
+      ],
+      "level": 4,
+      "syslog_enabled": true,
+      "scope": "Exact pinned standard file logger only; no blanket third-party logger qualification"
+    },
+    "actor": 2,
+    "business_bootstrap": "genuine authenticated main.inc.php; no business API called"
+  },
+  "mode": "NO_CHAIN",
+  "operation": "rollback",
+  "fault": "",
+  "fixtures": [
+    6203,
+    6204,
+    6205
+  ],
+  "result": {
+    "results": {
+      "6203": {
+        "fixture": 6203,
+        "operation": "rollback",
+        "member": "ROLLBACK_ACKNOWLEDGED",
+        "batch": "CONTINUE",
+        "end_ack": true,
+        "Core_return": true,
+        "Core_depth": 0,
+        "native_errno": 0,
+        "exception": null,
+        "classification": [
+          "NO_CHAIN",
+          "NO_CHAIN"
+        ],
+        "checkpoint": true
+      },
+      "6204": {
+        "fixture": 6204,
+        "operation": "commit",
+        "member": "SUCCESS",
+        "batch": "CONTINUE",
+        "end_ack": true,
+        "Core_return": 1,
+        "Core_depth": 0,
+        "native_errno": 0,
+        "exception": null,
+        "classification": [
+          "NO_CHAIN",
+          "NO_CHAIN"
+        ],
+        "checkpoint": true
+      },
+      "6205": {
+        "fixture": 6205,
+        "operation": "commit",
+        "member": "SUCCESS",
+        "batch": "CONTINUE",
+        "end_ack": true,
+        "Core_return": 1,
+        "Core_depth": 0,
+        "native_errno": 0,
+        "exception": null,
+        "classification": [
+          "NO_CHAIN",
+          "NO_CHAIN"
+        ],
+        "checkpoint": true
+      }
+    },
+    "batch": "CONTINUE",
+    "next_preflight_calls": 3,
+    "mail_calls": 0,
+    "pdf_calls": 0,
+    "fault": ""
+  },
+  "persisted": {
+    "6203": 0,
+    "6204": 1,
+    "6205": 1
+  },
+  "monitor": [
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 235
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 235
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 222
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 223
+    },
+    {
+      "function": "LogHandler->setIdent",
+      "source": "core/lib/functions.lib.php",
+      "line": 2910
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 267
+    },
+    {
+      "function": "LogHandler->setIdent",
+      "source": "core/lib/functions.lib.php",
+      "line": 2779
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 271
+    },
+    {
+      "function": "session_start",
+      "source": "http-router-r1.php",
+      "line": 59
+    },
+    {
+      "function": "session_write_close",
+      "source": "http-router-r1.php",
+      "line": 65
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 222
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 223
+    },
+    {
+      "function": "LogHandler->setIdent",
+      "source": "core/lib/functions.lib.php",
+      "line": 2910
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 243
+    },
+    {
+      "function": "LogHandler->setIdent",
+      "source": "core/lib/functions.lib.php",
+      "line": 2779
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 248
+    },
+    {
+      "function": "session_start",
+      "source": "http-router-r1.php",
+      "line": 59
+    },
+    {
+      "function": "session_write_close",
+      "source": "http-router-r1.php",
+      "line": 65
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 222
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 223
+    },
+    {
+      "function": "LogHandler->setIdent",
+      "source": "core/lib/functions.lib.php",
+      "line": 2910
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 243
+    },
+    {
+      "function": "LogHandler->setIdent",
+      "source": "core/lib/functions.lib.php",
+      "line": 2779
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 248
+    },
+    {
+      "function": "session_start",
+      "source": "http-router-r1.php",
+      "line": 59
+    },
+    {
+      "function": "session_write_close",
+      "source": "http-router-r1.php",
+      "line": 65
+    }
+  ],
+  "monitor_after_last_physical_ack": [
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 248
+    },
+    {
+      "function": "session_start",
+      "source": "http-router-r1.php",
+      "line": 59
+    },
+    {
+      "function": "session_write_close",
+      "source": "http-router-r1.php",
+      "line": 65
+    }
+  ],
+  "trace": [
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.542491,
+      "role": "independent",
+      "connection": 205,
+      "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+      "started": 1795044923.541035,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.562343,
+      "role": "independent",
+      "connection": 205,
+      "sql": "INSERT INTO probe VALUES (6203,'AP3-HTTP-NO-CHAIN-ROLLBACK',0)",
+      "started": 1795044923.542586,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.574919,
+      "role": "independent",
+      "connection": 205,
+      "sql": "INSERT INTO probe VALUES (6204,'AP3-HTTP-NO-CHAIN-ROLLBACK',0)",
+      "started": 1795044923.562402,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.592147,
+      "role": "independent",
+      "connection": 205,
+      "sql": "INSERT INTO probe VALUES (6205,'AP3-HTTP-NO-CHAIN-ROLLBACK',0)",
+      "started": 1795044923.575006,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.601696,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+      "started": 1795044923.599613,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "initial_test_stimulus",
+      "time": 1795044923.601755,
+      "mode": "NO_CHAIN",
+      "authorization": "Owner: initial new lab connections only; no adapter normalization"
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.603375,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SET SESSION completion_type='NO_CHAIN'",
+      "started": 1795044923.601811,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "member_preflight",
+      "time": 1795044923.603516,
+      "fixture": 6203
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.60593,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT n FROM probe WHERE id=6203",
+      "started": 1795044923.603534,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.60822,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT @@SESSION.completion_type AS completion",
+      "started": 1795044923.606122,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.609443,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+      "started": 1795044923.608301,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.61191,
+      "role": "lab",
+      "connection": 206,
+      "sql": "BEGIN",
+      "started": 1795044923.60949,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.613279,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT n FROM probe WHERE id=6203 FOR UPDATE",
+      "started": 1795044923.611999,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.616026,
+      "role": "lab",
+      "connection": 206,
+      "sql": "UPDATE probe SET n=1 WHERE id=6203",
+      "started": 1795044923.613369,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.618393,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT @@SESSION.completion_type AS completion",
+      "started": 1795044923.616498,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "pre_end_plan",
+      "time": 1795044923.618434,
+      "connection": 206,
+      "initial": "NO_CHAIN",
+      "last": "NO_CHAIN",
+      "continue": true,
+      "fault": ""
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.623821,
+      "role": "lab",
+      "connection": 206,
+      "sql": "ROLLBACK",
+      "started": 1795044923.618481,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "physical_end_ack",
+      "time": 1795044923.624052,
+      "connection": 206,
+      "operation": "ROLLBACK",
+      "monitor_count": 19
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "end_decision",
+      "time": 1795044923.624091,
+      "member": "ROLLBACK_ACKNOWLEDGED",
+      "batch": "CONTINUE",
+      "ack": true,
+      "connection": 206
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "session_checkpoint",
+      "time": 1795044923.624249,
+      "ok": true,
+      "handler": "files",
+      "uses_lab_connection": false
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "checkpoint_result",
+      "time": 1795044923.624252,
+      "ok": true,
+      "member": "ROLLBACK_ACKNOWLEDGED",
+      "batch": "CONTINUE"
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "member_preflight",
+      "time": 1795044923.624258,
+      "fixture": 6204
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.62541,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT n FROM probe WHERE id=6204",
+      "started": 1795044923.624283,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.626788,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT @@SESSION.completion_type AS completion",
+      "started": 1795044923.625617,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.627982,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+      "started": 1795044923.626834,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.629233,
+      "role": "lab",
+      "connection": 206,
+      "sql": "BEGIN",
+      "started": 1795044923.62801,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.631825,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT n FROM probe WHERE id=6204 FOR UPDATE",
+      "started": 1795044923.629312,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.633767,
+      "role": "lab",
+      "connection": 206,
+      "sql": "UPDATE probe SET n=1 WHERE id=6204",
+      "started": 1795044923.631914,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.636974,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT @@SESSION.completion_type AS completion",
+      "started": 1795044923.633817,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "pre_end_plan",
+      "time": 1795044923.637004,
+      "connection": 206,
+      "initial": "NO_CHAIN",
+      "last": "NO_CHAIN",
+      "continue": true,
+      "fault": ""
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.64809,
+      "role": "lab",
+      "connection": 206,
+      "sql": "COMMIT",
+      "started": 1795044923.637038,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "physical_end_ack",
+      "time": 1795044923.64812,
+      "connection": 206,
+      "operation": "COMMIT",
+      "monitor_count": 33
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "end_decision",
+      "time": 1795044923.64816,
+      "member": "SUCCESS",
+      "batch": "CONTINUE",
+      "ack": true,
+      "connection": 206
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "session_checkpoint",
+      "time": 1795044923.648304,
+      "ok": true,
+      "handler": "files",
+      "uses_lab_connection": false
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "checkpoint_result",
+      "time": 1795044923.648308,
+      "ok": true,
+      "member": "SUCCESS",
+      "batch": "CONTINUE"
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "member_preflight",
+      "time": 1795044923.648312,
+      "fixture": 6205
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.650576,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT n FROM probe WHERE id=6205",
+      "started": 1795044923.648337,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.65248,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT @@SESSION.completion_type AS completion",
+      "started": 1795044923.650752,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.654331,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+      "started": 1795044923.652564,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.655209,
+      "role": "lab",
+      "connection": 206,
+      "sql": "BEGIN",
+      "started": 1795044923.65436,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.657224,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT n FROM probe WHERE id=6205 FOR UPDATE",
+      "started": 1795044923.655281,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.660804,
+      "role": "lab",
+      "connection": 206,
+      "sql": "UPDATE probe SET n=1 WHERE id=6205",
+      "started": 1795044923.657498,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.662133,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT @@SESSION.completion_type AS completion",
+      "started": 1795044923.6609,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "pre_end_plan",
+      "time": 1795044923.662173,
+      "connection": 206,
+      "initial": "NO_CHAIN",
+      "last": "NO_CHAIN",
+      "continue": true,
+      "fault": ""
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.673168,
+      "role": "lab",
+      "connection": 206,
+      "sql": "COMMIT",
+      "started": 1795044923.662213,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "physical_end_ack",
+      "time": 1795044923.673206,
+      "connection": 206,
+      "operation": "COMMIT",
+      "monitor_count": 47
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "end_decision",
+      "time": 1795044923.673251,
+      "member": "SUCCESS",
+      "batch": "CONTINUE",
+      "ack": true,
+      "connection": 206
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "session_checkpoint",
+      "time": 1795044923.673422,
+      "ok": true,
+      "handler": "files",
+      "uses_lab_connection": false
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "checkpoint_result",
+      "time": 1795044923.673425,
+      "ok": true,
+      "member": "SUCCESS",
+      "batch": "CONTINUE"
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.676016,
+      "role": "independent",
+      "connection": 205,
+      "sql": "SELECT n FROM probe WHERE id=6203",
+      "started": 1795044923.673505,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.677393,
+      "role": "independent",
+      "connection": 205,
+      "sql": "SELECT n FROM probe WHERE id=6204",
+      "started": 1795044923.676081,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.679735,
+      "role": "independent",
+      "connection": 205,
+      "sql": "SELECT n FROM probe WHERE id=6205",
+      "started": 1795044923.67747,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "native_close",
+      "time": 1795044923.679784,
+      "role": "independent",
+      "connection": 205
+    }
+  ],
+  "real_scope": "authenticated main.inc.php plus restricted artificial lab transactions; no contributions/customer/invoice/mail/PDF",
+  "shutdown_trace": [
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.542491,
+      "role": "independent",
+      "connection": 205,
+      "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+      "started": 1795044923.541035,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.562343,
+      "role": "independent",
+      "connection": 205,
+      "sql": "INSERT INTO probe VALUES (6203,'AP3-HTTP-NO-CHAIN-ROLLBACK',0)",
+      "started": 1795044923.542586,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.574919,
+      "role": "independent",
+      "connection": 205,
+      "sql": "INSERT INTO probe VALUES (6204,'AP3-HTTP-NO-CHAIN-ROLLBACK',0)",
+      "started": 1795044923.562402,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.592147,
+      "role": "independent",
+      "connection": 205,
+      "sql": "INSERT INTO probe VALUES (6205,'AP3-HTTP-NO-CHAIN-ROLLBACK',0)",
+      "started": 1795044923.575006,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.601696,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac",
+      "started": 1795044923.599613,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "initial_test_stimulus",
+      "time": 1795044923.601755,
+      "mode": "NO_CHAIN",
+      "authorization": "Owner: initial new lab connections only; no adapter normalization"
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.603375,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SET SESSION completion_type='NO_CHAIN'",
+      "started": 1795044923.601811,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "member_preflight",
+      "time": 1795044923.603516,
+      "fixture": 6203
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.60593,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT n FROM probe WHERE id=6203",
+      "started": 1795044923.603534,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.60822,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT @@SESSION.completion_type AS completion",
+      "started": 1795044923.606122,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.609443,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+      "started": 1795044923.608301,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.61191,
+      "role": "lab",
+      "connection": 206,
+      "sql": "BEGIN",
+      "started": 1795044923.60949,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.613279,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT n FROM probe WHERE id=6203 FOR UPDATE",
+      "started": 1795044923.611999,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.616026,
+      "role": "lab",
+      "connection": 206,
+      "sql": "UPDATE probe SET n=1 WHERE id=6203",
+      "started": 1795044923.613369,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.618393,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT @@SESSION.completion_type AS completion",
+      "started": 1795044923.616498,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "pre_end_plan",
+      "time": 1795044923.618434,
+      "connection": 206,
+      "initial": "NO_CHAIN",
+      "last": "NO_CHAIN",
+      "continue": true,
+      "fault": ""
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.623821,
+      "role": "lab",
+      "connection": 206,
+      "sql": "ROLLBACK",
+      "started": 1795044923.618481,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "physical_end_ack",
+      "time": 1795044923.624052,
+      "connection": 206,
+      "operation": "ROLLBACK",
+      "monitor_count": 19
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "end_decision",
+      "time": 1795044923.624091,
+      "member": "ROLLBACK_ACKNOWLEDGED",
+      "batch": "CONTINUE",
+      "ack": true,
+      "connection": 206
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "session_checkpoint",
+      "time": 1795044923.624249,
+      "ok": true,
+      "handler": "files",
+      "uses_lab_connection": false
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "checkpoint_result",
+      "time": 1795044923.624252,
+      "ok": true,
+      "member": "ROLLBACK_ACKNOWLEDGED",
+      "batch": "CONTINUE"
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "member_preflight",
+      "time": 1795044923.624258,
+      "fixture": 6204
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.62541,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT n FROM probe WHERE id=6204",
+      "started": 1795044923.624283,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.626788,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT @@SESSION.completion_type AS completion",
+      "started": 1795044923.625617,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.627982,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+      "started": 1795044923.626834,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.629233,
+      "role": "lab",
+      "connection": 206,
+      "sql": "BEGIN",
+      "started": 1795044923.62801,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.631825,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT n FROM probe WHERE id=6204 FOR UPDATE",
+      "started": 1795044923.629312,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.633767,
+      "role": "lab",
+      "connection": 206,
+      "sql": "UPDATE probe SET n=1 WHERE id=6204",
+      "started": 1795044923.631914,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.636974,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT @@SESSION.completion_type AS completion",
+      "started": 1795044923.633817,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "pre_end_plan",
+      "time": 1795044923.637004,
+      "connection": 206,
+      "initial": "NO_CHAIN",
+      "last": "NO_CHAIN",
+      "continue": true,
+      "fault": ""
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.64809,
+      "role": "lab",
+      "connection": 206,
+      "sql": "COMMIT",
+      "started": 1795044923.637038,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "physical_end_ack",
+      "time": 1795044923.64812,
+      "connection": 206,
+      "operation": "COMMIT",
+      "monitor_count": 33
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "end_decision",
+      "time": 1795044923.64816,
+      "member": "SUCCESS",
+      "batch": "CONTINUE",
+      "ack": true,
+      "connection": 206
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "session_checkpoint",
+      "time": 1795044923.648304,
+      "ok": true,
+      "handler": "files",
+      "uses_lab_connection": false
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "checkpoint_result",
+      "time": 1795044923.648308,
+      "ok": true,
+      "member": "SUCCESS",
+      "batch": "CONTINUE"
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "member_preflight",
+      "time": 1795044923.648312,
+      "fixture": 6205
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.650576,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT n FROM probe WHERE id=6205",
+      "started": 1795044923.648337,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.65248,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT @@SESSION.completion_type AS completion",
+      "started": 1795044923.650752,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.654331,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ",
+      "started": 1795044923.652564,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.655209,
+      "role": "lab",
+      "connection": 206,
+      "sql": "BEGIN",
+      "started": 1795044923.65436,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.657224,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT n FROM probe WHERE id=6205 FOR UPDATE",
+      "started": 1795044923.655281,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.660804,
+      "role": "lab",
+      "connection": 206,
+      "sql": "UPDATE probe SET n=1 WHERE id=6205",
+      "started": 1795044923.657498,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.662133,
+      "role": "lab",
+      "connection": 206,
+      "sql": "SELECT @@SESSION.completion_type AS completion",
+      "started": 1795044923.6609,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "pre_end_plan",
+      "time": 1795044923.662173,
+      "connection": 206,
+      "initial": "NO_CHAIN",
+      "last": "NO_CHAIN",
+      "continue": true,
+      "fault": ""
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.673168,
+      "role": "lab",
+      "connection": 206,
+      "sql": "COMMIT",
+      "started": 1795044923.662213,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "physical_end_ack",
+      "time": 1795044923.673206,
+      "connection": 206,
+      "operation": "COMMIT",
+      "monitor_count": 47
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "end_decision",
+      "time": 1795044923.673251,
+      "member": "SUCCESS",
+      "batch": "CONTINUE",
+      "ack": true,
+      "connection": 206
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "session_checkpoint",
+      "time": 1795044923.673422,
+      "ok": true,
+      "handler": "files",
+      "uses_lab_connection": false
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "checkpoint_result",
+      "time": 1795044923.673425,
+      "ok": true,
+      "member": "SUCCESS",
+      "batch": "CONTINUE"
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.676016,
+      "role": "independent",
+      "connection": 205,
+      "sql": "SELECT n FROM probe WHERE id=6203",
+      "started": 1795044923.673505,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.677393,
+      "role": "independent",
+      "connection": 205,
+      "sql": "SELECT n FROM probe WHERE id=6204",
+      "started": 1795044923.676081,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "sql",
+      "time": 1795044923.679735,
+      "role": "independent",
+      "connection": 205,
+      "sql": "SELECT n FROM probe WHERE id=6205",
+      "started": 1795044923.67747,
+      "ok": true,
+      "errno": 0
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "native_close",
+      "time": 1795044923.679784,
+      "role": "independent",
+      "connection": 205
+    },
+    {
+      "case": "HTTP_NO_CHAIN_ROLLBACK",
+      "event": "native_close",
+      "time": 1795044923.680009,
+      "role": "lab",
+      "connection": 206
+    }
+  ],
+  "shutdown_monitor": [
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 235
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 235
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 222
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 223
+    },
+    {
+      "function": "LogHandler->setIdent",
+      "source": "core/lib/functions.lib.php",
+      "line": 2910
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 267
+    },
+    {
+      "function": "LogHandler->setIdent",
+      "source": "core/lib/functions.lib.php",
+      "line": 2779
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 271
+    },
+    {
+      "function": "session_start",
+      "source": "http-router-r1.php",
+      "line": 59
+    },
+    {
+      "function": "session_write_close",
+      "source": "http-router-r1.php",
+      "line": 65
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 222
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 223
+    },
+    {
+      "function": "LogHandler->setIdent",
+      "source": "core/lib/functions.lib.php",
+      "line": 2910
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 243
+    },
+    {
+      "function": "LogHandler->setIdent",
+      "source": "core/lib/functions.lib.php",
+      "line": 2779
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 248
+    },
+    {
+      "function": "session_start",
+      "source": "http-router-r1.php",
+      "line": 59
+    },
+    {
+      "function": "session_write_close",
+      "source": "http-router-r1.php",
+      "line": 65
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 222
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 223
+    },
+    {
+      "function": "LogHandler->setIdent",
+      "source": "core/lib/functions.lib.php",
+      "line": 2910
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 243
+    },
+    {
+      "function": "LogHandler->setIdent",
+      "source": "core/lib/functions.lib.php",
+      "line": 2779
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/DoliDB.class.php",
+      "line": 248
+    },
+    {
+      "function": "session_start",
+      "source": "http-router-r1.php",
+      "line": 59
+    },
+    {
+      "function": "session_write_close",
+      "source": "http-router-r1.php",
+      "line": 65
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/db/mysqli.class.php",
+      "line": 345
+    },
+    {
+      "function": "DoliDBMysqli->close",
+      "source": "http-router-r1.php",
+      "line": 70
+    },
+    {
+      "function": "Ap3Native->close",
+      "source": "core/db/mysqli.class.php",
+      "line": 314
+    },
+    {
+      "function": "dol_shutdown",
+      "source": "core/lib/functions.lib.php",
+      "line": 0
+    },
+    {
+      "function": "DoliDBMysqli->close",
+      "source": "core/lib/functions.lib.php",
+      "line": 881
+    },
+    {
+      "function": "Ap3Native->close",
+      "source": "core/db/mysqli.class.php",
+      "line": 314
+    },
+    {
+      "function": "dol_syslog",
+      "source": "core/lib/functions.lib.php",
+      "line": 883
+    }
+  ],
+  "session_status_at_shutdown": 1
+}
