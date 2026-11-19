@@ -42,8 +42,15 @@ class F28Languages extends Translate
 			if ($line !== '' && $line[0] !== '#' && strpos($line,'=') !== false) { list($k,$v)=explode('=',$line,2); $this->labels[$k]=$v; }
 		}
 	}
-	public function trans($key,...$args) { return $this->labels[$key] ?? parent::trans($key,...$args); }
-	public function transnoentities($key,...$args) { return $this->labels[$key] ?? parent::transnoentities($key,...$args); }
+	public function trans($key, $param1 = '', $param2 = '', $param3 = '', $param4 = '', $maxsize = 0)
+	{
+		return $this->labels[$key] ?? parent::trans($key, $param1, $param2, $param3, $param4, $maxsize);
+	}
+
+	public function transnoentities($key, $param1 = '', $param2 = '', $param3 = '', $param4 = '', $param5 = '')
+	{
+		return $this->labels[$key] ?? parent::transnoentities($key, $param1, $param2, $param3, $param4, $param5);
+	}
 }
 if (!function_exists('restrictedArea')) { function restrictedArea(...$args) { return 1; } }
 if (!function_exists('getEntity')) { function getEntity(...$args) { return '1'; } }
