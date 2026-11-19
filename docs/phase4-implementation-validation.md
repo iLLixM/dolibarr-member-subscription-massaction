@@ -1683,3 +1683,47 @@ base `c79830976a5f1e1bd57d51005ff34c10c424e36f`:
 No merge, real destructive test, productive Core-Guarded contribution DML, CF03
 business/Agenda/HTTP/replay/concurrency/V22/V23/Enhanced/MariaDB regression, ZIP,
 tag or release is performed or qualified by this follow-up.
+
+## F28-01 controller ordering correction — 2026-11-19
+
+Owner's finalization task accepts the external review at PR27 `2e794a87` /
+PR28 `75a531d9`: F27-02 **CLOSED WITH DOCUMENTED LIMITS**, F27-03 **CLOSED**;
+F27-04's bounded file-session/file-logger support provisionally accepted, with
+**direct service admission still a CF02 duty**. F27-01 remains a pre-DML obligation.
+PR27 is normally merged as `56ab0784be05ab866769a9674c961bd4198588a9` with its
+reviewed tree unchanged; reviewed push/PR and post-merge CI each21/21 PASS.
+The earlier finding-status statements above are historical review stages.
+
+F28-01 now checks CoreGuarded's actual runtime while the original confirmation
+session is still active. `msmConsumeConfirmation()` first validates replay/request
+shape on a **copy**; no consumed state is assigned or saved yet. Known session/
+logger refusal therefore retains confirmation, revision and rows, with the precise
+localized error flash. Only after that check and normal profile/database admission
+does the controller persist processing state and close the session. The same
+checkpoint object, bound before close, then rechecks the actual ID/path after close.
+No catch path restores a consumed confirmation after close or possible member DML.
+CSRF/profile/revision/entity/permission checks and disabled CoreGuarded features
+are unchanged; Enhanced/MariaDB do not acquire the CoreGuarded runtime restriction.
+
+`test/fixtures/controller-runtime.php` executes the **actual subscription.php
+body** in isolated CLI requests. It instruments the bootstrap, three constructed
+admission/service objects, header/session-close observation and layout helpers;
+it preserves the controller's branches, state assignments, catch and exit. Its
+synthetic admission permits exercising the future CoreGuarded handoff only inside
+the test process, without changing production feature flags. Native local PHP
+sessions are reopened by a separate GET/request. No protected config, DB or HTTP
+transport is used. Actual module EN labels are used for the visible-error check.
+
+`test/unit/controller-runtime.php` runs from the existing request CI runner:
+unsupported session handler/logger retain confirm/revision5 without UNKNOWN or
+service calls; redirected GET displays the specific diagnosis. Changed binding
+after close and a service fault after possible DML retain processing/revision6;
+replay with even a current revision cannot invoke the service. Legacy MariaDB and
+Enhanced success, CSRF and entity rejection remain covered. The existing
+`75a531d9` controller is also executed as a negative control: its known logger
+refusal incorrectly persists processing/UNKNOWN with no specific flash; corrected
+source retains confirmation and the precise flash. Evidence:
+`docs/evidence/f27/f28-controller-calls.json` and `f28-controller-regression.json`.
+This is reliable controller instrumentation, **not authenticated HTTP or real
+business-DML qualification**. Targeted independent verification of the new HEAD
+is still required; F28-01 is not independently self-closed.

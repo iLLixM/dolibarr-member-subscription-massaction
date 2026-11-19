@@ -339,3 +339,15 @@ new real contribution/Agenda tests are **NOT EXECUTED**. See the
 [F27 finding/gate matrix and independent delta-review assignment](phase4-implementation-validation.md#f27-pre-cf-02-dml-follow-up--2026-11-19).
 Historical AP3/D01 evidence is not rewritten; all six Issue22 gate tasks and
 CF02–CF05/release acceptance remain open. No change to the sole71-ID matrix.
+
+### F28-01 actual-controller ordering (2026-11-19)
+
+The request runner includes `test/unit/controller-runtime.php`. Isolated workers
+execute the real controller body with synthetic bootstrap/admission/services,
+native local file sessions and layout/header observation. They test known runtime
+refusal before consumption, localized redirected errors, no false pre-DML UNKNOWN,
+post-close binding checks, consumed replay after possible DML, legacy profiles and
+CSRF/entity protection. A negative control reproduces the old75a531d9 ordering bug.
+These30 assertions and sanitized traces are **instrumented controller evidence**,
+not real authenticated HTTP/Core-Guarded business DML. See the dated F28-01 section
+in `phase4-implementation-validation.md`; independent final-HEAD review is pending.

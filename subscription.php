@@ -99,7 +99,12 @@ if ($method === 'POST') {
 		$action = $_POST['action'] ?? null;
 		if ($action === 'book') {
 			if (($state['flash'] ?? '') === 'MSMProfileChanged') { throw new RuntimeException('MSMProfileChanged'); }
-			$ready = msmConsumeConfirmation($state, $_POST); // Reject consumed/replayed requests first.
+			$ready = msmConsumeConfirmation($state, $_POST); // Pure validation first; original session is still confirm.
+			$runtimeCheckpoint = null;
+			if (($state['profile']['profile'] ?? '') === 'CoreGuarded') {
+				MsmFileBookingCheckpoint::requireRuntime(); // Known refusal precedes durable consumption.
+				$runtimeCheckpoint = new MsmFileBookingCheckpoint($key);
+			}
 			msmRequireBookingDatabase($state, $databaseState, $bookingService, $profiles, $user);
 			$state = $ready;
 			$_SESSION['msm_previews'][$key] = $state;
@@ -117,9 +122,9 @@ if ($method === 'POST') {
 				$_SESSION['msm_previews'][$key] = $updated;
 				if (!session_write_close()) { throw new RuntimeException('MSMSessionFailure'); }
 			};
-			if (($state['profile']['profile'] ?? '') === 'CoreGuarded') {
-				MsmFileBookingCheckpoint::requireRuntime();
-				$save = new MsmFileBookingCheckpoint($key);
+			if ($runtimeCheckpoint !== null) {
+				$runtimeCheckpoint->requireBinding(); // Recheck actual ID/path after session close; never unconsume.
+				$save = $runtimeCheckpoint;
 			}
 			$save($state); // Read back consumed state before the first database side effect.
 			$state = msmProcessBooking($state, $bookingService, new MsmSubscriptionMail($db), $user, $save, new MsmInvoicePdfService($db));

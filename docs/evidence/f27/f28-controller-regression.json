@@ -1,0 +1,46 @@
+{
+  "kind": "old-source negative control and corrected actual-controller instrumentation",
+  "observations": [
+    {
+      "case": "logger",
+      "method": "POST",
+      "profile": "CoreGuarded",
+      "source_sha256": "8d973b72a69fe6bab186c216ae59c32bc0e48e399ab00b9d175f7840fe134383",
+      "phase": "processing",
+      "revision": 6,
+      "initial_phase": "confirm",
+      "flash": null,
+      "result_status": "unknown",
+      "book_calls": 0,
+      "events": [
+        "header",
+        "admission_spy",
+        "tables_spy",
+        "session_closed",
+        "redirect:303"
+      ],
+      "visible_specific_error": false,
+      "has_confirmation_form": false,
+      "reference": "75a531d9a81663f3c2241a2cb8e412503f3d373f"
+    },
+    {
+      "case": "logger",
+      "method": "POST",
+      "profile": "CoreGuarded",
+      "source_sha256": "2d9809ee00fc1a3ef67178e02a57b94029e96c2f2ff3544f0dbdf7f1005e3f82",
+      "phase": "confirm",
+      "revision": 5,
+      "initial_phase": "confirm",
+      "flash": "MSMCoreGuardedLoggerUnsupported",
+      "result_status": null,
+      "book_calls": 0,
+      "events": [
+        "header",
+        "redirect:303"
+      ],
+      "visible_specific_error": false,
+      "has_confirmation_form": false,
+      "reference": "corrected controller source"
+    }
+  ]
+}
