@@ -4,6 +4,7 @@
  */
 require_once __DIR__.'/invoiceprofile.class.php';
 require_once __DIR__.'/databasestate.class.php';
+require_once __DIR__.'/transactionprofile.class.php';
 /** Core business APIs only; the caller owns the outer transaction. */
 class MsmInvoiceService
 {
@@ -49,9 +50,18 @@ class MsmInvoiceService
 	{
 		return htmlspecialchars($description, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', true);
 	}
+	/** Directly callable service must recheck authoritative profile before any writes. */
+	protected function requireInvoiceAdmission()
+	{
+		global $conf;
+		$profile = new MsmTransactionProfile($this->db, $this->databaseState, (int) $conf->entity);
+		$current = $profile->current();
+		if (empty($current['features']['invoice']) || $current['reason'] !== '') { throw new RuntimeException('MSMProfileFeatureUnavailable'); }
+	}
 	public function create($member, $subscription, array $row, $actor, array &$diagnostic)
 	{
 		global $conf, $langs, $user;
+		$this->requireInvoiceAdmission();
 		$this->owned();
 		$plan = $row['invoice']; $diagnostic['stage'] = 'customer';
 		$customerid = (int) $plan['customer_id'];

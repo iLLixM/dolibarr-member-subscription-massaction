@@ -70,7 +70,7 @@ class BookingServiceDouble extends MsmBookingService
 	public $object; public $reader;
 	public function __construct($db, $state = null) { $this->profileDb = $db; parent::__construct($db, $state ?? new SyntheticDatabaseState($db)); }
 	public function observer() { return $this->databaseState; }
-	protected function currentUser($user) { return $user; }
+	protected function currentUser($user, $coreGuarded = false) { return $user; }
 	protected function member($id) { $this->object->id = $id; return $this->object; }
 	protected function preview($member) { return $this->reader; }
 }

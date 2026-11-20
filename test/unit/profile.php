@@ -76,7 +76,9 @@ foreach(array('', '{}', 'bad',profileRaw('mysql','invalid'),profileRaw('mariadb'
 }
 list($pd,$ps)=profileStore('mysql',profileRaw('mysql','CoreGuarded'));$pd->psDenied=true;
 $c=$ps->current();$b=$ps->binding($c,$user,0);
-fails(static function()use($ps,$b,$user){$ps->admit($b,$user,array('invoice'=>false));},'MSMCoreGuardedPending');
+verify($ps->admit($b,$user,array('invoice'=>false))['features']['booking'], 'CF02 CoreGuarded contributes without P_S');
+fails(static function()use($ps,$b,$user){$ps->admit($b,$user,array('invoice'=>true));},'MSMProfileFeatureUnavailable');
+fails(static function()use($ps,$b,$user){$ps->admit($b,$user,array('sendmail'=>true));},'MSMProfileFeatureUnavailable');
 verify(!array_filter($pd->queries,static function($q){return stripos($q,'performance_schema')!==false;}),'CF01 CoreGuarded blocked without P_S fallback');
 // Admin authorization/CSRF/field/family checks execute before config mutation.
 list($pd,$ps)=profileStore();$revision=$ps->current()['revision'];$session=array('token'=>'synthetic-csrf');
@@ -132,7 +134,7 @@ $old=profileState();$old['phase']='confirm';$old['revision']=7;
 $sync=msmSyncPreviewProfile($old,$ps,$user);
 verify($sync['phase']==='preview'&&$sync['revision']===8&&$sync['flash']==='MSMProfileChanged','CF01 old unbound confirmation needs fresh consent');
 $pd->profileRaw=profileRaw('mysql','CoreGuarded','c');$sync=msmSyncPreviewProfile($state,$ps,$user);
-verify($sync['phase']==='preview'&&$sync['revision']>$state['revision']&&$sync['profile_notice']==='MSMCoreGuardedPending','CF01 changed admin config invalidates pending confirmation');
+verify($sync['phase']==='preview'&&$sync['revision']>$state['revision']&&$sync['profile_notice']==='' ,'CF01 changed admin config invalidates pending confirmation');
 fails(static function()use($sync){msmConsumeConfirmation($sync,array('action'=>'book','revision'=>(string)$sync['revision']));},'MSMInvalidForm');
 foreach(array('done','processing')as $phase){$done=$state;$done['phase']=$phase;$pd->configDenied=true;$before=count($pd->queries);
 	verify(msmSyncPreviewProfile($done,$ps,$user)===$done&&count($pd->queries)===$before,'CF01 consumed result read bypasses profile storage');
@@ -144,7 +146,7 @@ foreach(array('CoreGuarded','EnhancedMySQL','MariaDBSnapshot') as $name){
 	$flow=new ProfileBookingFlow($pd);$flow->autoBindProfile=false;$flow->object=new BookingMemberDouble($pd);$flow->object->id=1;$flow->object->typeid=1;$flow->object->entity=1;
 	$flow->reader=new BookingPreviewDouble();$flow->reader->row=$row;$confirmed=$row;$confirmed['_profile']=$ps->binding($ps->current(),$user,0);
 	$result=$flow->book(1,$confirmed,$options,$user,false);
-	verify($name==='CoreGuarded'?$result['message']==='MSMCoreGuardedPending'&&$result['stop']&&empty($pd->events):$result['status']==='success','CF01 direct booking admission '.$name);
+	verify($name==='CoreGuarded'?$result['message']==='MSMCoreGuardedSessionUnsupported'&&$result['stop']&&empty($pd->events):$result['status']==='success','CF01 direct booking admission '.$name);
 	if($name!=='CoreGuarded'){
 		$pd->events=array();$result=$flow->book(2,$row,$options,$user,false);
 		verify($result['message']==='MSMProfileChanged'&&$result['stop']&&!$pd->events,'CF01 direct unbound booking refused');

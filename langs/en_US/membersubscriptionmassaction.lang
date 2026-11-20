@@ -129,9 +129,9 @@ MSMBatchLimitDetail=You selected %s members. The current maximum is %s per bulk 
 
 // CF-01 profile selection and readiness
 MSMProfileSetup=Transaction profile
-MSMProfileSetupHelp=Select the database profile explicitly for this entity. New MySQL installations should select Core-Guarded for future use; booking remains unavailable until its implementation and qualification are complete. Existing MySQL installations can explicitly retain Enhanced. Missing configuration does not prove a new installation. Each save invalidates old confirmations. No automatic fallback.
+MSMProfileSetupHelp=Select a database profile explicitly for this entity. Core-Guarded contribution-only booking in this development branch is not yet independently reviewed or real integration qualified; invoice/customer creation and mail remain disabled. Enhanced can be retained explicitly. A missing MySQL configuration requires an administrator choice. Every save invalidates old confirmations. No automatic fallback.
 MSMProfileSelect=Select a profile
-MSMProfileCoreGuarded=Core-Guarded (booking not yet available)
+MSMProfileCoreGuarded=Core-Guarded (contributions only; development qualification pending)
 MSMProfileEnhancedMySQL=Enhanced MySQL (Performance Schema required)
 MSMProfileMariaDBSnapshot=MariaDB Snapshot
 MSMProfileSelectionRequired=MySQL profile selection is required. An administrator must explicitly choose a profile in the module setup; missing configuration is not a new-installation signal. Preview remains read-only.

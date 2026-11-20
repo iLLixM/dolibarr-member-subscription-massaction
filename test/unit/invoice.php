@@ -78,6 +78,7 @@ class InvoiceCustomerDouble
 }
 class InvoiceServiceDouble extends MsmInvoiceService
 {
+	protected function requireInvoiceAdmission() {} // Synthetic tests use admitted Enhanced/MariaDB fixture.
 	protected function invoice() { return new InvoiceObjectDouble($this->db); }
 	protected function customer() { return new InvoiceCustomerDouble($this->db); }
 }

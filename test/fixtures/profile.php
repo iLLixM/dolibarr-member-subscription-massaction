@@ -21,9 +21,10 @@ class FixtureTransactionProfile extends MsmTransactionProfile
 		global $conf;
 		$raw = self::raw($db); $c = $raw === null ? array() : json_decode($raw, true);
 		$name = $c['profile'] ?? ($db->family === 'mariadb' ? 'MariaDBSnapshot' : '');
-		$enabled = in_array($name, array('EnhancedMySQL', 'MariaDBSnapshot'), true);
+		$enabled = in_array($name, array('CoreGuarded', 'EnhancedMySQL', 'MariaDBSnapshot'), true);
+		$extended = $enabled && $name !== 'CoreGuarded';
 		return array('family' => $db->family, 'profile' => $name, 'revision' => hash('sha256', $raw === null ? 'missing' : 'configured:'.$raw),
-			'features' => array('booking' => $enabled, 'invoice' => $enabled, 'autocreate' => $enabled, 'sendmail' => $enabled), 'owner' => (int) $user->id, 'entity' => (int) $conf->entity, 'confirmation_revision' => 0);
+			'features' => array('booking' => $enabled, 'invoice' => $extended, 'autocreate' => $extended, 'sendmail' => $extended), 'owner' => (int) $user->id, 'entity' => (int) $conf->entity, 'confirmation_revision' => 0);
 	}
 }
 trait ProfileBookingFixture
@@ -31,9 +32,9 @@ trait ProfileBookingFixture
 	protected $profileDb;
 	public $autoBindProfile = true;
 	protected function profiles() { global $conf; return new FixtureTransactionProfile($this->profileDb, $this->databaseState, (int) $conf->entity); }
-	public function book($id, array $expected, array $options, $user, $overlapConfirmed)
+	public function book($id, array $expected, array $options, $user, $overlapConfirmed, $checkpoint = null)
 	{
 		if ($this->autoBindProfile && !isset($expected['_profile'])) { $expected['_profile'] = FixtureTransactionProfile::context($this->profileDb, $user); }
-		return parent::book($id, $expected, $options, $user, $overlapConfirmed);
+		return parent::book($id, $expected, $options, $user, $overlapConfirmed, $checkpoint);
 	}
 }

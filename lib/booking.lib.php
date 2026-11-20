@@ -13,7 +13,11 @@ function msmRequireBookingDatabase(array $state, $observer, $service, $profiles,
 	msmRequireBatchSize($state['ids']);
 	$profile = $profiles->admit($state['profile'] ?? null, $user, $state['options'], $state['revision']);
 	try {
-		$observed = $observer->beforeBegin();
+		$observed = $profile['profile'] === 'CoreGuarded' ? null : $observer->beforeBegin();
+		if ($profile['profile'] === 'CoreGuarded') {
+			$service->coreGuardedReadiness();
+			$observed = array('state' => MsmDatabaseState::IDLE, 'fresh' => true);
+		}
 		if ($observed['state'] !== MsmDatabaseState::IDLE || !$observed['fresh']) {
 			throw new RuntimeException($observed['reason']);
 		}
@@ -71,7 +75,9 @@ function msmProcessBooking(array $state, $service, $mailer, $user, callable $sav
 			$save($state); continue;
 		}
 		$row['_profile'] = $state['profile'] ?? null;
-		$result = $service->book($id, $row, $state['options'], $user, !empty($state['overlap'][$id]));
+		$result = $coreGuarded
+			? $service->book($id, $row, $state['options'], $user, !empty($state['overlap'][$id]), $save)
+			: $service->book($id, $row, $state['options'], $user, !empty($state['overlap'][$id]));
 		$stop = !empty($result['stop']) || ($coreGuarded && (($result['completion'] ?? '') !== 'nonterminal_acknowledged'
 			|| !in_array($result['status'], array('success', 'failed', 'skipped'), true)
 			|| ($result['status'] !== 'success' && ($result['rollback'] ?? '') !== 'confirmed'))); // Decide before checkpoints or any post-completion effect.
@@ -100,7 +106,7 @@ function msmProcessBooking(array $state, $service, $mailer, $user, callable $sav
 				if (!msmSaveBookingCheckpoint($state, $save, $coreGuarded)) { msmStopUnprocessed($state, $id); return $state; }
 			}
 			$invoice = $state['results'][$id]['invoice'] ?? null;
-			$state['results'][$id]['mail'] = $mailer->send($member, $row, $user, $state['options']['sendmail'], $invoice);
+			$state['results'][$id]['mail'] = $coreGuarded ? 'not_selected' : $mailer->send($member, $row, $user, $state['options']['sendmail'], $invoice);
 			if (!msmSaveBookingCheckpoint($state, $save, $coreGuarded)) { msmStopUnprocessed($state, $id); return $state; }
 		}
 	}

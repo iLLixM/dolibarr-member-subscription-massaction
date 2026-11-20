@@ -47,10 +47,10 @@ class MsmTransactionProfile
 				$profile = $c['profile']; $reason = '';
 			} else { $reason = 'MSMProfileInvalid'; }
 		}
-		$enabled = in_array($profile, array('EnhancedMySQL', 'MariaDBSnapshot'), true);
-		if ($profile === 'CoreGuarded') { $reason = 'MSMCoreGuardedPending'; }
+		$enabled = in_array($profile, array('CoreGuarded', 'EnhancedMySQL', 'MariaDBSnapshot'), true);
+		$extended = $profile !== 'CoreGuarded' && $enabled;
 		return array('family' => $family, 'profile' => $profile, 'revision' => self::revision($raw),
-			'features' => array('booking' => $enabled, 'invoice' => $enabled, 'autocreate' => $enabled, 'sendmail' => $enabled), 'reason' => $reason);
+			'features' => array('booking' => $enabled, 'invoice' => $extended, 'autocreate' => $extended, 'sendmail' => $extended), 'reason' => $reason);
 	}
 	public function binding(array $current, $user, $revision)
 	{

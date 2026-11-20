@@ -121,3 +121,22 @@
 - Investigate failures narrowly instead of repeating broad repository, architecture, or requirement audits.
 - Write code identifiers, comments, commit messages, and review text in English.
 - Finish with a concise report covering changed files and behavior, executed tests, remaining risks, and open evidence.
+
+## CF-02 branch implementation addendum (2026-11-20)
+
+The Owner authorized development of CoreGuarded contribution-only booking in
+feature/cf02-core-guarded-contribution. Issue #22 and ADR-0001, including D-01/D-02,
+E01–E15, and the Owner-accepted bounded Completion Gate, are authoritative.
+PR #29 is an Owner test-accepted **external review candidate**, but remains
+independently unreviewed and does NOT qualify production CoreGuarded DML,
+development merge or release. EnhancedMySQL retains its event-observer contract,
+MariaDBSnapshot retains the historical snapshot contract. No invoice/customer
+creation, PDF or mail under CoreGuarded until independently qualified and
+separately Owner approved. Owner-run real restricted-MySQL 8.4.13/V24.0.3
+contribution+Agenda and the actual empty Core transaction were positive; the
+formal POS01-B witness still reports STOP for a missing description marker,
+which the Owner explicitly waived **only for external review entry**. No code
+or witness PASS may be rewritten to erase this limitation. Real negative
+fault/concurrency/replay and current-source MariaDB/Enhanced invoice tests,
+independent code review, and separate merge/release authorization remain open.
+See docs/cf02-review-handoff.md and the preserved POS01 evidence.
