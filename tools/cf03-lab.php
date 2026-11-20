@@ -53,8 +53,28 @@ function cf03Configure($id,array $env)
     Cf03LabContract::need($root!==false && is_file($root.'/conf/conf.php')
         && is_file($root.'/version.inc.php'),'CF03WrongDolibarrRoot');
     $module=realpath($root.'/custom/membersubscriptionmassaction');
-    Cf03LabContract::need($module!==false && $module===realpath(dirname(__DIR__)),
-        'CF03WrongModuleSymlink');
+    Cf03LabContract::need($module!==false && is_dir($module)
+        && $module===realpath($root.'/custom/membersubscriptionmassaction'),
+        'CF03ModuleNotInstalled');
+    $checkout=realpath(dirname(__DIR__));
+    Cf03LabContract::need($checkout!==false
+        && ($id==='D' || $module===$checkout),'CF03WrongModuleSymlink');
+    // D is tested from a deployed ZIP copy, not necessarily a checkout symlink.
+    // Compare every selected runtime file with this exact CF-03 source checkout.
+    $deployed=array();
+    foreach (array('subscription.php','class/booking.class.php',
+        'class/databasestate.class.php','class/coreguardedtransaction.class.php',
+        'class/coreguardedrightsdb.class.php','class/transactionprofile.class.php',
+        'class/filebookingcheckpoint.class.php','class/invoice.class.php',
+        'lib/booking.lib.php') as $path) {
+        $installed=$module.'/'.$path; $source=$checkout.'/'.$path;
+        Cf03LabContract::need(is_file($installed) && is_file($source)
+            && !is_link($installed) && !is_link($source),'CF03DeployedSourceMissing');
+        $actual=hash_file('sha256',$installed);
+        Cf03LabContract::need(hash_equals(hash_file('sha256',$source),$actual),
+            'CF03DeployedSourceMismatch');
+        $deployed[$path]=$actual;
+    }
     $version=file_get_contents($root.'/version.inc.php');
     $parts=explode('.',$env['core_version']);
     Cf03LabContract::need(preg_match("/define\\('DOL_MAJOR_VERSION',\\s*'".preg_quote($parts[0],'/')."'\\)/",$version)===1
@@ -162,6 +182,8 @@ function cf03Configure($id,array $env)
             'completion'=>(string)$identity['completion']),
         'profile'=>$profile,'performance_schema'=>$ps,'engines'=>$engines,
         'source_hashes'=>cf03Source(),
+        'deployed_source_hashes'=>$deployed,
+        'deployment_kind'=>$module===$checkout?'source_checkout':'verified_deployed_copy',
         'core_source_hashes'=>$coreHashes,
         'config_sha256'=>hash_file('sha256',$root.'/conf/conf.php'),
         'dolibarr_version'=>$env['core_version'],
@@ -245,6 +267,8 @@ function cf03State($db,array $context,array $expected)
         'profile'=>$context['profile'],
         'engines'=>$context['engines'],
         'source_hashes'=>$context['source_hashes'],
+        'deployed_source_hashes'=>$context['deployed_source_hashes'],
+        'deployment_kind'=>$context['deployment_kind'],
         'core_source_hashes'=>$context['core_source_hashes'],
         'config_sha256'=>$context['config_sha256'],
         'performance_schema'=>$context['performance_schema'],
@@ -303,6 +327,8 @@ try {
             'profile_sha256'=>$context['profile']['raw_hash'],
             'config_sha256'=>$context['config_sha256'],
             'source_hashes'=>$context['source_hashes'],
+            'deployed_source_hashes'=>$context['deployed_source_hashes'],
+            'deployment_kind'=>$context['deployment_kind'],
             'core_source_hashes'=>$context['core_source_hashes'],
             'writes'=>'no_business_sql');
     } else {
