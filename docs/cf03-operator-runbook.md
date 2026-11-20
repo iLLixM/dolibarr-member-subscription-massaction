@@ -6,7 +6,7 @@ Tools: `tools/cf03-lab.php` and `tools/cf03-lab.lib.php`. They do **not** reuse 
 
 ## 0. Source and operator prerequisites
 
-Use the new CF-03 worktree from the GitHub PR. Verify the exact checked-out 40-character SHA and the live module symlink; the PHP tool independently rejects a different module target. Complete the entire baseline–manual-operation–verify window on the same SHA and config; no Git checkout, module update, profile switch, PHP-process credentials change, or concurrent business writes in between.
+Use the new CF-03 worktree from the GitHub PR. Verify the exact checked-out 40-character SHA and installed module source. For A/B/C, the PHP tool requires the live module to resolve to this exact worktree; **D explicitly allows a separate module copy installed from a test ZIP, but checks matching hashes of nine runtime product PHP files against this worktree**. This is not a complete package-manifest or install audit. Complete the entire baseline–manual-operation–verify window on the same SHA and config; no Git checkout, module update, profile switch, PHP-process credentials change, or concurrent business writes in between.
 
 ```sh
 cd /home/marcel/dolibarr-member-subscription-massaction-cf03 || exit 1
@@ -77,7 +77,7 @@ sudo -u www-data /usr/bin/php -d xdebug.mode=off \
   --db-name=ACTUAL_SCHEMA --db-user=ACTUAL_RESTRICTED_DB_USER
 ```
 
-Expect actual Dolibarr 22.0.5 source, actual CoreGuarded profile in entity 1, InnoDB, autocommit 1, NO_CHAIN, denied P_S SELECT 1142. The ZIP installation flow, permission configuration and business tests are later separate cases. No controlled destructive fault is authorized on a shared hosting provider.
+Expect actual Dolibarr 22.0.5 source, actual CoreGuarded profile in entity 1, InnoDB, autocommit 1, NO_CHAIN, denied P_S SELECT 1142. The full ZIP packaging/manifest and install validation, permission configuration and business tests remain later separate cases. A D preflight can attest a deployed module copy only when its selected product file hashes match the current CF-03 checkout; it does not require the ZIP to ship test tools. No controlled destructive fault is authorized on a shared hosting provider.
 
 ## 2. Stage-1 snapshot witness (not an authorization to run a booking)
 
