@@ -264,4 +264,73 @@ c3stop(static function(){
     Cf03LabContract::arguments(array('cf03-lab.php','--preflight','--environment=A',
         '--evidence-dir=/tmp/unsafe'));
 },'preflight cannot write evidence');
+// W01 CLI contract: no implicit D evidence parent, no non-invoice extra flags,
+// explicit invoice expectations, and D base kept outside the legacy local path.
+$common=array('--member-id=271','--member-ref=MEM2611-0271',
+    '--marker=CF03LAB-D-ABCDEF123','--start=2080-01-01',
+    '--end=2080-12-31','--amount=120.00','--agenda=off',
+    '--scenario=no-change');
+$hosted=array('cf03-lab.php','--baseline','--environment=D',
+    '--document-root=/synthetic/htdocs','--db-host=127.0.0.1',
+    '--db-port=3306','--db-name=synthetic_hosted','--db-user=hosted_user');
+c3stop(static function()use($hosted,$common){
+    Cf03LabContract::arguments(array_merge($hosted,$common,
+        array('--evidence-dir=/private/cf03-d-testfixture1')));
+},'D evidence root explicitly required');
+list($mode,$envName,$env,$opts)=Cf03LabContract::arguments(
+    array_merge($hosted,$common,array('--evidence-root=/private/evidence',
+        '--evidence-dir=/private/evidence/cf03-d-testfixture1')));
+c3ok($mode==='baseline' && $envName==='D'
+    && $opts['evidence-root']==='/private/evidence','hosted root accepted');
+c3stop(static function()use($hosted,$common){
+    Cf03LabContract::arguments(array_merge($hosted,$common,
+        array('--evidence-root=/synthetic/../unsafe',
+            '--evidence-dir=/synthetic/../unsafe/cf03-d-testfixture1')));
+},'traversal root denied');
+$invoiceArgs=array('cf03-lab.php','--check-only','--environment=C',
+    '--db-user=enhanced_user','--scenario=invoice-existing',
+    '--member-id=271','--member-ref=MEM2611-0271',
+    '--marker=CF03LAB-C-ABCDEF123','--start=2080-01-01',
+    '--end=2080-12-31','--amount=120.00','--agenda=on');
+c3stop(static function()use($invoiceArgs){
+    Cf03LabContract::arguments($invoiceArgs);
+},'missing invoice options denied');
+$invoiceArgs=array_merge($invoiceArgs,array('--invoice-date=2026-11-20',
+    '--invoice-quantity=1','--invoice-product=0','--invoice-vat=0',
+    '--invoice-term=1','--invoice-payment-mode=0','--invoice-bank=0',
+    '--invoice-currency=EUR'));
+list($mode,$envName,$env,$opts)=Cf03LabContract::arguments($invoiceArgs);
+$expected=Cf03LabContract::expected($opts);
+c3ok($mode==='check-only' && $envName==='C'
+    && $expected['invoice']['currency']==='EUR'
+    && $expected['invoice']['quantity']===1.0,
+    'explicit invoice expectations accepted');
+c3stop(static function()use($invoiceArgs){
+    $bad=$invoiceArgs;
+    $bad[array_search('--invoice-quantity=1',$bad,true)]='--invoice-quantity=0';
+    Cf03LabContract::arguments($bad);
+},'zero invoice quantity denied');
+c3stop(static function()use($invoiceArgs){
+    $bad=$invoiceArgs;
+    $bad[array_search('--invoice-currency=EUR',$bad,true)]='--invoice-currency=EU';
+    Cf03LabContract::arguments($bad);
+},'invalid currency denied');
+foreach (array('B','C') as $invoiceEnvironment) {
+    list($expected,$before,$after)=c3make($invoiceEnvironment,'invoice-existing','off');
+    Cf03LabContract::baseline($before,$expected,$invoiceEnvironment);
+    c3ok(Cf03LabContract::verify($before,$after,$expected,$invoiceEnvironment)['status']==='PASS',
+        'invoice without Agenda '.$invoiceEnvironment);
+    list($expected,$before,$after)=c3make($invoiceEnvironment,'invoice-existing','on');
+    $before['invoice_agenda_flags']['BILL_CREATE']=true;
+    $after['invoice_agenda_flags']['BILL_CREATE']=true;
+    $after['invoice_agenda_events'][]=array('id'=>54,'code'=>'AC_BILL_CREATE',
+        'invoice_id'=>60);
+    $after['invoice_agenda_resources'][]=array('id'=>55,'agenda_id'=>54,
+        'element_type'=>'user','actor_id'=>4);
+    $after['counts']['actioncomm']++;
+    $after['counts']['actioncomm_resources']++;
+    Cf03LabContract::baseline($before,$expected,$invoiceEnvironment);
+    c3ok(Cf03LabContract::verify($before,$after,$expected,$invoiceEnvironment)['status']==='PASS',
+        'two configured invoice Agenda actions '.$invoiceEnvironment);
+}
 echo 'CF03 A-D pure harness contracts: '.$passed.' assertions PASS (no DB/HTTP).'.PHP_EOL;
