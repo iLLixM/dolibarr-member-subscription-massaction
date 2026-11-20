@@ -51,6 +51,10 @@ Code scope is test-only. New `tools/cf03-evidence.lib.php` implements mandatory 
 
 The external W01 review on HEAD `460b75d28bedfc9f4397c0cbf314d56964e638e1` identified P1 F32-W01-01/02/03/04 and P2 F32-W01-05..10; its **NO REAL-TEST RELEASE** decision remains active. Paket A implements only F32-W01-01/03/04/05 and exact STOP-reason checking from -10. Review the actual corrected HEAD, with particular focus on official V22/V24 `llx_adherent_type` status/entity/fee fields, 0700/UID private Evidence parent for A/B/C/D, mark-before-DB verify sequencing, fail-closed partial verdicts, and whether synthetic negative tests reject wrong STOP codes. Current code changes must not be treated as independently approved findings. P1 F32-W01-02 and P2 06–09 remain OPEN until Paket B and follow-up; do not authorize real business tests.
 
+## F32-W01 Paket B — final independent delta review requirements
+
+The Owner selected the bounded, manifest-based approach. Test-only implementation expands PHP source fingerprints to the module production-tree inventory and version-specific selected Core objects. Deployed D module PHP files are compared against checkout, with explicit **no full ZIP attestation** limitation. Read-only invoice profile data now checks actual configured product / `fk_product_type` 0 or 1, required one-unit quantity and only client 1 or 3. Agenda ON checks bound active entity-1 user plus Core-generated author/owner and resource IDs; explicit `--actor-id` is required for positive Agenda ON cases. Review exact content of `tools/cf03-source.lib.php`, `tools/cf03-lab.php`, `tools/cf03-lab.lib.php`, `test/unit/cf03-source.php` and expanded negative tests. An explicit security/contract recheck of **all ten original F32-W01 findings**, including Paket A, is required before any Real-Test GO. Historical 4/4 A–D read-only PASS applies to an older HEAD only. All seven test families remain NO-GO.
+
 ## Specific review questions
 
 1. Is the single-schema A/C model represented correctly, with distinct application DB identities and explicit per-entity profile selection, one change window at a time?
