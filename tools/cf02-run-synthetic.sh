@@ -11,6 +11,7 @@ php test/unit/f29-rights.php
 php test/unit/coreguarded-session.php
 php test/unit/cf02-contribution-witness.php
 php test/unit/cf03-lab.php
+php test/unit/cf03-evidence.php
 php test/unit/run.php
 php test/unit/database.php
 node test/unit/loading.js
