@@ -107,6 +107,14 @@ The preflight now evaluates a wider deterministic PHP source inventory, and each
 
 At preflight and each baseline/verify readback, module PHP files and selected Dolibarr V22/V24 Core critical-path files are hashed and compared. A hosted D deployment may be a checkout, not an installed ZIP, and this hash contract alone does not attest the complete ZIP. Real tests remain prohibited pending independent F32-W01 follow-up review and scenario-specific Owner admission.
 
+## F32-W01-08/-11 — independently configured invoice Agenda (new source review pending)
+
+For `--scenario=invoice-existing` (B/C only), supply **`--actor-id=<ACTUAL_AUTHENTICATED_DOLIBARR_USER_ROWID>` on check-only, baseline and verify regardless of `--agenda=on/off`**. The latter option means **member subscription Agenda ON/OFF only**. Separately configured Core `BILL_CREATE`/`BILL_VALIDATE` events are read and reconciled independently, including the mixed case member OFF + invoice VALIDATE ON. The selected invoice Resultset must contain event entity, author and owner; missing columns STOP before attributing an event.
+
+Do not disable legitimate Core invoice Agenda flags to force a PASS; `LINEBILL_INSERT` effective ON remains a documented early Admission STOP for the bounded invoice witness. Check-only must confirm a new synthetic fixture, actual authenticated actor, effective agenda flags and relevant source/profile/DB identity before the Owner performs any single UI action.
+
+The original partial real-test approval on source `7fc5898d57d7c6bba51cf7cb2c572c5dc3131217` is not a blanket approval of changed source. Wait for independent exact-HEAD F32-W01-08/-11 delta review and new Owner authorization before any invoice-existing booking. PR #32 remains Draft.
+
 ## 2. Stage-1 snapshot witness (not an authorization to run a booking)
 
 `--check-only`, `--baseline`, and `--verify` additionally require a freshly created synthetic member. The following *generic* A example uses placeholders; replace with values of an **entirely new** member (do not reuse 56, 57, 58 or a historical CF02 marker).
