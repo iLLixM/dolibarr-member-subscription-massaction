@@ -65,25 +65,47 @@ final class Cf03LabContract
                 'data_root'=>'/home/marcel/dolibarr-i105-v24-mysql-data',
                 'db_host'=>'127.0.0.1', 'db_port'=>3307, 'db_name'=>'dolibarr_i105_v24',
                 'db_user'=>'dolibarr_i105_v24_limited', 'core_version'=>'24.0.3',
+                'php_target'=>'8.2',
                 'web_url'=>'http://i105-v24.localhost:8091/', 'ps'=>'denied'),
             'B' => array('family'=>'mariadb', 'profile'=>'MariaDBSnapshot', 'version'=>'10.11.19',
                 'document_root'=>'/home/marcel/dolibarr-v24/htdocs',
                 'data_root'=>'/home/marcel/dolibarr-v24-data',
                 'db_host'=>'localhost', 'db_port'=>3306, 'db_name'=>'dolibarr_db_v24',
                 'db_user'=>null, 'core_version'=>'24.0.3',
+                'php_target'=>'8.2',
                 'web_url'=>'http://doli24.test:8090/', 'ps'=>'not_required'),
             'C' => array('family'=>'mysql', 'profile'=>'EnhancedMySQL', 'version'=>'8.4.13',
                 'document_root'=>'/home/marcel/dolibarr-i105-v24-mysql/htdocs',
                 'data_root'=>'/home/marcel/dolibarr-i105-v24-mysql-data',
                 'db_host'=>'127.0.0.1', 'db_port'=>3307, 'db_name'=>'dolibarr_i105_v24',
                 'db_user'=>null, 'core_version'=>'24.0.3',
+                'php_target'=>'8.2',
                 'web_url'=>'http://i105-v24.localhost:8091/', 'ps'=>'select'),
             'D' => array('family'=>'mysql', 'profile'=>'CoreGuarded', 'version'=>'8.4.13',
                 'document_root'=>null, 'data_root'=>null,
                 'db_host'=>null, 'db_port'=>null, 'db_name'=>null,
                 'db_user'=>null, 'core_version'=>'22.0.5',
+                'php_target'=>'8.3',
                 'web_url'=>null, 'ps'=>'denied')
         );
+    }
+
+    /** Real W01 environments bind the actual PHP CLI major/minor runtime. */
+    public static function phpTarget($id)
+    {
+        $environments=self::environments();
+        self::need(isset($environments[$id]),'CF03UnknownEnvironment');
+        return $environments[$id]['php_target'];
+    }
+
+    public static function assertPhpRuntime($id,$version)
+    {
+        $target=self::phpTarget($id);
+        self::need(is_string($version)
+            && preg_match('/^([0-9]+)\\.([0-9]+)\\.[0-9]+(?:[A-Za-z0-9._+-]*)$/D',
+                $version,$matches)===1
+            && $matches[1].'.'.$matches[2]===$target,'CF03WrongPHPRuntime');
+        return $target;
     }
 
     /** V22 defines DOL_VERSION in filefunc; V24 uses a dedicated version file.
@@ -258,6 +280,9 @@ final class Cf03LabContract
 
     public static function baseline(array $s,array $e,$id)
     {
+        $runtime=self::assertPhpRuntime($id,$s['php_version']??null);
+        self::need(($s['php_major_minor']??null)===$runtime,
+            'CF03WrongPHPRuntime');
         self::need(($s['environment']??null)===$id && ($s['profile']['name']??null)
             ===self::environments()[$id]['profile'],'CF03WrongProfile');
         self::need(($s['identity']['autocommit']??null)==='1'
@@ -349,7 +374,7 @@ final class Cf03LabContract
     {
         self::baseline($before,$e,$id);
         foreach (array('environment','identity','profile','engines','type',
-            'source_hashes','source_manifest_version','deployed_source_hashes','deployment_kind','core_source_hashes','config_sha256','performance_schema','agenda_enabled','customer_exists','customer','invoice_agenda_flags','invoice_agenda_supported','schema_columns','invoice_product','actor') as $field) {
+            'php_version','php_major_minor','source_hashes','source_manifest_version','deployed_source_hashes','deployment_kind','core_source_hashes','config_sha256','performance_schema','agenda_enabled','customer_exists','customer','invoice_agenda_flags','invoice_agenda_supported','schema_columns','invoice_product','actor') as $field) {
             self::need(array_key_exists($field,$after)
                 && $before[$field]===$after[$field],'CF03ContextChanged');
         }
