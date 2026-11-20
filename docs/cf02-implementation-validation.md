@@ -1,0 +1,49 @@
+# CF-02 – Core-Guarded contribution-only development evidence
+
+**Status: DEVELOPMENT – NOT YET INDEPENDENTLY REVIEWED OR LIVE-QUALIFIED.**
+
+Branch: feature/cf02-core-guarded-contribution; baseline main: 4698ec1540110a6250ba95b8bf0e57689a5e9f8b.
+Authority: [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22) and [ADR-0001](adr/ADR-0001-core-first-transaction-profiles.md).
+The pre-CF-02 Completion Gate was independently assessed and Owner accepted with documented limits.
+
+## Implementation boundaries
+
+- CoreGuarded uses a new bounded MySQL coordinator, but the booking service remains the only owner of the outer Dolibarr Core begin/commit/rollback.
+- The required D-01 order is finished preflight, SET TRANSACTION REPEATABLE READ, immediately Core BEGIN on the same connection, member/type locks, then checked business and Agenda operations.
+- The new CoreGuarded transaction checks current native connection identity and Dolibarr depth. It does not read the Performance Schema, create journals, run compensation or perform a second transaction manager.
+- Completion is classified before the Core end, never via a forbidden post-end SQL probe. Known CHAIN/RELEASE produce a terminal STOP after a confirmed Core end; confirmed member outcomes survive and following members are NOT_PROCESSED.
+- Lost acknowledgement, connection/depth uncertainty, unexpected completion changes and unqualified SQL faults remain UNKNOWN/STOP. Only narrowly qualified business errors permit one normal Core rollback; no S SQL error mapping is claimed.
+- Administrative CoreGuarded selection admits contributions only. Invoice/customer creation, PDF and mail are denied. Existing EnhancedMySQL and MariaDBSnapshot capabilities must remain available.
+- Direct CoreGuarded booking service invocation requires a bound file-session checkpoint and independently reopened proof of the durably consumed run and specific expected member/options. The supported standard file logger check remains mandatory.
+- Unsupported third-party hooks, other session handlers and other loggers are not universally qualified; no new permissions are requested.
+
+## Test matrix and provenance
+
+| Layer | Executed result | Qualification limit |
+| --- | --- | --- |
+| Adapter synthetic | Initial PHP 8.4 local run: 88 assertions PASS | No live loaded Dolibarr/MySQL or native connection |
+| Durable file-session synthetic | Initial PHP 8.4 local run: 15 assertions PASS | Genuine isolated local session files, no HTTP/DB |
+| Existing no-Core suites | run.php 141, database.php 188, loading.js 6 PASS locally | Existing synthetic contracts, not real integration |
+| Pinned-Core suites | NOT EXECUTED locally | To be executed by GitHub PR CI and operator's V24.0.3 environment |
+| Restricted MySQL read-only | NOT EXECUTED by author | Owner separately confirmed limited user and P_S 1142 |
+| Real MySQL contribution/Agenda/rollback/HTTP/concurrency | NOT EXECUTED | Requires version-bound isolated synthetic fixtures and operator traces |
+| Enhanced MySQL/MariaDB real invoice regression | NOT EXECUTED on this branch | Full CF-03 qualification remains required |
+
+Use tools/cf02-run-synthetic.sh for repeatable no-business-DB tests.
+Use tools/cf02-lab-readonly.sh --check-only for a read-only SQL privilege/configuration inspection (no writes).
+
+### Example restricted-MySQL operator invocation
+
+    CF02_DB_FAMILY=mysql CF02_DB_NAME=dolibarr_i105_v24 \
+    CF02_DB_USER=dolibarr_i105_v24_limited CF02_DB_HOST=127.0.0.1 \
+    CF02_DB_PORT=3307 sh tools/cf02-lab-readonly.sh --check-only
+
+Do not paste passwords, cookies, session identifiers, raw member records or private DB exports into CI or versioned evidence.
+
+## Explicit remaining gates
+
+The current work is a development implementation, not production authorization.
+Before an independent development merge: inspect the effective diff, full PHP 7.4/8.2 pinned-Core regression jobs, security invariants, external transaction review and Owner merge decision.
+Before production/release: real restricted-MySQL contribution+Agenda ON/OFF, rollback and errors, concurrency, HTTP session/replay, EnhancedMySQL and MariaDB invoice non-regression, cross-version and package qualification.
+
+Historical D-01, AP3 and F27 evidence files are unchanged; a new result must be separately versioned and SHA-256 bound to its exact tested commit.

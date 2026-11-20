@@ -369,3 +369,7 @@ remaining concrete callback gap warranting a new lab run before independent
 sufficiency review. This assessment does not independently close F27-01 or the
 gate. `finalization-validation.json` records ten successful local regression
 runners; they are synthetic/controller/session checks, not new real DB/HTTP tests.
+
+## CF-02 Core-Guarded development (2026-11-20)
+
+The independent no-Dolibarr runner test/unit/coreguarded.php initially executed 88 synthetic assertions against the bounded D-01 transaction coordinator, including SET/BEGIN adjacency, NO_CHAIN/CHAIN/RELEASE completion, nesting, 1568, depth/native connection faults and no Performance Schema. The separate test/unit/coreguarded-session.php initially executed 15 local file-session assertions for durable consumed-state readback and direct service admission. Both are included in standard CI and full CI. Neither is live MySQL/Agenda or authenticated HTTP qualification. Existing business/observer tests and the single 71-ID requirements matrix remain authoritative. See [CF-02 validation and remaining gates](cf02-implementation-validation.md). Real restricted-MySQL and Enhanced/MariaDB business regression: **NOT EXECUTED on this branch** at document creation.
