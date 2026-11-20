@@ -1,21 +1,8 @@
 # Member Subscription Massaction for Dolibarr
 
-**CF-02 review-entry status — 2026-11-20:** The bounded CoreGuarded
-contribution-only implementation in [PR #29](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/29) is
-**Owner test-accepted with documented limits and ready for independent external
-source/security/transaction review**; it is **not** independently approved,
-merged, production qualified, or released. The restricted MySQL 8.4.13 / Dolibarr
-24.0.3 lab showed real Core BEGIN/ROLLBACK and authenticated contribution+standard
-Agenda persistence. The formal POS01-B witness still returned STOP because the
-subscription description lacked the prescribed test marker; the Owner expressly
-waived a marker-only repeat for review entry without rewriting that STOP.
-CoreGuarded still permits **contributions only**, with invoice/customer/PDF/mail
-disabled, no general P_S grants, no new journal, automatic retry or physical
-event-identity equivalence, and no Enhanced fallback. Real negative/parallel
-tests and real Enhanced/MySQL/MariaDB invoice non-regression remain pending
-under Issue #22 CF-03. See the [review handoff](docs/cf02-review-handoff.md),
-[validation](docs/cf02-implementation-validation.md), and
-[binding ADR](docs/adr/ADR-0001-core-first-transaction-profiles.md).
+**CF-02 development merge completed — 2026-11-20:** [PR #29](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/29) was independently reviewed at source HEAD `290782dfdf6d6048b801843b5e1c4e464ac3bfdc`: **APPROVED FOR DEVELOPMENT MERGE WITH DOCUMENTED LIMITS**; **F29-01/P1 and F29-02/P1 CLOSED**, no remaining P0/P1 blocker; 9/9 standard PHP/Core CI PASS ([run #44762573886](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44762573886)). The Owner accepted the report and a separate real authenticated **POS01-C PASS** on the same reviewed source: restricted MySQL 8.4.13 / Dolibarr V24.0.3, one EUR 120 contribution **#67**, correct 2080 period and persisted description marker, one standard Agenda event/resource, expected R16 member end, unchanged non-contribution table counts and source/context hashes. Normal merge commit: `f0b1e6d40ff55abb1e7555c800caea0fdd1fe90d`. See the [new immutable POS01-C sanitized reconciliation](docs/evidence/cf02/pos01-c-owner-positive-2026-11-20.md) and [CF-02 central validation](docs/cf02-implementation-validation.md). Historical POS01-A/B witness **STOP** results and the Owner's earlier marker-only review-entry waiver remain preserved and were not relabeled PASS.
+
+CoreGuarded is **contribution-only**, without general Performance Schema SELECT, journal, automatic retry, universal physical transaction-event proof or Enhanced fallback. Invoice/customer/PDF/mail are disabled for CoreGuarded, while pre-existing EnhancedMySQL and MariaDBSnapshot scope remains. **CF-03 real negative/replay/concurrency/other-profile integration, CF-04 exact release artifact and Owner release GO, and CF-05 feature extension remain OPEN.** This development merge is **not** general production support or approval of v0.1.0.
 
 **Database development status — 2026-11-17:** MariaDB and Oracle MySQL use the
 shared `MsmDatabaseState` observer. Original **I1-05 FAILED** (19/20), subsequent
@@ -106,10 +93,10 @@ The separate MySQL iteration below adds its explicitly bounded invoice evidence.
 ## Transaction profile setup (CF-01)
 
 Administrators select a profile under the module's setup link (entity-specific).
-In the CF-02 development branch, Core-Guarded on Oracle MySQL permits **contribution
+In the merged CF-02 development implementation, Core-Guarded on Oracle MySQL permits **contribution
 booking only**, guarded by the bounded Core-first adapter, local file-session
-checkpoint and standard file-logger preconditions. It is NOT independently
-reviewed or production qualified. Invoice/customer creation and email/PDF remain
+checkpoint and standard file-logger preconditions. It is independently
+reviewed for development merge, but NOT production or release qualified. Invoice/customer creation and email/PDF remain
 disabled, and it never falls back to Enhanced. Read-only preview does not require
 physical observer readiness; booking performs current profile and business checks.
 
@@ -193,8 +180,7 @@ a one-shot `SET TRANSACTION` differs from the session default. No
 for this profile. Observer queries filter to the current thread; the table-level
 SELECT permission itself does not restrict access to that thread's rows.
 These P_S prerequisites apply to EnhancedMySQL booking, not to read-only preview
-or to Core-Guarded as a general requirement. The CF-02 Core-Guarded adapter in
-Draft PR #29 is intended for isolated development qualification only. No new
+or to Core-Guarded as a general requirement. The Core-Guarded adapter merged in PR #29 remains bounded to the documented development qualification; it is not production qualified. No new
 production compatibility or release approval follows from profile selection. Missing Enhanced rights/events/freshness
 fail closed. Idle calibration reads an existing InnoDB member row; an empty member
 table is not silently seeded or accepted.
