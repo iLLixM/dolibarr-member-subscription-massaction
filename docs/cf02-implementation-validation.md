@@ -97,3 +97,7 @@ script and the non-writing loaded-Core `--check-only` script. The optional
 `--empty-transaction` mode runs only a single empty Core BEGIN/ROLLBACK with an
 explicit environment opt-in; it does not issue member, customer or Agenda DML.
 Real contribution/Agenda/invoice and concurrency qualification remain open.
+
+## Stage-0 Owner-reported MySQL qualification (2026-11-20)
+
+The independent lab operator executed synthetic runner B, restricted-MySQL privilege/engine inspection C and loaded-Core read-only preflight D at exact source HEAD `f205f9a7c2954670fe6f0e42fb78051a9ba6fa04`. All three reported PASS. The limited user had DML-only schema grants, no Performance Schema SELECT (`ERROR 1142`), `autocommit=1`, `completion_type=NO_CHAIN`; Dolibarr V24.0.3 and MySQL 8.4.13 were separately identified. Evidence provenance and the strict absence of a real Core BEGIN/ROLLBACK or business DML in the first three checks are recorded at [CF-02 Stage-0 lab evidence](evidence/cf02/stage0-owner-reported-2026-11-20.md). This is **Owner-reported, not independently repeated**.
