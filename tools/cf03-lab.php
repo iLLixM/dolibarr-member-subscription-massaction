@@ -208,12 +208,14 @@ function cf03State($db,array $context,array $expected)
     // The line event has no unambiguous invoice-id association in this scoped
     // witness: do not promise complete Agenda proof when it is enabled.
     $invoiceAgendaSupported=!$invoiceFlags['LINEBILL_INSERT'];
-    $productSetting=(string)($on['ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS']??'0');
-    Cf03LabContract::need(preg_match('/^(?:0|[1-9][0-9]{0,8})$/D',
-        $productSetting)===1,'CF03InvoiceProductConfigurationUnsupported');
-    $productId=(int)$productSetting;
     $invoiceProduct=array('id'=>0,'type'=>1,'status'=>1,'entity'=>1);
-    if ($productId>0) {
+    if ($expected['scenario']==='invoice-existing') {
+        $productSetting=trim((string)($on['ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS']??'0'));
+        if ($productSetting==='') { $productSetting='0'; }
+        Cf03LabContract::need(preg_match('/^(?:0|[1-9][0-9]{0,8})$/D',
+            $productSetting)===1,'CF03InvoiceProductConfigurationUnsupported');
+        $productId=(int)$productSetting;
+        if ($productId>0) {
         $productRows=cf03Query($db,'SELECT rowid,entity,tosell,fk_product_type '
             .'FROM llx_product WHERE rowid='.$productId);
         Cf03LabContract::need(count($productRows)===1,
@@ -222,6 +224,7 @@ function cf03State($db,array $context,array $expected)
         $invoiceProduct=array('id'=>(int)$p['rowid'],
             'type'=>(int)$p['fk_product_type'],
             'status'=>(int)$p['tosell'],'entity'=>(int)$p['entity']);
+        }
     }
     $actor=null;
     if (($expected['actor_id']??0)>0) {
