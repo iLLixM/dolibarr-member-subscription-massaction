@@ -2,6 +2,17 @@
 
 **Implementation status:** Test-only hardening in [Draft PR #32](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/32). Earlier Owner A–D read-only preflights PASS; **no new real DB booking, invoice, rollback or HTTP test executed for W01**. Issue #22 CF-03 gates remain OPEN.
 
+## CF03-W01 Operator Readiness Hardening – targeted 2026-11-21 implementation
+
+An independent overall review at original HEAD `3511175fc33489e7e8e89e4ae13f36db8e87aa62` confirmed technical W01 test-tool readiness but identified F32-GR-01 (runbook missing required actor for Agenda ON), F32-GR-02 (unbound PHP CLI runtime), historic source/Agenda status wording and F32-W01-12 (P3 Reader warning). The Owner accepted a **single bounded remediation**. It does not create new production booking functions or change Core-first architecture.
+
+- A/B/C W01 real CLI execution requires PHP **8.2.x**, hosted D requires **8.3.x**. `Cf03LabContract::assertPhpRuntime()` checks the target before real DB use. Full `PHP_VERSION` and major/minor are in both before/after SQL-state contexts; missing/wrong baseline values or patch drift STOP (`CF03WrongPHPRuntime` / `CF03ContextChanged`). Web worker PHP identity is still a separate Owner observation.
+- `docs/cf03-operator-runbook.md` now provides the correct required `--actor-id` for Contribution Agenda ON and for B/C Invoice-existing (including Member Agenda OFF). It has operator-specific A, B/C and D documented case patterns and a `test/unit/cf03-runbook.php` test that parses their real argument tokens through `Cf03LabContract::arguments()`. These are only example/check-only patterns; real booking requires separate Owner case admission.
+- F32-W01-12: The strict fake invoice SQL-projection corruption affects only the Invoice Resultset. Even when Member Agenda ON, the member event fields remain intact, while `CF03InvoiceAgendaProjectionIncomplete` continues to STOP the damaged invoice.
+- Scope boundaries remain unchanged: read-only witness; scenario-specific source/core manifest, no whole ZIP verification; independent Member and Invoice Agenda flags, fail-closed `LINEBILL_INSERT`; A/C share one schema and require serialized account/profile switching; no automatic real-case retries.
+
+**Approval remains pending for the new code SHA:** the original independent real-test admission was limited to the original HEAD; updated standard/hosted CI and a short independent remediation-only Delta Review are necessary. Before any real test, fresh A–D read-only preflight, correct private Evidence rights, scenario-specific synthetic fixture and explicit Owner authorization are required. PR #32 remains DRAFT and all six Issue #22 qualification gates stay OPEN.
+
 ## F32-W01 Invoice-Agenda Final Delta – F32-W01-08 and F32-W01-11 (2026-11-21)
 
 Following the independent review of fixed HEAD `7fc5898d57d7c6bba51cf7cb2c572c5dc3131217`, **9 of the 10 original findings were independently CLOSED**, F32-W01-08 P2 remained PARTIAL and new F32-W01-11 P2 OPEN. The original review authorized **conditional controlled real-test admission on that exact HEAD only** for A/B contribution and selected no-change, C/D subject to extra Owner conditions, while B/C invoice-existing remained NO-GO.
