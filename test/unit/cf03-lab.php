@@ -90,6 +90,41 @@ function c3make($id,$scenario,$agenda)
     }
     return array($expected,$s,$after);
 }
+// Regression: Dolibarr V22.0.5 has no htdocs/version.inc.php.
+// Official pinned V22 filefunc.inc.php defines DOL_VERSION directly;
+// V24.0.3 uses htdocs/version.inc.php major/minor declarations.
+c3ok(Cf03LabContract::versionSource('22.0.5')==='filefunc.inc.php',
+    'V22 version source');
+c3ok(Cf03LabContract::versionSource('24.0.3')==='version.inc.php',
+    'V24 version source');
+$fixtureV22="<?php\nif (!defined('DOL_VERSION')) {\n"
+    ."\tdefine('DOL_VERSION', '22.0.5'); // a.b.c\n}\n";
+$fixtureV24="<?php\ndefine('DOL_MAJOR_VERSION', '24');\n"
+    ."define('DOL_MINOR_VERSION', '0.3');\n"
+    ."define('DOL_VERSION', constant('DOL_MAJOR_VERSION').'.'.constant('DOL_MINOR_VERSION'));\n";
+Cf03LabContract::assertCoreVersion('22.0.5',$fixtureV22);
+c3ok(true,'V22 22.0.5 official-style version declaration accepted');
+Cf03LabContract::assertCoreVersion('24.0.3',$fixtureV24);
+c3ok(true,'V24 24.0.3 split version declarations accepted');
+foreach (array('22.0.4','22.0.6','23.0.0','24.0.3','untrusted') as $bad) {
+    c3stop(static function()use($bad){
+        Cf03LabContract::assertCoreVersion('22.0.5',
+            "<?php\n"."define('DOL_VERSION', '".$bad."');\n");
+    },'V22 wrong version denied '.$bad);
+}
+foreach (array('0.0','0.2','0.4','22.0.5') as $bad) {
+    c3stop(static function()use($bad){
+        Cf03LabContract::assertCoreVersion('24.0.3',
+            "<?php\n"."define('DOL_MAJOR_VERSION', '24');\n"
+            ."define('DOL_MINOR_VERSION', '".$bad."');\n");
+    },'V24 wrong minor version denied '.$bad);
+}
+c3stop(static function() {
+    Cf03LabContract::versionSource('23.0.0');
+},'unqualified version source denied');
+c3stop(static function() {
+    Cf03LabContract::assertCoreVersion('22.0.5',null);
+},'unreadable version denied');
 $environments=Cf03LabContract::environments();
 c3ok(count($environments)===4,'four environments');
 c3ok($environments['A']['document_root']===$environments['C']['document_root']
