@@ -60,6 +60,16 @@ function cf03Configure($id,array $env)
     Cf03LabContract::need(preg_match("/define\\('DOL_MAJOR_VERSION',\\s*'".preg_quote($parts[0],'/')."'\\)/",$version)===1
         && preg_match("/define\\('DOL_MINOR_VERSION',\\s*'".preg_quote($parts[1].'.'.$parts[2],'/')."'\\)/",$version)===1,
         'CF03WrongCoreVersion');
+    // Bind the actual selected Core source in addition to its version string.
+    $corePaths=array('version.inc.php','adherents/class/adherent.class.php',
+        'core/db/mysqli.class.php','user/class/user.class.php');
+    $coreHashes=array();
+    foreach($corePaths as $path) {
+        $coreFile=$root.'/'.$path;
+        Cf03LabContract::need(is_file($coreFile) && !is_link($coreFile),
+            'CF03CoreSourceUnavailable');
+        $coreHashes[$path]=hash_file('sha256',$coreFile);
+    }
     // Approved local Dolibarr config; execute as its trusted web system user.
     require $root.'/conf/conf.php';
     Cf03LabContract::need(($dolibarr_main_db_type??'')==='mysqli'
@@ -152,6 +162,7 @@ function cf03Configure($id,array $env)
             'completion'=>(string)$identity['completion']),
         'profile'=>$profile,'performance_schema'=>$ps,'engines'=>$engines,
         'source_hashes'=>cf03Source(),
+        'core_source_hashes'=>$coreHashes,
         'config_sha256'=>hash_file('sha256',$root.'/conf/conf.php'),
         'dolibarr_version'=>$env['core_version'],
         'php_version'=>PHP_VERSION,
@@ -234,6 +245,7 @@ function cf03State($db,array $context,array $expected)
         'profile'=>$context['profile'],
         'engines'=>$context['engines'],
         'source_hashes'=>$context['source_hashes'],
+        'core_source_hashes'=>$context['core_source_hashes'],
         'config_sha256'=>$context['config_sha256'],
         'performance_schema'=>$context['performance_schema'],
         'member'=>array('id'=>(int)$m['rowid'],'ref'=>$m['ref'],
@@ -291,6 +303,7 @@ try {
             'profile_sha256'=>$context['profile']['raw_hash'],
             'config_sha256'=>$context['config_sha256'],
             'source_hashes'=>$context['source_hashes'],
+            'core_source_hashes'=>$context['core_source_hashes'],
             'writes'=>'no_business_sql');
     } else {
         $e=Cf03LabContract::expected($opts);
