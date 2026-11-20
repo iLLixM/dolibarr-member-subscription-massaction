@@ -2,21 +2,27 @@
 
 ## Unreleased
 
-- CF-02 review-entry / PR #29: bounded MySQL Core-Guarded contribution
-  adapter and server-side contribution-only admission with session/replay
-  fencing; 88 adapter/19 session synthetic assertions and standard 9-profile
-  PR CI PASS. Restricted MySQL 8.4.13 / Dolibarr 24.0.3 real loaded-Core
-  BEGIN/ROLLBACK and two authenticated synthetic-member contribution+Agenda
-  bookings were Owner-observed, with independent before/after witness
-  snapshots. POS01-B's original STOP for a missing description marker is
-  preserved; the Owner waived a marker-only rerun for external review entry.
-  External implementation/security review, real negative and other-profile
-  regression, development merge and v0.1.0 release remain open.
+- CF-02 / PR #29: implement bounded CoreGuarded contribution-only booking,
+  server-side direct-service feature restrictions, transaction/terminal STOP
+  and file-session admission. Independent final review of exact HEAD
+  `290782dfdf6d6048b801843b5e1c4e464ac3bfdc` concluded **APPROVED FOR
+  DEVELOPMENT MERGE WITH DOCUMENTED LIMITS**; F29-01/P1 and F29-02/P1
+  **CLOSED**, no remaining P0/P1 blockers; standard PR CI **9/9 PASS**.
+  New Owner-operated restricted-MySQL authenticated POS01-C formally **PASS**:
+  member #58 / subscription #67, EUR 120, correct 2080 dates and persisted
+  marker, one Agenda action/resource, matching Core R16 end, no unexpected
+  protected-table count change. Independent readback and baseline integrity
+  checked; physical commit-event identity is not claimed. Historical POS01-A/B
+  STOPs and Owner review-entry exception are preserved. Separate Owner
+  development-merge authorization fulfilled by normal PR #29 merge
+  `f0b1e6d40ff55abb1e7555c800caea0fdd1fe90d`.
+  D29-01/P3 documentation drift resolved. CF-03 real negative/other-profile
+  regression, release artifacts, production and v0.1.0 approval remain OPEN.
 - CF-01: add administrator-controlled transaction profiles with entity-specific revision/CAS,
   safe explicit MySQL migration and unchanged MariaDB Snapshot default. Separate read-only
   preview from final/per-member booking admission; invalidate stale confirmations without
-  reopening consumed results. Core-Guarded bookings remain disabled pending CF-02/qualification.
-  Development implementation pending independent review/Owner acceptance; no release approval.
+  reopening consumed results. CoreGuarded contribution-only booking was later implemented,
+  independently reviewed and development-merged in PR #29 as recorded above; no release approval.
 
 - Issue #8: replace the fixed 50-member booking cap with configurable
   `MEMBERSUBSCRIPTIONMASSACTION_MAX_MEMBERS_PER_BATCH`, default 100 even for
