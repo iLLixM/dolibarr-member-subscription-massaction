@@ -2,6 +2,12 @@
 
 Status: **Stage 0 inventory and Stage 1 read-only witness scaffolding committed; no live CF-03 operator test executed or authorized by this document**. Source baseline: main `786f271240d230b90fad77fe1c3397d1ec796f81` (2026-11-20). The active PR HEAD must be pinned separately at the time of each test. Binding scope: [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22), [ADR-0001](adr/ADR-0001-core-first-transaction-profiles.md), D-01/D-02 and E01–E15.
 
+## Owner A–D preflight disposition (2026-11-20)
+
+**Stage 0 environmental readiness: A/B/C/D all PASS on read-only `--preflight`.** The Owner provided a complete console record from corrected PR #32 source, including 171 pure unit assertions PASS on the local and hosted checkouts. A/C use the same MySQL 8.4.13 V24 schema under different manually selected restricted/Enhanced DB users and matching entity-1 profiles; P_S SELECT was denied 1142 for A and allowed for C. B passed MariaDBSnapshot/MariaDB 10.11.19. D passed CoreGuarded/MySQL 8.4.13/Dolibarr 22.0.5 on PHP 8.3.37 and denied P_S SELECT 1142. All eleven recorded module/tool source hashes and nine selected deployed production hashes were consistent across A–D; A/B/C V24 Core fingerprints matched, and D used distinct expected V22 Core file hashes with `filefunc.inc.php`.
+
+The initial D `CF03WrongDolibarrRoot` remains a historical preflight tool STOP, now resolved by the V22 filefunc version detection. **D's `deployment_kind=source_checkout`: no ZIP-origin/installation PASS is claimed.** Real HTTP, positive/negative booking, faults/rollback, invoice, active Enhanced observer, concurrency/replay and hosted private evidence-root qualification remain **NOT EXECUTED**. Full sanitized details in [Owner A–D preflight evidence](evidence/cf03/stage01-owner-preflight-2026-11-20.md). This later evidence supersedes dated `NOT EXECUTED` preflight markers below for current Stage 0 status; all six Issue #22 CF-03 acceptance checkboxes remain OPEN.
+
 ## 1. Binding environment assignments
 
 | Environment | Profile | Installed Dolibarr / PHP | MySQL / MariaDB | Web / document root | Schema/account | Evidence level |
