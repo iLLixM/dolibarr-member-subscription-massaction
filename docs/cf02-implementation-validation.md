@@ -51,3 +51,26 @@ Historical D-01, AP3 and F27 evidence files are unchanged; a new result must be 
 ## Automated PR-CI execution at integration HEAD (2026-11-20)
 
 [GitHub PR-CI run #44711013746](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44711013746) completed **9/9 SUCCESS** for commit `6d220c91c7c72ef86b0207069c86e52be84de124`. This included PHP 7.4 with Dolibarr V22.0.0/V22.0.5, PHP 8.2 with V22.0.5/V23.0.0/V23.0.4/V24.0.0–V24.0.3, all synthetic Core-Guarded adapter/file-session runners, and historical booking, controller, invoice, mail, terminal and request tests. The first two earlier PR-CI runs failed due to incomplete test double wiring (`SyntheticDatabaseState::beginAttempted`, missing `F28Service::coreGuardedReadiness`) and were corrected with follow-up commits; these historical failures are not erased. The new run confirms only the tested synthetic contracts. **Real HTTP, MySQL business DML and MariaDB/Enhanced regressions remain NOT EXECUTED.**
+
+## Operator loaded-Core restricted MySQL empty-transaction gate
+
+Added `tools/cf02-loaded-core-entry.php`. It loads genuine pinned Dolibarr Core
+database methods and the existing local MySQL application configuration, without
+HTTP/business bootstrap. The default `--check-only` performs bounded
+read-only admission; `--empty-transaction` additionally requires
+`CF02_ACK_EMPTY_TRANSACTION=YES`, performs exactly one Core BEGIN/ROLLBACK on
+an empty own transaction, and **never** writes contribution/customer/Agenda DML.
+It checks the exact restricted database/schema identity and fails closed.
+This is a separately limited D-01 loaded-Core gate, **NOT** an authenticated
+HTTP/Agenda contribution integration test. This script has been syntax checked
+locally but has **NOT EXECUTED** against the real database by the author.
+
+Run in the operator's isolated MySQL V24.0.3 installation, as the web-account:
+
+    CF02_DOLIBARR_ROOT=/home/marcel/dolibarr-i105-v24-mysql \
+      sudo -u www-data /usr/bin/php -d xdebug.mode=off tools/cf02-loaded-core-entry.php --check-only
+
+Only after verifying the output and intended target, optionally execute the
+separate empty transaction mode with `CF02_ACK_EMPTY_TRANSACTION=YES`.
+Do not repeat after an unexpected STOP, and never paste the Dolibarr conf.php
+or passwords into the evidence or PR.
