@@ -174,6 +174,10 @@ function cf03Configure($id,array $env)
         $name=substr($column['TABLE_NAME'],4);
         $columns[$name][]=$column['COLUMN_NAME'];
     }
+    // information_schema row order is unspecified; fingerprint a stable schema.
+    foreach ($columns as &$names) { sort($names, SORT_STRING); }
+    unset($names);
+    ksort($columns, SORT_STRING);
     Cf03LabContract::columnsComplete($columns);
     foreach (Cf03LabContract::BASIC_ENGINES as $name) {
         Cf03LabContract::need(($engines[$name]??null)==='InnoDB','CF03RequiredEngineUnavailable');
