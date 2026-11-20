@@ -82,4 +82,3 @@ The six Issue #22 CF-03 checkboxes **stay unchecked** until qualified with compl
 3. Owner sets A and C accounts and matching profiles **manually**, one exclusive test window at a time. Both share unchanged schema; snapshots must be completed before switching.
 4. After review of four preflight results, prepare separate authorized targeted UI/fault/invoice/ZIP operator procedures with fresh fixtures and explicit safe action permits. Repeat existing positive case only when it adds evidence.
 5. Before final PR merge, rerun affected CI and independently review implementation/evidence; CF-04 final v0.1.0 package/Owner GO remains open.
-
