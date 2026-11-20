@@ -67,10 +67,33 @@ locally but has **NOT EXECUTED** against the real database by the author.
 
 Run in the operator's isolated MySQL V24.0.3 installation, as the web-account:
 
-    CF02_DOLIBARR_ROOT=/home/marcel/dolibarr-i105-v24-mysql \
-      sudo -u www-data /usr/bin/php -d xdebug.mode=off tools/cf02-loaded-core-entry.php --check-only
+    sudo -u www-data env CF02_DOLIBARR_ROOT=/home/marcel/dolibarr-i105-v24-mysql \
+      /usr/bin/php -d xdebug.mode=off tools/cf02-loaded-core-entry.php --check-only
 
 Only after verifying the output and intended target, optionally execute the
 separate empty transaction mode with `CF02_ACK_EMPTY_TRANSACTION=YES`.
 Do not repeat after an unexpected STOP, and never paste the Dolibarr conf.php
 or passwords into the evidence or PR.
+
+## Direct replay-latch follow-up and final initial CI (2026-11-20)
+
+An additional service capability gate binds the MsmFileBookingCheckpoint object
+to the original live confirmation phase and captures the expected member rows,
+options, revision, owner and entity *before* session consumption. After durable
+consumption it verifies the independently reopened file-session snapshot, and
+latches each member's attempt once per controller/request. A new checkpoint
+constructed from an already consumed session is not a valid booking capability,
+preventing E15/UNKNOWN direct-service replay through freshly constructed objects.
+The initial 15 file-session assertions were extended to **19 PASS** locally.
+
+[GitHub PR-CI run #44711910617](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44711910617):
+**9/9 PASS** at commit `c2972cdefc73ca6dad7c57527ec3254c5bd3dc63`.
+The first two CI attempts and their genuine synthetic fixture failures are retained
+in the PR history; no rewriting of earlier evidence. This green CI is synthetic
+and does not itself qualify authenticated HTTP or business contributions.
+
+Operator testing must begin with the non-writing restricted-account read-only
+script and the non-writing loaded-Core `--check-only` script. The optional
+`--empty-transaction` mode runs only a single empty Core BEGIN/ROLLBACK with an
+explicit environment opt-in; it does not issue member, customer or Agenda DML.
+Real contribution/Agenda/invoice and concurrency qualification remain open.
