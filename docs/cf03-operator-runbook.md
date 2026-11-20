@@ -101,6 +101,12 @@ A valid, admitted case's `--verify` now creates `verify.started` **before databa
 
 **Paket A is not a real-test release:** further P1/P2 review findings remain. Do not perform a new business booking with this corrected branch until Paket B, final CI and independent review explicitly authorize the individual scenario.
 
+## Paket B operator requirements — source and actor-bound invoice/Agenda
+
+The preflight now evaluates a wider deterministic PHP source inventory, and each case binds the configured product (invoice only) plus the real authenticated operator (Agenda ON). On a **new** synthetic Contribution or Invoice-existing case with `--agenda=on`, add **`--actor-id=<ACTUAL_AUTHENTICATED_DOLIBARR_USER_ROWID>`** consistently to check-only, baseline and verify; the argument must represent the browser-operator executing the one authenticated action. For Agenda OFF and no-change scenarios, omit the actor argument. Invoice-existing on B/C uses the actual configured `ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS`, product type (0 goods / 1 service), existing eligible customer (1 or 3), and `--invoice-quantity=1` only. Do not invent an invoice product or change legitimate settings merely to produce a PASS.
+
+At preflight and each baseline/verify readback, module PHP files and selected Dolibarr V22/V24 Core critical-path files are hashed and compared. A hosted D deployment may be a checkout, not an installed ZIP, and this hash contract alone does not attest the complete ZIP. Real tests remain prohibited pending independent F32-W01 follow-up review and scenario-specific Owner admission.
+
 ## 2. Stage-1 snapshot witness (not an authorization to run a booking)
 
 `--check-only`, `--baseline`, and `--verify` additionally require a freshly created synthetic member. The following *generic* A example uses placeholders; replace with values of an **entirely new** member (do not reuse 56, 57, 58 or a historical CF02 marker).
