@@ -47,6 +47,8 @@ function c3make($id,$scenario,$agenda)
             'raw_hash'=>str_repeat('a',64)),
         'engines'=>$engines,'type'=>array('id'=>2,'status'=>1,'amount'=>'120.00000000'),
         'source_hashes'=>array('php'=>str_repeat('b',64)),
+        'deployed_source_hashes'=>array('product'=>str_repeat('f',64)),
+        'deployment_kind'=>$id==='D'?'verified_deployed_copy':'source_checkout',
         'core_source_hashes'=>array('core'=>str_repeat('e',64)),
         'config_sha256'=>str_repeat('c',64),
         'performance_schema'=>$env['ps']==='select'?'select_allowed':
@@ -125,7 +127,11 @@ foreach(array('A','B','C','D') as $id) {
             c3stop(static function()use($before,$wrong,$e,$id){
                 Cf03LabContract::verify($before,$wrong,$e,$id);
             },'unexpected bank DML');
-                        $wrong=$after;$wrong['core_source_hashes']['core']=str_repeat('a',64);
+                        $wrong=$after;$wrong['deployed_source_hashes']['product']=str_repeat('d',64);
+            c3stop(static function()use($before,$wrong,$e,$id){
+                Cf03LabContract::verify($before,$wrong,$e,$id);
+            },'deployed product source changed');
+            $wrong=$after;$wrong['core_source_hashes']['core']=str_repeat('a',64);
             c3stop(static function()use($before,$wrong,$e,$id){
                 Cf03LabContract::verify($before,$wrong,$e,$id);
             },'Dolibarr Core source changed');
