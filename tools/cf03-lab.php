@@ -8,6 +8,7 @@ if (PHP_SAPI!=='cli') { exit(64); }
 ini_set('display_errors','0');
 umask(0077);
 require_once __DIR__.'/cf03-lab.lib.php';
+require_once __DIR__.'/cf03-source.lib.php';
 
 function cf03Query($db,$sql)
 {
@@ -32,18 +33,7 @@ function cf03Quoted($db,$value)
 }
 function cf03Source()
 {
-    $paths=array('subscription.php','class/booking.class.php','class/databasestate.class.php',
-        'class/coreguardedtransaction.class.php','class/coreguardedrightsdb.class.php',
-        'class/transactionprofile.class.php','class/filebookingcheckpoint.class.php',
-        'class/invoice.class.php','lib/booking.lib.php','tools/cf03-lab.php',
-        'tools/cf03-lab.lib.php','tools/cf03-evidence.lib.php');
-    $out=array();
-    foreach ($paths as $path) {
-        $file=dirname(__DIR__).'/'.$path;
-        Cf03LabContract::need(is_file($file) && !is_link($file),'CF03SourceUnavailable');
-        $out[$path]=hash_file('sha256',$file);
-    }
-    return $out;
+    return Cf03SourceManifest::fullModuleSource(dirname(__DIR__));
 }
 function cf03Configure($id,array $env)
 {
@@ -64,32 +54,13 @@ function cf03Configure($id,array $env)
         && ($id==='D' || $module===$checkout),'CF03WrongModuleSymlink');
     // D is tested from a deployed ZIP copy, not necessarily a checkout symlink.
     // Compare every selected runtime file with this exact CF-03 source checkout.
-    $deployed=array();
-    foreach (array('subscription.php','class/booking.class.php',
-        'class/databasestate.class.php','class/coreguardedtransaction.class.php',
-        'class/coreguardedrightsdb.class.php','class/transactionprofile.class.php',
-        'class/filebookingcheckpoint.class.php','class/invoice.class.php',
-        'lib/booking.lib.php') as $path) {
-        $installed=$module.'/'.$path; $source=$checkout.'/'.$path;
-        Cf03LabContract::need(is_file($installed) && is_file($source)
-            && !is_link($installed) && !is_link($source),'CF03DeployedSourceMissing');
-        $actual=hash_file('sha256',$installed);
-        Cf03LabContract::need(hash_equals(hash_file('sha256',$source),$actual),
-            'CF03DeployedSourceMismatch');
-        $deployed[$path]=$actual;
-    }
+    $deployed=Cf03SourceManifest::deployed($checkout,$module);
     $version=file_get_contents($root.'/'.$versionPath);
     Cf03LabContract::assertCoreVersion($env['core_version'],$version);
     // Bind the actual selected Core source in addition to its version string.
-    $corePaths=array($versionPath,'adherents/class/adherent.class.php',
-        'core/db/mysqli.class.php','user/class/user.class.php');
-    $coreHashes=array();
-    foreach($corePaths as $path) {
-        $coreFile=$root.'/'.$path;
-        Cf03LabContract::need(is_file($coreFile) && !is_link($coreFile),
-            'CF03CoreSourceUnavailable');
-        $coreHashes[$path]=hash_file('sha256',$coreFile);
-    }
+    $coreHashes=Cf03SourceManifest::hashes($root,
+        Cf03SourceManifest::corePaths($env['core_version'],'preflight'),
+        'CF03CoreSourceUnavailable');
     // Approved local Dolibarr config; execute as its trusted web system user.
     require $root.'/conf/conf.php';
     Cf03LabContract::need(($dolibarr_main_db_type??'')==='mysqli'
@@ -196,6 +167,7 @@ function cf03Configure($id,array $env)
             'completion'=>(string)$identity['completion']),
         'profile'=>$profile,'performance_schema'=>$ps,'engines'=>$engines,
         'source_hashes'=>cf03Source(),
+        'source_manifest_version'=>'CF03-W01-MODULE-PHP-1',
         'deployed_source_hashes'=>$deployed,
         'deployment_kind'=>$module===$checkout?'source_checkout':'verified_deployed_copy',
         'core_source_hashes'=>$coreHashes,
@@ -324,6 +296,7 @@ function cf03State($db,array $context,array $expected)
         'profile'=>$context['profile'],
         'engines'=>$context['engines'],
         'source_hashes'=>$context['source_hashes'],
+        'source_manifest_version'=>$context['source_manifest_version'],
         'deployed_source_hashes'=>$context['deployed_source_hashes'],
         'deployment_kind'=>$context['deployment_kind'],
         'core_source_hashes'=>$context['core_source_hashes'],
@@ -392,6 +365,7 @@ try {
             'profile_sha256'=>$context['profile']['raw_hash'],
             'config_sha256'=>$context['config_sha256'],
             'source_hashes'=>$context['source_hashes'],
+            'source_manifest_version'=>$context['source_manifest_version'],
             'deployed_source_hashes'=>$context['deployed_source_hashes'],
             'deployment_kind'=>$context['deployment_kind'],
             'core_source_hashes'=>$context['core_source_hashes'],
