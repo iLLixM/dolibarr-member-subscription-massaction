@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- CF-02 development / Draft PR #29: bounded Core-Guarded MySQL contribution
+  adapter using D-01 SET RR immediately before Core BEGIN, acknowledged
+  Core commit/rollback and terminal completion STOP; direct processing
+  file-session admission, contribution-only server-side features, 88 adapter
+  and 15 session assertions initially passed locally. Real MySQL/HTTP/Agenda
+  and Enhanced/MariaDB business regression remain NOT EXECUTED on this
+  code; independent review and release remain pending.
+
 - CF-01: add administrator-controlled transaction profiles with entity-specific revision/CAS,
   safe explicit MySQL migration and unchanged MariaDB Snapshot default. Separate read-only
   preview from final/per-member booking admission; invalidate stale confirmations without

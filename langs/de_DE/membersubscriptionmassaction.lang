@@ -129,9 +129,9 @@ MSMBatchLimitDetail=Sie haben %s Mitglieder ausgewählt. Aktuell sind höchstens
 
 // CF-01 profile selection and readiness
 MSMProfileSetup=Transaktionsprofil
-MSMProfileSetupHelp=Das Datenbankprofil für diesen Mandanten ausdrücklich auswählen. Neue MySQL-Installationen sollen Core-Guarded für die spätere Nutzung wählen; Buchungen bleiben bis zum Abschluss der Implementierung und Qualifikation gesperrt. Bestehende MySQL-Installationen können Enhanced ausdrücklich beibehalten. Eine fehlende Konfiguration beweist keine Neuinstallation. Jede Speicherung macht alte Bestätigungen ungültig. Kein automatischer Fallback.
+MSMProfileSetupHelp=Das Datenbankprofil für diesen Mandanten ausdrücklich auswählen. Der Core-Guarded-Entwicklungszweig für reine Beitragsbuchungen ist noch nicht unabhängig geprüft oder real integriert qualifiziert; Rechnungs-/Kundenanlage und E-Mail bleiben gesperrt. Enhanced kann ausdrücklich gewählt werden. Fehlende MySQL-Konfiguration erfordert eine Administratorentscheidung. Jede Speicherung macht alte Bestätigungen ungültig. Kein automatischer Fallback.
 MSMProfileSelect=Profil auswählen
-MSMProfileCoreGuarded=Core-Guarded (Buchung noch nicht verfügbar)
+MSMProfileCoreGuarded=Core-Guarded (nur Beiträge; Entwicklungsqualifikation ausstehend)
 MSMProfileEnhancedMySQL=Enhanced MySQL (Performance Schema erforderlich)
 MSMProfileMariaDBSnapshot=MariaDB Snapshot
 MSMProfileSelectionRequired=Ein MySQL-Profil muss gewählt werden. Ein Administrator muss das Profil in der Moduleinrichtung ausdrücklich festlegen; eine fehlende Konfiguration kennzeichnet keine Neuinstallation. Die Vorschau bleibt schreibfrei.

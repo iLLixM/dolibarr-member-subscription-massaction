@@ -1,23 +1,19 @@
 # Member Subscription Massaction for Dolibarr
 
-**Current Core-first development status — 2026-11-18:** CF-01 is Owner-accepted
-and merged in [PR #24](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/24).
-D-01 [PR #25](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/25)
-is merged as `3bc9e4653778cdc870d79e2f5b7e025bc9ca036a`: bounded evidence accepted,
-**Option A — Bounded STOP conditionally approved**. Core-Guarded booking remains
-**disabled / not qualified**. Before CF-02 contribution DML, independently assessed
-completion/session-checkpoint/logger evidence is mandatory and still **NOT EXECUTED**.
-The conditional design preserves acknowledged member results but stops immediately
-after CHAIN/RELEASE before further SQL, mail/PDF or another member; controlled partial
-processing must be transparent. It does not guarantee complete multi-member batches
-under every MySQL configuration. See the [Owner architecture addendum](docs/adr/ADR-0001-core-first-transaction-profiles.md#d-01-owner-addendum--2026-11-18)
-and [evidence/remaining gates](docs/phase4-implementation-validation.md#d-01-evidence-and-conditional-option-a-closure--2026-11-18).
-No general P_S prerequisite, compatibility, production or release approval follows.
-Permanent CHAIN/RELEASE support and Option C remain separate later decisions;
-EnhancedMySQL/MariaDB behavior and their bounded evidence remain unchanged.
-This AP2 documentation proposal awaits independent review and separate Owner
-acceptance before merge. Earlier dated development/evidence records below remain
-historical; the unchanged D-01 experiment verdict is not retroactively replaced.
+**CF-02 development status — 2026-11-20:** A bounded Core-Guarded
+contribution-only adapter is now under development in
+[Draft PR #29](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/29).
+This is **NOT a production-qualified, independently approved or released feature**.
+The six pre-CF-02 Completion Gates in Issue #22 were Owner-accepted with documented
+limits; the new implementation must still pass its own independent code review and
+real restricted-MySQL/Agenda/HTTP qualification. CoreGuarded permits contributions
+only: invoice/customer creation, PDF and email are disabled. Under CHAIN/RELEASE a
+confirmed member result remains acknowledged while the batch immediately stops
+without processing remaining members. There is no generic Performance Schema
+prerequisite, no new journal, no automatic retry, no physical event-identity
+equivalence, and no fallback from Enhanced MySQL. See the
+[CF-02 development evidence](docs/cf02-implementation-validation.md) and
+[binding ADR](docs/adr/ADR-0001-core-first-transaction-profiles.md).
 
 **Database development status — 2026-11-17:** MariaDB and Oracle MySQL use the
 shared `MsmDatabaseState` observer. Original **I1-05 FAILED** (19/20), subsequent
@@ -108,10 +104,12 @@ The separate MySQL iteration below adds its explicitly bounded invoice evidence.
 ## Transaction profile setup (CF-01)
 
 Administrators select a profile under the module's setup link (entity-specific).
-Core-Guarded on Oracle MySQL is available for future use, but **all Core-Guarded
-bookings are blocked until CF-02 implementation/qualification**. It never falls
-back to Enhanced. Read-only preview works without physical observer readiness;
-booking independently checks current configuration and the existing observer.
+In the CF-02 development branch, Core-Guarded on Oracle MySQL permits **contribution
+booking only**, guarded by the bounded Core-first adapter, local file-session
+checkpoint and standard file-logger preconditions. It is NOT independently
+reviewed or production qualified. Invoice/customer creation and email/PDF remain
+disabled, and it never falls back to Enhanced. Read-only preview does not require
+physical observer readiness; booking performs current profile and business checks.
 
 Missing MySQL configuration does not prove a new installation: fresh, legacy and
 reactivated installations with unknown history require an explicit administrator
@@ -193,9 +191,9 @@ a one-shot `SET TRANSACTION` differs from the session default. No
 for this profile. Observer queries filter to the current thread; the table-level
 SELECT permission itself does not restrict access to that thread's rows.
 These P_S prerequisites apply to EnhancedMySQL booking, not to read-only preview
-or to Core-Guarded as a general requirement. Core-Guarded booking remains blocked
-until CF-02 implementation/qualification; no additional compatibility or release
-approval follows from profile selection. Missing Enhanced rights/events/freshness
+or to Core-Guarded as a general requirement. The CF-02 Core-Guarded adapter in
+Draft PR #29 is intended for isolated development qualification only. No new
+production compatibility or release approval follows from profile selection. Missing Enhanced rights/events/freshness
 fail closed. Idle calibration reads an existing InnoDB member row; an empty member
 table is not silently seeded or accepted.
 
