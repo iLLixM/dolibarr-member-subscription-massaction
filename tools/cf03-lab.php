@@ -212,8 +212,8 @@ function cf03State($db,array $context,array $expected)
     $m=cf03One($db,'SELECT rowid,ref,firstname,lastname,email,entity,'
         .'fk_adherent_type,fk_soc,statut,CAST(datefin AS CHAR) AS datefin '
         .'FROM llx_adherent WHERE rowid='.$id);
-    $t=cf03One($db,'SELECT rowid,statut,amount,duration FROM llx_adherent_type WHERE rowid='
-        .(int)$m['fk_adherent_type']);
+    $t=cf03One($db,'SELECT rowid,statut,entity,subscription,amount,duration '
+        .'FROM llx_adherent_type WHERE rowid='.(int)$m['fk_adherent_type']);
     $flags=cf03Query($db,"SELECT name, value, entity FROM llx_const "
         ."WHERE name IN ('MAIN_MODULE_AGENDA','MAIN_AGENDA_ACTIONAUTO_MEMBER_SUBSCRIPTION_CREATE',"
         ."'MAIN_AGENDA_ACTIONAUTO_BILL_CREATE','MAIN_AGENDA_ACTIONAUTO_BILL_VALIDATE',"
@@ -337,6 +337,7 @@ function cf03State($db,array $context,array $expected)
             'fk_soc'=>(int)$m['fk_soc'],'status'=>(int)$m['statut'],
             'datefin'=>$m['datefin']),
         'type'=>array('id'=>(int)$t['rowid'],'status'=>(int)$t['statut'],
+            'entity'=>(int)$t['entity'],'subscription'=>(string)$t['subscription'],
             'amount'=>$t['amount'],'duration'=>$t['duration']),
         'agenda_enabled'=>$on['MAIN_MODULE_AGENDA']==='1'
             && $on['MAIN_AGENDA_ACTIONAUTO_MEMBER_SUBSCRIPTION_CREATE']==='1',
