@@ -14,6 +14,10 @@ The read-only A–D preflights completed **4/4 Owner PASS** on earlier source. F
 
 The invoice witness deliberately rejects unsupported `LINEBILL_INSERT` event attribution; separate live invoice/customer/PDF/SMTP/observer tests remain necessary. All six CF-03 Issue #22 checkboxes remain OPEN, the PR remains DRAFT, and Owner merge/release GO remains separate.
 
+## CF03-W01 Paket B remediation (2026-11-20)
+
+Owner-approved bounded runtime-source and business-contract correction in Draft PR #32: F32-W01-02 (deterministic PHP inventory of module production sources + scenario-relevant pinned Dolibarr V22/V24 Core subset; matching deployed module source copy, no ZIP attestation), F32-W01-06 (configured invoice product `fk_product_type` 0/1), F32-W01-07 (only customers `client=1/3`), F32-W01-08 (read-only validation of active entity-1 authenticated operator and Core Agenda event author/owner/resource), and F32-W01-09 (exactly one invoice unit). All five now have targeted positive/negative synthetic regressions. Together with Paket A, this is **implementation evidence only**: independent delta review of **all ten** F32-W01 findings and Owner A–D re-preflight are still pending. Previous Owner A–D preflights belong to pre-W01 source. Realtest families all remain **NO-GO**, PR #32 stays DRAFT, and Issue #22's six CF-03 qualification checkboxes remain OPEN. See [W01 validation](cf03-w01-validation.md).
+
 ## 1. Binding environment assignments
 
 | Environment | Profile | Installed Dolibarr / PHP | MySQL / MariaDB | Web / document root | Schema/account | Evidence level |
