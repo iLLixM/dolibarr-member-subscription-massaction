@@ -49,6 +49,31 @@ final class Cf03LabContract
         );
     }
 
+    /** V22 defines DOL_VERSION in filefunc; V24 uses a dedicated version file.
+     * Read the installed source without executing bootstrap code or trusting DB labels.
+     */
+    public static function versionSource($expected)
+    {
+        if ($expected === '22.0.5') { return 'filefunc.inc.php'; }
+        if ($expected === '24.0.3') { return 'version.inc.php'; }
+        throw new RuntimeException('CF03CoreVersionPolicyUnsupported');
+    }
+
+    public static function assertCoreVersion($expected, $source)
+    {
+        self::versionSource($expected);
+        self::need(is_string($source), 'CF03CoreVersionReadUnavailable');
+        if ($expected === '22.0.5') {
+            self::need(preg_match("/^[ \t]*define\('DOL_VERSION',\s*'22\.0\.5'\);/m",
+                $source) === 1, 'CF03WrongCoreVersion');
+            return;
+        }
+        self::need(preg_match("/^[ \t]*define\('DOL_MAJOR_VERSION',\s*'24'\);/m",
+            $source) === 1
+            && preg_match("/^[ \t]*define\('DOL_MINOR_VERSION',\s*'0\.3'\);/m",
+                $source) === 1, 'CF03WrongCoreVersion');
+    }
+
     public static function arguments(array $argv)
     {
         $mode=null; $opts=array();
