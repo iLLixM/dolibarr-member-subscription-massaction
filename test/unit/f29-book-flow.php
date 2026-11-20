@@ -9,11 +9,10 @@ ob_start();
 require __DIR__.'/booking.php';
 ob_end_clean();
 require_once DOL_DOCUMENT_ROOT.'/core/modules/syslog/mod_syslog_file.php';
-if (class_exists('User', false)) {
-    throw new RuntimeException('Unexpected real User class in synthetic F29 test');
-}
-/** Models the pinned Core: fetch_optionals() SQL failure is ignored by fetch(). */
-class User
+/** Models Core User's ignored fetch_optionals() SQL failure, without replacing the
+ * pinned Core User class already loaded by the booking test bootstrap.
+ */
+class F29FlowUser
 {
     public static $latest;
     public $db; public $id = 0; public $status = 1; public $errors = array();
@@ -97,6 +96,7 @@ class F29FlowBookingService extends MsmBookingService
         $this->tx = new F29FlowCoreTransaction($db);
     }
     protected function coreTransaction() { return $this->tx; }
+    protected function newCurrentUser() { return new F29FlowUser($this->profileDb); }
     protected function member($id) { $this->memberCalls++; throw new LogicException('Business operation reached after injected fault'); }
 }
 class F29FlowMailer
@@ -138,7 +138,7 @@ try {
         $checkpoint = new MsmFileBookingCheckpoint($key);
         f29FlowCheck(session_write_close(), 'confirmation persisted '.$fault);
         f29FlowCheck(session_start(), 'reopen before confirmation consumption '.$fault);
-        $processing = msmConsumeConfirmation($state, array('preview'=>$key,'revision'=>'3','action'=>'book','token'=>'synthetic'), 'book');
+        $processing = msmConsumeConfirmation($state, array('preview'=>$key,'revision'=>'3','action'=>'book','token'=>'synthetic'));
         $_SESSION['msm_previews'][$key] = $processing;
         f29FlowCheck(session_write_close(), 'consumption persisted '.$fault);
         $mail = new F29FlowMailer();
@@ -160,7 +160,7 @@ try {
             ? array('user-fetch','optionals')
             : array('user-fetch','optionals','rights-user')),
             'first SQL failure cuts off the user reload '.$fault);
-        f29FlowCheck(User::$latest->db === $db, 'original user DoliDB restored '.$fault);
+        f29FlowCheck(F29FlowUser::$latest->db === $db, 'original user DoliDB restored '.$fault);
         f29FlowCheck(session_start(), 'read durable terminal result '.$fault);
         $stored = $_SESSION['msm_previews'][$key];
         f29FlowCheck($stored['results'][1]['status'] === 'unknown'

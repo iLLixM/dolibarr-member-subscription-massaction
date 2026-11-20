@@ -49,9 +49,11 @@ class MsmBookingService
 		$member = new MsmBookingMember($this->db); $member->id = $id;
 		return $member;
 	}
+	/** Fresh Core user; overridable solely by isolated synthetic test fixtures. */
+	protected function newCurrentUser() { return new User($this->db); }
 	protected function currentUser($user, $coreGuarded = false)
 	{
-		$current = new User($this->db);
+		$current = $this->newCurrentUser();
 		if ($coreGuarded) {
 			// Core User::fetch() returns 0 for a missing user and <0 for a
 			// SQL/load error. A technical error must never be rollback-qualified
