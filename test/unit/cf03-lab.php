@@ -291,6 +291,67 @@ c3stop(static function(){
     Cf03LabContract::arguments(array('cf03-lab.php','--preflight','--environment=A',
         '--evidence-dir=/tmp/unsafe'));
 },'preflight cannot write evidence','CF03EvidencePathNotPermitted');
+// Paket B: product, customer and Core Agenda identity negative/positive contracts.
+foreach (array('B','C') as $environment) {
+    list($e,$before,$after)=c3make($environment,'invoice-existing','on');
+    $e['invoice']['product']=19;
+    $before['invoice_product']=array('id'=>19,'type'=>0,'status'=>1,'entity'=>1);
+    $after['invoice_product']=$before['invoice_product'];
+    $after['invoices'][0]['lines'][0]['product']=19;
+    $after['invoices'][0]['lines'][0]['product_type']=0;
+    Cf03LabContract::baseline($before,$e,$environment);
+    c3ok(Cf03LabContract::verify($before,$after,$e,$environment)['status']==='PASS',
+        'valid goods invoice '.$environment);
+    $wrong=$after;$wrong['invoices'][0]['lines'][0]['product_type']=1;
+    c3stop(static function()use($before,$wrong,$e,$environment){
+        Cf03LabContract::verify($before,$wrong,$e,$environment);
+    },'wrong goods product type','CF03InvoiceLineMismatch');
+    $wrong=$before;$wrong['invoice_product']['type']=9;
+    c3stop(static function()use($wrong,$e,$environment){
+        Cf03LabContract::baseline($wrong,$e,$environment);
+    },'unsupported product type','CF03InvoiceProductMismatch');
+    $wrong=$before;$wrong['invoice_product']['id']=20;
+    c3stop(static function()use($wrong,$e,$environment){
+        Cf03LabContract::baseline($wrong,$e,$environment);
+    },'product unrelated to confirmed plan','CF03InvoiceProductMismatch');
+    foreach (array(0,2) as $client) {
+        $wrong=$before;$wrong['customer']['client']=$client;
+        c3stop(static function()use($wrong,$e,$environment){
+            Cf03LabContract::baseline($wrong,$e,$environment);
+        },'prospect-only/noncustomer denied '.$client,'CF03InvoiceCustomerMismatch');
+    }
+    $before['customer']['client']=3;$after['customer']['client']=3;
+    Cf03LabContract::baseline($before,$e,$environment);
+    c3ok(Cf03LabContract::verify($before,$after,$e,$environment)['status']==='PASS',
+        'combined customer/prospect eligible');
+    $wrong=$after;$wrong['invoice_agenda_events'][0]['author_id']=43;
+    c3stop(static function()use($before,$wrong,$e,$environment){
+        Cf03LabContract::verify($before,$wrong,$e,$environment);
+    },'invoice event wrong author','CF03InvoiceAgendaActorMismatch');
+    $wrong=$after;$wrong['invoice_agenda_resources'][0]['actor_id']=43;
+    c3stop(static function()use($before,$wrong,$e,$environment){
+        Cf03LabContract::verify($before,$wrong,$e,$environment);
+    },'invoice wrong actor assignment','CF03InvoiceAgendaActorMismatch');
+    $wrong=$before;$wrong['actor']['status']=0;
+    c3stop(static function()use($wrong,$e,$environment){
+        Cf03LabContract::baseline($wrong,$e,$environment);
+    },'inactive actor admission denied','CF03ExpectedActorUnavailable');
+}
+foreach (array('A','B','C','D') as $environment) {
+    list($e,$before,$after)=c3make($environment,'contribution','on');
+    $wrong=$after;$wrong['agenda_events'][0]['owner_id']=44;
+    c3stop(static function()use($before,$wrong,$e,$environment){
+        Cf03LabContract::verify($before,$wrong,$e,$environment);
+    },'wrong member Agenda owner','CF03AgendaActorMismatch');
+    $wrong=$after;$wrong['agenda_resources'][0]['actor_id']=44;
+    c3stop(static function()use($before,$wrong,$e,$environment){
+        Cf03LabContract::verify($before,$wrong,$e,$environment);
+    },'wrong member Agenda resource','CF03AgendaActorMismatch');
+    $wrong=$before;$wrong['actor']=null;
+    c3stop(static function()use($wrong,$e,$environment){
+        Cf03LabContract::baseline($wrong,$e,$environment);
+    },'unknown actor denied','CF03ExpectedActorUnavailable');
+}
 // W01 CLI contract: no implicit D evidence parent, no non-invoice extra flags,
 // explicit invoice expectations, and D base kept outside the legacy local path.
 $common=array('--member-id=271','--member-ref=MEM2611-0271',
@@ -337,6 +398,15 @@ c3stop(static function()use($invoiceArgs){
     $bad[array_search('--invoice-quantity=1',$bad,true)]='--invoice-quantity=0';
     Cf03LabContract::arguments($bad);
 },'zero invoice quantity denied','CF03InvalidInvoiceExpectedField');
+foreach (array('2','0.5','3.0') as $wrongQuantity) {
+    $bad=$invoiceArgs;
+    $bad[array_search('--invoice-quantity=1',$bad,true)]='--invoice-quantity='.$wrongQuantity;
+    c3stop(static function()use($bad){Cf03LabContract::arguments($bad);},
+        'unsupported quantity '.$wrongQuantity,'CF03InvalidInvoiceExpectedField');
+}
+$withoutActor=array_values(array_diff($invoiceArgs,array('--actor-id=4')));
+c3stop(static function()use($withoutActor){Cf03LabContract::arguments($withoutActor);},
+    'missing operator actor','CF03InvalidExpectedActor');
 c3stop(static function()use($invoiceArgs){
     $bad=$invoiceArgs;
     $bad[array_search('--invoice-currency=EUR',$bad,true)]='--invoice-currency=EU';
