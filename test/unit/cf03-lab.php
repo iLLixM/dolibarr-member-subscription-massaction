@@ -63,6 +63,8 @@ function c3make($id,$scenario,$agenda)
         'core_source_hashes'=>array('core'=>str_repeat('e',64)),
         'schema_columns'=>Cf03LabContract::columnPolicy(),
         'config_sha256'=>str_repeat('c',64),
+        'php_version'=>$id==='D'?'8.3.37':'8.2.35',
+        'php_major_minor'=>$id==='D'?'8.3':'8.2',
         'performance_schema'=>$env['ps']==='select'?'select_allowed':
             ($env['ps']==='denied'?'select_denied_1142':'not_required'),
         'agenda_enabled'=>$agenda==='on',
@@ -119,6 +121,35 @@ function c3make($id,$scenario,$agenda)
         }
     }
     return array($expected,$s,$after);
+}
+// GR-02: real environments must be pinned to the expected PHP major/minor;
+// baseline and verify additionally bind the exact patch/runtime version.
+foreach (array('A'=>'8.2','B'=>'8.2','C'=>'8.2','D'=>'8.3') as $envId=>$target) {
+    c3ok(Cf03LabContract::phpTarget($envId)===$target,
+        'expected PHP target '.$envId);
+    c3ok(Cf03LabContract::assertPhpRuntime($envId,$target.'.35')===$target,
+        'accepted PHP target '.$envId);
+    $incorrect=$envId==='D'?'8.2.35':'8.3.37';
+    c3stop(static function()use($envId,$incorrect){
+        Cf03LabContract::assertPhpRuntime($envId,$incorrect);
+    },'wrong target PHP '.$envId,'CF03WrongPHPRuntime');
+    list($runtimeExpected,$runtimeBefore,$runtimeAfter)=
+        c3make($envId,'no-change','off');
+    $runtimeWrong=$runtimeBefore;
+    $runtimeWrong['php_version']=$incorrect;
+    c3stop(static function()use($runtimeWrong,$runtimeExpected,$envId){
+        Cf03LabContract::baseline($runtimeWrong,$runtimeExpected,$envId);
+    },'wrong runtime baseline '.$envId,'CF03WrongPHPRuntime');
+    $runtimeWrong=$runtimeAfter;
+    $runtimeWrong['php_version']=$target.'.99';
+    c3stop(static function()use($runtimeBefore,$runtimeWrong,$runtimeExpected,$envId){
+        Cf03LabContract::verify($runtimeBefore,$runtimeWrong,$runtimeExpected,$envId);
+    },'changed PHP patch during case '.$envId,'CF03ContextChanged');
+    $runtimeWrong=$runtimeBefore;
+    unset($runtimeWrong['php_major_minor']);
+    c3stop(static function()use($runtimeWrong,$runtimeExpected,$envId){
+        Cf03LabContract::baseline($runtimeWrong,$runtimeExpected,$envId);
+    },'missing PHP major/minor '.$envId,'CF03WrongPHPRuntime');
 }
 // Regression: Dolibarr V22.0.5 has no htdocs/version.inc.php.
 // Official pinned V22 filefunc.inc.php defines DOL_VERSION directly;
