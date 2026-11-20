@@ -51,6 +51,12 @@ final class Cf03Evidence
         self::need(is_dir($root) && !is_link($root)
             && realpath($root) === $root && is_readable($root)
             && is_writable($root), 'CF03EvidenceParentUnavailable');
+        // Same trust boundary for A/B/C and D: a writable public parent can
+        // replace the case directory even when its own mode is 0700.
+        self::need((fileperms($root) & 0077) === 0
+            && function_exists('posix_geteuid')
+            && fileowner($root) === posix_geteuid(),
+            'CF03EvidenceRootNotPrivate');
         if ($environment === 'D') {
             $doc = realpath($documentRoot);
             $source = realpath($checkout);
@@ -66,10 +72,7 @@ final class Cf03Evidence
                 && !self::within($doc, $root)
                 && !self::within($source, $root),
                 'CF03EvidenceInsideWebOrSource');
-            self::need((fileperms($root) & 0077) === 0
-                && function_exists('posix_geteuid')
-                && fileowner($root) === posix_geteuid(),
-                'CF03EvidenceRootNotPrivate');
+
         }
     }
 
