@@ -165,6 +165,16 @@ function cf03Configure($id,array $env)
         ."WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME LIKE 'llx_%'") as $row) {
         $engines[substr($row['TABLE_NAME'],4)]=$row['ENGINE'];
     }
+    // Validate the exact V22/V24 SQL projection before admitting a witness case.
+    $columns=array();
+    $sqlTables=array_keys(Cf03LabContract::columnPolicy());
+    foreach (cf03Query($db,"SELECT TABLE_NAME,COLUMN_NAME FROM information_schema.COLUMNS "
+        ."WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME IN ('llx_"
+        .implode("','llx_",$sqlTables)."')") as $column) {
+        $name=substr($column['TABLE_NAME'],4);
+        $columns[$name][]=$column['COLUMN_NAME'];
+    }
+    Cf03LabContract::columnsComplete($columns);
     foreach (Cf03LabContract::BASIC_ENGINES as $name) {
         Cf03LabContract::need(($engines[$name]??null)==='InnoDB','CF03RequiredEngineUnavailable');
     }
@@ -185,6 +195,7 @@ function cf03Configure($id,array $env)
         'deployed_source_hashes'=>$deployed,
         'deployment_kind'=>$module===$checkout?'source_checkout':'verified_deployed_copy',
         'core_source_hashes'=>$coreHashes,
+        'schema_columns'=>$columns,
         'config_sha256'=>hash_file('sha256',$root.'/conf/conf.php'),
         'dolibarr_version'=>$env['core_version'],
         'php_version'=>PHP_VERSION,
@@ -200,7 +211,9 @@ function cf03State($db,array $context,array $expected)
     $t=cf03One($db,'SELECT rowid,statut,amount,duration FROM llx_adherent_type WHERE rowid='
         .(int)$m['fk_adherent_type']);
     $flags=cf03Query($db,"SELECT name, value, entity FROM llx_const "
-        ."WHERE name IN ('MAIN_MODULE_AGENDA','MAIN_AGENDA_ACTIONAUTO_MEMBER_SUBSCRIPTION_CREATE') "
+        ."WHERE name IN ('MAIN_MODULE_AGENDA','MAIN_AGENDA_ACTIONAUTO_MEMBER_SUBSCRIPTION_CREATE',"
+        ."'MAIN_AGENDA_ACTIONAUTO_BILL_CREATE','MAIN_AGENDA_ACTIONAUTO_BILL_VALIDATE',"
+        ."'MAIN_AGENDA_ACTIONAUTO_LINEBILL_INSERT') "
         ."AND entity IN (0,1) ORDER BY entity");
     $on=array();foreach($flags as $f){$on[$f['name']]=$f['value'];}
     Cf03LabContract::need(isset($on['MAIN_MODULE_AGENDA'])
@@ -208,6 +221,16 @@ function cf03State($db,array $context,array $expected)
         && in_array($on['MAIN_MODULE_AGENDA'],array('0','1'),true)
         && in_array($on['MAIN_AGENDA_ACTIONAUTO_MEMBER_SUBSCRIPTION_CREATE'],array('0','1'),true),
         'CF03AgendaConfigurationMissing');
+    $invoiceFlags=array();
+    foreach (array('BILL_CREATE','BILL_VALIDATE','LINEBILL_INSERT') as $action) {
+        $val=$on['MAIN_AGENDA_ACTIONAUTO_'.$action]??'0';
+        Cf03LabContract::need(in_array($val,array('0','1'),true),
+            'CF03InvoiceAgendaConfigUnknown');
+        $invoiceFlags[$action]=$on['MAIN_MODULE_AGENDA']==='1' && $val==='1';
+    }
+    // The line event has no unambiguous invoice-id association in this scoped
+    // witness: do not promise complete Agenda proof when it is enabled.
+    $invoiceAgendaSupported=!$invoiceFlags['LINEBILL_INSERT'];
     $subRows=cf03Query($db,'SELECT rowid,fk_adherent,fk_type,subscription,'
         .'CAST(dateadh AS CHAR) AS dateadh,CAST(datef AS CHAR) AS datef,note '
         .'FROM llx_subscription WHERE fk_adherent='.$id.' ORDER BY rowid');
@@ -232,17 +255,23 @@ function cf03State($db,array $context,array $expected)
                 'actor_id'=>(int)$link['fk_element']);
         }
     }
-    $invoices=array();
+    $invoices=array();$invoiceEvents=array();$invoiceResources=array();
     $linked=cf03Query($db,"SELECT f.rowid,f.entity,f.fk_soc,f.type,f.fk_statut,"
-        ."f.paye,f.ref,f.total_ttc,ee.fk_source AS subscription_id "
+        ."f.paye,f.ref,f.total_ttc,CAST(f.datef AS CHAR) AS invoice_date,"
+        ."f.fk_cond_reglement,f.fk_mode_reglement,f.fk_account,"
+        ."f.multicurrency_code,ee.fk_source AS subscription_id "
         ."FROM llx_facture f JOIN llx_element_element ee ON ee.fk_target=f.rowid "
         ."WHERE ee.sourcetype='subscription' AND ee.targettype='facture' "
         ."AND ee.fk_source IN (SELECT rowid FROM llx_subscription WHERE fk_adherent=".$id.")");
     foreach ($linked as $inv) {
         $lines=array();
-        foreach(cf03Query($db,'SELECT rowid,total_ttc,description FROM llx_facturedet '
+        foreach(cf03Query($db,'SELECT rowid,total_ttc,description,qty,fk_product,'
+            .'product_type,tva_tx,CAST(date_start AS CHAR) AS start_date FROM llx_facturedet '
             .'WHERE fk_facture='.(int)$inv['rowid'].' ORDER BY rowid') as $line) {
             $lines[]=array('id'=>(int)$line['rowid'],'total'=>$line['total_ttc'],
+                'quantity'=>$line['qty'],'product'=>(int)$line['fk_product'],
+                'product_type'=>(int)$line['product_type'],'vat'=>$line['tva_tx'],
+                'date_start'=>$line['start_date'],
                 'marker'=>strpos((string)$line['description'],$expected['marker'])!==false);
         }
         $invoices[]=array('id'=>(int)$inv['rowid'],
@@ -250,16 +279,40 @@ function cf03State($db,array $context,array $expected)
             'entity'=>(int)$inv['entity'],'fk_soc'=>(int)$inv['fk_soc'],
             'type'=>(int)$inv['type'],'status'=>(int)$inv['fk_statut'],
             'paid'=>(int)$inv['paye'],'ref'=>$inv['ref'],
-            'total'=>$inv['total_ttc'],'lines'=>$lines);
+            'total'=>$inv['total_ttc'],'date'=>$inv['invoice_date'],
+            'term'=>(int)$inv['fk_cond_reglement'],
+            'payment_mode'=>(int)$inv['fk_mode_reglement'],
+            'bank'=>(int)$inv['fk_account'],
+            'currency'=>$inv['multicurrency_code'],'lines'=>$lines);
+        foreach (cf03Query($db,'SELECT id,code,fk_element FROM llx_actioncomm '
+            ."WHERE elementtype='facture' AND fk_element=".(int)$inv['rowid']
+            .' ORDER BY id') as $action) {
+            $event=(int)$action['id'];
+            $invoiceEvents[]=array('id'=>$event,'code'=>$action['code'],
+                'invoice_id'=>(int)$action['fk_element']);
+            foreach (cf03Query($db,'SELECT rowid,element_type,fk_element '
+                .'FROM llx_actioncomm_resources WHERE fk_actioncomm='.$event
+                .' ORDER BY rowid') as $res) {
+                $invoiceResources[]=array('id'=>(int)$res['rowid'],
+                    'agenda_id'=>$event,'element_type'=>$res['element_type'],
+                    'actor_id'=>(int)$res['fk_element']);
+            }
+        }
     }
     $counts=array();
     foreach(Cf03LabContract::COUNTS as $table){
         $counts[$table]=(int)cf03One($db,'SELECT COUNT(*) AS n FROM llx_'.$table)['n'];
     }
-    $customerExists=false;
+    $customerExists=false; $customer=null;
     if ((int)$m['fk_soc']>0) {
-        $customerExists=(int)cf03One($db,'SELECT COUNT(*) AS n FROM llx_societe '
-            .'WHERE rowid='.(int)$m['fk_soc'])['n']===1;
+        $customers=cf03Query($db,'SELECT rowid,entity,client FROM llx_societe '
+            .'WHERE rowid='.(int)$m['fk_soc']);
+        $customerExists=count($customers)===1;
+        if ($customerExists) {
+            $c=$customers[0];
+            $customer=array('id'=>(int)$c['rowid'],
+                'entity'=>(int)$c['entity'],'client'=>(int)$c['client']);
+        }
     }
     return array(
         'environment'=>$context['environment'],
@@ -270,6 +323,7 @@ function cf03State($db,array $context,array $expected)
         'deployed_source_hashes'=>$context['deployed_source_hashes'],
         'deployment_kind'=>$context['deployment_kind'],
         'core_source_hashes'=>$context['core_source_hashes'],
+        'schema_columns'=>$context['schema_columns'],
         'config_sha256'=>$context['config_sha256'],
         'performance_schema'=>$context['performance_schema'],
         'member'=>array('id'=>(int)$m['rowid'],'ref'=>$m['ref'],
@@ -282,9 +336,13 @@ function cf03State($db,array $context,array $expected)
             'amount'=>$t['amount'],'duration'=>$t['duration']),
         'agenda_enabled'=>$on['MAIN_MODULE_AGENDA']==='1'
             && $on['MAIN_AGENDA_ACTIONAUTO_MEMBER_SUBSCRIPTION_CREATE']==='1',
-        'customer_exists'=>$customerExists,'subscriptions'=>$subs,
-        'agenda_events'=>$actions,'agenda_resources'=>$resources,
-        'invoices'=>$invoices,'counts'=>$counts);
+        'customer_exists'=>$customerExists,'customer'=>$customer,
+        'invoice_agenda_flags'=>$invoiceFlags,
+        'invoice_agenda_supported'=>$invoiceAgendaSupported,
+        'invoice_agenda_events'=>$invoiceEvents,
+        'invoice_agenda_resources'=>$invoiceResources,
+        'subscriptions'=>$subs,'agenda_events'=>$actions,
+        'agenda_resources'=>$resources,'invoices'=>$invoices,'counts'=>$counts);
 }
 
 try {
