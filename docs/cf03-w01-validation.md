@@ -28,7 +28,7 @@ EVIDENCE_DIR="$PRIVATE_ROOT/cf03-d-newcase001"
 
 # Only after separate case approval and check-only PASS:
 # /usr/bin/php tools/cf03-lab.php --baseline --environment=D \
-#   --document-root=/dorfverein-borlas.de/erptest/htdocs \
+#   --document-root=/ACTUAL/HOSTING/SHELL/HTDOCS \
 #   --db-host=... --db-port=3306 --db-name=... --db-user=... \
 #   --scenario=contribution --member-id=... --member-ref=... \
 #   --marker=CF03LAB-D-... --start=2080-01-01 --end=2080-12-31 \
