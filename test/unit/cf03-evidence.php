@@ -44,6 +44,10 @@ evStop(static function()use($site,$doc,$source){
 evStop(static function()use($source,$doc){
     Cf03Evidence::privateRoot($source,'D',$doc,$source);
 },'CF03EvidenceInsideWebOrSource');
+$hostSibling=$site.'/cf03-private-evidence';
+evOk(mkdir($hostSibling,0700),'create a private sibling of htdocs');
+Cf03Evidence::privateRoot($hostSibling,'D',$doc,$source);
+evOk(true,'hosting private sibling accepted when strictly outside htdocs');
 Cf03Evidence::directory($dir,true,'D',$private,$doc,$source);
 evOk(is_dir($dir) && (fileperms($dir)&0077)===0,'private one-shot directory');
 evStop(static function()use($dir,$private,$doc,$source){
@@ -88,6 +92,7 @@ foreach (array($dir,$other) as $d) {
 rmdir($open);
 rmdir($private);
 rmdir($source);
+rmdir($hostSibling);
 rmdir($doc);
 rmdir($site);
 rmdir($root);
