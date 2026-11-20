@@ -69,15 +69,19 @@ If returning to A, repeat the manual inverse switch, ensure a fresh effective li
 
 The Owner must provide the actual host/port/schema/account, document root and install source; no values are guessed. The expected DB release is MySQL 8.4.13. `--document-root` must point to `.../htdocs` (not the parent directory).
 
+**V22.0.5 version source correction (2026-11-20):** The pinned V22.0.5 Core defines `DOL_VERSION = '22.0.5'` inside `htdocs/filefunc.inc.php`; there is no `htdocs/version.inc.php`. The initial D preflight incorrectly required the V24 file, returning `CF03WrongDolibarrRoot` before DB activity. The version-aware implementation now requires and hashes `filefunc.inc.php` for D; V24 continues to require and hash `version.inc.php`. The initial Owner-reported D STOP is a **preflight tool finding, not a V22 qualification FAIL**, and remains historical. Verify the fixed script's new SHA/CI before re-running a read-only preflight.
+
+Shared hosting may have no `sudo` and may expose a *shell-logical* document root different from the real host path shown by the Dolibarr web administration screen. Use the path actually accessible to **CLI PHP's `realpath()`**, with readable `conf/conf.php` and `filefunc.inc.php`. Never modify `conf.php` to fake a web-visible root.
+
 ```sh
-sudo -u www-data /usr/bin/php -d xdebug.mode=off \
+/usr/bin/php -d xdebug.mode=off \
   tools/cf03-lab.php --preflight --environment=D \
   --document-root=/ACTUAL/PATH/TO/V22/htdocs \
   --db-host=ACTUAL_DB_HOST --db-port=ACTUAL_PORT \
   --db-name=ACTUAL_SCHEMA --db-user=ACTUAL_RESTRICTED_DB_USER
 ```
 
-Expect actual Dolibarr 22.0.5 source, actual CoreGuarded profile in entity 1, InnoDB, autocommit 1, NO_CHAIN, denied P_S SELECT 1142. The full ZIP packaging/manifest and install validation, permission configuration and business tests remain later separate cases. A D preflight can attest a deployed module copy only when its selected product file hashes match the current CF-03 checkout; it does not require the ZIP to ship test tools. No controlled destructive fault is authorized on a shared hosting provider.
+Expect actual Dolibarr 22.0.5 source, actual CoreGuarded profile in entity 1, InnoDB, autocommit 1, NO_CHAIN, denied P_S SELECT 1142. The full ZIP packaging/manifest and install validation, permission configuration and business tests remain later separate cases. A D preflight can attest a deployed module copy only when its selected product file hashes match the current CF-03 checkout; it does not require the ZIP to ship test tools. No controlled destructive fault is authorized on a shared hosting provider. **Warning:** this fixes only the early V22 version-file assumption; DB settings, source-copy hashes, P_S denial, and a private hosting-safe evidence directory remain separate checks and may surface their own STOP conditions.
 
 ## 2. Stage-1 snapshot witness (not an authorization to run a booking)
 
