@@ -28,6 +28,7 @@ jobs:
           php -l tools/cf03-evidence.lib.php
           php -l test/unit/cf03-lab.php
           php -l test/unit/cf03-reader.php
+          php -l test/unit/cf03-runbook.php
           php -l test/unit/cf03-evidence.php
           php -l tools/cf03-source.lib.php
           php -l test/unit/cf03-source.php
@@ -35,6 +36,7 @@ jobs:
         run: |
           php test/unit/cf03-lab.php
           php test/unit/cf03-reader.php
+          php test/unit/cf03-runbook.php
           php test/unit/cf03-evidence.php
           php test/unit/cf03-source.php
       - uses: actions/checkout@v4
