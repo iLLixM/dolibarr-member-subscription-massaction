@@ -150,12 +150,12 @@ class MsmBookingService
 			$profile = $this->profiles()->admit($expected['_profile'] ?? null, $user, $options);
 			$coreGuarded = ($profile['profile'] === 'CoreGuarded');
 			if ($coreGuarded) {
+				$this->activeTransaction = $this->coreTransaction();
 				// Direct service calls cannot bypass the HTTP file-session checkpoint.
 				if (!($checkpoint instanceof MsmFileBookingCheckpoint)) { throw new RuntimeException('MSMCoreGuardedSessionUnsupported'); }
 				MsmFileBookingCheckpoint::requireRuntime();
 				$checkpoint->requireProcessing((int) $id, $expected['_profile'], $user, $expected, $options);
 				if (!empty($options['invoice']) || !empty($options['autocreate']) || !empty($options['sendmail'])) { throw new RuntimeException('MSMProfileFeatureUnavailable'); }
-				$this->activeTransaction = $this->coreTransaction();
 			}
 			$initial = $this->activeTransaction->beforeBegin();
 			if ($initial['state'] !== MsmDatabaseState::IDLE || !$initial['fresh']) {
