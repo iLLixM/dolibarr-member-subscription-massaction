@@ -122,4 +122,3 @@ For B and C, use `--environment=B/C` and the corresponding `--db-user` as in Ste
 - Do not attach `conf.php`, passwords, database exports, tokens, cookies, real member data, host secrets or raw private snapshots to public PRs/issues. The test marker, exact source SHA, sanitized verdict and hash may be used in the review dossier.
 
 **Operator input needed for later test scheduling:** B DB username; C Enhanced DB username; D document root, data path, URL, DB host/port/schema/user and actual PHP version. Supplying them is not a prerequisite for the repository's offline Stage-1 CI.
-
