@@ -28,7 +28,8 @@ function c3config($id,$scenario='contribution',$agenda='on')
     $marker='CF03LAB-'.$id.'-ABCDEF123';
     $config=array('scenario'=>$scenario,'member_id'=>271,'member_ref'=>'MEM2611-0271',
         'marker'=>$marker,'start'=>'2080-01-01','end'=>'2080-12-31',
-        'amount'=>'120.00','agenda'=>$agenda);
+        'amount'=>'120.00','agenda'=>$agenda,
+        'actor_id'=>$agenda==='on' && $scenario!=='no-change'?4:0);
     if ($scenario==='invoice-existing') {
         $config['invoice']=array('date'=>'2026-11-20','quantity'=>1.0,
             'product'=>0,'vat'=>0.0,'term'=>1,'payment_mode'=>0,
@@ -55,6 +56,7 @@ function c3make($id,$scenario,$agenda)
         'engines'=>$engines,'type'=>array('id'=>2,'status'=>0,'entity'=>1,
             'subscription'=>'1','amount'=>'120.00000000'),
         'source_hashes'=>array('php'=>str_repeat('b',64)),
+        'source_manifest_version'=>'CF03-W01-MODULE-PHP-1',
         'deployed_source_hashes'=>array('product'=>str_repeat('f',64)),
         'deployment_kind'=>$id==='D'?'verified_deployed_copy':'source_checkout',
         'core_source_hashes'=>array('core'=>str_repeat('e',64)),
@@ -63,6 +65,9 @@ function c3make($id,$scenario,$agenda)
         'performance_schema'=>$env['ps']==='select'?'select_allowed':
             ($env['ps']==='denied'?'select_denied_1142':'not_required'),
         'agenda_enabled'=>$agenda==='on',
+        'invoice_product'=>array('id'=>0,'type'=>1,'status'=>1,'entity'=>1),
+        'actor'=>$expected['actor_id']>0
+            ? array('id'=>4,'entity'=>1,'status'=>1):null,
         'customer_exists'=>$scenario==='invoice-existing',
         'customer'=>$scenario==='invoice-existing'
             ? array('id'=>5,'entity'=>1,'client'=>1):null,
@@ -83,7 +88,8 @@ function c3make($id,$scenario,$agenda)
         $after['counts']['subscription']++;
         if ($agenda==='on') {
             $after['agenda_events'][]=array('id'=>50,'code'=>'AC_MEMBER_SUBSCRIPTION_CREATE',
-                'member_id'=>271);
+                'member_id'=>271,
+                'entity'=>1,'author_id'=>4,'owner_id'=>4);
             $after['agenda_resources'][]=array('id'=>51,'agenda_id'=>50,
                 'element_type'=>'user','actor_id'=>4);
             $after['counts']['actioncomm']++;
@@ -102,7 +108,8 @@ function c3make($id,$scenario,$agenda)
             }
             if ($agenda==='on') {
                 $after['invoice_agenda_events'][]=array('id'=>52,
-                    'code'=>'AC_BILL_VALIDATE','invoice_id'=>60);
+                    'code'=>'AC_BILL_VALIDATE','invoice_id'=>60,
+                    'entity'=>1,'author_id'=>4,'owner_id'=>4);
                 $after['invoice_agenda_resources'][]=array('id'=>53,
                     'agenda_id'=>52,'element_type'=>'user','actor_id'=>4);
                 $after['counts']['actioncomm']++;
@@ -254,7 +261,8 @@ $wrong=$after;$wrong['source_hashes']['php']=str_repeat('d',64);
             Cf03LabContract::verify($before,$wrong,$e,$id);
         },'unexplained invoice Agenda count denied','CF03UnexpectedTableDelta');
         $wrong=$after;$wrong['invoice_agenda_events'][]=array('id'=>60,
-            'code'=>'AC_BILL_CREATE','invoice_id'=>60);
+            'code'=>'AC_BILL_CREATE','invoice_id'=>60,
+            'entity'=>1,'author_id'=>4,'owner_id'=>4);
         c3stop(static function()use($before,$wrong,$e,$id){
             Cf03LabContract::verify($before,$wrong,$e,$id);
         },'unknown invoice Agenda event','CF03InvoiceAgendaMismatch');
@@ -310,7 +318,7 @@ $invoiceArgs=array('cf03-lab.php','--check-only','--environment=C',
     '--db-user=enhanced_user','--scenario=invoice-existing',
     '--member-id=271','--member-ref=MEM2611-0271',
     '--marker=CF03LAB-C-ABCDEF123','--start=2080-01-01',
-    '--end=2080-12-31','--amount=120.00','--agenda=on');
+    '--end=2080-12-31','--amount=120.00','--agenda=on','--actor-id=4');
 c3stop(static function()use($invoiceArgs){
     Cf03LabContract::arguments($invoiceArgs);
 },'missing invoice options denied','CF03MissingInvoiceExpectedField');
@@ -343,7 +351,7 @@ foreach (array('B','C') as $invoiceEnvironment) {
     $before['invoice_agenda_flags']['BILL_CREATE']=true;
     $after['invoice_agenda_flags']['BILL_CREATE']=true;
     $after['invoice_agenda_events'][]=array('id'=>54,'code'=>'AC_BILL_CREATE',
-        'invoice_id'=>60);
+        'invoice_id'=>60,'entity'=>1,'author_id'=>4,'owner_id'=>4);
     $after['invoice_agenda_resources'][]=array('id'=>55,'agenda_id'=>54,
         'element_type'=>'user','actor_id'=>4);
     $after['counts']['actioncomm']++;
