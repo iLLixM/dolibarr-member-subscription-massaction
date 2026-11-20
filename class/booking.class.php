@@ -7,6 +7,7 @@ require_once __DIR__.'/corecompatibility.class.php';
 require_once __DIR__.'/databasestate.class.php';
 require_once __DIR__.'/transactionprofile.class.php';
 require_once __DIR__.'/coreguardedtransaction.class.php';
+require_once __DIR__.'/coreguardedrightsdb.class.php';
 require_once __DIR__.'/filebookingcheckpoint.class.php';
 /** One owned transaction per member. Invoice operations share the owned transaction. */
 class MsmBookingService
@@ -48,11 +49,33 @@ class MsmBookingService
 		$member = new MsmBookingMember($this->db); $member->id = $id;
 		return $member;
 	}
-	protected function currentUser($user)
+	protected function currentUser($user, $coreGuarded = false)
 	{
 		$current = new User($this->db);
-		if ($current->fetch($user->id) <= 0 || empty($current->status)) { throw new RuntimeException('NotEnoughPermissions'); }
-		$current->loadRights('', 1);
+		if ($coreGuarded) {
+			// Core User::fetch() returns 0 for a missing user and <0 for a
+			// SQL/load error. A technical error must never be rollback-qualified
+			// as an ordinary permission refusal after Core BEGIN.
+			try { $fetched = $current->fetch($user->id); }
+			catch (Throwable $e) { throw new RuntimeException('MSMTransactionUnknown', 0, $e); }
+			if ($fetched < 0) { throw new RuntimeException('MSMTransactionUnknown'); }
+		} else {
+			$fetched = $current->fetch($user->id);
+		}
+		if ($fetched <= 0 || empty($current->status)) { throw new RuntimeException('NotEnoughPermissions'); }
+		if (!$coreGuarded) {
+			// Preserve the previous EnhancedMySQL/MariaDBSnapshot behavior.
+			$current->loadRights('', 1);
+			return $current;
+		}
+		// Core loadRights() is void and can silently ignore a failed SQL
+		// query. Observe the exact calls on this user's original DoliDB and
+		// throw before any partial rights can authorize business operations.
+		$originalDb = $current->db;
+		$current->db = new MsmCoreGuardedRightsDb($originalDb);
+		try { $current->loadRights('', 1); }
+		catch (Throwable $e) { throw new RuntimeException('MSMTransactionUnknown', 0, $e); }
+		finally { $current->db = $originalDb; }
 		return $current;
 	}
 	protected function preview($member) { return new MsmPreviewService($this->db, $member); }
@@ -123,6 +146,11 @@ class MsmBookingService
 		}
 	}
 	/** Roll back only our own context; ambiguous depth/connection failures stop the batch. */
+	/** Only these observed, non-SQL business failures allow an owned Core rollback. */
+	protected function coreGuardedBusinessRollbackAllowed(Throwable $e)
+	{
+		return in_array($e->getMessage(), array('MSMChangedConfirmation', 'NotEnoughPermissions', 'MSMTransactionUnsupported', 'MSMConsistencyError'), true);
+	}
 	private function rollbackOwned($coreGuarded = false)
 	{
 		$state = $this->activeTransaction->rollbackContext();
@@ -180,7 +208,7 @@ class MsmBookingService
 			// MySQL ENGINE metadata reads establish a consistent view. Defer them
 			// until all locks are held so preview and Core SELECTs see prior winners.
 			$this->checkTables(!empty($options['invoice']), !empty($options['autocreate']));
-			$user = $this->currentUser($user);
+			$user = $this->currentUser($user, $coreGuarded);
 			if (!MsmPreviewService::canCreateSubscriptionWithOptions($user, !empty($options['invoice']), !empty($options['sendmail']))) { throw new RuntimeException('NotEnoughPermissions'); }
 			$member = $this->member($id);
 			$row = $this->preview($member)->previewSubscriptionWithOptions($user, $expected['start'], !empty($options['invoice']), $options['sendmail'], $expected['end'], !empty($options['autocreate']), $options['description']);
@@ -218,7 +246,7 @@ class MsmBookingService
 			$safe = false;
 			if ($coreGuarded) {
 				$beginAttempted = $beginAttempted || $this->activeTransaction->beginAttempted();
-				$qualifiedBusinessError = in_array($e->getMessage(), array('MSMChangedConfirmation', 'NotEnoughPermissions', 'MSMTransactionUnsupported', 'MSMConsistencyError'), true);
+				$qualifiedBusinessError = $this->coreGuardedBusinessRollbackAllowed($e);
 				// No S error mappings have been qualified yet. Unknown SQL, 1213/1205,
 				// nested failures or connection faults NEVER authorize a foreign rollback.
 				if ($owned && !$committing && $qualifiedBusinessError) {
