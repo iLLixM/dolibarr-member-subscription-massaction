@@ -183,7 +183,10 @@ final class Cf03LabContract
                     $opts['amount'])===1,'CF03InvalidAmount');
             self::need(in_array($opts['agenda']??null,array('on','off'),true),
                 'CF03InvalidAgenda');
-            if ($opts['agenda']==='on' && $opts['scenario']!=='no-change') {
+            // Positive invoice cases always bind the authenticated UI actor,
+            // regardless of the independently configured member Agenda flag.
+            if ($opts['scenario']==='invoice-existing'
+                || ($opts['scenario']==='contribution' && $opts['agenda']==='on')) {
                 self::need(isset($opts['actor-id'])
                     && preg_match('/^[1-9][0-9]{0,8}$/D',$opts['actor-id'])===1,
                     'CF03InvalidExpectedActor');
@@ -280,7 +283,8 @@ final class Cf03LabContract
             'CF03MemberTypeMismatch');
         self::need(($s['agenda_enabled']??null)===($e['agenda']==='on'),
             'CF03AgendaMismatch');
-        if ($e['agenda']==='on' && $e['scenario']!=='no-change') {
+        if ($e['scenario']==='invoice-existing'
+            || ($e['scenario']==='contribution' && $e['agenda']==='on')) {
             self::need(($e['actor_id']??0)>0
                 && ($s['actor']['id']??null)===$e['actor_id']
                 && ($s['actor']['entity']??null)===1
@@ -420,11 +424,11 @@ final class Cf03LabContract
             $invoiceEvents=$after['invoice_agenda_events']??array();
             $invoiceResources=$after['invoice_agenda_resources']??array();
             $wanted=array();
-            if ($e['agenda']==='on') {
-                foreach (array('BILL_CREATE','BILL_VALIDATE') as $action) {
-                    if (!empty($before['invoice_agenda_flags'][$action])) {
-                        $wanted[]='AC_'.$action;
-                    }
+            // Dolibarr stores member and invoice Agenda actions under
+            // independent flags. --agenda refers to MEMBER only.
+            foreach (array('BILL_CREATE','BILL_VALIDATE') as $action) {
+                if (!empty($before['invoice_agenda_flags'][$action])) {
+                    $wanted[]='AC_'.$action;
                 }
             }
             $observed=array();
