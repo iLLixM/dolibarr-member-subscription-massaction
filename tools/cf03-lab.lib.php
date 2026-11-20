@@ -28,7 +28,7 @@ final class Cf03LabContract
         return array(
             'adherent'=>array('rowid','ref','firstname','lastname','email','entity',
                 'fk_adherent_type','fk_soc','statut','datefin'),
-            'adherent_type'=>array('rowid','statut','amount','duration'),
+            'adherent_type'=>array('rowid','statut','entity','subscription','amount','duration'),
             'subscription'=>array('rowid','fk_adherent','fk_type','subscription','dateadh',
                 'datef','note'),
             'actioncomm'=>array('id','code','fk_element','elementtype'),
@@ -259,8 +259,12 @@ final class Cf03LabContract
             && ($m['entity']??null)===1 && ($m['status']??null)===1
             && array_key_exists('datefin',$m) && $m['datefin']===null
             && ($m['type_id']??0)>0,'CF03FixtureMismatch');
+        // Dolibarr V22/V24 llx_adherent_type: statut=0 ACTIVE, 1 INACTIVE.
+        // The paid-fixture contract also requires entity 1 and subscription '1'.
         self::need(($s['type']['id']??null)===$m['type_id']
-            && ($s['type']['status']??null)===1
+            && ($s['type']['status']??null)===0
+            && ($s['type']['entity']??null)===1
+            && ($s['type']['subscription']??null)==='1'
             && isset($s['type']['amount'])
             && abs((float)$s['type']['amount']-(float)$e['amount'])<0.000001,
             'CF03MemberTypeMismatch');
