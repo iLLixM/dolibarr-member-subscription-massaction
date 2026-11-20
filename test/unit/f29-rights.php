@@ -20,11 +20,13 @@ class F29Database
     public function num_rows($res)
     {
         if ($res->site === $this->faultAt && $this->faultMode === 'num_rows') { return false; }
+        if ($res->site === $this->faultAt && $this->faultMode === 'num_rows_negative') { return -1; }
         return count($res->rows);
     }
     public function fetch_object($res)
     {
         if ($res->site === $this->faultAt && $this->faultMode === 'fetch_object') { return false; }
+        if ($res->site === $this->faultAt && $this->faultMode === 'fetch_object_null') { return null; }
         return array_shift($res->rows);
     }
     public function free($res) {}
@@ -90,7 +92,7 @@ foreach (array(1213,1205) as $errno) {
         'thrown fetch SQL '.$errno.' no qualified rollback');
 }
 foreach (array('user','group') as $site) {
-    foreach (array('query','throw','num_rows','fetch_object') as $mode) {
+    foreach (array('query','throw','num_rows','num_rows_negative','fetch_object','fetch_object_null') as $mode) {
         list($db,$service,$caller)=f29Fixture();
         $db->faultAt=$site; $db->faultMode=$mode; $db->faultCode=$site==='user' ? 1213 : 1205;
         f29Fails(static function()use($service,$caller){$service->reload($caller,true);}, 'MSMTransactionUnknown');

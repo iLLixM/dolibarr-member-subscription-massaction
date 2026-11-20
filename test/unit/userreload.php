@@ -15,6 +15,45 @@ if (($argv[1] ?? '') === '--core-user-contract') {
 	MsmCoreCompatibility::methods('User', array('fetch' => 1, 'loadRights' => 2, 'hasRight' => 3));
 	$status = new ReflectionProperty('User', 'status');
 	if (!$status->isPublic() || $status->isStatic()) { fwrite(STDERR, "User::\$status is not a public instance property.\n"); exit(1); }
+	// Exercise the ACTUAL pinned Core loadRights() on the guarded per-User DoliDB.
+	// A void Core method can silently skip failed user or group SELECTs.
+	require_once __DIR__.'/../../class/coreguardedrightsdb.class.php';
+	$conf = new stdClass();
+	$conf->entity = 1; $conf->global = new stdClass(); $conf->modules = array();
+	class F29PinnedCoreRightsDb
+	{
+		public $calls = array(); public $failedSite = ''; public $negativeCountSite = '';
+		public function prefix() { return 'test_'; }
+		public function query($sql)
+		{
+			$site = strpos($sql, 'user_rights as ur') !== false ? 'user'
+				: (strpos($sql, 'usergroup_rights as gr') !== false ? 'group' : 'unrecognized');
+			if ($site === 'unrecognized') { throw new RuntimeException('Unexpected Core rights SELECT'); }
+			$this->calls[] = $site;
+			if ($site === $this->failedSite) { return false; }
+			return (object) array('site' => $site, 'rows' => array());
+		}
+		public function num_rows($result) { return $result->site === $this->negativeCountSite ? -1 : count($result->rows); }
+		public function fetch_object($result) { return array_shift($result->rows); }
+		public function free($result) {}
+	}
+	foreach (array('none', 'user', 'group', 'user-negative-count', 'group-negative-count') as $fault) {
+		$db = new F29PinnedCoreRightsDb();
+		if ($fault === 'user' || $fault === 'group') { $db->failedSite = $fault; }
+		if ($fault === 'user-negative-count') { $db->negativeCountSite = 'user'; }
+		if ($fault === 'group-negative-count') { $db->negativeCountSite = 'group'; }
+		$current = new User($db); $current->id = 17; $current->status = 1;
+		$current->db = new MsmCoreGuardedRightsDb($db);
+		$caught = '';
+		try { $current->loadRights('', 1); }
+		catch (RuntimeException $e) { $caught = $e->getMessage(); }
+		finally { $current->db = $db; }
+		$expect = $fault === 'none' ? '' : 'MSMTransactionUnknown';
+		if ($caught !== $expect || $current->db !== $db
+			|| $db->calls !== ($fault === 'user' || $fault === 'user-negative-count' ? array('user') : array('user', 'group'))) {
+			fwrite(STDERR, 'Pinned Core loadRights failure classification mismatch: '.$fault.PHP_EOL); exit(1);
+		}
+	}
 	echo "ok\n";
 	exit(0);
 }

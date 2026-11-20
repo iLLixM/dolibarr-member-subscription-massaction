@@ -28,8 +28,14 @@ final class MsmCoreGuardedRightsDb
     {
         try { $result = $this->inner->$name(...$args); }
         catch (Throwable $e) { throw new RuntimeException('MSMTransactionUnknown', 0, $e); }
-        // Core enumerates a known num_rows count: missing rows are errors here.
-        if (($name === 'num_rows' || $name === 'fetch_object') && ($result === false || $result === null)) {
+        // Core loadRights() silently treats a negative num_rows() as an
+        // empty result set. A valid DoliDB row count must be a nonnegative int.
+        if ($name === 'num_rows' && (!is_int($result) || $result < 0)) {
+            throw new RuntimeException('MSMTransactionUnknown');
+        }
+        // A row was promised by num_rows(): NULL/false is a read failure,
+        // not a harmless absence of rights (zero rows are never fetched).
+        if ($name === 'fetch_object' && !is_object($result)) {
             throw new RuntimeException('MSMTransactionUnknown');
         }
         return $result;
