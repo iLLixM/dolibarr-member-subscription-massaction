@@ -26,6 +26,7 @@ class F28Database extends BookingDatabase { public function close() { $GLOBALS['
 class F28Observer { public function beforeBegin() { return array('state'=>'IDLE','fresh'=>true); } }
 class F28Service
 {
+	public function coreGuardedReadiness() { $GLOBALS['events'][] = 'core_guarded_readiness_spy'; }
 	public function checkTables(...$args) { $GLOBALS['events'][] = 'tables_spy'; }
 	public function book(...$args) {
 		$GLOBALS['bookCalls']++; $GLOBALS['events'][] = 'book_possible_DML_spy';
