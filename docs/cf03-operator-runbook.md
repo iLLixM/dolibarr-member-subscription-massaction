@@ -93,6 +93,14 @@ For `--scenario=invoice-existing` (B/C only), supply the actual UI-confirmed `--
 
 See [CF03-W01 implementation and assurance limits](cf03-w01-validation.md). The operator is **not authorized to book an invoice or contribution solely by the existence of these CLI options**.
 
+## Paket A gate — private parent and one-shot verify
+
+After Paket A, **A/B/C and D all require a private Evidence parent** owned by the effective PHP-CLI user, canonical/non-symlink, and mode 0700. A/B/C keep the existing fixed `/var/lib/dolibarr-test-results` parent; provisioning or correcting it is a separate manual Owner action, not a witness operation. D continues to use its explicit private `--evidence-root`, under the previously documented non-HTTP-exposed hosting requirements.
+
+A valid, admitted case's `--verify` now creates `verify.started` **before database connection, profile inspection or source hash checks**. After that point, any STOP is terminal for the Case ID, including database or configuration failure; when possible `verdict.json` carries the STOP, but the exclusive marker remains authoritative. No retry, file deletion, directory replacement, rebooking or automatic cleanup. An invalid baseline is not admitted as a valid case.
+
+**Paket A is not a real-test release:** further P1/P2 review findings remain. Do not perform a new business booking with this corrected branch until Paket B, final CI and independent review explicitly authorize the individual scenario.
+
 ## 2. Stage-1 snapshot witness (not an authorization to run a booking)
 
 `--check-only`, `--baseline`, and `--verify` additionally require a freshly created synthetic member. The following *generic* A example uses placeholders; replace with values of an **entirely new** member (do not reuse 56, 57, 58 or a historical CF02 marker).
