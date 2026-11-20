@@ -83,6 +83,16 @@ Shared hosting may have no `sudo` and may expose a *shell-logical* document root
 
 Expect actual Dolibarr 22.0.5 source, actual CoreGuarded profile in entity 1, InnoDB, autocommit 1, NO_CHAIN, denied P_S SELECT 1142. The full ZIP packaging/manifest and install validation, permission configuration and business tests remain later separate cases. A D preflight can attest a deployed module copy only when its selected product file hashes match the current CF-03 checkout; it does not require the ZIP to ship test tools. No controlled destructive fault is authorized on a shared hosting provider. **Warning:** this fixes only the early V22 version-file assumption; DB settings, source-copy hashes, P_S denial, and a private hosting-safe evidence directory remain separate checks and may surface their own STOP conditions.
 
+## CF03-W01 hardened evidence and invoice operator prerequisites
+
+The W01 library now requires a **manually provisioned private evidence root for hosted D**. A/B/C retain the existing protected `/var/lib/dolibarr-test-results` parent. D's `--baseline` and `--verify` require **both** `--evidence-root=/ACTUAL/PRIVATE/PATH` and `--evidence-dir=/ACTUAL/PRIVATE/PATH/cf03-d-unique-case-01` with the same values in both calls. The root must already exist, be private (0700), owned by the effective PHP CLI user, have a canonical non-symlink path, and lie outside the Dolibarr webroot/site directory and checkout. No sudo, chown, mkdir of the parent or account/profile change is performed by the witness. No evidence options may be supplied to `--preflight` or `--check-only`. The hosting environment must expose PHP POSIX effective-user inspection; otherwise fail closed. Never select a path that might be publicly downloadable.
+
+**Only after specific Owner authorization of a real business case**: check-only PASS → baseline once → one authenticated UI action → verify once. Verification enforces exactly the two original baseline files, 0600 file modes, checksum integrity, stable DB/profile/conf/module/Core/SQL schema context, and creates `verify.started` before readback. No replay or cleanup even after a partial write.
+
+For `--scenario=invoice-existing` (B/C only), supply the actual UI-confirmed `--invoice-date`, `--invoice-quantity`, `--invoice-product`, `--invoice-vat`, `--invoice-term`, `--invoice-payment-mode`, `--invoice-bank` and `--invoice-currency`. Missing/invalid fields STOP. This bounded witness requires exactly one linked validated invoice/line and checks the selected payment/customer, amount, VAT and attribution to `BILL_CREATE`/`BILL_VALIDATE` Agenda actions. An enabled `LINEBILL_INSERT` Agenda action STOPS until a separate line-specific witness is qualified; do not reconfigure legitimate events to bypass it.
+
+See [CF03-W01 implementation and assurance limits](cf03-w01-validation.md). The operator is **not authorized to book an invoice or contribution solely by the existence of these CLI options**.
+
 ## 2. Stage-1 snapshot witness (not an authorization to run a booking)
 
 `--check-only`, `--baseline`, and `--verify` additionally require a freshly created synthetic member. The following *generic* A example uses placeholders; replace with values of an **entirely new** member (do not reuse 56, 57, 58 or a historical CF02 marker).
