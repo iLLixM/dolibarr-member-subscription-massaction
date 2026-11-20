@@ -1,6 +1,8 @@
 # CF-02 – Core-Guarded contribution-only development evidence
 
-**Status: DEVELOPMENT – NOT YET INDEPENDENTLY REVIEWED OR LIVE-QUALIFIED.**
+**Current status (2026-11-20): READY FOR INDEPENDENT EXTERNAL REVIEW — OWNER TEST EVIDENCE ACCEPTED WITH DOCUMENTED LIMITS; INDEPENDENT REVIEW, MERGE AND RELEASE PENDING.**
+
+The [current review handoff](cf02-review-handoff.md) and [Owner-accepted POS01-A/B evidence](evidence/cf02/pos01-owner-test-acceptance-2026-11-20.md) supersede the execution-status claims in dated earlier sections below. Those earlier statements intentionally retain their contemporaneous provenance and are **not** statements that live MySQL booking remains untested. The Owner accepts the absent POS01-B description marker **only as a documented review-entry exception**; the original witness STOP is retained.
 
 Branch: feature/cf02-core-guarded-contribution; baseline main: 4698ec1540110a6250ba95b8bf0e57689a5e9f8b.
 Authority: [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22) and [ADR-0001](adr/ADR-0001-core-first-transaction-profiles.md).
@@ -17,17 +19,21 @@ The pre-CF-02 Completion Gate was independently assessed and Owner accepted with
 - Direct CoreGuarded booking service invocation requires a bound file-session checkpoint and independently reopened proof of the durably consumed run and specific expected member/options. The supported standard file logger check remains mandatory.
 - Unsupported third-party hooks, other session handlers and other loggers are not universally qualified; no new permissions are requested.
 
-## Test matrix and provenance
+## Current test matrix and provenance (Owner acceptance, 2026-11-20)
 
-| Layer | Executed result | Qualification limit |
+| Layer | Evidence / result | Limit |
 | --- | --- | --- |
-| Adapter synthetic | Initial PHP 8.4 local run: 88 assertions PASS | No live loaded Dolibarr/MySQL or native connection |
-| Durable file-session synthetic | Initial PHP 8.4 local run: 15 assertions PASS | Genuine isolated local session files, no HTTP/DB |
-| Existing no-Core suites | run.php 141, database.php 188, loading.js 6 PASS locally | Existing synthetic contracts, not real integration |
-| Pinned-Core suites | NOT EXECUTED locally | To be executed by GitHub PR CI and operator's V24.0.3 environment |
-| Restricted MySQL read-only | NOT EXECUTED by author | Owner separately confirmed limited user and P_S 1142 |
-| Real MySQL contribution/Agenda/rollback/HTTP/concurrency | NOT EXECUTED | Requires version-bound isolated synthetic fixtures and operator traces |
-| Enhanced MySQL/MariaDB real invoice regression | NOT EXECUTED on this branch | Full CF-03 qualification remains required |
+| Synthetic bounded adapter | 88 assertions PASS; nine-profile PR CI includes new runner | No physical event-identity guarantee |
+| Durable local file-session / replay admission | 19 assertions PASS | No real crash/replay or multi-member HTTP qualification |
+| Existing synthetic and pinned Dolibarr Core regression | Owner-run V24.0.3 synthetics PASS; [nine-profile PR CI #44723124036](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44723124036) 9/9 PASS at `c2347f610efc1c4c160dd0b21ffaf095753e7e40` | Synthetic PHP/Core V22/V23/V24, not real DB nonregression across profiles |
+| Restricted MySQL and loaded Core admission | Owner-run read-only B/C/D PASS, P_S 1142, selected InnoDB tables and NO_CHAIN | No system table privilege or arbitrary hook coverage |
+| Real loaded-Core empty transaction | Owner-run one Core BEGIN/ROLLBACK PASS | No contribution or actual COMMIT in empty test |
+| Actual CoreGuarded HTTP contribution + Agenda | Owner-run POS01-A and B persisted subscriptions #65/#66 and standard Agenda events; B had correct member, dates, amount, R16 end, user resource and only expected table-count deltas; browser reported "commit confirmed" | A date/marker deviation, B marker-only witness STOP; Owner accepted B marker exception for review entry |
+| Real error injection, concurrency, CHAIN/RELEASE, Agenda OFF | NOT EXECUTED on CF-02 | Deferred explicit negative CF-03 gates |
+| Real EnhancedMySQL / MariaDBSnapshot invoice non-regression | NOT EXECUTED on this CF-02 implementation | Historical different source/profile evidence exists; new CF-03 test required |
+| Full optional 21-profile matrix | NOT EXECUTED on CF-02 | Nine-profile CI is accepted development baseline; full CI before later qualification as required |
+
+The counts above are **not additive** where a runner invokes other runners. The original POS01-B witness reports `STOP / CF02SubscriptionPostconditionMismatch` because `note_contains_marker=false`; this is **not** reclassified as PASS. See [Owner disposition](evidence/cf02/pos01-owner-test-acceptance-2026-11-20.md).
 
 Use tools/cf02-run-synthetic.sh for repeatable no-business-DB tests.
 Use tools/cf02-lab-readonly.sh --check-only for a read-only SQL privilege/configuration inspection (no writes).
@@ -42,8 +48,7 @@ Do not paste passwords, cookies, session identifiers, raw member records or priv
 
 ## Explicit remaining gates
 
-The current work is a development implementation, not production authorization.
-Before an independent development merge: inspect the effective diff, full PHP 7.4/8.2 pinned-Core regression jobs, security invariants, external transaction review and Owner merge decision.
+The implementation is Owner-admitted **for independent external review only**, not for production or development merge. Before a development merge: inspect the effective diff, code-HEAD and documentation-HEAD nine-profile CI, PHP 7.4/8.2 pinned-Core contracts, security invariants, independent transaction review and the **separate Owner merge decision**. The 21-profile full workflow is a later full-regression option, not a prerequisite to begin external review.
 Before production/release: real restricted-MySQL contribution+Agenda ON/OFF, rollback and errors, concurrency, HTTP session/replay, EnhancedMySQL and MariaDB invoice non-regression, cross-version and package qualification.
 
 Historical D-01, AP3 and F27 evidence files are unchanged; a new result must be separately versioned and SHA-256 bound to its exact tested commit.
@@ -113,3 +118,7 @@ A new CLI tool `tools/cf02-contribution-witness.php`, pure comparison contract `
 ## POS01 identity adaptation for the Owner-created member (2026-11-20)
 
 The Owner created technical member ID **56** with Dolibarr-generated reference **MEM2611-0056** but has no editable member-login field. POS01 now uses both `llx_adherent.rowid` and `llx_adherent.ref` as a mandatory exact identity pair (`--member-id=56 --member-ref=MEM2611-0056`) and retains synthetic name/email, entity, status, no third party and no prior subscription as independent protections. Login is no longer required to match the marker, but remains in the before/after snapshot so unexpected login mutations are still detected. Run the revised non-writing `--check-only` first; no business DML is authorized by this change. [Runbook](cf02-positive-contribution-lab.md).
+
+## Review-entry disposition (2026-11-20)
+
+**Owner acceptance:** the provided B/C/D, real empty Core transaction, POS01-A and POS01-B positive contribution/Agenda evidence is sufficient for an independent CF-02 review **with the missing POS01-B note marker accepted as a documented non-blocking exception**. The Owner explicitly waived a test rerun solely for that marker. A remains a procedural deviation; B remains script STOP even though its other checked real postconditions passed. No code/witness/CI changes, no altered stored subscription or overwritten evidence. Current authority and reviewer questions: [CF-02 independent review handoff](cf02-review-handoff.md). Independent review, CF-03 negative/other-profile tests, development merge and release remain open.

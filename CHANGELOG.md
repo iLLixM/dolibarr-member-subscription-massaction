@@ -2,14 +2,16 @@
 
 ## Unreleased
 
-- CF-02 development / Draft PR #29: bounded Core-Guarded MySQL contribution
-  adapter using D-01 SET RR immediately before Core BEGIN, acknowledged
-  Core commit/rollback and terminal completion STOP; direct processing
-  file-session admission, contribution-only server-side features, 88 adapter
-  and 19 session assertions (including replay-latch hardening) PASS locally. Real MySQL/HTTP/Agenda
-  and Enhanced/MariaDB business regression remain NOT EXECUTED on this
-  code; independent review and release remain pending.
-
+- CF-02 review-entry / PR #29: bounded MySQL Core-Guarded contribution
+  adapter and server-side contribution-only admission with session/replay
+  fencing; 88 adapter/19 session synthetic assertions and standard 9-profile
+  PR CI PASS. Restricted MySQL 8.4.13 / Dolibarr 24.0.3 real loaded-Core
+  BEGIN/ROLLBACK and two authenticated synthetic-member contribution+Agenda
+  bookings were Owner-observed, with independent before/after witness
+  snapshots. POS01-B's original STOP for a missing description marker is
+  preserved; the Owner waived a marker-only rerun for external review entry.
+  External implementation/security review, real negative and other-profile
+  regression, development merge and v0.1.0 release remain open.
 - CF-01: add administrator-controlled transaction profiles with entity-specific revision/CAS,
   safe explicit MySQL migration and unchanged MariaDB Snapshot default. Separate read-only
   preview from final/per-member booking admission; invalidate stale confirmations without

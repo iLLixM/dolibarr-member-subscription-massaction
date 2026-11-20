@@ -1,18 +1,20 @@
 # Member Subscription Massaction for Dolibarr
 
-**CF-02 development status — 2026-11-20:** A bounded Core-Guarded
-contribution-only adapter is now under development in
-[Draft PR #29](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/29).
-This is **NOT a production-qualified, independently approved or released feature**.
-The six pre-CF-02 Completion Gates in Issue #22 were Owner-accepted with documented
-limits; the new implementation must still pass its own independent code review and
-real restricted-MySQL/Agenda/HTTP qualification. CoreGuarded permits contributions
-only: invoice/customer creation, PDF and email are disabled. Under CHAIN/RELEASE a
-confirmed member result remains acknowledged while the batch immediately stops
-without processing remaining members. There is no generic Performance Schema
-prerequisite, no new journal, no automatic retry, no physical event-identity
-equivalence, and no fallback from Enhanced MySQL. See the
-[CF-02 development evidence](docs/cf02-implementation-validation.md) and
+**CF-02 review-entry status — 2026-11-20:** The bounded CoreGuarded
+contribution-only implementation in [PR #29](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/29) is
+**Owner test-accepted with documented limits and ready for independent external
+source/security/transaction review**; it is **not** independently approved,
+merged, production qualified, or released. The restricted MySQL 8.4.13 / Dolibarr
+24.0.3 lab showed real Core BEGIN/ROLLBACK and authenticated contribution+standard
+Agenda persistence. The formal POS01-B witness still returned STOP because the
+subscription description lacked the prescribed test marker; the Owner expressly
+waived a marker-only repeat for review entry without rewriting that STOP.
+CoreGuarded still permits **contributions only**, with invoice/customer/PDF/mail
+disabled, no general P_S grants, no new journal, automatic retry or physical
+event-identity equivalence, and no Enhanced fallback. Real negative/parallel
+tests and real Enhanced/MySQL/MariaDB invoice non-regression remain pending
+under Issue #22 CF-03. See the [review handoff](docs/cf02-review-handoff.md),
+[validation](docs/cf02-implementation-validation.md), and
 [binding ADR](docs/adr/ADR-0001-core-first-transaction-profiles.md).
 
 **Database development status — 2026-11-17:** MariaDB and Oracle MySQL use the

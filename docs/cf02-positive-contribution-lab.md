@@ -1,3 +1,7 @@
+# Historical POS01-A/B runbook — tests completed (2026-11-20)
+
+**Do not rerun these instructions for members 56 or 57 or reuse their consumed baseline directories.** The original read-only witness states remain STOP (A: incorrect selected dates and absent marker; B: absent description marker only). The Owner accepted the positive CoreGuarded contribution/Agenda evidence with a marker-only waiver for *external review entry*, not as a rewritten witness PASS. See [the Owner-acceptance evidence](evidence/cf02/pos01-owner-test-acceptance-2026-11-20.md) and [review handoff](cf02-review-handoff.md). The numbered steps below are preserved as the **historical original test protocol**, not a new instruction to book again.
+
 # CF-02 POS01 – restricted MySQL real-HTTP contribution witness
 
 **Status: witness prepared; real business DML NOT EXECUTED.** This is a
