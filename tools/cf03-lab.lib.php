@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  * Pure CF-03 operator contract: no DB connection and no business SQL.
  */
+require_once __DIR__.'/cf03-evidence.lib.php';
+
 final class Cf03LabContract
 {
     const COUNTS = array('adherent', 'subscription', 'actioncomm', 'actioncomm_resources',
@@ -80,7 +82,7 @@ final class Cf03LabContract
         $modes=array('--preflight','--check-only','--baseline','--verify');
         $keys=array('environment','document-root','db-host','db-port','db-name',
             'db-user','scenario','member-id','member-ref','marker','start','end',
-            'amount','agenda','evidence-dir');
+            'amount','agenda','evidence-dir','evidence-root');
         foreach (array_slice($argv,1) as $arg) {
             if (in_array($arg,$modes,true)) {
                 self::need($mode===null,'CF03DuplicateMode');
@@ -146,12 +148,12 @@ final class Cf03LabContract
                 'CF03InvalidAgenda');
         }
         $path=$opts['evidence-dir']??'';
+        $evidenceRoot=$opts['evidence-root']??null;
         if ($mode==='baseline' || $mode==='verify') {
-            self::need(preg_match('~^/var/lib/dolibarr-test-results/cf03-'
-                .strtolower($id).'-[a-z0-9-]{6,40}$~D',$path)===1,
-                'CF03UnsafeEvidencePath');
+            Cf03Evidence::choice($id,$path,$evidenceRoot);
         } else {
-            self::need($path==='','CF03EvidencePathNotPermitted');
+            self::need($path==='' && $evidenceRoot===null,
+                'CF03EvidencePathNotPermitted');
         }
         return array($mode,$id,$env,$opts);
     }
