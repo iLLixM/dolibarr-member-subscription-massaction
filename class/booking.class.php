@@ -6,20 +6,40 @@ require_once __DIR__.'/preview.class.php';
 require_once __DIR__.'/corecompatibility.class.php';
 require_once __DIR__.'/databasestate.class.php';
 require_once __DIR__.'/transactionprofile.class.php';
+require_once __DIR__.'/coreguardedtransaction.class.php';
+require_once __DIR__.'/filebookingcheckpoint.class.php';
 /** One owned transaction per member. Invoice operations share the owned transaction. */
 class MsmBookingService
 {
 	private $db;
 	protected $databaseState;
+	private $activeTransaction;
+	private $coreTransaction;
+	private $coreTerminal = false;
 	public function __construct($db, MsmDatabaseState $databaseState = null)
 	{
 		$this->db = $db; $this->databaseState = $databaseState ?? new MsmDatabaseState($db);
 		if (!$this->databaseState->isFor($db)) { throw new InvalidArgumentException('MSMDatabaseUnsupported'); }
+		$this->activeTransaction = $this->databaseState;
 	}
 	protected function profiles()
 	{
 		global $conf;
 		return new MsmTransactionProfile($this->db, $this->databaseState, (int) $conf->entity);
+	}
+	/** A fresh bounded coordinator may be reused for several acknowledged NO_CHAIN members. */
+	protected function coreTransaction()
+	{
+		if ($this->coreTransaction === null) { $this->coreTransaction = new MsmCoreGuardedTransaction($this->db); }
+		return $this->coreTransaction;
+	}
+	/** Controller readiness must never probe Performance Schema for Core-Guarded. */
+	public function coreGuardedReadiness()
+	{
+		$state = $this->coreTransaction()->beforeBegin();
+		if ($state['state'] !== MsmDatabaseState::IDLE || !$state['fresh']) {
+			throw new RuntimeException($state['reason'] ?: 'MSMTransactionUnknown');
+		}
 	}
 	protected function invoicing() { require_once __DIR__.'/invoice.class.php'; return new MsmInvoiceService($this->db, $this->databaseState); }
 	protected function member($id)
@@ -45,9 +65,9 @@ class MsmBookingService
 	}
 	protected function requireOwned()
 	{
-		$state = $this->databaseState->active();
+		$state = $this->activeTransaction->active();
 		if ($state['state'] !== MsmDatabaseState::ACTIVE || !$state['fresh'] || !$state['owned']) { throw new RuntimeException('MSMTransactionUnknown'); }
-		$this->databaseState->requireSupportedIsolation($state);
+		$this->activeTransaction->requireSupportedIsolation($state);
 	}
 	/** Read-only readiness; repeat after all locks, before any business writes. */
 	public function checkTables($invoice = false, $autocreate = false)
@@ -103,38 +123,58 @@ class MsmBookingService
 		}
 	}
 	/** Roll back only our own context; ambiguous depth/connection failures stop the batch. */
-	private function rollbackOwned()
+	private function rollbackOwned($coreGuarded = false)
 	{
-		$state = $this->databaseState->rollbackContext();
+		$state = $this->activeTransaction->rollbackContext();
 		// FAILED is reserved for future failed-but-open backends, never an alias for UNKNOWN.
 		if (!in_array($state['state'], array(MsmDatabaseState::ACTIVE, MsmDatabaseState::FAILED), true) || !$state['owned'] || !$state['fresh']) { return false; }
+		if ($coreGuarded) { $this->activeTransaction->beforeCompletion(); }
 		$acknowledged = $this->db->rollback();
-		$ended = $this->databaseState->completed('ROLLBACK', $acknowledged);
+		$ended = $this->activeTransaction->completed('ROLLBACK', $acknowledged);
 		return $ended['state'] === MsmDatabaseState::IDLE && $ended['fresh'];
 	}
-	public function book($id, array $expected, array $options, $user, $overlapConfirmed)
+	public function book($id, array $expected, array $options, $user, $overlapConfirmed, $checkpoint = null)
 	{
 		$result = array('status' => 'failed', 'message' => 'MSMBookingFailed', 'id' => 0, 'amount' => 0, 'mail' => 'not_selected', 'stop' => false);
+		if ($this->coreTerminal) { $result['status'] = 'not_processed'; $result['stop'] = true; $result['message'] = 'MSMBatchStopped'; return $result; }
 		if ((!empty($options['invoice']) && empty($expected['invoice'])) || (!empty($options['autocreate']) && empty($options['invoice']))) { $result['message'] = 'MSMUnsupportedAction'; return $result; }
 		if (!MsmPreviewService::canCreateSubscriptionWithOptions($user, !empty($options['invoice']), !empty($options['sendmail']))) { $result['message'] = 'NotEnoughPermissions'; return $result; }
 		// Never touch a transaction owned by another caller.
 		if ((int) $this->db->transaction_opened !== 0) { $result['status'] = 'unknown'; $result['stop'] = true; return $result; }
 		$owned = false; $beginAttempted = false; $committing = false; $invoice = null;
+		$coreGuarded = false;
+		$this->activeTransaction = $this->databaseState;
 		$diagnostic = array('stage' => 'preflight', 'subscription_id' => 0, 'invoice_id' => 0, 'customer_id' => 0);
 		try {
 			MsmCoreCompatibility::booking($this->db); // Capability failures precede transactions/writes.
-			$this->profiles()->admit($expected['_profile'] ?? null, $user, $options);
-			$initial = $this->databaseState->beforeBegin();
+			$profile = $this->profiles()->admit($expected['_profile'] ?? null, $user, $options);
+			$coreGuarded = ($profile['profile'] === 'CoreGuarded');
+			if ($coreGuarded) {
+				// Direct service calls cannot bypass the HTTP file-session checkpoint.
+				if (!($checkpoint instanceof MsmFileBookingCheckpoint)) { throw new RuntimeException('MSMCoreGuardedSessionUnsupported'); }
+				MsmFileBookingCheckpoint::requireRuntime();
+				$checkpoint->requireProcessing((int) $id, $expected['_profile'], $user, $expected, $options);
+				if (!empty($options['invoice']) || !empty($options['autocreate']) || !empty($options['sendmail'])) { throw new RuntimeException('MSMProfileFeatureUnavailable'); }
+				$this->activeTransaction = $this->coreTransaction();
+			}
+			$initial = $this->activeTransaction->beforeBegin();
 			if ($initial['state'] !== MsmDatabaseState::IDLE || !$initial['fresh']) {
-				$result['status'] = 'unknown'; $result['stop'] = true; $result['message'] = $initial['reason']; return $result;
+				$result['status'] = 'unknown'; $result['stop'] = true; $result['message'] = $initial['reason'];
+				if ($coreGuarded) { $this->coreTerminal = true; }
+				return $result;
 			}
 			$this->checkTables(!empty($options['invoice']), !empty($options['autocreate']));
-			$beginAttempted = true;
-			if (!$this->db->begin()) { throw new RuntimeException('SubscriptionBulkDatabaseError'); }
-			$owned = true;
-			$begun = $this->databaseState->afterBegin();
+			if ($coreGuarded) {
+				$this->activeTransaction->begin(); // Performs final SET RR immediately before Core BEGIN.
+				$beginAttempted = true; $owned = true;
+			} else {
+				$beginAttempted = true;
+				if (!$this->db->begin()) { throw new RuntimeException('SubscriptionBulkDatabaseError'); }
+				$owned = true;
+			}
+			$begun = $this->activeTransaction->afterBegin();
 			if ($begun['state'] !== MsmDatabaseState::ACTIVE || !$begun['fresh'] || !$begun['owned']) { throw new RuntimeException('MSMTransactionUnknown'); }
-			$this->databaseState->requireSupportedIsolation($begun);
+			$this->activeTransaction->requireSupportedIsolation($begun);
 			$this->lock($id);
 			if (!empty($options['invoice'])) { $this->invoicing()->lock($id); }
 			// MySQL ENGINE metadata reads establish a consistent view. Defer them
@@ -158,21 +198,51 @@ class MsmBookingService
 			$this->verifyStored($id, $subscription, $member, $row);
 			$this->requireOwned();
 			$diagnostic['stage'] = 'commit';
+			if ($coreGuarded) { $this->activeTransaction->beforeCompletion(); }
 			$committing = true;
 			$acknowledged = $this->db->commit();
-			$ended = $this->databaseState->completed('COMMIT', $acknowledged);
+			$ended = $this->activeTransaction->completed('COMMIT', $acknowledged);
 			if ($ended['state'] !== MsmDatabaseState::IDLE || !$ended['fresh']) { throw new RuntimeException('MSMTransactionUnknown'); }
 			$owned = false;
 			$result = array('status' => 'success', 'message' => 'MSMBooked', 'id' => (int) $subscription, 'amount' => $row['amount'], 'mail' => 'not_selected', 'stop' => false);
+			if ($coreGuarded) {
+				$continue = $this->activeTransaction->nonterminalAcknowledged();
+				$result['completion'] = $continue ? 'nonterminal_acknowledged' : 'terminal_acknowledged';
+				$result['stop'] = !$continue;
+				if (!$continue) { $this->coreTerminal = true; }
+			}
 			// Internal only; never put live DB objects in the session/result renderer.
 			$result['_member'] = $member;
 			if ($invoice !== null) { $result['invoice'] = $invoice; }
 		} catch (Throwable $e) {
 			$safe = false;
-			if (!$owned) { $result['stop'] = true; }
-			if ($owned && !$committing) { try { $safe = $this->rollbackOwned(); } catch (Throwable $ignored) {} }
-			if ($committing || ($beginAttempted && !$owned) || ($owned && !$safe)) { $result['status'] = 'unknown'; $result['stop'] = true; $result['message'] = 'MSMTransactionUnknown'; }
-			else { $result['message'] = in_array($e->getMessage(), array('MSMCoreVersionUnsupported', 'MSMCoreContractUnsupported', 'MSMChangedConfirmation', 'MSMConsistencyError', 'MSMTransactionUnsupported', 'MSMProfileChanged', 'MSMProfileInvalid', 'MSMProfileUnavailable', 'MSMProfileSelectionRequired', 'MSMProfileFeatureUnavailable', 'MSMCoreGuardedPending', 'NotEnoughPermissions', 'MSMInvoiceFailed'), true) ? $e->getMessage() : 'MSMBookingFailed'; }
+			if ($coreGuarded) {
+				$beginAttempted = $beginAttempted || $this->activeTransaction->beginAttempted();
+				$qualifiedBusinessError = in_array($e->getMessage(), array('MSMChangedConfirmation', 'NotEnoughPermissions', 'MSMTransactionUnsupported', 'MSMConsistencyError'), true);
+				// No S error mappings have been qualified yet. Unknown SQL, 1213/1205,
+				// nested failures or connection faults NEVER authorize a foreign rollback.
+				if ($owned && !$committing && $qualifiedBusinessError) {
+					try { $safe = $this->rollbackOwned(true); } catch (Throwable $ignored) {}
+				}
+				if ($safe) {
+					$result['completion'] = $this->activeTransaction->nonterminalAcknowledged() ? 'nonterminal_acknowledged' : 'terminal_acknowledged';
+					$result['stop'] = $result['completion'] !== 'nonterminal_acknowledged';
+					if ($result['status'] !== 'skipped') { $result['status'] = 'failed'; }
+					$result['message'] = $e->getMessage();
+				} elseif ($e instanceof MsmCoreGuardedEntryRejected && !$beginAttempted) {
+					$result['status'] = 'not_processed'; $result['message'] = 'MSMTransactionUnsupported'; $result['stop'] = true;
+				} elseif (!$beginAttempted && !$owned && !in_array($e->getMessage(), array('MSMTransactionUnknown', 'MSMDatabaseObservationUnavailable'), true)) {
+					$result['status'] = 'not_processed'; $result['message'] = $e->getMessage(); $result['stop'] = true;
+				} else {
+					$result['status'] = 'unknown'; $result['stop'] = true; $result['message'] = 'MSMTransactionUnknown';
+				}
+				if ($result['stop']) { $this->coreTerminal = true; }
+			} else {
+				if (!$owned) { $result['stop'] = true; }
+				if ($owned && !$committing) { try { $safe = $this->rollbackOwned(); } catch (Throwable $ignored) {} }
+				if ($committing || ($beginAttempted && !$owned) || ($owned && !$safe)) { $result['status'] = 'unknown'; $result['stop'] = true; $result['message'] = 'MSMTransactionUnknown'; }
+				else { $result['message'] = in_array($e->getMessage(), array('MSMCoreVersionUnsupported', 'MSMCoreContractUnsupported', 'MSMChangedConfirmation', 'MSMConsistencyError', 'MSMTransactionUnsupported', 'MSMProfileChanged', 'MSMProfileInvalid', 'MSMProfileUnavailable', 'MSMProfileSelectionRequired', 'MSMProfileFeatureUnavailable', 'MSMCoreGuardedPending', 'NotEnoughPermissions', 'MSMInvoiceFailed'), true) ? $e->getMessage() : 'MSMBookingFailed'; }
+			}
 		}
 		if ($result['status'] !== 'success') { $result['diagnostic'] = $diagnostic; $result['rollback'] = $owned && !$committing && !empty($safe) ? 'confirmed' : 'unconfirmed'; }
 		return $result;
