@@ -22,6 +22,38 @@ final class Cf03LabContract
         if (!$condition) { throw new RuntimeException($reason); }
     }
 
+    /** Columns actually read by the V22/V24 witness: fail before any case snapshot. */
+    public static function columnPolicy()
+    {
+        return array(
+            'adherent'=>array('rowid','ref','firstname','lastname','email','entity',
+                'fk_adherent_type','fk_soc','statut','datefin'),
+            'adherent_type'=>array('rowid','statut','amount','duration'),
+            'subscription'=>array('rowid','fk_adherent','fk_type','subscription','dateadh',
+                'datef','note'),
+            'actioncomm'=>array('id','code','fk_element','elementtype'),
+            'actioncomm_resources'=>array('rowid','fk_actioncomm','element_type','fk_element'),
+            'const'=>array('name','value','entity'),
+            'societe'=>array('rowid','entity','client'),
+            'facture'=>array('rowid','entity','fk_soc','type','fk_statut','paye',
+                'ref','total_ttc','datef','fk_cond_reglement','fk_mode_reglement',
+                'fk_account','multicurrency_code'),
+            'facturedet'=>array('rowid','fk_facture','total_ttc','description',
+                'qty','fk_product','product_type','tva_tx','date_start'),
+            'element_element'=>array('fk_source','fk_target','sourcetype','targettype')
+        );
+    }
+
+    public static function columnsComplete(array $observed)
+    {
+        foreach (self::columnPolicy() as $table=>$fields) {
+            foreach ($fields as $column) {
+                self::need(in_array($column,$observed[$table]??array(),true),
+                    'CF03WitnessSchemaUnsupported');
+            }
+        }
+    }
+
     public static function environments()
     {
         return array(
