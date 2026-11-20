@@ -137,6 +137,23 @@ final class Cf03Evidence
         return $decoded;
     }
 
+    /**
+     * Admit a complete, valid case and seal this ONE verify attempt before
+     * calling cf03Configure() or touching DB/Source/HTTP-dependent code.
+     * An invalid baseline remains STOP without any business evaluation.
+     */
+    public static function startVerify($dir, $environment, $root,
+        $documentRoot, $checkout, $validate)
+    {
+        self::need(is_callable($validate), 'CF03InvalidVerifyValidator');
+        self::directory($dir, false, $environment, $root,
+            $documentRoot, $checkout);
+        $baseline = self::readyToVerify($dir);
+        $validate($baseline);
+        self::exclusive($dir, 'verify.started', gmdate('c')."\n");
+        return $baseline;
+    }
+
     public static function exclusive($dir, $filename, $value)
     {
         self::need(in_array($filename, array('baseline.json', 'baseline.sha256',
