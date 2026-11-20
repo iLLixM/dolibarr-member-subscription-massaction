@@ -6,7 +6,7 @@
   adapter using D-01 SET RR immediately before Core BEGIN, acknowledged
   Core commit/rollback and terminal completion STOP; direct processing
   file-session admission, contribution-only server-side features, 88 adapter
-  and 15 session assertions initially passed locally. Real MySQL/HTTP/Agenda
+  and 19 session assertions (including replay-latch hardening) PASS locally. Real MySQL/HTTP/Agenda
   and Enhanced/MariaDB business regression remain NOT EXECUTED on this
   code; independent review and release remain pending.
 
