@@ -136,7 +136,7 @@ final class Cf03FakeDb
             foreach ($this->events as $event) {
                 if ($event['id']===$eventId) {
                     $rows[]=array('rowid'=>$eventId+1,'element_type'=>'user',
-                        'fk_element'=>$this->resourceActor);
+                        'fk_element'=>$eventId===50?4:$this->resourceActor);
                 }
             }
         } elseif (preg_match('/^SELECT COUNT\(\*\) AS n FROM llx_([a-z_]+)$/D',$sql,$m)) {
