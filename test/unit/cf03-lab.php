@@ -352,4 +352,57 @@ foreach (array('B','C') as $invoiceEnvironment) {
     c3ok(Cf03LabContract::verify($before,$after,$expected,$invoiceEnvironment)['status']==='PASS',
         'two configured invoice Agenda actions '.$invoiceEnvironment);
 }
+// End-to-end CLI regression on a synthetic file tree: first --verify is
+// sealed BEFORE cf03Configure() finds its deliberately absent conf.php.
+// The second invocation cannot re-use the same case (no database accessed).
+$caseRoot=sys_get_temp_dir().'/cf03-seal-'.bin2hex(random_bytes(7));
+$fakeDoc=$caseRoot.'/site/htdocs';
+$privateRoot=$caseRoot.'/private';
+c3ok(mkdir($fakeDoc,0700,true),'synthetic hosted webroot');
+c3ok(mkdir($privateRoot,0700),'synthetic hosted Evidence parent');
+$caseDir=$privateRoot.'/cf03-d-verifysealfail1';
+list($expected,$beforeState,$unchanged)=c3make('D','no-change','off');
+Cf03LabContract::baseline($beforeState,$expected,'D');
+Cf03Evidence::directory($caseDir,true,'D',$privateRoot,$fakeDoc,dirname(__DIR__,2));
+Cf03Evidence::json($caseDir,'baseline.json',array(
+    'case'=>'CF03','environment'=>'D','expected'=>$expected,
+    'before'=>$beforeState,'created_utc'=>gmdate('c')));
+Cf03Evidence::exclusive($caseDir,'baseline.sha256',
+    hash_file('sha256',$caseDir.'/baseline.json')."\n");
+$flags=array(
+    '--verify','--environment=D','--document-root='.$fakeDoc,
+    '--db-host=127.0.0.1','--db-port=3306','--db-name=cf03_synthetic',
+    '--db-user=cf03_synthetic','--scenario=no-change','--member-id=271',
+    '--member-ref=MEM2611-0271',
+    '--marker=CF03LAB-D-ABCDEF123','--start=2080-01-01',
+    '--end=2080-12-31','--amount=120.00','--agenda=off',
+    '--evidence-root='.$privateRoot,'--evidence-dir='.$caseDir
+);
+$command=escapeshellarg(PHP_BINARY).' '
+    .escapeshellarg(dirname(__DIR__,2).'/tools/cf03-lab.php').' '
+    .implode(' ',array_map('escapeshellarg',$flags)).' 2>&1';
+$output=array();$exitStatus=0;
+exec($command,$output,$exitStatus);
+$response=json_decode(implode("\n",$output),true);
+c3ok($exitStatus===1 && is_array($response)
+    && ($response['reason']??null)==='CF03WrongDolibarrRoot',
+    'first sealed verify stops on unavailable external config');
+c3ok(is_file($caseDir.'/verify.started'),'CLI seals verify before configure');
+$verdict=json_decode(file_get_contents($caseDir.'/verdict.json'),true);
+c3ok(($verdict['reason']??null)==='CF03WrongDolibarrRoot',
+    'early STOP persisted as exclusive verdict');
+$output=array();$exitStatus=0;
+exec($command,$output,$exitStatus);
+$response=json_decode(implode("\n",$output),true);
+c3ok($exitStatus===1 && is_array($response)
+    && ($response['reason']??null)==='CF03EvidenceExistsNoRetry',
+    'repeated verify must STOP at admission without external config');
+$still=json_decode(file_get_contents($caseDir.'/verdict.json'),true);
+c3ok(($still['reason']??null)==='CF03WrongDolibarrRoot',
+    'second attempt must not overwrite original failure');
+foreach (scandir($caseDir) as $name) {
+    if($name!=='.' && $name!=='..') { unlink($caseDir.'/'.$name); }
+}
+rmdir($caseDir);rmdir($privateRoot);rmdir($fakeDoc);
+rmdir($caseRoot.'/site');rmdir($caseRoot);
 echo 'CF03 A-D pure harness contracts: '.$passed.' assertions PASS (no DB/HTTP).'.PHP_EOL;
