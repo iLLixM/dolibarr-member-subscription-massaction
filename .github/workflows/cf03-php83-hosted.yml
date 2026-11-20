@@ -1,0 +1,51 @@
+name: CF-03 hosted PHP 8.3 / Dolibarr 22.0.5
+on:
+  pull_request:
+    paths:
+      - 'tools/cf03-*'
+      - 'test/unit/cf03-*'
+      - '.github/workflows/cf03-php83-hosted.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  hosted-php83:
+    name: PHP 8.3 / Dolibarr 22.0.5 - targeted CF03
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mysqli
+          coverage: none
+      - name: CF-03 source syntax
+        run: |
+          php -l tools/cf03-lab.php
+          php -l tools/cf03-lab.lib.php
+          php -l tools/cf03-evidence.lib.php
+          php -l test/unit/cf03-lab.php
+          php -l test/unit/cf03-evidence.php
+      - name: Offline CF-03 contracts
+        run: |
+          php test/unit/cf03-lab.php
+          php test/unit/cf03-evidence.php
+      - uses: actions/checkout@v4
+        with:
+          repository: Dolibarr/dolibarr
+          ref: 88ad132763be45e9620128c1830e41493e1cdd05
+          path: .test-core
+          persist-credentials: false
+      - name: PHP 8.3/V22.0.5 business synthetic spot checks
+        env:
+          DOLIBARR_TEST_ROOT: ${{ github.workspace }}/.test-core
+        run: |
+          php test/unit/coreguarded.php
+          php test/unit/f29-rights.php
+          php test/unit/booking.php
+          php test/unit/f29-book-flow.php
+          php test/unit/invoiceprofile.php
+          php test/unit/invoice.php
+          php test/unit/request.php
