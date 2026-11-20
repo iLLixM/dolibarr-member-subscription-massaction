@@ -17,17 +17,19 @@ final class Cf02ContributionWitnessContract
         if (!$condition) { throw new RuntimeException($reason); }
     }
 
-    public static function parameters($id, $marker, $start, $end, $amount, $agenda)
+    public static function parameters($id, $marker, $start, $end, $amount, $agenda, $memberRef)
     {
         self::requireTrue(is_string($id) && preg_match('/^[1-9][0-9]{0,8}$/D', $id) === 1, 'CF02InvalidMemberId');
         self::requireTrue(is_string($marker) && preg_match(self::MARKER_PATTERN, $marker) === 1, 'CF02InvalidMarker');
+        // Member login is optional in Dolibarr; use the Core-generated reference.
+        self::requireTrue(is_string($memberRef) && preg_match('/^[A-Z0-9][A-Z0-9_-]{4,31}$/D', $memberRef) === 1, 'CF02InvalidMemberReference');
         self::requireTrue(is_string($start) && is_string($end) && preg_match('/^20[5-9][0-9]-[0-9]{2}-[0-9]{2}$/D', $start) === 1
             && preg_match('/^20[5-9][0-9]-[0-9]{2}-[0-9]{2}$/D', $end) === 1
             && self::validDay($start) && self::validDay($end) && $end > $start, 'CF02InvalidPeriod');
         self::requireTrue(is_string($amount) && preg_match('/^(?:0|[1-9][0-9]{0,5})(?:\.[0-9]{1,2})?$/D', $amount) === 1,
             'CF02InvalidAmount');
         self::requireTrue($agenda === 'on' || $agenda === 'off', 'CF02InvalidAgendaMode');
-        return array('member_id' => (int) $id, 'marker' => $marker, 'start' => $start,
+        return array('member_id' => (int) $id, 'member_ref' => $memberRef, 'marker' => $marker, 'start' => $start,
             'end' => $end, 'amount' => $amount, 'agenda' => $agenda);
     }
 
@@ -49,7 +51,7 @@ final class Cf02ContributionWitnessContract
             && !empty($s['profile']['raw_hash']), 'CF02WrongProfile');
         $m = $s['member'] ?? array();
         self::requireTrue(($m['id'] ?? null) === $e['member_id']
-            && ($m['login'] ?? null) === $e['marker']
+            && ($m['ref'] ?? null) === $e['member_ref']
             && ($m['lastname'] ?? null) === $e['marker']
             && ($m['firstname'] ?? null) === 'Synthetic'
             && ($m['email_hash'] ?? null) === hash('sha256', strtolower($e['marker']).'@example.invalid')

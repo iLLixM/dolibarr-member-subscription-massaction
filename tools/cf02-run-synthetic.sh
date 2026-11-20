@@ -8,6 +8,7 @@ echo "CF-02 source: $(git rev-parse HEAD)"
 find class lib test/unit test/fixtures -name '*.php' -type f -print0 | xargs -0 -n1 php -l > /dev/null
 php test/unit/coreguarded.php
 php test/unit/coreguarded-session.php
+php test/unit/cf02-contribution-witness.php
 php test/unit/run.php
 php test/unit/database.php
 node test/unit/loading.js

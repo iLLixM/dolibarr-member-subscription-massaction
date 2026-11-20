@@ -12,9 +12,13 @@ booking happens separately through Dolibarr's genuine authenticated UI.
   `dolibarr_i105_v24`, effective account
   `dolibarr_i105_v24_limited@10.0.2.100`, and CoreGuarded profile is admitted.
 - Select one **newly created synthetic member**, never an existing real member:
-  login and surname `CF02LAB-20261120A1`, first name `Synthetic`,
+  **technical ID `56` and Core-generated reference `MEM2611-0056`**.
+  A member login is **not required**. For an independent synthetic marker,
+  the surname must be `CF02LAB-20261120A1`, first name `Synthetic`,
   email `cf02lab-20261120a1@example.invalid`, entity 1, validated status,
-  no linked third party, no existing subscriptions. Record its numeric ID.
+  no linked third party and no existing subscriptions.
+  If one of these fields differs, update **only the synthetic test member**
+  through the regular Dolibarr UI before running the witness.
 - Use an existing active, subscription-required member type with configured
   amount **120.00**; do not modify existing non-synthetic types.
 - Book exactly `2080-01-01` to `2080-12-31` with this exact marker in
@@ -34,17 +38,18 @@ From the CF-02 worktree after a clean git checkout and exact HEAD check:
 cd ~/dolibarr-member-subscription-massaction-cf02
 git rev-parse HEAD
 git status --short
-MEMBER_ID=REPLACE_WITH_NEW_SYNTHETIC_MEMBER_ID
+MEMBER_ID=56
+MEMBER_REF=MEM2611-0056
 MARKER=CF02LAB-20261120A1
 EVIDENCE_DIR=/var/lib/dolibarr-test-results/cf02-pos01-20261120a1
 
 sudo -u www-data env CF02_DOLIBARR_ROOT=/home/marcel/dolibarr-i105-v24-mysql \
   /usr/bin/php -d xdebug.mode=off tools/cf02-contribution-witness.php \
-  --check-only --member-id="$MEMBER_ID" --marker="$MARKER" \
+  --check-only --member-id="$MEMBER_ID" --member-ref="$MEMBER_REF" --marker="$MARKER" \
   --start=2080-01-01 --end=2080-12-31 --amount=120.00 --agenda=on
 ```
 
-Expected: `status=PASS`. STOP means **no business booking**. The witness checks
+Expected: `status=PASS`. STOP means **no business booking**. `CF02FixtureNotIsolated` indicates that member ID/reference or another mandatory synthetic marker/status/entity/third-party field differs. An empty member login is permitted. The witness checks
 the exact synthetic identity, database/privilege/context, profile, member
 type and status, empty prior contribution/Agenda history, InnoDB engines,
 Agenda event configuration, and key protected-table counts.
@@ -57,7 +62,7 @@ business write, run **once** with all previous parameters unchanged:
 ```sh
 sudo -u www-data env CF02_DOLIBARR_ROOT=/home/marcel/dolibarr-i105-v24-mysql \
   /usr/bin/php -d xdebug.mode=off tools/cf02-contribution-witness.php \
-  --baseline --member-id="$MEMBER_ID" --marker="$MARKER" \
+  --baseline --member-id="$MEMBER_ID" --member-ref="$MEMBER_REF" --marker="$MARKER" \
   --start=2080-01-01 --end=2080-12-31 --amount=120.00 --agenda=on \
   --evidence-dir="$EVIDENCE_DIR"
 ```
@@ -79,7 +84,7 @@ STOP on unexpected preview, warning, profile switch or inconsistent state.
 ```sh
 sudo -u www-data env CF02_DOLIBARR_ROOT=/home/marcel/dolibarr-i105-v24-mysql \
   /usr/bin/php -d xdebug.mode=off tools/cf02-contribution-witness.php \
-  --verify --member-id="$MEMBER_ID" --marker="$MARKER" \
+  --verify --member-id="$MEMBER_ID" --member-ref="$MEMBER_REF" --marker="$MARKER" \
   --start=2080-01-01 --end=2080-12-31 --amount=120.00 --agenda=on \
   --evidence-dir="$EVIDENCE_DIR"
 ```

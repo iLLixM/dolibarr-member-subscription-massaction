@@ -8,11 +8,11 @@ $pass=0;
 function wOk($cond,$reason){global $pass;if(!$cond){throw new RuntimeException($reason);}$pass++;}
 function wDeny($f,$reason){try{$f();}catch(RuntimeException $e){wOk(strpos($e->getMessage(),'CF02')===0,$reason);return;}throw new RuntimeException('Not denied: '.$reason);}
 function wMake($agenda) {
- $e=Cf02ContributionWitnessContract::parameters('271','CF02LAB-ABCDEF12','2080-01-01','2080-12-31','120.00',$agenda);
+ $e=Cf02ContributionWitnessContract::parameters('271','CF02LAB-ABCDEF12','2080-01-01','2080-12-31','120.00',$agenda,'MEM2611-0271');
  $b=array('identity'=>array('schema'=>'dolibarr_i105_v24','account'=>'dolibarr_i105_v24_limited@10.0.2.100',
   'version'=>'8.4.13','autocommit'=>'1','completion'=>'NO_CHAIN'),
   'profile'=>array('family'=>'mysql','profile'=>'CoreGuarded','raw_hash'=>str_repeat('a',64)),
-  'member'=>array('id'=>271,'login'=>'CF02LAB-ABCDEF12','firstname'=>'Synthetic','lastname'=>'CF02LAB-ABCDEF12',
+  'member'=>array('id'=>271,'ref'=>'MEM2611-0271','login'=>null,'firstname'=>'Synthetic','lastname'=>'CF02LAB-ABCDEF12',
     'email_hash'=>hash('sha256','cf02lab-abcdef12@example.invalid'),'entity'=>1,'type_id'=>19,
     'fk_soc'=>0,'status'=>1,'datefin'=>null),
   'type'=>array('id'=>19,'status'=>1,'amount'=>'120.00','duration'=>'1y'),
@@ -37,13 +37,16 @@ foreach(array('on','off') as $agenda){
  list($e,$before,$after)=wMake($agenda);
  Cf02ContributionWitnessContract::assertBaseline($before,$e);
  wOk(Cf02ContributionWitnessContract::assertPositive($before,$after,$e)['status']==='PASS','valid '.$agenda);
- foreach(array('member.login'=>'REAL','member.fk_soc'=>20,'type.amount'=>'121.00',
+ foreach(array('member.ref'=>'MEM2611-9999','member.fk_soc'=>20,'type.amount'=>'121.00',
    'profile.profile'=>'EnhancedMySQL','identity.completion'=>'CHAIN',
    'engines.subscription'=>'MyISAM') as $field=>$value){
    $wrong=$before;list($outer,$inner)=explode('.',$field);
    $wrong[$outer][$inner]=$value;
    wDeny(static function() use($wrong,$e){Cf02ContributionWitnessContract::assertBaseline($wrong,$e);},'refuse '.$field);
  }
+ $withLogin=$before;$withLogin['member']['login']='generated-by-core';
+ Cf02ContributionWitnessContract::assertBaseline($withLogin,$e);
+ wOk(true,'optional core login accepted');
  $wrong=$before;$wrong['subscriptions']=array(array('id'=>1));
  wDeny(static function()use($wrong,$e){Cf02ContributionWitnessContract::assertBaseline($wrong,$e);},'prior subscription');
  foreach(array('counts.facture','counts.societe','counts.subscription',
@@ -67,11 +70,12 @@ foreach(array('on','off') as $agenda){
  }
 }
 foreach(array(
- array('0','CF02LAB-ABCDEF12','2080-01-01','2080-12-31','120.00','on'),
- array('1','NORMAL-MEMBER','2080-01-01','2080-12-31','120.00','on'),
- array('1','CF02LAB-ABCDEF12','2080-02-30','2080-12-31','120.00','on'),
- array('1','CF02LAB-ABCDEF12','2080-01-01','2080-12-31','-10','on'),
- array('1','CF02LAB-ABCDEF12','2080-01-01','2080-12-31','120.00','else')
+ array('0','CF02LAB-ABCDEF12','2080-01-01','2080-12-31','120.00','on','MEM2611-0271'),
+ array('1','NORMAL-MEMBER','2080-01-01','2080-12-31','120.00','on','MEM2611-0271'),
+ array('1','CF02LAB-ABCDEF12','2080-02-30','2080-12-31','120.00','on','MEM2611-0271'),
+ array('1','CF02LAB-ABCDEF12','2080-01-01','2080-12-31','-10','on','MEM2611-0271'),
+ array('1','CF02LAB-ABCDEF12','2080-01-01','2080-12-31','120.00','else','MEM2611-0271'),
+ array('1','CF02LAB-ABCDEF12','2080-01-01','2080-12-31','120.00','on','invalid reference')
 ) as $args){
  wDeny(static function()use($args){call_user_func_array(array('Cf02ContributionWitnessContract','parameters'),$args);},'invalid parameters');
 }

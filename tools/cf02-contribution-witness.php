@@ -16,13 +16,13 @@ function cf02Args($argv) {
         }
         cf02Need(strpos($v, '--') === 0 && strpos($v, '=') !== false, 'CF02InvalidArgument');
         list($k,$value) = explode('=', substr($v, 2), 2);
-        cf02Need(in_array($k, array('member-id','marker','start','end','amount','agenda','evidence-dir'), true)
+        cf02Need(in_array($k, array('member-id','member-ref','marker','start','end','amount','agenda','evidence-dir'), true)
             && !isset($a[$k]) && $value !== '', 'CF02InvalidArgument');
         $a[$k] = $value;
     }
     cf02Need($mode !== null, 'CF02MissingMode');
     $e = Cf02ContributionWitnessContract::parameters($a['member-id'] ?? null, $a['marker'] ?? null,
-        $a['start'] ?? null, $a['end'] ?? null, $a['amount'] ?? null, $a['agenda'] ?? null);
+        $a['start'] ?? null, $a['end'] ?? null, $a['amount'] ?? null, $a['agenda'] ?? null, $a['member-ref'] ?? null);
     $path = $a['evidence-dir'] ?? '';
     if ($mode !== 'check-only' || $path !== '') {
         cf02Need(preg_match('~^/var/lib/dolibarr-test-results/cf02-pos01-[a-z0-9-]{6,40}$~D', $path) === 1
@@ -47,7 +47,7 @@ function cf02One($db, $sql) {
 function cf02Snapshot($db, $e) {
     $id = $e['member_id'];
     $identity = cf02One($db,'SELECT DATABASE() AS schemaname, CURRENT_USER() AS account, VERSION() AS version, @@SESSION.autocommit AS ac, @@SESSION.completion_type AS mode');
-    $m = cf02One($db,'SELECT rowid,login,firstname,lastname,email,entity,fk_adherent_type,fk_soc,statut, CAST(datefin AS CHAR) AS datefin FROM llx_adherent WHERE rowid='.$id);
+    $m = cf02One($db,'SELECT rowid,ref,login,firstname,lastname,email,entity,fk_adherent_type,fk_soc,statut, CAST(datefin AS CHAR) AS datefin FROM llx_adherent WHERE rowid='.$id);
     $t = cf02One($db,'SELECT rowid,statut,amount,duration FROM llx_adherent_type WHERE rowid='.(int)$m['fk_adherent_type']);
     $p = cf02Rows($db,"SELECT value FROM llx_const WHERE name='MEMBERSUBSCRIPTIONMASSACTION_TRANSACTION_PROFILE' AND entity=1");
     cf02Need(count($p) === 1, 'CF02WrongProfile');
@@ -92,7 +92,7 @@ function cf02Snapshot($db, $e) {
             'version'=>$identity['version'],'autocommit'=>(string)$identity['ac'],'completion'=>$identity['mode']),
         'profile'=>array('family'=>'mysql','profile'=>'CoreGuarded','raw_hash'=>hash('sha256',$p[0]['value'])),
         'agenda_enabled'=>$f['MAIN_MODULE_AGENDA']==='1' && $f['MAIN_AGENDA_ACTIONAUTO_MEMBER_SUBSCRIPTION_CREATE']==='1',
-        'member'=>array('id'=>(int)$m['rowid'],'login'=>$m['login'],'firstname'=>$m['firstname'],
+        'member'=>array('id'=>(int)$m['rowid'],'ref'=>$m['ref'],'login'=>$m['login'],'firstname'=>$m['firstname'],
             'lastname'=>$m['lastname'],'email_hash'=>hash('sha256',strtolower((string)$m['email'])),
             'entity'=>(int)$m['entity'],'type_id'=>(int)$m['fk_adherent_type'],
             'fk_soc'=>(int)$m['fk_soc'],'status'=>(int)$m['statut'],'datefin'=>$m['datefin']),
