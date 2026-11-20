@@ -1,8 +1,8 @@
 # CF-02 – Core-Guarded contribution-only development evidence
 
-**Current status (2026-11-20): READY FOR INDEPENDENT EXTERNAL REVIEW — OWNER TEST EVIDENCE ACCEPTED WITH DOCUMENTED LIMITS; INDEPENDENT REVIEW, MERGE AND RELEASE PENDING.**
+**Final status (2026-11-20): CF-02 OWNER-ACCEPTED AND DEVELOPMENT-MERGED WITH DOCUMENTED LIMITS.** Independent final review on exact PR #29 HEAD `290782dfdf6d6048b801843b5e1c4e464ac3bfdc`: **APPROVED FOR DEVELOPMENT MERGE WITH DOCUMENTED LIMITS**, **F29-01 and F29-02 CLOSED**, no P0/P1 blockers. The reviewed HEAD passed [standard CI #44762573886](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44762573886) **9/9**. Owner-operated authenticated POS01-C formally **PASS** on the exact source (member #58, subscription #67, Agenda #103, preserved marker and correct 2080/R16 end, only expected database deltas; independent snapshot integrity and comparison). The Owner separately accepted the outcome and authorized the normal [PR #29](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/29) development merge `f0b1e6d40ff55abb1e7555c800caea0fdd1fe90d`.
 
-The [current review handoff](cf02-review-handoff.md) and [Owner-accepted POS01-A/B evidence](evidence/cf02/pos01-owner-test-acceptance-2026-11-20.md) supersede the execution-status claims in dated earlier sections below. Those earlier statements intentionally retain their contemporaneous provenance and are **not** statements that live MySQL booking remains untested. The Owner accepts the absent POS01-B description marker **only as a documented review-entry exception**; the original witness STOP is retained.
+See [POS01-C sanitized independent reconciliation](evidence/cf02/pos01-c-owner-positive-2026-11-20.md), [historic POS01-A/B acceptance](evidence/cf02/pos01-owner-test-acceptance-2026-11-20.md), the [review handoff and closure](cf02-review-handoff.md), and [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22). POS01-A/B **original STOP verdicts are not overwritten**; the earlier missing-marker waiver is confined to historical review entry. The new POS01-C PASS does not establish independent physical event identity or waive CF-03 real negative/other-profile tests, CF-04 release or CF-05 expansion. Dated historical sections below retain their original time-specific findings and pending markers; this final disposition supersedes them for current status.
 
 Branch: feature/cf02-core-guarded-contribution; baseline main: 4698ec1540110a6250ba95b8bf0e57689a5e9f8b.
 Authority: [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22) and [ADR-0001](adr/ADR-0001-core-first-transaction-profiles.md).
@@ -45,6 +45,22 @@ Use tools/cf02-lab-readonly.sh --check-only for a read-only SQL privilege/config
     CF02_DB_PORT=3307 sh tools/cf02-lab-readonly.sh --check-only
 
 Do not paste passwords, cookies, session identifiers, raw member records or private DB exports into CI or versioned evidence.
+
+## Final reviewed-HEAD evidence and Owner development-merge acceptance (2026-11-20)
+
+| Gate | Final status / evidence |
+| --- | --- |
+| Independent implementation/security/architecture/transaction review | **APPROVED FOR DEVELOPMENT MERGE WITH DOCUMENTED LIMITS**, exact HEAD `290782dfdf6d6048b801843b5e1c4e464ac3bfdc` |
+| F29-01 / P1 | **CLOSED**, strict CoreGuarded SQL/user/rights error classification |
+| F29-02 / P1 | **CLOSED**, positive Core `User::fetch()` with nonempty fresh `User::$errors` correctly becomes `MSMTransactionUnknown` |
+| Actual `book()` and `msmProcessBooking()` targeted regression | F29 synthetics, including 66 rights assertions and two 22-assertion flow cases, PASS; not real DB fault injection |
+| Nine-profile pinned PHP/Core CI | [Run #44762573886](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44762573886): **9/9 PASS** |
+| Real restricted-MySQL POS01-C on reviewed HEAD | **PASS**: Owner frontend acknowledged subscription #67 / EUR 120 / 2080 dates and marker; immutable before/after Witness `verdict.json` PASS; Agenda #103 + user resource; only expected table deltas |
+| Owner decision | Independent review **accepted**, POS01-C **accepted**, **normal development merge authorized and completed**: `f0b1e6d40ff55abb1e7555c800caea0fdd1fe90d` |
+| D29-01 / P3 | README/CHANGELOG stale draft/review status corrected as documentation-only follow-up |
+| Remaining | **CF-03 real rollback/fault/batch/replay/concurrency/other profiles, CF-04 release artifact and Owner release GO, CF-05 deferred expansion OPEN** |
+
+The independent review report was Owner-provided outside GitHub's formal review-vote workflow; no formal reviewer vote is asserted. See the [Owner PR merge/acceptance comment](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/29#issuecomment-7044837353). The private POS01-C raw evidence was **not committed**, only the sanitized reconciliation plus hashes. The Owner browser acknowledgement and separate readback have different evidential scope; no physical COMMIT-event proof is inferred. The merge is a development integration, not a production release.
 
 ## Explicit remaining gates
 
