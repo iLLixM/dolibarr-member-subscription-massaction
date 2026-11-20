@@ -96,6 +96,7 @@ jobs:
           php test/unit/run.php
           php test/unit/database.php
           php test/unit/coreguarded.php
+          php test/unit/coreguarded-session.php
           node test/unit/loading.js
       - uses: actions/checkout@v4
         with:
