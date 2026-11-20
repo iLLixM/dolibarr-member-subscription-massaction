@@ -293,9 +293,17 @@ function cf03State($db,array $context,array $expected)
             'payment_mode'=>(int)$inv['fk_mode_reglement'],
             'bank'=>(int)$inv['fk_account'],
             'currency'=>$inv['multicurrency_code'],'lines'=>$lines);
-        foreach (cf03Query($db,'SELECT id,code,fk_element FROM llx_actioncomm '
+        foreach (cf03Query($db,'SELECT id,code,fk_element,entity,'
+            .'fk_user_author,fk_user_action FROM llx_actioncomm '
             ."WHERE elementtype='facture' AND fk_element=".(int)$inv['rowid']
             .' ORDER BY id') as $action) {
+            // An omitted selected field must never silently become 0.
+            foreach (array('id','code','fk_element','entity',
+                'fk_user_author','fk_user_action') as $required) {
+                Cf03LabContract::need(array_key_exists($required,$action)
+                    && $action[$required]!==null,
+                    'CF03InvoiceAgendaProjectionIncomplete');
+            }
             $event=(int)$action['id'];
             $invoiceEvents[]=array('id'=>$event,'code'=>$action['code'],
                 'invoice_id'=>(int)$action['fk_element'],
@@ -360,6 +368,9 @@ function cf03State($db,array $context,array $expected)
         'agenda_resources'=>$resources,'invoices'=>$invoices,'counts'=>$counts);
 }
 
+// Production CLI entrypoint; isolated tests can include this file and
+// exercise the actual cf03State() SQL pipeline without starting a run.
+if (realpath($_SERVER['SCRIPT_FILENAME']) === __FILE__) {
 $verifyStarted=false;
 $verifyDir=null;
 try {
@@ -459,4 +470,5 @@ try {
         'action'=>'do not book, retry or cleanup automatically; preserve any evidence'),
         JSON_UNESCAPED_SLASHES)."\n";
     exit(1);
+}
 }
