@@ -2,6 +2,19 @@
 
 **Implementation status:** Test-only hardening in [Draft PR #32](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/32). Earlier Owner A–D read-only preflights PASS; **no new real DB booking, invoice, rollback or HTTP test executed for W01**. Issue #22 CF-03 gates remain OPEN.
 
+## F32-W01 Invoice-Agenda Final Delta – F32-W01-08 and F32-W01-11 (2026-11-21)
+
+Following the independent review of fixed HEAD `7fc5898d57d7c6bba51cf7cb2c572c5dc3131217`, **9 of the 10 original findings were independently CLOSED**, F32-W01-08 P2 remained PARTIAL and new F32-W01-11 P2 OPEN. The original review authorized **conditional controlled real-test admission on that exact HEAD only** for A/B contribution and selected no-change, C/D subject to extra Owner conditions, while B/C invoice-existing remained NO-GO.
+
+The subsequent owner-authorized **test-only** delta changes the following contracts:
+
+- **F32-W01-08:** The production `cf03State()` Invoice-Agenda SELECT now projects `id,code,fk_element,entity,fk_user_author,fk_user_action`; missing/null required columns lead to `CF03InvoiceAgendaProjectionIncomplete` instead of silently converting absent values to 0. The existing `eventActor()` checks still require correct entity, author, owner, assigned user resource and the actual CLI-confirmed authenticated operator.
+- **F32-W01-11:** `--agenda` controls ONLY `AC_MEMBER_SUBSCRIPTION_CREATE`; effective `BILL_CREATE` and `BILL_VALIDATE` flags independently determine expected invoice events. Every positive `invoice-existing` case on B/C requires `--actor-id=<ACTUAL_UI_USER_ROWID>` **even when `--agenda=off`**. The same actor and invoice expectations are bound at check-only, baseline and verify; `LINEBILL_INSERT` remains an early baseline STOP if enabled, not a workaround by disabling authentic Core settings. Counts remain exact and distinguish member/invoice deltas.
+- **Actual readback regression:** `test/unit/cf03-reader.php` **requires the actual `tools/cf03-lab.php`** and invokes its real `cf03State()` SQL mapping on a strict SELECT-only in-memory DB/Resultset double; the fake projects only explicitly SELECTed actioncomm columns, so the historical omitted-column bug fails. It exercises all eight Member ON/OFF × BillCreate ON/OFF × BillValidate ON/OFF combinations (with line event disabled), missing and unexpected events, bad actor/owner/entity/resource and missing resultset columns with exact STOP reasons. No real DB, HTTP, booking or evidence writes occur. The normal CLI entrypoint remains executable only when invoked as the main script.
+- Standard nine-profile, optional full and targeted PHP 8.3/V22.0.5 CI run this reader test in addition to existing W01 contracts.
+
+**Status restriction:** A successful CI on the corrected final HEAD is implementation evidence, not an independent finding closure. The earlier partial real-test GO belongs strictly to `7fc5898d57d7c6bba51cf7cb2c572c5dc3131217`; it does **not** transfer automatically to the new source. An independent, tightly scoped F32-W01-08/-11 delta review and a fresh Owner-specific admission are required before any B/C invoice-existing case. PR #32 remains OPEN/DRAFT, Issue #22 six CF-03 gates remain OPEN, and no merge, release, production or real-DB DML action is authorized.
+
 ## F32-W01 Paket B — source provenance and invoice/Agenda contracts (2026-11-20)
 
 Following the Owner's explicit choice of a **bounded, scenario-specific runtime source manifest** instead of a full Dolibarr tree attestation, Paket B corrects **F32-W01-02/06/07/08/09** in Draft PR #32. These are implementation claims pending independent follow-up, **not** finding closures or permission for real bookings.
