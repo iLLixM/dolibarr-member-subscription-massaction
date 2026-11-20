@@ -48,6 +48,7 @@ final class Cf03Evidence
     public static function privateRoot($root, $environment, $documentRoot, $checkout)
     {
         self::absolute($root);
+        clearstatcache(true, $root);
         self::need(is_dir($root) && !is_link($root)
             && realpath($root) === $root && is_readable($root)
             && is_writable($root), 'CF03EvidenceParentUnavailable');
