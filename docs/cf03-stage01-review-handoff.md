@@ -31,6 +31,10 @@
 - `docs/cf03-operator-runbook.md`: no-writing preflight commands and only provisionally described future booking sequence.
 - Nine/21 profile CI and existing offline runner: include one new no-DB unit file.
 
+## D preflight V22.0.5 correction
+
+The Owner's initial D read-only preflight returned `CF03WrongDolibarrRoot`: the existing Stage-1 CLI mistakenly required `version.inc.php`. The pinned V22.0.5 Dolibarr source instead defines `DOL_VERSION` in `htdocs/filefunc.inc.php`. The code now selects and hashes the correct source by exact supported Core version, denies mismatched/unreadable files, and retains the V24.0.3 major/minor check. Dedicated pure tests include valid and invalid V22/V24 versions. The original D STOP stays in evidence; **D is not yet PASS**. Actual operator-accessible jailed path, real DB profile/rights, installed ZIP file hashes and evidence-directory hosting restrictions remain to be checked.
+
 ## Specific review questions
 
 1. Is the single-schema A/C model represented correctly, with distinct application DB identities and explicit per-entity profile selection, one change window at a time?
