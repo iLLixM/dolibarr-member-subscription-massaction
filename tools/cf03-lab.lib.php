@@ -197,7 +197,7 @@ final class Cf03LabContract
     {
         self::baseline($before,$e,$id);
         foreach (array('environment','identity','profile','engines','type',
-            'source_hashes','config_sha256','performance_schema','agenda_enabled') as $field) {
+            'source_hashes','core_source_hashes','config_sha256','performance_schema','agenda_enabled') as $field) {
             self::need(array_key_exists($field,$after)
                 && $before[$field]===$after[$field],'CF03ContextChanged');
         }
