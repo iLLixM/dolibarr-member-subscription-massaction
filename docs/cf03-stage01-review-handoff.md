@@ -25,7 +25,7 @@
 ## Files for independent Stage-1 review
 
 - `tools/cf03-lab.lib.php`: pure immutable environment contracts, scenario validation and bounded before/after comparator.
-- `tools/cf03-lab.php`: operator-only, read-only preflight, fresh fixture check, immutable baseline and one-time verification; independently opened mysqli connection and strict module/config/profile/rights/source match.
+- `tools/cf03-lab.php`: operator-only, read-only preflight, fresh fixture check, immutable baseline and one-time verification; independently opened mysqli connection and strict module/config/profile/rights/source match. A/B/C require the current source checkout as the live module; D additionally admits a separately installed ZIP copy only when nine selected runtime product hashes match the checked-out CF-03 source, without claiming complete ZIP/manifest equivalence.
 - `test/unit/cf03-lab.php`: isolated pure contract tests for A/C shared schema, dynamic B/C/D configuration, supported contribution/no-change and scoped invoice-existing readback and negative drift cases.
 - `docs/cf03-qualification-plan.md`: A-D matrix, remaining risk gates, source and architectural limits.
 - `docs/cf03-operator-runbook.md`: no-writing preflight commands and only provisionally described future booking sequence.
