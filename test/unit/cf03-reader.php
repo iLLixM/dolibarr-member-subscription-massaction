@@ -73,12 +73,20 @@ final class Cf03FakeDb
                     throw new RuntimeException('Missing fake field '.$field);
                 }
                 // Database resultset exposes ONLY columns actually SELECTed.
-                if ($this->fault===$field) { continue; }
+                // Fault-inject the invoice projection only; member Agenda
+                // must remain valid so the STOP reason is unambiguous.
+                if ($this->fault===$field && ($record['elementtype']??null)==='facture') {
+                    continue;
+                }
                 $projected[$field]=$record[$field];
             }
             $result[]=$projected;
         }
         return $result;
+    }
+    public function projectionForUnitTest($sql,array $events)
+    {
+        return $this->projection($sql,$events);
     }
     public function query($sql)
     {
@@ -172,7 +180,9 @@ function cf03ReaderContext()
         'deployment_kind'=>'source_checkout',
         'core_source_hashes'=>array('core'=>str_repeat('d',64)),
         'schema_columns'=>Cf03LabContract::columnPolicy(),
-        'config_sha256'=>str_repeat('e',64),'performance_schema'=>'not_required');
+        'config_sha256'=>str_repeat('e',64),
+        'php_version'=>'8.2.35','php_major_minor'=>'8.2',
+        'performance_schema'=>'not_required');
 }
 function cf03ReaderExpected($memberOn)
 {
@@ -254,10 +264,22 @@ foreach ($cases as $case) {
             $label.' wrong user resource from actual SQL Resultset');
         $wrong=new Cf03FakeDb(true,$memberOn,$create,$validate);
         $wrong->fault='fk_user_author';
+        // Ensure any member event keeps its author while invoice projection fails.
+        if ($memberOn) {
+            $memberProjection=$wrong->projectionForUnitTest(
+                'SELECT id,code,fk_element,entity,fk_user_author,fk_user_action FROM llx_actioncomm '
+                ."WHERE elementtype='member' AND fk_element=271",
+                array_values(array_filter($wrong->events,static function($event) {
+                    return $event['elementtype']==='member';
+                })));
+            readerOk(isset($memberProjection[0]['fk_user_author'])
+                && $memberProjection[0]['fk_user_author']===4,
+                $label.' member Agenda unaffected by invoice fault');
+        }
         readerStop(static function()use($wrong,$expected) {
             cf03State($wrong,cf03ReaderContext(),$expected);
         },'CF03InvoiceAgendaProjectionIncomplete',
-            $label.' incomplete Resultset must fail closed');
+            $label.' incomplete invoice Resultset must fail closed');
     }
 }
 $expect=cf03ReaderExpected(false);
