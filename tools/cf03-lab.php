@@ -36,7 +36,7 @@ function cf03Source()
         'class/coreguardedtransaction.class.php','class/coreguardedrightsdb.class.php',
         'class/transactionprofile.class.php','class/filebookingcheckpoint.class.php',
         'class/invoice.class.php','lib/booking.lib.php','tools/cf03-lab.php',
-        'tools/cf03-lab.lib.php');
+        'tools/cf03-lab.lib.php','tools/cf03-evidence.lib.php');
     $out=array();
     foreach ($paths as $path) {
         $file=dirname(__DIR__).'/'.$path;
@@ -286,31 +286,6 @@ function cf03State($db,array $context,array $expected)
         'agenda_events'=>$actions,'agenda_resources'=>$resources,
         'invoices'=>$invoices,'counts'=>$counts);
 }
-function cf03Dir($dir,$create)
-{
-    $parent='/var/lib/dolibarr-test-results';
-    Cf03LabContract::need(is_dir($parent)&&!is_link($parent)
-        && realpath($parent)===$parent,'CF03EvidenceParentUnavailable');
-    if (!file_exists($dir)) {
-        Cf03LabContract::need($create && mkdir($dir,0700),'CF03EvidenceDirectoryUnavailable');
-    }
-    Cf03LabContract::need(!is_link($dir)&&realpath($dir)===$dir
-        && (fileperms($dir)&0077)===0 && is_readable($dir)&&is_writable($dir),
-        'CF03UnsafeEvidenceDirectory');
-}
-function cf03Exclusive($file,$value)
-{
-    $h=@fopen($file,'x');
-    Cf03LabContract::need($h!==false,'CF03EvidenceExistsNoRetry');
-    try { Cf03LabContract::need(fwrite($h,$value)===strlen($value)
-        && fflush($h),'CF03EvidenceWriteFailure'); }
-    finally { fclose($h); }
-    chmod($file,0600);
-}
-function cf03Json($file,array $value)
-{
-    cf03Exclusive($file,json_encode($value,JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_THROW_ON_ERROR)."\n");
-}
 
 try {
     list($mode,$id,$env,$opts)=Cf03LabContract::arguments($argv);
@@ -334,38 +309,37 @@ try {
     } else {
         $e=Cf03LabContract::expected($opts);
         if ($mode==='verify') {
-            $dir=$opts['evidence-dir'];cf03Dir($dir,false);
-            Cf03LabContract::need(is_file($dir.'/baseline.json')
-                && is_file($dir.'/baseline.sha256')
-                && !is_link($dir.'/baseline.json')
-                && !is_link($dir.'/baseline.sha256'),'CF03BaselineMissing');
-            $sha=trim(file_get_contents($dir.'/baseline.sha256'));
-            Cf03LabContract::need(preg_match('/^[a-f0-9]{64}$/D',$sha)===1
-                && hash_equals($sha,hash_file('sha256',$dir.'/baseline.json')),
-                'CF03BaselineIntegrityMismatch');
-            $before=json_decode(file_get_contents($dir.'/baseline.json'),true);
+            $dir=$opts['evidence-dir'];
+            $evidenceRoot=Cf03Evidence::choice($id,$dir,$opts['evidence-root']??null);
+            Cf03Evidence::directory($dir,false,$id,$evidenceRoot,
+                $env['document_root'],dirname(__DIR__));
+            $before=Cf03Evidence::readyToVerify($dir);
             Cf03LabContract::need(is_array($before) && ($before['case']??null)==='CF03'
                 && ($before['environment']??null)===$id
                 && ($before['expected']??null)===$e,'CF03BaselineMismatch');
             Cf03LabContract::baseline($before['before'],$e,$id);
-            cf03Exclusive($dir.'/verify.started',gmdate('c')."\n");
+            Cf03Evidence::exclusive($dir,'verify.started',gmdate('c')."\n");
             $after=cf03State($db,$context,$e);
-            cf03Json($dir.'/after.json',array('case'=>'CF03','after'=>$after,
+            Cf03Evidence::json($dir,'after.json',array('case'=>'CF03','after'=>$after,
                 'observed_utc'=>gmdate('c')));
             try { $result=Cf03LabContract::verify($before['before'],$after,$e,$id); }
             catch (RuntimeException $error) {
                 $result=array('status'=>'STOP','case'=>'CF03','reason'=>$error->getMessage(),
                     'action'=>'preserve immutable evidence; do not rebook or retry');
             }
-            cf03Json($dir.'/verdict.json',$result);
+            Cf03Evidence::json($dir,'verdict.json',$result);
         } else {
             $snapshot=cf03State($db,$context,$e);
             Cf03LabContract::baseline($snapshot,$e,$id);
             if ($mode==='baseline') {
-                $dir=$opts['evidence-dir'];cf03Dir($dir,true);
-                cf03Json($dir.'/baseline.json',array('case'=>'CF03','environment'=>$id,
-                    'expected'=>$e,'before'=>$snapshot,'created_utc'=>gmdate('c')));
-                cf03Exclusive($dir.'/baseline.sha256',
+                $dir=$opts['evidence-dir'];
+                $evidenceRoot=Cf03Evidence::choice($id,$dir,$opts['evidence-root']??null);
+                Cf03Evidence::directory($dir,true,$id,$evidenceRoot,
+                    $env['document_root'],dirname(__DIR__));
+                Cf03Evidence::json($dir,'baseline.json',array('case'=>'CF03',
+                    'environment'=>$id,'expected'=>$e,'before'=>$snapshot,
+                    'created_utc'=>gmdate('c')));
+                Cf03Evidence::exclusive($dir,'baseline.sha256',
                     hash_file('sha256',$dir.'/baseline.json')."\n");
             }
             $result=array('status'=>'PASS','mode'=>$mode,'environment'=>$id,
