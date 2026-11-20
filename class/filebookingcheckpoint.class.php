@@ -45,6 +45,36 @@ final class MsmFileBookingCheckpoint
 	{
 		if (self::requireSession() !== $this->path || session_id() !== $this->session || session_status() !== PHP_SESSION_NONE) { throw new RuntimeException('MSMSessionFailure'); }
 	}
+	/** Independently read back the consumed run before admitting direct service DML. */
+	public function requireProcessing($id, array $binding, $user, array $expected, array $options)
+	{
+		$this->requireBinding();
+		// A real, separately closed file-session readback is required; in-memory
+		// $_SESSION alone does not demonstrate durable controller consumption.
+		set_error_handler(static function () { throw new RuntimeException('MSMSessionFailure'); });
+		try {
+			if (!session_start()) { throw new RuntimeException('MSMSessionFailure'); }
+			$state = $_SESSION['msm_previews'][$this->key] ?? null;
+			$confirmed = $expected;
+			unset($confirmed['_profile']);
+			if (!is_array($state) || ($state['phase'] ?? null) !== 'processing'
+				|| !is_array($state['ids'] ?? null) || !in_array($id, $state['ids'], true)
+				|| !isset($state['rows'][$id]) || $state['rows'][$id] !== $confirmed
+				|| ($state['options'] ?? null) !== $options
+				|| ($state['profile'] ?? null) !== $binding
+				|| ($binding['profile'] ?? null) !== 'CoreGuarded'
+				|| (int) ($state['owner'] ?? 0) !== (int) ($user->id ?? 0)
+				|| (int) ($state['entity'] ?? 0) !== (int) ($binding['entity'] ?? 0)
+				|| ($state['results'][$id]['status'] ?? null) !== 'unknown') {
+				throw new RuntimeException('MSMCoreGuardedSessionUnsupported');
+			}
+		} finally {
+			if (session_status() === PHP_SESSION_ACTIVE && !session_write_close()) {
+				throw new RuntimeException('MSMSessionFailure');
+			}
+			restore_error_handler();
+		}
+	}
 	public function __invoke(array $updated)
 	{
 		$this->requireBinding();

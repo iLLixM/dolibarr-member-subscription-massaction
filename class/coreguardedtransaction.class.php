@@ -78,7 +78,7 @@ class MsmCoreGuardedTransaction
 	public function beforeBegin()
 	{
 		if ($this->owning || $this->uncertain || !$this->depth(0)) { return $this->unknown(); }
-		$this->ready = false;
+		$this->ready = false; $this->attempted = false;
 		try {
 			$handle = $this->nativeHandle(); $thread = $this->nativeThread($handle);
 			if ($thread === '' || $thread === '0' || ($this->handle !== null && ($this->handle !== $handle || $this->thread !== $thread))) {
