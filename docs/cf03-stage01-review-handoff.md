@@ -35,6 +35,12 @@
 
 The Owner's initial D read-only preflight returned `CF03WrongDolibarrRoot`: the existing Stage-1 CLI mistakenly required `version.inc.php`. The pinned V22.0.5 Dolibarr source instead defines `DOL_VERSION` in `htdocs/filefunc.inc.php`. The code now selects and hashes the correct source by exact supported Core version, denies mismatched/unreadable files, and retains the V24.0.3 major/minor check. Dedicated pure tests include valid and invalid V22/V24 versions. The original D STOP stays in evidence; **D is not yet PASS**. Actual operator-accessible jailed path, real DB profile/rights, installed ZIP file hashes and evidence-directory hosting restrictions remain to be checked.
 
+## Owner A–D read-only runtime verification after F03-D01 fix (2026-11-20)
+
+Owner supplied the full four-environment console output. **All four `--preflight` cases returned PASS**, with no business SQL writes; A/B/C were PHP 8.2.35 / Dolibarr 24.0.3 and D was PHP 8.3.37 / Dolibarr 22.0.5. D additionally ran 171 pure-contract assertions PASS with the corrected script at `3e7d87f633813131198697591666d706f8eb64a3`. All eleven reported source hashes were identical across A–D; nine selected deployed product hashes matched the checkout, V24 Core hashes agreed for A/B/C, and D reported appropriately different V22 Core hashes. Restricted A/D P_S SELECT denied 1142, C P_S SELECT allowed; correct profiles and effective accounts were independently checked by the CLI. The original V22 version-path STOP is now a documented, resolved test-tool issue.
+
+See [sanitized Owner preflight evaluation](evidence/cf03/stage01-owner-preflight-2026-11-20.md). **The D deployment is `source_checkout`, not a proven ZIP install.** Enhanced observer event continuity, real HTTP business booking, rollback/fault injection, invoice/Agenda/PDF/mail, and portable hosted witness evidence directory remain unqualified. Stage-0 environment readiness PASS does not close CF-03 and does not authorize its development merge or release.
+
 ## Specific review questions
 
 1. Is the single-schema A/C model represented correctly, with distinct application DB identities and explicit per-entity profile selection, one change window at a time?
