@@ -31,7 +31,8 @@ final class Cf03LabContract
             'adherent_type'=>array('rowid','statut','entity','subscription','amount','duration'),
             'subscription'=>array('rowid','fk_adherent','fk_type','subscription','dateadh',
                 'datef','note'),
-            'actioncomm'=>array('id','code','fk_element','elementtype'),
+            'actioncomm'=>array('id','code','fk_element','elementtype',
+                'entity','fk_user_author','fk_user_action'),
             'actioncomm_resources'=>array('rowid','fk_actioncomm','element_type','fk_element'),
             'const'=>array('name','value','entity'),
             'societe'=>array('rowid','entity','client'),
@@ -40,7 +41,9 @@ final class Cf03LabContract
                 'fk_account','multicurrency_code'),
             'facturedet'=>array('rowid','fk_facture','total_ttc','description',
                 'qty','fk_product','product_type','tva_tx','date_start'),
-            'element_element'=>array('fk_source','fk_target','sourcetype','targettype')
+            'element_element'=>array('fk_source','fk_target','sourcetype','targettype'),
+            'user'=>array('rowid','entity','statut'),
+            'product'=>array('rowid','entity','tosell','fk_product_type')
         );
     }
 
@@ -116,7 +119,7 @@ final class Cf03LabContract
             'db-user','scenario','member-id','member-ref','marker','start','end',
             'amount','agenda','evidence-dir','evidence-root','invoice-date',
             'invoice-quantity','invoice-product','invoice-vat','invoice-term',
-            'invoice-payment-mode','invoice-bank','invoice-currency');
+            'invoice-payment-mode','invoice-bank','invoice-currency','actor-id');
         foreach (array_slice($argv,1) as $arg) {
             if (in_array($arg,$modes,true)) {
                 self::need($mode===null,'CF03DuplicateMode');
@@ -180,6 +183,13 @@ final class Cf03LabContract
                     $opts['amount'])===1,'CF03InvalidAmount');
             self::need(in_array($opts['agenda']??null,array('on','off'),true),
                 'CF03InvalidAgenda');
+            if ($opts['agenda']==='on' && $opts['scenario']!=='no-change') {
+                self::need(isset($opts['actor-id'])
+                    && preg_match('/^[1-9][0-9]{0,8}$/D',$opts['actor-id'])===1,
+                    'CF03InvalidExpectedActor');
+            } else {
+                self::need(!isset($opts['actor-id']),'CF03UnexpectedActorOption');
+            }
             $invoiceKeys=array('invoice-date','invoice-quantity','invoice-product',
                 'invoice-vat','invoice-term','invoice-payment-mode','invoice-bank',
                 'invoice-currency');
@@ -195,8 +205,7 @@ final class Cf03LabContract
                     self::need(preg_match('/^[0-9]{1,9}$/D',$opts[$key])===1,
                         'CF03InvalidInvoiceExpectedField');
                 }
-                self::need(preg_match('/^[1-9][0-9]{0,5}(?:\\.[0-9]{1,4})?$/D',
-                    $opts['invoice-quantity'])===1
+                self::need(($opts['invoice-quantity']==='1' || $opts['invoice-quantity']==='1.0')
                     && preg_match('/^[0-9]{1,3}(?:\\.[0-9]{1,4})?$/D',
                     $opts['invoice-vat'])===1
                     && preg_match('/^[A-Z]{3}$/D',$opts['invoice-currency'])===1,
@@ -229,7 +238,8 @@ final class Cf03LabContract
         $e=array('scenario'=>$opts['scenario'],'member_id'=>(int)$opts['member-id'],
             'member_ref'=>$opts['member-ref'],'marker'=>$opts['marker'],
             'start'=>$opts['start'],'end'=>$opts['end'],
-            'amount'=>$opts['amount'],'agenda'=>$opts['agenda']);
+            'amount'=>$opts['amount'],'agenda'=>$opts['agenda'],
+            'actor_id'=>isset($opts['actor-id'])?(int)$opts['actor-id']:0);
         if ($e['scenario']==='invoice-existing') {
             $e['invoice']=array('date'=>$opts['invoice-date'],
                 'quantity'=>(float)$opts['invoice-quantity'],
@@ -289,10 +299,17 @@ final class Cf03LabContract
             foreach (self::INVOICE_ENGINES as $table) {
                 self::need(($s['engines'][$table]??null)==='InnoDB','CF03NonTransactionalInvoiceTable');
             }
+            self::need(isset($s['invoice_product'])
+                && ($s['invoice_product']['id']??null)===$e['invoice']['product']
+                && ($s['invoice_product']['entity']??null)===1
+                && ($s['invoice_product']['status']??null)===1
+                && in_array($s['invoice_product']['type']??null,array(0,1),true)
+                && ($e['invoice']['quantity']??null)===1.0,
+                'CF03InvoiceProductMismatch');
             self::need(($s['customer_exists']??null)===true,'CF03CustomerNotFound');
             self::need(($s['customer']['id']??null)===$m['fk_soc']
                 && ($s['customer']['entity']??null)===1
-                && ($s['customer']['client']??0)>0,
+                && in_array($s['customer']['client']??0,array(1,3),true),
                 'CF03InvoiceCustomerMismatch');
         } else {
             self::need($m['fk_soc']===0,'CF03UnexpectedCustomer');
@@ -303,11 +320,25 @@ final class Cf03LabContract
         }
     }
 
+    /** Bound Core event author/owner and default user resource; no arbitrary ID. */
+    public static function eventActor(array $event, array $resource, array $e, $reason)
+    {
+        $id=$e['actor_id']??0;
+        self::need($id>0 && ($event['id']??0)>0
+            && ($event['entity']??null)===1
+            && ($event['author_id']??null)===$id
+            && ($event['owner_id']??null)===$id
+            && ($resource['id']??0)>0
+            && ($resource['agenda_id']??null)===$event['id']
+            && ($resource['element_type']??null)==='user'
+            && ($resource['actor_id']??null)===$id, $reason);
+    }
+
     public static function verify(array $before,array $after,array $e,$id)
     {
         self::baseline($before,$e,$id);
         foreach (array('environment','identity','profile','engines','type',
-            'source_hashes','deployed_source_hashes','deployment_kind','core_source_hashes','config_sha256','performance_schema','agenda_enabled','customer_exists','customer','invoice_agenda_flags','invoice_agenda_supported','schema_columns') as $field) {
+            'source_hashes','source_manifest_version','deployed_source_hashes','deployment_kind','core_source_hashes','config_sha256','performance_schema','agenda_enabled','customer_exists','customer','invoice_agenda_flags','invoice_agenda_supported','schema_columns','invoice_product','actor') as $field) {
             self::need(array_key_exists($field,$after)
                 && $before[$field]===$after[$field],'CF03ContextChanged');
         }
@@ -332,6 +363,12 @@ final class Cf03LabContract
                 && ($sub['marker']??false)===true,'CF03SubscriptionPostconditionMismatch');
         }
         $agendaExpected=$positive && $e['agenda']==='on' ? 1 : 0;
+        if ($agendaExpected===1) {
+            self::need(($before['actor']['id']??null)===$e['actor_id']
+                && ($before['actor']['entity']??null)===1
+                && ($before['actor']['status']??null)===1,
+                'CF03ExpectedActorUnavailable');
+        }
         self::need(count($after['agenda_events']??array())===$agendaExpected
             && count($after['agenda_resources']??array())===$agendaExpected,
             'CF03AgendaCountMismatch');
@@ -339,9 +376,8 @@ final class Cf03LabContract
             $event=$after['agenda_events'][0]; $actor=$after['agenda_resources'][0];
             self::need(($event['member_id']??null)===$e['member_id']
                 && ($event['code']??null)==='AC_MEMBER_SUBSCRIPTION_CREATE'
-                && ($actor['agenda_id']??null)===$event['id']
-                && ($actor['element_type']??null)==='user'
-                && ($actor['actor_id']??0)>0,'CF03AgendaActorMismatch');
+                ,'CF03AgendaActorMismatch');
+            self::eventActor($event,$actor,$e,'CF03AgendaActorMismatch');
         }
         $invoices=$after['invoices']??array();
         self::need(count($invoices)===($scenario==='invoice-existing'?1:0),
@@ -368,7 +404,7 @@ final class Cf03LabContract
             self::need(($line['id']??0)>0
                 && ($line['marker']??false)===true
                 && ($line['product']??null)===$plan['product']
-                && ($line['product_type']??null)===1
+                && ($line['product_type']??null)===$before['invoice_product']['type']
                 && ($line['date_start']??null)===$e['start'].' 00:00:00'
                 && abs((float)($line['vat']??-1)-$plan['vat'])<0.000001
                 && abs((float)($line['quantity']??-1)-$plan['quantity'])<0.000001
@@ -396,12 +432,14 @@ final class Cf03LabContract
             self::need($observed===$wanted,'CF03InvoiceAgendaMismatch');
             $actors=array();
             foreach ($invoiceResources as $res) {
-                self::need(($res['id']??0)>0
-                    && ($res['element_type']??null)==='user'
-                    && ($res['actor_id']??0)>0
-                    && in_array($res['agenda_id']??0,
-                        array_column($invoiceEvents,'id'),true),
-                    'CF03InvoiceAgendaActorMismatch');
+                $matching=null;
+                foreach ($invoiceEvents as $event) {
+                    if (($event['id']??null)===($res['agenda_id']??null)) {
+                        $matching=$event; break;
+                    }
+                }
+                self::need(is_array($matching),'CF03InvoiceAgendaActorMismatch');
+                self::eventActor($matching,$res,$e,'CF03InvoiceAgendaActorMismatch');
                 $actors[]=$res['agenda_id'];
             }
             sort($actors);
