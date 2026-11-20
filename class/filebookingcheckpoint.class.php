@@ -8,10 +8,21 @@ final class MsmFileBookingCheckpoint
 	private $key;
 	private $path;
 	private $session;
+	private $confirmedOrigin;
+	private $attempted = array();
 	public function __construct($key)
 	{
 		if (!is_string($key) || !preg_match('/^[a-f0-9]{32}$/D', $key)) { throw new RuntimeException('MSMSessionFailure'); }
 		$this->path = self::requireSession(); $this->session = session_id(); $this->key = $key;
+		// Only an object created by the controller in the original active
+		// CONFIRM session can authorize direct DML. An object manufactured from
+		// an already consumed or interrupted session must never enable replay.
+		$state = session_status() === PHP_SESSION_ACTIVE ? ($_SESSION['msm_previews'][$key] ?? null) : null;
+		$this->confirmedOrigin = is_array($state) && ($state['phase'] ?? null) === 'confirm'
+			? array('revision' => $state['revision'] ?? null, 'ids' => $state['ids'] ?? null,
+				'rows' => $state['rows'] ?? null, 'options' => $state['options'] ?? null,
+				'profile' => $state['profile'] ?? null, 'owner' => $state['owner'] ?? null,
+				'entity' => $state['entity'] ?? null) : null;
 	}
 	public static function requireSession()
 	{
@@ -49,6 +60,9 @@ final class MsmFileBookingCheckpoint
 	public function requireProcessing($id, array $binding, $user, array $expected, array $options)
 	{
 		$this->requireBinding();
+		if ($this->confirmedOrigin === null || isset($this->attempted[$id])) {
+			throw new RuntimeException('MSMCoreGuardedSessionUnsupported');
+		}
 		// A real, separately closed file-session readback is required; in-memory
 		// $_SESSION alone does not demonstrate durable controller consumption.
 		set_error_handler(static function () { throw new RuntimeException('MSMSessionFailure'); });
@@ -58,6 +72,14 @@ final class MsmFileBookingCheckpoint
 			$confirmed = $expected;
 			unset($confirmed['_profile']);
 			if (!is_array($state) || ($state['phase'] ?? null) !== 'processing'
+				|| !is_int($this->confirmedOrigin['revision'])
+				|| ($state['revision'] ?? null) !== $this->confirmedOrigin['revision'] + 1
+				|| ($state['ids'] ?? null) !== $this->confirmedOrigin['ids']
+				|| ($state['rows'] ?? null) !== $this->confirmedOrigin['rows']
+				|| ($state['options'] ?? null) !== $this->confirmedOrigin['options']
+				|| ($state['profile'] ?? null) !== $this->confirmedOrigin['profile']
+				|| ($state['owner'] ?? null) !== $this->confirmedOrigin['owner']
+				|| ($state['entity'] ?? null) !== $this->confirmedOrigin['entity']
 				|| !is_array($state['ids'] ?? null) || !in_array($id, $state['ids'], true)
 				|| !isset($state['rows'][$id]) || $state['rows'][$id] !== $confirmed
 				|| ($state['options'] ?? null) !== $options
@@ -74,6 +96,9 @@ final class MsmFileBookingCheckpoint
 			}
 			restore_error_handler();
 		}
+		// Once admitted, even an unsuccessful Core BEGIN may have an unknown
+		// acknowledgement. This in-process capability cannot be reused.
+		$this->attempted[$id] = true;
 	}
 	public function __invoke(array $updated)
 	{

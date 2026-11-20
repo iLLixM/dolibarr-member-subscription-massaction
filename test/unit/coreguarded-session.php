@@ -24,14 +24,21 @@ $opts = array('invoice'=>false,'autocreate'=>false,'sendmail'=>false,'descriptio
 $sessionid = 'cf02'.bin2hex(random_bytes(12));
 try {
 	session_id($sessionid); verifySession(session_start(), 'start isolated file session');
-	$_SESSION = array('msm_previews'=>array($key=>array('owner'=>18,'entity'=>1,'phase'=>'processing',
+	$_SESSION = array('msm_previews'=>array($key=>array('owner'=>18,'entity'=>1,'phase'=>'confirm','revision'=>5,
 		'profile'=>$binding,'ids'=>array(7),'options'=>$opts,'rows'=>$rows,
 		'results'=>array(7=>array('status'=>'unknown','stop'=>false)))));
 	$checkpoint = new MsmFileBookingCheckpoint($key);
+	verifySession(session_write_close(), 'persist controller confirmation');
+	verifySession(session_start(), 'reopen to consume');
+	$_SESSION['msm_previews'][$key]['phase'] = 'processing';
+	$_SESSION['msm_previews'][$key]['revision'] = 6;
 	verifySession(session_write_close(), 'persist controller consumption');
 	$confirmed = $rows[7]; $confirmed['_profile'] = $binding;
 	$checkpoint->requireProcessing(7, $binding, $user, $confirmed, $opts);
 	verifySession(session_status() === PHP_SESSION_NONE, 'independent readback closed session');
+	denySession(static function()use($checkpoint,$binding,$user,$confirmed,$opts){$checkpoint->requireProcessing(7,$binding,$user,$confirmed,$opts);},'same-capability replay denied');
+	$replayed = new MsmFileBookingCheckpoint($key);
+	denySession(static function()use($replayed,$binding,$user,$confirmed,$opts){$replayed->requireProcessing(7,$binding,$user,$confirmed,$opts);},'new checkpoint after consumption denied');
 	denySession(static function() use ($checkpoint,$binding,$user,$confirmed,$opts) { $checkpoint->requireProcessing(8,$binding,$user,$confirmed,$opts); }, 'unknown member denied');
 	$wrong=$confirmed; $wrong['amount']=999;
 	denySession(static function()use($checkpoint,$binding,$user,$wrong,$opts){$checkpoint->requireProcessing(7,$binding,$user,$wrong,$opts);},'wrong expected amount denied');
