@@ -350,8 +350,35 @@ function cf03State($db,array $context,array $expected)
         'agenda_resources'=>$resources,'invoices'=>$invoices,'counts'=>$counts);
 }
 
+$verifyStarted=false;
+$verifyDir=null;
 try {
     list($mode,$id,$env,$opts)=Cf03LabContract::arguments($argv);
+    $e=null;
+    $beforeState=null;
+    if ($mode==='verify') {
+        // A valid existing baseline is sealed before any fallible DB,
+        // profile, source-hash or connection call. A STOP is not retriable.
+        $e=Cf03LabContract::expected($opts);
+        $verifyDir=$opts['evidence-dir'];
+        $evidenceRoot=Cf03Evidence::choice($id,$verifyDir,
+            $opts['evidence-root']??null);
+        $admission=Cf03Evidence::startVerify($verifyDir,$id,$evidenceRoot,
+            $env['document_root'],dirname(__DIR__),
+            static function($baseline)use($e,$id) {
+                Cf03LabContract::need(is_array($baseline)
+                    && ($baseline['case']??null)==='CF03'
+                    && ($baseline['environment']??null)===$id
+                    && ($baseline['expected']??null)===$e,
+                    'CF03BaselineMismatch');
+                Cf03LabContract::need(isset($baseline['before'])
+                    && is_array($baseline['before']),
+                    'CF03BaselineMismatch');
+                Cf03LabContract::baseline($baseline['before'],$e,$id);
+            });
+        $beforeState=$admission['before'];
+        $verifyStarted=true;
+    }
     list($db,$context)=cf03Configure($id,$env);
     if ($mode==='preflight') {
         $result=array('status'=>'PASS','mode'=>'preflight','environment'=>$id,
@@ -370,22 +397,13 @@ try {
             'core_source_hashes'=>$context['core_source_hashes'],
             'writes'=>'no_business_sql');
     } else {
-        $e=Cf03LabContract::expected($opts);
+        if ($e===null) { $e=Cf03LabContract::expected($opts); }
         if ($mode==='verify') {
-            $dir=$opts['evidence-dir'];
-            $evidenceRoot=Cf03Evidence::choice($id,$dir,$opts['evidence-root']??null);
-            Cf03Evidence::directory($dir,false,$id,$evidenceRoot,
-                $env['document_root'],dirname(__DIR__));
-            $before=Cf03Evidence::readyToVerify($dir);
-            Cf03LabContract::need(is_array($before) && ($before['case']??null)==='CF03'
-                && ($before['environment']??null)===$id
-                && ($before['expected']??null)===$e,'CF03BaselineMismatch');
-            Cf03LabContract::baseline($before['before'],$e,$id);
-            Cf03Evidence::exclusive($dir,'verify.started',gmdate('c')."\n");
+            $dir=$verifyDir;
             $after=cf03State($db,$context,$e);
             Cf03Evidence::json($dir,'after.json',array('case'=>'CF03','after'=>$after,
                 'observed_utc'=>gmdate('c')));
-            try { $result=Cf03LabContract::verify($before['before'],$after,$e,$id); }
+            try { $result=Cf03LabContract::verify($beforeState,$after,$e,$id); }
             catch (RuntimeException $error) {
                 $result=array('status'=>'STOP','case'=>'CF03','reason'=>$error->getMessage(),
                     'action'=>'preserve immutable evidence; do not rebook or retry');
@@ -415,6 +433,17 @@ try {
 } catch(Throwable $error) {
     $reason=$error->getMessage();
     if(strpos($reason,'CF03')!==0){$reason='CF03UnexpectedRuntimeFailure';}
+    if ($verifyStarted && $verifyDir!==null) {
+        // The marker is already sealed: persist an early STOP independently
+        // of the DB path. An existing or partial verdict is NEVER overwritten.
+        try {
+            Cf03Evidence::json($verifyDir,'verdict.json',array(
+                'status'=>'STOP','case'=>'CF03','reason'=>$reason,
+                'action'=>'preserve evidence; do not rebook or retry'));
+        } catch (Throwable $evidenceError) {
+            // verify.started remains the permanent no-retry proof.
+        }
+    }
     echo json_encode(array('status'=>'STOP','reason'=>$reason,
         'action'=>'do not book, retry or cleanup automatically; preserve any evidence'),
         JSON_UNESCAPED_SLASHES)."\n";
