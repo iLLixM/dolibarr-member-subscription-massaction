@@ -12,11 +12,12 @@ function c3ok($ok,$message)
     if (!$ok) { throw new RuntimeException('CF03 unit failed: '.$message); }
     $passed++;
 }
-function c3stop($fn,$message)
+function c3stop($fn,$message,$expectedReason)
 {
     try { $fn(); }
     catch (RuntimeException $error) {
-        c3ok(strpos($error->getMessage(),'CF03')===0,$message);
+        c3ok($error->getMessage()===$expectedReason,
+            $message.' expected '.$expectedReason.' got '.$error->getMessage());
         return;
     }
     throw new RuntimeException('CF03 unit not denied: '.$message);
@@ -51,7 +52,8 @@ function c3make($id,$scenario,$agenda)
             'completion'=>'NO_CHAIN'),
         'profile'=>array('name'=>$env['profile'],'family'=>$env['family'],
             'raw_hash'=>str_repeat('a',64)),
-        'engines'=>$engines,'type'=>array('id'=>2,'status'=>1,'amount'=>'120.00000000'),
+        'engines'=>$engines,'type'=>array('id'=>2,'status'=>0,'entity'=>1,
+            'subscription'=>'1','amount'=>'120.00000000'),
         'source_hashes'=>array('php'=>str_repeat('b',64)),
         'deployed_source_hashes'=>array('product'=>str_repeat('f',64)),
         'deployment_kind'=>$id==='D'?'verified_deployed_copy':'source_checkout',
@@ -130,28 +132,38 @@ foreach (array('22.0.4','22.0.6','23.0.0','24.0.3','untrusted') as $bad) {
     c3stop(static function()use($bad){
         Cf03LabContract::assertCoreVersion('22.0.5',
             "<?php\n"."define('DOL_VERSION', '".$bad."');\n");
-    },'V22 wrong version denied '.$bad);
+    },'V22 wrong version denied '.$bad,'CF03WrongCoreVersion');
 }
 foreach (array('0.0','0.2','0.4','22.0.5') as $bad) {
     c3stop(static function()use($bad){
         Cf03LabContract::assertCoreVersion('24.0.3',
             "<?php\n"."define('DOL_MAJOR_VERSION', '24');\n"
             ."define('DOL_MINOR_VERSION', '".$bad."');\n");
-    },'V24 wrong minor version denied '.$bad);
+    },'V24 wrong minor version denied '.$bad,'CF03WrongCoreVersion');
 }
 c3stop(static function() {
     Cf03LabContract::versionSource('23.0.0');
-},'unqualified version source denied');
+},'unqualified version source denied','CF03CoreVersionPolicyUnsupported');
 c3stop(static function() {
     Cf03LabContract::assertCoreVersion('22.0.5',null);
-},'unreadable version denied');
+},'unreadable version denied','CF03CoreVersionReadUnavailable');
 // Prevent SQL drift before a live selected-table witness.
 $columns=Cf03LabContract::columnPolicy();
 Cf03LabContract::columnsComplete($columns);
 c3ok(true,'V22/V24 schema projection present');
 unset($columns['facturedet'][array_search('qty',$columns['facturedet'],true)]);
 c3stop(static function()use($columns){Cf03LabContract::columnsComplete($columns);},
-    'missing invoice quantity column rejected');
+    'missing invoice quantity column rejected','CF03WitnessSchemaUnsupported');
+// An unrelated CF03 exception must NEVER make a negative test green.
+try {
+    c3stop(static function() {
+        throw new RuntimeException('CF03WrongProfile');
+    },'unrelated STOP rejected','CF03FixtureMismatch');
+    throw new RuntimeException('CF03 stop mismatch falsely accepted');
+} catch (RuntimeException $reasonMismatch) {
+    c3ok(strpos($reasonMismatch->getMessage(),'CF03 unit failed:')===0,
+        'exact negative error contract enforced');
+}
 $environments=Cf03LabContract::environments();
 c3ok(count($environments)===4,'four environments');
 c3ok($environments['A']['document_root']===$environments['C']['document_root']
@@ -170,46 +182,53 @@ foreach(array('A','B','C','D') as $id) {
     c3ok($parsed[0]==='preflight' && $parsed[1]===$id,'preflight '.$id);
     c3stop(static function()use($args){
         Cf03LabContract::arguments(array_merge($args,array('--db-name=foreign')));
-    },'no accidental override '.$id);
+    },'no accidental override '.$id,($id==='D'?'CF03InvalidArgument':'CF03EnvironmentOverrideDenied'));
     foreach(array('contribution','no-change') as $scenario) {
         foreach(array('on','off') as $agenda) {
             list($e,$before,$after)=c3make($id,$scenario,$agenda);
             Cf03LabContract::baseline($before,$e,$id);
             c3ok(Cf03LabContract::verify($before,$after,$e,$id)['status']==='PASS',
                 'scenario '.$id.' '.$scenario.' '.$agenda);
+            foreach (array('status'=>1,'entity'=>2,'subscription'=>'0') as $key=>$bad) {
+                $wrongType=$before;
+                $wrongType['type'][$key]=$bad;
+                c3stop(static function()use($wrongType,$e,$id) {
+                    Cf03LabContract::baseline($wrongType,$e,$id);
+                },'invalid membership type '.$key,'CF03MemberTypeMismatch');
+            }
             $wrong=$after;$wrong['config_sha256']=str_repeat('f',64);
             c3stop(static function()use($before,$wrong,$e,$id){
                 Cf03LabContract::verify($before,$wrong,$e,$id);
-            },'configuration changed');
+            },'configuration changed','CF03ContextChanged');
             $wrong=$after;$wrong['profile']['raw_hash']=str_repeat('f',64);
             c3stop(static function()use($before,$wrong,$e,$id){
                 Cf03LabContract::verify($before,$wrong,$e,$id);
-            },'profile changed');
+            },'profile changed','CF03ContextChanged');
             $wrong=$after;$wrong['counts']['bank']++;
             c3stop(static function()use($before,$wrong,$e,$id){
                 Cf03LabContract::verify($before,$wrong,$e,$id);
-            },'unexpected bank DML');
+            },'unexpected bank DML','CF03UnexpectedTableDelta');
                         $wrong=$after;$wrong['deployed_source_hashes']['product']=str_repeat('d',64);
             c3stop(static function()use($before,$wrong,$e,$id){
                 Cf03LabContract::verify($before,$wrong,$e,$id);
-            },'deployed product source changed');
+            },'deployed product source changed','CF03ContextChanged');
             $wrong=$after;$wrong['core_source_hashes']['core']=str_repeat('a',64);
             c3stop(static function()use($before,$wrong,$e,$id){
                 Cf03LabContract::verify($before,$wrong,$e,$id);
-            },'Dolibarr Core source changed');
+            },'Dolibarr Core source changed','CF03ContextChanged');
 $wrong=$after;$wrong['source_hashes']['php']=str_repeat('d',64);
             c3stop(static function()use($before,$wrong,$e,$id){
                 Cf03LabContract::verify($before,$wrong,$e,$id);
-            },'source changed');
+            },'source changed','CF03ContextChanged');
             $wrong=$before;$wrong['member']['datefin']='2079-12-31 00:00:00';
             c3stop(static function()use($wrong,$e,$id){
                 Cf03LabContract::baseline($wrong,$e,$id);
-            },'prior member end disallowed');
+            },'prior member end disallowed','CF03FixtureMismatch');
             if($scenario==='contribution') {
                 $wrong=$after;$wrong['subscriptions'][0]['marker']=false;
                 c3stop(static function()use($before,$wrong,$e,$id){
                     Cf03LabContract::verify($before,$wrong,$e,$id);
-                },'marker required');
+                },'marker required','CF03SubscriptionPostconditionMismatch');
             }
         }
     }
@@ -221,49 +240,49 @@ $wrong=$after;$wrong['source_hashes']['php']=str_repeat('d',64);
         $wrong=$after;$wrong['invoices'][0]['lines'][0]['marker']=false;
         c3stop(static function()use($before,$wrong,$e,$id){
             Cf03LabContract::verify($before,$wrong,$e,$id);
-        },'invoice marker');
+        },'invoice marker','CF03InvoiceLineMismatch');
         $wrong=$after;$wrong['invoices'][0]['currency']='USD';
         c3stop(static function()use($before,$wrong,$e,$id){
             Cf03LabContract::verify($before,$wrong,$e,$id);
-        },'invoice currency mismatch');
+        },'invoice currency mismatch','CF03InvoicePostconditionMismatch');
         $wrong=$after;$wrong['invoices'][0]['lines'][0]['quantity']=2.0;
         c3stop(static function()use($before,$wrong,$e,$id){
             Cf03LabContract::verify($before,$wrong,$e,$id);
-        },'invoice quantity mismatch');
+        },'invoice quantity mismatch','CF03InvoiceLineMismatch');
         $wrong=$after;$wrong['counts']['actioncomm']++;
         c3stop(static function()use($before,$wrong,$e,$id){
             Cf03LabContract::verify($before,$wrong,$e,$id);
-        },'unexplained invoice Agenda count denied');
+        },'unexplained invoice Agenda count denied','CF03UnexpectedTableDelta');
         $wrong=$after;$wrong['invoice_agenda_events'][]=array('id'=>60,
             'code'=>'AC_BILL_CREATE','invoice_id'=>60);
         c3stop(static function()use($before,$wrong,$e,$id){
             Cf03LabContract::verify($before,$wrong,$e,$id);
-        },'unknown invoice Agenda event');
+        },'unknown invoice Agenda event','CF03InvoiceAgendaMismatch');
         $wrong=$before;$wrong['invoice_agenda_supported']=false;
         c3stop(static function()use($wrong,$e,$id){
             Cf03LabContract::baseline($wrong,$e,$id);
-        },'unattributed line bill trigger denied');
+        },'unattributed line bill trigger denied','CF03InvoiceAgendaConfigUnsupported');
         $wrong=$after;$wrong['invoices'][0]['fk_soc']=66;
         c3stop(static function()use($before,$wrong,$e,$id){
             Cf03LabContract::verify($before,$wrong,$e,$id);
-        },'invoice customer');
+        },'invoice customer','CF03InvoicePostconditionMismatch');
     }
 }
 c3stop(static function(){
     Cf03LabContract::arguments(array('cf03-lab.php','--preflight','--environment=C',
         '--db-user=dolibarr_i105_v24_limited'));
-},'C must not use A limited account');
+},'C must not use A limited account','CF03EnhancedMustUseSeparateAccount');
 c3stop(static function(){
     Cf03LabContract::arguments(array('cf03-lab.php','--baseline','--environment=A',
         '--scenario=invoice-existing','--member-id=1',
         '--member-ref=MEM2611-0271','--marker=CF03LAB-A-ABCDEF123',
         '--start=2080-01-01','--end=2080-12-31','--amount=120',
         '--agenda=on','--evidence-dir=/var/lib/dolibarr-test-results/cf03-a-testunit'));
-},'CoreGuarded invoice denied');
+},'CoreGuarded invoice denied','CF03CoreGuardedInvoiceForbidden');
 c3stop(static function(){
     Cf03LabContract::arguments(array('cf03-lab.php','--preflight','--environment=A',
         '--evidence-dir=/tmp/unsafe'));
-},'preflight cannot write evidence');
+},'preflight cannot write evidence','CF03EvidencePathNotPermitted');
 // W01 CLI contract: no implicit D evidence parent, no non-invoice extra flags,
 // explicit invoice expectations, and D base kept outside the legacy local path.
 $common=array('--member-id=271','--member-ref=MEM2611-0271',
@@ -276,7 +295,7 @@ $hosted=array('cf03-lab.php','--baseline','--environment=D',
 c3stop(static function()use($hosted,$common){
     Cf03LabContract::arguments(array_merge($hosted,$common,
         array('--evidence-dir=/private/cf03-d-testfixture1')));
-},'D evidence root explicitly required');
+},'D evidence root explicitly required','CF03UnsafeEvidenceRoot');
 list($mode,$envName,$env,$opts)=Cf03LabContract::arguments(
     array_merge($hosted,$common,array('--evidence-root=/private/evidence',
         '--evidence-dir=/private/evidence/cf03-d-testfixture1')));
@@ -286,7 +305,7 @@ c3stop(static function()use($hosted,$common){
     Cf03LabContract::arguments(array_merge($hosted,$common,
         array('--evidence-root=/synthetic/../unsafe',
             '--evidence-dir=/synthetic/../unsafe/cf03-d-testfixture1')));
-},'traversal root denied');
+},'traversal root denied','CF03UnsafeEvidenceRoot');
 $invoiceArgs=array('cf03-lab.php','--check-only','--environment=C',
     '--db-user=enhanced_user','--scenario=invoice-existing',
     '--member-id=271','--member-ref=MEM2611-0271',
@@ -294,7 +313,7 @@ $invoiceArgs=array('cf03-lab.php','--check-only','--environment=C',
     '--end=2080-12-31','--amount=120.00','--agenda=on');
 c3stop(static function()use($invoiceArgs){
     Cf03LabContract::arguments($invoiceArgs);
-},'missing invoice options denied');
+},'missing invoice options denied','CF03MissingInvoiceExpectedField');
 $invoiceArgs=array_merge($invoiceArgs,array('--invoice-date=2026-11-20',
     '--invoice-quantity=1','--invoice-product=0','--invoice-vat=0',
     '--invoice-term=1','--invoice-payment-mode=0','--invoice-bank=0',
@@ -309,12 +328,12 @@ c3stop(static function()use($invoiceArgs){
     $bad=$invoiceArgs;
     $bad[array_search('--invoice-quantity=1',$bad,true)]='--invoice-quantity=0';
     Cf03LabContract::arguments($bad);
-},'zero invoice quantity denied');
+},'zero invoice quantity denied','CF03InvalidInvoiceExpectedField');
 c3stop(static function()use($invoiceArgs){
     $bad=$invoiceArgs;
     $bad[array_search('--invoice-currency=EUR',$bad,true)]='--invoice-currency=EU';
     Cf03LabContract::arguments($bad);
-},'invalid currency denied');
+},'invalid currency denied','CF03InvalidInvoiceExpectedField');
 foreach (array('B','C') as $invoiceEnvironment) {
     list($expected,$before,$after)=c3make($invoiceEnvironment,'invoice-existing','off');
     Cf03LabContract::baseline($before,$expected,$invoiceEnvironment);
