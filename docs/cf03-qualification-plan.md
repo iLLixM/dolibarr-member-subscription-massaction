@@ -8,6 +8,12 @@ Status: **Stage 0 inventory and Stage 1 read-only witness scaffolding committed;
 
 The initial D `CF03WrongDolibarrRoot` remains a historical preflight tool STOP, now resolved by the V22 filefunc version detection. **D's `deployment_kind=source_checkout`: no ZIP-origin/installation PASS is claimed.** Real HTTP, positive/negative booking, faults/rollback, invoice, active Enhanced observer, concurrency/replay and hosted private evidence-root qualification remain **NOT EXECUTED**. Full sanitized details in [Owner A–D preflight evidence](evidence/cf03/stage01-owner-preflight-2026-11-20.md). This later evidence supersedes dated `NOT EXECUTED` preflight markers below for current Stage 0 status; all six Issue #22 CF-03 acceptance checkboxes remain OPEN.
 
+## CF03-W01 tool hardening (2026-11-20)
+
+The read-only A–D preflights completed **4/4 Owner PASS** on earlier source. Following that qualification, CF03-W01 adds [private hosted evidence and invoice checks](cf03-w01-validation.md): a strictly explicit, private D evidence root (A/B/C unchanged), one-shot checksum/ownership/mode/file-list integrity, sorted V22/V24 SQL column fingerprints, a stricter single existing-customer invoice header/line/Agenda count witness, pure negative unit tests, and a targeted PHP 8.3/V22.0.5 CI lane without broadening standard PR CI. **No real W01 readback/booking/invoice test has been conducted**; earlier preflight evidence does not automatically qualify changed W01 code and must be rechecked before real scenario admission.
+
+The invoice witness deliberately rejects unsupported `LINEBILL_INSERT` event attribution; separate live invoice/customer/PDF/SMTP/observer tests remain necessary. All six CF-03 Issue #22 checkboxes remain OPEN, the PR remains DRAFT, and Owner merge/release GO remains separate.
+
 ## 1. Binding environment assignments
 
 | Environment | Profile | Installed Dolibarr / PHP | MySQL / MariaDB | Web / document root | Schema/account | Evidence level |
