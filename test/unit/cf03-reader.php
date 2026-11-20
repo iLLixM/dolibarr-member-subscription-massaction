@@ -38,6 +38,7 @@ final class Cf03FakeDb
     public $billValidate;
     public $lineOn;
     public $fault='';
+    public $resourceActor=4;
     public $sql=array();
     public $events=array();
     public function __construct($after,$memberOn,$billCreate,$billValidate,$lineOn=false)
@@ -135,7 +136,7 @@ final class Cf03FakeDb
             foreach ($this->events as $event) {
                 if ($event['id']===$eventId) {
                     $rows[]=array('rowid'=>$eventId+1,'element_type'=>'user',
-                        'fk_element'=>4);
+                        'fk_element'=>$this->resourceActor);
                 }
             }
         } elseif (preg_match('/^SELECT COUNT\(\*\) AS n FROM llx_([a-z_]+)$/D',$sql,$m)) {
@@ -189,8 +190,10 @@ $cases=array(
     array(false,false,false,'all-off'),
     array(false,false,true,'member-off-bill-validate-on'),
     array(false,true,false,'member-off-bill-create-on'),
+    array(false,true,true,'member-off-both-bill-on'),
     array(true,false,false,'member-on-bill-off'),
     array(true,false,true,'member-on-bill-validate-on'),
+    array(true,true,false,'member-on-bill-create-on'),
     array(true,true,true,'member-on-both-bill-on')
 );
 foreach ($cases as $case) {
@@ -211,8 +214,18 @@ foreach ($cases as $case) {
             }
         }
     }
-    if ($validate) {
-        $missing=new Cf03FakeDb(true,$memberOn,$create,false);
+    if (!$create && !$validate) {
+        $unexpected=new Cf03FakeDb(true,$memberOn,true,false);
+        $unexpectedState=cf03State($unexpected,cf03ReaderContext(),$expected);
+        $unexpectedState['invoice_agenda_flags']=$before['invoice_agenda_flags'];
+        readerStop(static function()use($before,$unexpectedState,$expected) {
+            Cf03LabContract::verify($before,$unexpectedState,$expected,'B');
+        },'CF03InvoiceAgendaMismatch',
+            $label.' unconfigured invoice event rejected');
+    }
+    if ($create || $validate) {
+        $missing=new Cf03FakeDb(true,$memberOn,
+            $create && $validate ? $create : false,false);
         $missingState=cf03State($missing,cf03ReaderContext(),$expected);
         $missingState['invoice_agenda_flags']=$after['invoice_agenda_flags'];
         readerStop(static function()use($before,$missingState,$expected) {
@@ -221,7 +234,7 @@ foreach ($cases as $case) {
         foreach (array('fk_user_author','fk_user_action','entity') as $field) {
             $wrong=new Cf03FakeDb(true,$memberOn,$create,$validate);
             foreach ($wrong->events as &$event) {
-                if ($event['code']==='AC_BILL_VALIDATE') {
+                if ($event['code']===($validate?'AC_BILL_VALIDATE':'AC_BILL_CREATE')) {
                     $event[$field]=$field==='entity'?2:44;
                 }
             }
@@ -232,6 +245,13 @@ foreach ($cases as $case) {
             },'CF03InvoiceAgendaActorMismatch',
                 $label.' wrong '.$field.' from real projection');
         }
+        $wrong=new Cf03FakeDb(true,$memberOn,$create,$validate);
+        $wrong->resourceActor=44;
+        $wrongState=cf03State($wrong,cf03ReaderContext(),$expected);
+        readerStop(static function()use($before,$wrongState,$expected) {
+            Cf03LabContract::verify($before,$wrongState,$expected,'B');
+        },'CF03InvoiceAgendaActorMismatch',
+            $label.' wrong user resource from actual SQL Resultset');
         $wrong=new Cf03FakeDb(true,$memberOn,$create,$validate);
         $wrong->fault='fk_user_author';
         readerStop(static function()use($wrong,$expected) {
