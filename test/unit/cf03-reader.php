@@ -106,7 +106,8 @@ final class Cf03FakeDb
             }
         } elseif (strpos($sql,'FROM llx_user WHERE')!==false) {
             $rows=array(array('rowid'=>4,'entity'=>1,'statut'=>1));
-        } elseif (strpos($sql,'FROM llx_subscription WHERE')!==false) {
+        } elseif (strpos($sql,'FROM llx_subscription WHERE')!==false
+            && strpos($sql,'FROM llx_facture f JOIN')===false) {
             $rows=$this->after?array(array('rowid'=>57,'fk_adherent'=>271,'fk_type'=>2,
                 'subscription'=>'120.00','dateadh'=>'2080-01-01 00:00:00',
                 'datef'=>'2080-12-31 00:00:00','note'=>$marker)):array();
