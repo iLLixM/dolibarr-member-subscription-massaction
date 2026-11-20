@@ -47,6 +47,10 @@ Code scope is test-only. New `tools/cf03-evidence.lib.php` implements mandatory 
 
 **Review questions for W01:** Are the hosted path/ownership checks strong enough to prevent symlink, traversal, web exposure or overwrites, including a hosting-private directory beside htdocs that the operator certifies is not HTTP-served? Can any partial baseline/verify file creation be accidentally retried? Are selected SQL column checks genuinely valid on V22/V24 without DML? Is the invoice event/header/line/actor model accurate and conservatively bounded? Does the syntax/test suite pass PHP 7.4/8.2/8.3? Is the preflight PASS correctly distinguished from current-W01 real DB/business PASS? Do not merge PR #32 or close any CF-03 qualification gate on W01 alone.
 
+## F32-W01 Paket A correction — independent delta review required
+
+The external W01 review on HEAD `460b75d28bedfc9f4397c0cbf314d56964e638e1` identified P1 F32-W01-01/02/03/04 and P2 F32-W01-05..10; its **NO REAL-TEST RELEASE** decision remains active. Paket A implements only F32-W01-01/03/04/05 and exact STOP-reason checking from -10. Review the actual corrected HEAD, with particular focus on official V22/V24 `llx_adherent_type` status/entity/fee fields, 0700/UID private Evidence parent for A/B/C/D, mark-before-DB verify sequencing, fail-closed partial verdicts, and whether synthetic negative tests reject wrong STOP codes. Current code changes must not be treated as independently approved findings. P1 F32-W01-02 and P2 06–09 remain OPEN until Paket B and follow-up; do not authorize real business tests.
+
 ## Specific review questions
 
 1. Is the single-schema A/C model represented correctly, with distinct application DB identities and explicit per-entity profile selection, one change window at a time?
