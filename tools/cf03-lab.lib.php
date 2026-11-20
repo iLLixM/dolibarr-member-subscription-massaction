@@ -407,7 +407,7 @@ final class Cf03LabContract
         foreach (self::COUNTS as $table) {
             $delta=0;
             if ($positive && $table==='subscription') { $delta=1; }
-            if ($scenario==='contribution' && $e['agenda']==='on'
+            if ($positive && $e['agenda']==='on'
                 && in_array($table,array('actioncomm','actioncomm_resources'),true)) { $delta=1; }
             if ($scenario==='invoice-existing' && in_array($table,
                 array('facture','facturedet','element_element'),true)) { $delta=1; }
