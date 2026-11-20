@@ -2,6 +2,18 @@
 
 **Implementation status:** Test-only hardening in [Draft PR #32](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/32). Earlier Owner A–D read-only preflights PASS; **no new real DB booking, invoice, rollback or HTTP test executed for W01**. Issue #22 CF-03 gates remain OPEN.
 
+## F32-W01 independent review follow-up — Paket A (2026-11-20)
+
+The independent W01 review on PR HEAD `460b75d28bedfc9f4397c0cbf314d56964e638e1` ruled **CHANGES REQUIRED / NO REAL-TEST RELEASE**, with four P1 and six P2 findings. This branch has since received a **scoped Paket A correction**, which does **not** constitute independent finding closure or real-test admission.
+
+Paket A covers F32-W01-01 (Dolibarr V22/V24 paid member type `statut=0` active), F32-W01-05 (`adherent_type.entity=1` and `subscription='1'`), F32-W01-03 (0700/effective-CLI-owner evidence-root requirement for **all A/B/C/D**), F32-W01-04 (valid case baseline and expected state admitted, then exclusive `verify.started` **before any fresh runtime/DB/config/source access**; after this seal, early STOP attempts write a non-overwriting `verdict.json`), and the focused F32-W01-10 negative-assertion helper (requires exact `CF03...` STOP reason, not merely the prefix).
+
+A/B/C retain the previously fixed `/var/lib/dolibarr-test-results` path, but the Owner must **manually** ensure it is a canonical directory owned by the actual PHP-CLI effective user with mode 0700 before any baseline/verify; the tool does not chmod/chown a shared parent. An installation that previously worked with a group/world-accessible parent must now STOP rather than silently accept a weak evidence root. No direct local DB, HTTP action or filesystem configuration change was made by the developer.
+
+**One-shot boundary:** The case is sealed only after an otherwise valid local baseline/fixture is admitted and before fresh external observation starts. An invalid baseline remains STOP; a sealed case is never retried. Any early post-seal DB/config/source STOP is recorded via exclusive `verdict.json` when possible; a filesystem write failure still preserves `verify.started` as durable no-retry evidence. Do not delete/reinitialize a case directory or repeat a booked action.
+
+**Still OPEN:** P1 F32-W01-02 (source/runtime manifest) and P2 F32-W01-06/07/08/09 plus the wider test-coverage refinement of -10. Paket B and independent follow-up review remain required. **All seven real-test families remain NO-GO**, PR #32 stays DRAFT, and Issue #22 CF-03 gates remain OPEN.
+
 ## Delivered components
 
 - `tools/cf03-evidence.lib.php`: isolated, immutable evidence directory and file handling; no SQL/HTTP.
