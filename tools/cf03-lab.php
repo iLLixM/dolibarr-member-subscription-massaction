@@ -50,8 +50,11 @@ function cf03Configure($id,array $env)
     Cf03LabContract::need(PHP_VERSION_ID>=70400,'CF03PHPUnsupported');
     Cf03LabContract::need(extension_loaded('mysqli'),'CF03MysqliUnavailable');
     $root=realpath($env['document_root']);
-    Cf03LabContract::need($root!==false && is_file($root.'/conf/conf.php')
-        && is_file($root.'/version.inc.php'),'CF03WrongDolibarrRoot');
+    Cf03LabContract::need($root!==false && is_file($root.'/conf/conf.php'),
+        'CF03WrongDolibarrRoot');
+    $versionPath=Cf03LabContract::versionSource($env['core_version']);
+    Cf03LabContract::need(is_file($root.'/'.$versionPath)
+        && !is_link($root.'/'.$versionPath),'CF03CoreVersionSourceUnavailable');
     $module=realpath($root.'/custom/membersubscriptionmassaction');
     Cf03LabContract::need($module!==false && is_dir($module)
         && $module===realpath($root.'/custom/membersubscriptionmassaction'),
@@ -75,13 +78,10 @@ function cf03Configure($id,array $env)
             'CF03DeployedSourceMismatch');
         $deployed[$path]=$actual;
     }
-    $version=file_get_contents($root.'/version.inc.php');
-    $parts=explode('.',$env['core_version']);
-    Cf03LabContract::need(preg_match("/define\\('DOL_MAJOR_VERSION',\\s*'".preg_quote($parts[0],'/')."'\\)/",$version)===1
-        && preg_match("/define\\('DOL_MINOR_VERSION',\\s*'".preg_quote($parts[1].'.'.$parts[2],'/')."'\\)/",$version)===1,
-        'CF03WrongCoreVersion');
+    $version=file_get_contents($root.'/'.$versionPath);
+    Cf03LabContract::assertCoreVersion($env['core_version'],$version);
     // Bind the actual selected Core source in addition to its version string.
-    $corePaths=array('version.inc.php','adherents/class/adherent.class.php',
+    $corePaths=array($versionPath,'adherents/class/adherent.class.php',
         'core/db/mysqli.class.php','user/class/user.class.php');
     $coreHashes=array();
     foreach($corePaths as $path) {
