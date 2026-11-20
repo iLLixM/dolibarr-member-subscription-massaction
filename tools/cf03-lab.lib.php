@@ -280,6 +280,13 @@ final class Cf03LabContract
             'CF03MemberTypeMismatch');
         self::need(($s['agenda_enabled']??null)===($e['agenda']==='on'),
             'CF03AgendaMismatch');
+        if ($e['agenda']==='on' && $e['scenario']!=='no-change') {
+            self::need(($e['actor_id']??0)>0
+                && ($s['actor']['id']??null)===$e['actor_id']
+                && ($s['actor']['entity']??null)===1
+                && ($s['actor']['status']??null)===1,
+                'CF03ExpectedActorUnavailable');
+        }
         self::need(count($s['subscriptions']??array())===0
             && count($s['agenda_events']??array())===0
             && count($s['invoices']??array())===0,'CF03FixtureAlreadyUsed');
