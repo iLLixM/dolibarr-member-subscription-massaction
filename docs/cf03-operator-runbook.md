@@ -1,12 +1,12 @@
 # CF-03 – Operator runbook for stages 0/1 (A–D)
 
-**This runbook is read-only.** No live CF-03 test has been executed, no real booking or invoice is authorized by this document, and no application database user or transaction profile is changed by the provided commands. Only an authorized operator can operate the lab. Source attestation includes four actual installed Dolibarr Core file SHA-256 values; preserve them alongside the module and config hashes. Stage 2/3/4 business and controlled destructive cases require separately approved case-specific procedures.
+**This runbook is read-only.** No live CF-03 test has been executed, no real booking or invoice is authorized by this document, and no application database user or transaction profile is changed by the provided commands. Only an authorized operator can operate the lab. Source attestation covers the bounded deterministic module production-PHP inventory and the selected version-specific Dolibarr Core runtime dependency manifest; preserve the reported hashes alongside the config fingerprint, without claiming a complete ZIP/Core-tree audit. Stage 2/3/4 business and controlled destructive cases require separately approved case-specific procedures.
 
 Tools: `tools/cf03-lab.php` and `tools/cf03-lab.lib.php`. They do **not** reuse or modify the historical POS01-A/B/C evidence. The standard CF-02 positive witness remains unchanged.
 
 ## 0. Source and operator prerequisites
 
-Use the new CF-03 worktree from the GitHub PR. Verify the exact checked-out 40-character SHA and installed module source. For A/B/C, the PHP tool requires the live module to resolve to this exact worktree; **D explicitly allows a separate module copy installed from a test ZIP, but checks matching hashes of nine runtime product PHP files against this worktree**. This is not a complete package-manifest or install audit. Complete the entire baseline–manual-operation–verify window on the same SHA and config; no Git checkout, module update, profile switch, PHP-process credentials change, or concurrent business writes in between.
+Use the new CF-03 worktree from the GitHub PR. Verify the exact checked-out 40-character SHA and installed module source. For A/B/C, the PHP tool requires the live module to resolve to this exact worktree; **D additionally permits a separately deployed module copy only when the complete selected production-PHP inventory and SHA-256 values match this checkout**. This is not a complete package-manifest or install audit. Complete the entire baseline–manual-operation–verify window on the same SHA and config; no Git checkout, module update, profile switch, PHP-process credentials change, or concurrent business writes in between.
 
 ```sh
 cd /home/marcel/dolibarr-member-subscription-massaction-cf03 || exit 1
@@ -99,29 +99,31 @@ After Paket A, **A/B/C and D all require a private Evidence parent** owned by th
 
 A valid, admitted case's `--verify` now creates `verify.started` **before database connection, profile inspection or source hash checks**. After that point, any STOP is terminal for the Case ID, including database or configuration failure; when possible `verdict.json` carries the STOP, but the exclusive marker remains authoritative. No retry, file deletion, directory replacement, rebooking or automatic cleanup. An invalid baseline is not admitted as a valid case.
 
-**Paket A is not a real-test release:** further P1/P2 review findings remain. Do not perform a new business booking with this corrected branch until Paket B, final CI and independent review explicitly authorize the individual scenario.
+**Historical Paket A restriction (superseded):** Later independent reviews approved W01 test-tool admission on pinned HEAD `3511175fc33489e7e8e89e4ae13f36db8e87aa62` under operator-specific conditions. Any subsequent code change needs a fresh SHA-specific review and separate Owner authorization before a real case.
 
 ## Paket B operator requirements — source and actor-bound invoice/Agenda
 
-The preflight now evaluates a wider deterministic PHP source inventory, and each case binds the configured product (invoice only) plus the real authenticated operator (Agenda ON). On a **new** synthetic Contribution or Invoice-existing case with `--agenda=on`, add **`--actor-id=<ACTUAL_AUTHENTICATED_DOLIBARR_USER_ROWID>`** consistently to check-only, baseline and verify; the argument must represent the browser-operator executing the one authenticated action. For Agenda OFF and no-change scenarios, omit the actor argument. Invoice-existing on B/C uses the actual configured `ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS`, product type (0 goods / 1 service), existing eligible customer (1 or 3), and `--invoice-quantity=1` only. Do not invent an invoice product or change legitimate settings merely to produce a PASS.
+The preflight now evaluates a wider deterministic PHP source inventory, and each case binds the configured product (invoice only) plus the real authenticated operator (Agenda ON). For **every** positive `invoice-existing` case, specify `--actor-id=<ACTUAL_AUTHENTICATED_DOLIBARR_USER_ROWID>` regardless of Member-Agenda ON/OFF; for positive `contribution`, specify it only with Member-Agenda ON. Omit the option for contribution Agenda OFF and for no-change. The ID must identify the authenticated browser operator executing exactly one approved action, and must stay fixed through check-only/baseline/verify. Invoice-existing on B/C uses the actual configured `ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS`, product type (0 goods / 1 service), existing eligible customer (1 or 3), and `--invoice-quantity=1` only. Do not invent an invoice product or change legitimate settings merely to produce a PASS.
 
-At preflight and each baseline/verify readback, module PHP files and selected Dolibarr V22/V24 Core critical-path files are hashed and compared. A hosted D deployment may be a checkout, not an installed ZIP, and this hash contract alone does not attest the complete ZIP. Real tests remain prohibited pending independent F32-W01 follow-up review and scenario-specific Owner admission.
+At preflight and each baseline/verify readback, module PHP files and selected Dolibarr V22/V24 Core critical-path files are hashed and compared. A hosted D deployment may be a checkout, not an installed ZIP, and this hash contract alone does not attest the complete ZIP. Independent W01 technical admission has been granted on the original pinned SHA only; actual real-case execution remains conditional on current-HEAD admission, fresh preflight, private evidence and explicit case-specific Owner approval.
 
-## F32-W01-08/-11 — independently configured invoice Agenda (new source review pending)
+## F32-W01-08/-11 — independently configured invoice Agenda (independently CLOSED on reviewed HEAD)
 
 For `--scenario=invoice-existing` (B/C only), supply **`--actor-id=<ACTUAL_AUTHENTICATED_DOLIBARR_USER_ROWID>` on check-only, baseline and verify regardless of `--agenda=on/off`**. The latter option means **member subscription Agenda ON/OFF only**. Separately configured Core `BILL_CREATE`/`BILL_VALIDATE` events are read and reconciled independently, including the mixed case member OFF + invoice VALIDATE ON. The selected invoice Resultset must contain event entity, author and owner; missing columns STOP before attributing an event.
 
 Do not disable legitimate Core invoice Agenda flags to force a PASS; `LINEBILL_INSERT` effective ON remains a documented early Admission STOP for the bounded invoice witness. Check-only must confirm a new synthetic fixture, actual authenticated actor, effective agenda flags and relevant source/profile/DB identity before the Owner performs any single UI action.
 
-The original partial real-test approval on source `7fc5898d57d7c6bba51cf7cb2c572c5dc3131217` is not a blanket approval of changed source. Wait for independent exact-HEAD F32-W01-08/-11 delta review and new Owner authorization before any invoice-existing booking. PR #32 remains Draft.
+The independent final delta review subsequently CLOSED F32-W01-08 and F32-W01-11 on `3511175fc33489e7e8e89e4ae13f36db8e87aa62` and admitted bounded B/C invoice-existing witness use under the prescribed operator conditions. A changed HEAD is **not** automatically approved: require independent follow-up of the new delta and explicit Owner case authorization. PR #32 remains Draft; no real W01 bookings have yet been executed.
 
 ## 2. Stage-1 snapshot witness (not an authorization to run a booking)
 
-`--check-only`, `--baseline`, and `--verify` additionally require a freshly created synthetic member. The following *generic* A example uses placeholders; replace with values of an **entirely new** member (do not reuse 56, 57, 58 or a historical CF02 marker).
+`--check-only`, `--baseline`, and `--verify` additionally require a freshly created synthetic member. The following *generic* A example uses placeholders and is subject to the documentation argument-regression test; replace with values of an **entirely new** member (do not reuse 56, 57, 58 or a historical CF02 marker).
 
+<!-- CF03-CASE-A -->
 ```sh
 MEMBER_ID=REPLACE_WITH_NEW_NUMERIC_ID
 MEMBER_REF=REPLACE_WITH_CORE_REFERENCE
+ACTOR_ID=REPLACE_WITH_AUTHENTICATED_UI_ROWID
 MARKER=CF03LAB-A-20261120A1
 EVIDENCE_DIR=/var/lib/dolibarr-test-results/cf03-a-20261120a1
 
@@ -131,7 +133,7 @@ common() {
     --scenario=contribution \
     --member-id="$MEMBER_ID" --member-ref="$MEMBER_REF" \
     --marker="$MARKER" --start=2080-01-01 --end=2080-12-31 \
-    --amount=120.00 --agenda=on
+    --amount=120.00 --agenda=on --actor-id="$ACTOR_ID"
 }
 common --check-only
 ```
@@ -147,6 +149,75 @@ When authorized, sequence:
 5. Preserve `baseline.json`, `baseline.sha256`, `verify.started`, `after.json`, `verdict.json` privately. No rerun, cleanup or result rewrite after STOP.
 
 For B and C, use `--environment=B/C` and the corresponding `--db-user` as in Step 1, with a **new environment-specific marker and directory**. For D, use the complete Step-1 root/host/port/schema/user parameters in every witness call. C/A must not change account/profile between baseline and verify; source hashes and `conf.php` hash are verified. Only `--scenario=contribution` and `--scenario=no-change` apply to CoreGuarded. `--scenario=invoice-existing` is restricted to B/C, needs an existing synthetic linked customer, and provides **only selected invoice-row/line/link evidence**, not full invoice/Agenda/PDF/SMTP qualification. Never mix case profiles, fixture IDs or evidence directories.
+
+## 2.1 Contract-validated B/C Invoice-existing operator pattern
+
+For B and C, use **one case at a time** with the actual profile and application DB user. C must follow the documented A/C switch and verified active EnhancedMySQL instrumentation; do not reuse any earlier case directory or marker. Populate values from a new *synthetic* member and its existing eligible customer. The chosen invoice plan must match the actual UI/module configuration (one invoice line, quantity 1); do **not** change genuine Agenda settings just to pass. `LINEBILL_INSERT` effective ON remains an admission STOP.
+
+<!-- CF03-CASE-INVOICE -->
+```sh
+ENVIRONMENT=B                   # or C, only after exclusive switch
+DB_USER=REPLACE_WITH_ACTUAL_B_OR_C_DB_USER
+MEMBER_ID=REPLACE_WITH_NEW_NUMERIC_ID
+MEMBER_REF=REPLACE_WITH_CORE_REFERENCE
+ACTOR_ID=REPLACE_WITH_AUTHENTICATED_UI_ROWID
+MARKER=CF03LAB-B-20261121B1     # environment-specific new marker (C if C)
+INVOICE_DATE=REPLACE_WITH_CONFIRMED_INVOICE_DATE
+INVOICE_PRODUCT=REPLACE_WITH_CONFIRMED_PRODUCT_ID_OR_0
+INVOICE_VAT=REPLACE_WITH_CONFIRMED_VAT_RATE
+INVOICE_TERM=REPLACE_WITH_CONFIRMED_PAYMENT_TERM_ID
+INVOICE_PAYMENT_MODE=REPLACE_WITH_CONFIRMED_PAYMENT_MODE_ID_OR_0
+INVOICE_BANK=REPLACE_WITH_CONFIRMED_BANK_ID_OR_0
+INVOICE_CURRENCY=REPLACE_WITH_CONFIRMED_CURRENCY
+EVIDENCE_DIR=/var/lib/dolibarr-test-results/REPLACE_WITH_UNIQUE_CASE_DIR
+invoice_case() {
+  sudo -u www-data /usr/bin/php -d xdebug.mode=off tools/cf03-lab.php "$@" \
+    --environment="$ENVIRONMENT" --db-user="$DB_USER" \
+    --scenario=invoice-existing --member-id="$MEMBER_ID" \
+    --member-ref="$MEMBER_REF" --marker="$MARKER" \
+    --start=2080-01-01 --end=2080-12-31 --amount=120.00 \
+    --agenda=off --actor-id="$ACTOR_ID" \
+    --invoice-date="$INVOICE_DATE" --invoice-quantity=1 \
+    --invoice-product="$INVOICE_PRODUCT" --invoice-vat="$INVOICE_VAT" \
+    --invoice-term="$INVOICE_TERM" --invoice-payment-mode="$INVOICE_PAYMENT_MODE" \
+    --invoice-bank="$INVOICE_BANK" --invoice-currency="$INVOICE_CURRENCY"
+}
+invoice_case --check-only
+```
+
+Before any `invoice_case --baseline --evidence-dir="$EVIDENCE_DIR"` and authenticated browser action, obtain explicit per-case Owner approval. After the single approved action, invoke `invoice_case --verify --evidence-dir="$EVIDENCE_DIR"` **once**. Invoice-specific Agenda flags are independent of `--agenda=off`, which concerns only the Member trigger. For a Member-Agenda ON invoice case, use `--agenda=on` without dropping the mandatory actor.
+
+## 2.2 Contract-validated hosted D contribution pattern
+
+This is a **placeholder** pattern, not a disclosure of hosting credentials or an authorization to book. The same real CLI PHP user must own a pre-provisioned mode-0700 evidence parent outside all public HTTP paths, and the hosting operator must attest no alias/backup exposure. The source-checkout/preflight evidence does **not** prove ZIP installation.
+
+<!-- CF03-CASE-D -->
+```sh
+DOCUMENT_ROOT=/ACTUAL/HOSTED/V22/htdocs
+DB_HOST=REPLACE_WITH_ACTUAL_DB_HOST
+DB_PORT=3306
+DB_NAME=REPLACE_WITH_ACTUAL_DB_SCHEMA
+DB_USER=REPLACE_WITH_ACTUAL_DB_USER
+MEMBER_ID=REPLACE_WITH_NEW_NUMERIC_ID
+MEMBER_REF=REPLACE_WITH_CORE_REFERENCE
+ACTOR_ID=REPLACE_WITH_AUTHENTICATED_UI_ROWID
+MARKER=CF03LAB-D-20261121D1
+EVIDENCE_ROOT=/ACTUAL/PRIVATE/EVIDENCE
+EVIDENCE_DIR="$EVIDENCE_ROOT/cf03-d-unique-case-01"
+hosted_case() {
+  /usr/bin/php -d xdebug.mode=off tools/cf03-lab.php "$@" \
+    --environment=D --document-root="$DOCUMENT_ROOT" \
+    --db-host="$DB_HOST" --db-port="$DB_PORT" \
+    --db-name="$DB_NAME" --db-user="$DB_USER" \
+    --scenario=contribution --member-id="$MEMBER_ID" \
+    --member-ref="$MEMBER_REF" --marker="$MARKER" \
+    --start=2080-01-01 --end=2080-12-31 --amount=120.00 \
+    --agenda=on --actor-id="$ACTOR_ID"
+}
+hosted_case --check-only
+```
+
+Only after successful private-root/HTTP-exposure checks and separate Owner admission: `hosted_case --baseline --evidence-root="$EVIDENCE_ROOT" --evidence-dir="$EVIDENCE_DIR"`, one permitted UI action, then `hosted_case --verify --evidence-root="$EVIDENCE_ROOT" --evidence-dir="$EVIDENCE_DIR"` exactly once. No retry or cleanup after STOP.
 
 ## 3. Interpretation and incident handling
 
