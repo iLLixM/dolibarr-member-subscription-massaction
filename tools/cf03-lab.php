@@ -187,7 +187,8 @@ function cf03State($db,array $context,array $expected)
     $t=cf03One($db,'SELECT rowid,statut,entity,subscription,amount,duration '
         .'FROM llx_adherent_type WHERE rowid='.(int)$m['fk_adherent_type']);
     $flags=cf03Query($db,"SELECT name, value, entity FROM llx_const "
-        ."WHERE name IN ('MAIN_MODULE_AGENDA','MAIN_AGENDA_ACTIONAUTO_MEMBER_SUBSCRIPTION_CREATE',"
+        ."WHERE name IN ('ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS',"
+        ."'MAIN_MODULE_AGENDA','MAIN_AGENDA_ACTIONAUTO_MEMBER_SUBSCRIPTION_CREATE',"
         ."'MAIN_AGENDA_ACTIONAUTO_BILL_CREATE','MAIN_AGENDA_ACTIONAUTO_BILL_VALIDATE',"
         ."'MAIN_AGENDA_ACTIONAUTO_LINEBILL_INSERT') "
         ."AND entity IN (0,1) ORDER BY entity");
@@ -207,6 +208,32 @@ function cf03State($db,array $context,array $expected)
     // The line event has no unambiguous invoice-id association in this scoped
     // witness: do not promise complete Agenda proof when it is enabled.
     $invoiceAgendaSupported=!$invoiceFlags['LINEBILL_INSERT'];
+    $productSetting=(string)($on['ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS']??'0');
+    Cf03LabContract::need(preg_match('/^(?:0|[1-9][0-9]{0,8})$/D',
+        $productSetting)===1,'CF03InvoiceProductConfigurationUnsupported');
+    $productId=(int)$productSetting;
+    $invoiceProduct=array('id'=>0,'type'=>1,'status'=>1,'entity'=>1);
+    if ($productId>0) {
+        $productRows=cf03Query($db,'SELECT rowid,entity,tosell,fk_product_type '
+            .'FROM llx_product WHERE rowid='.$productId);
+        Cf03LabContract::need(count($productRows)===1,
+            'CF03InvoiceProductUnavailable');
+        $p=$productRows[0];
+        $invoiceProduct=array('id'=>(int)$p['rowid'],
+            'type'=>(int)$p['fk_product_type'],
+            'status'=>(int)$p['tosell'],'entity'=>(int)$p['entity']);
+    }
+    $actor=null;
+    if (($expected['actor_id']??0)>0) {
+        $actorRows=cf03Query($db,'SELECT rowid,entity,statut FROM llx_user '
+            .'WHERE rowid='.(int)$expected['actor_id']);
+        Cf03LabContract::need(count($actorRows)===1,
+            'CF03ExpectedActorUnavailable');
+        $u=$actorRows[0];
+        $actor=array('id'=>(int)$u['rowid'],'entity'=>(int)$u['entity'],
+            'status'=>(int)$u['statut']);
+    }
+
     $subRows=cf03Query($db,'SELECT rowid,fk_adherent,fk_type,subscription,'
         .'CAST(dateadh AS CHAR) AS dateadh,CAST(datef AS CHAR) AS datef,note '
         .'FROM llx_subscription WHERE fk_adherent='.$id.' ORDER BY rowid');
@@ -216,14 +243,17 @@ function cf03State($db,array $context,array $expected)
             'start'=>$sub['dateadh'],'end'=>$sub['datef'],
             'marker'=>strpos((string)$sub['note'],$expected['marker'])!==false);
     }
-    $actionRows=cf03Query($db,"SELECT id,code,fk_element FROM llx_actioncomm "
+    $actionRows=cf03Query($db,"SELECT id,code,fk_element,entity,fk_user_author,fk_user_action FROM llx_actioncomm "
         ."WHERE elementtype='member' AND fk_element=".$id
         ." AND code='AC_MEMBER_SUBSCRIPTION_CREATE' ORDER BY id");
     $actions=array();$resources=array();
     foreach($actionRows as $action) {
         $event=(int)$action['id'];
         $actions[]=array('id'=>$event,'code'=>$action['code'],
-            'member_id'=>(int)$action['fk_element']);
+            'member_id'=>(int)$action['fk_element'],
+            'entity'=>(int)$action['entity'],
+            'author_id'=>(int)$action['fk_user_author'],
+            'owner_id'=>(int)$action['fk_user_action']);
         foreach(cf03Query($db,'SELECT rowid,element_type,fk_element FROM llx_actioncomm_resources '
             .'WHERE fk_actioncomm='.$event.' ORDER BY rowid') as $link){
             $resources[]=array('id'=>(int)$link['rowid'],'agenda_id'=>$event,
@@ -265,7 +295,10 @@ function cf03State($db,array $context,array $expected)
             .' ORDER BY id') as $action) {
             $event=(int)$action['id'];
             $invoiceEvents[]=array('id'=>$event,'code'=>$action['code'],
-                'invoice_id'=>(int)$action['fk_element']);
+                'invoice_id'=>(int)$action['fk_element'],
+                'entity'=>(int)$action['entity'],
+                'author_id'=>(int)$action['fk_user_author'],
+                'owner_id'=>(int)$action['fk_user_action']);
             foreach (cf03Query($db,'SELECT rowid,element_type,fk_element '
                 .'FROM llx_actioncomm_resources WHERE fk_actioncomm='.$event
                 .' ORDER BY rowid') as $res) {
@@ -315,6 +348,7 @@ function cf03State($db,array $context,array $expected)
         'agenda_enabled'=>$on['MAIN_MODULE_AGENDA']==='1'
             && $on['MAIN_AGENDA_ACTIONAUTO_MEMBER_SUBSCRIPTION_CREATE']==='1',
         'customer_exists'=>$customerExists,'customer'=>$customer,
+        'invoice_product'=>$invoiceProduct,'actor'=>$actor,
         'invoice_agenda_flags'=>$invoiceFlags,
         'invoice_agenda_supported'=>$invoiceAgendaSupported,
         'invoice_agenda_events'=>$invoiceEvents,
