@@ -56,8 +56,12 @@ final class Cf03Evidence
             $source = realpath($checkout);
             self::need($doc !== false && $source !== false,
                 'CF03EvidenceIsolationUnknown');
-            // No evidence in a webroot, its site directory, or the checkout.
-            self::need(!self::within($root, dirname($doc))
+            // Permit an owner-private sibling of htdocs on jailed hosting,
+            // but never the site root itself, inside htdocs or an ancestor
+            // of the webroot or source checkout. Public alias exposure must
+            // additionally be ruled out by the hosting operator.
+            self::need($root !== dirname($doc)
+                && !self::within($root, $doc)
                 && !self::within($root, $source)
                 && !self::within($doc, $root)
                 && !self::within($source, $root),
