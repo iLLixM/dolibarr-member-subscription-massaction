@@ -29,7 +29,8 @@ function c3config($id,$scenario='contribution',$agenda='on')
     $config=array('scenario'=>$scenario,'member_id'=>271,'member_ref'=>'MEM2611-0271',
         'marker'=>$marker,'start'=>'2080-01-01','end'=>'2080-12-31',
         'amount'=>'120.00','agenda'=>$agenda,
-        'actor_id'=>$agenda==='on' && $scenario!=='no-change'?4:0);
+        'actor_id'=>$scenario==='invoice-existing'
+            || ($scenario==='contribution' && $agenda==='on')?4:0);
     if ($scenario==='invoice-existing') {
         $config['invoice']=array('date'=>'2026-11-20','quantity'=>1.0,
             'product'=>0,'vat'=>0.0,'term'=>1,'payment_mode'=>0,
@@ -412,6 +413,18 @@ c3stop(static function()use($invoiceArgs){
     $bad[array_search('--invoice-currency=EUR',$bad,true)]='--invoice-currency=EU';
     Cf03LabContract::arguments($bad);
 },'invalid currency denied','CF03InvalidInvoiceExpectedField');
+
+$invoiceOffArgs=$invoiceArgs;
+$invoiceOffArgs[array_search('--agenda=on',$invoiceOffArgs,true)]='--agenda=off';
+list($invoiceMode,$invoiceEnv,$invoiceConfig,$invoiceOptions)=
+    Cf03LabContract::arguments($invoiceOffArgs);
+c3ok(Cf03LabContract::expected($invoiceOptions)['actor_id']===4,
+    'Invoice requires actor even if member Agenda is OFF');
+$invoiceOffNoActor=array_values(array_diff($invoiceOffArgs,array('--actor-id=4')));
+c3stop(static function()use($invoiceOffNoActor) {
+    Cf03LabContract::arguments($invoiceOffNoActor);
+},'Invoice member OFF still needs actor','CF03InvalidExpectedActor');
+
 foreach (array('B','C') as $invoiceEnvironment) {
     list($expected,$before,$after)=c3make($invoiceEnvironment,'invoice-existing','off');
     Cf03LabContract::baseline($before,$expected,$invoiceEnvironment);
