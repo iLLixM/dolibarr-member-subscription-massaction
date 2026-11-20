@@ -159,7 +159,7 @@ final class Cf03LabContract
             && ($m['lastname']??null)===$e['marker']
             && ($m['email_hash']??null)===hash('sha256',strtolower($e['marker']).'@example.invalid')
             && ($m['entity']??null)===1 && ($m['status']??null)===1
-            && ($m['datefin']??'UNSET')===null
+            && array_key_exists('datefin',$m) && $m['datefin']===null
             && ($m['type_id']??0)>0,'CF03FixtureMismatch');
         self::need(($s['type']['id']??null)===$m['type_id']
             && ($s['type']['status']??null)===1
@@ -197,7 +197,7 @@ final class Cf03LabContract
     {
         self::baseline($before,$e,$id);
         foreach (array('environment','identity','profile','engines','type',
-            'source_hashes','agenda_enabled') as $field) {
+            'source_hashes','config_sha256','performance_schema','agenda_enabled') as $field) {
             self::need(array_key_exists($field,$after)
                 && $before[$field]===$after[$field],'CF03ContextChanged');
         }
