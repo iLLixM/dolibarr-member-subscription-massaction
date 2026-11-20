@@ -15,6 +15,7 @@ php test/unit/database.php
 node test/unit/loading.js
 if [ -n "${DOLIBARR_TEST_ROOT:-}" ]; then
   php test/unit/booking.php
+  php test/unit/f29-book-flow.php
   php test/unit/invoice.php
   php test/unit/postcommit.php
   php test/unit/profile.php

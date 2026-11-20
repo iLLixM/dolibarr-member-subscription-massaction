@@ -35,11 +35,13 @@ class F29Database
 class User
 {
     public static $result = 1; public static $fetchError = 0; public static $latest;
-    public $db; public $status = 1;
+    public static $optionalSqlError = false;
+    public $db; public $status = 1; public $errors = array();
     public function __construct($db) { $this->db = $db; self::$latest = $this; }
     public function fetch($id)
     {
         if (self::$fetchError) { throw new RuntimeException('Injected SQL fault', self::$fetchError); }
+        if (self::$optionalSqlError) { $this->errors[] = 'Simulated swallowed fetch_optionals SQL error'; }
         return self::$result;
     }
     public function loadRights($tag = '', $refresh = 0)
@@ -70,7 +72,7 @@ function f29Fails(callable $fn, $code)
 }
 function f29Fixture()
 {
-    User::$result=1; User::$fetchError=0;
+    User::$result=1; User::$fetchError=0; User::$optionalSqlError=false;
     $db=new F29Database(); return array($db, new F29BookingProbe($db), (object) array('id'=>17));
 }
 list($db,$service,$caller)=f29Fixture();
@@ -85,6 +87,14 @@ foreach (array(0 => 'missing', -1 => 'SQL error', -3 => 'nested fetch error') as
         $ret<0 ? 'MSMTransactionUnknown' : 'NotEnoughPermissions');
     f29Verify($db->calls === array() && User::$latest->db === $db, $description.' stops before rights');
 }
+list($db,$service,$caller)=f29Fixture(); User::$optionalSqlError=true;
+f29Fails(static function()use($service,$caller){$service->reload($caller,true);}, 'MSMTransactionUnknown');
+f29Verify($db->calls === array() && User::$latest->db === $db,
+    'successful outer fetch must not conceal Core optional-field SQL error');
+list($db,$service,$caller)=f29Fixture(); User::$optionalSqlError=true;
+$legacy=$service->reload($caller,false);
+f29Verify($legacy instanceof User && $legacy->db === $db,
+    'legacy profile reload retains pre-existing Core optional-field behavior');
 foreach (array(1213,1205) as $errno) {
     list($db,$service,$caller)=f29Fixture(); User::$fetchError=$errno;
     f29Fails(static function()use($service,$caller){$service->reload($caller,true);}, 'MSMTransactionUnknown');

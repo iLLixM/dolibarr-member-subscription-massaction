@@ -58,7 +58,12 @@ class MsmBookingService
 			// as an ordinary permission refusal after Core BEGIN.
 			try { $fetched = $current->fetch($user->id); }
 			catch (Throwable $e) { throw new RuntimeException('MSMTransactionUnknown', 0, $e); }
-			if ($fetched < 0) { throw new RuntimeException('MSMTransactionUnknown'); }
+			// Core User::fetch() ignores the return from fetch_optionals().
+			// A failed optional-field SQL query is recorded in this fresh
+			// User object's errors array even when fetch() returns success.
+			if ($fetched < 0 || ($fetched > 0 && !empty($current->errors))) {
+				throw new RuntimeException('MSMTransactionUnknown');
+			}
 		} else {
 			$fetched = $current->fetch($user->id);
 		}
