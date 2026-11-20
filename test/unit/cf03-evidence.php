@@ -79,11 +79,45 @@ evStop(static function()use($symlink,$private,$doc,$source) {
 $open=$root.'/open';
 evOk(mkdir($open,0777),'create root to deny');
 chmod($open,0755);
-evStop(static function()use($open,$doc,$source){
-    Cf03Evidence::privateRoot($open,'D',$doc,$source);
-},'CF03EvidenceRootNotPrivate');
+// The historic defect accepted a public A/B/C parent while D STOPped.
+foreach (array('A','B','C','D') as $envName) {
+    foreach (array(0777,0770,0755) as $permissions) {
+        chmod($open,$permissions);
+        clearstatcache(true,$open);
+        evStop(static function()use($open,$envName,$doc,$source) {
+            Cf03Evidence::privateRoot($open,$envName,$doc,$source);
+        },'CF03EvidenceRootNotPrivate');
+    }
+    chmod($open,0700);
+    clearstatcache(true,$open);
+    Cf03Evidence::privateRoot($open,$envName,$doc,$source);
+    evOk(true,'private evidence parent allowed '.$envName);
+}
+
+// Simulate DB failure AFTER a valid case is permanently sealed.
+// A later verify for the same case MUST STOP before any external DB work.
+$retry=$private.'/cf03-d-testcase08';
+Cf03Evidence::directory($retry,true,'D',$private,$doc,$source);
+Cf03Evidence::json($retry,'baseline.json',array('case'=>'CF03','environment'=>'D'));
+Cf03Evidence::exclusive($retry,'baseline.sha256',
+    hash_file('sha256',$retry.'/baseline.json')."\n");
+try {
+    Cf03Evidence::startVerify($retry,'D',$private,$doc,$source,
+        static function($baseline) {
+            evOk($baseline['environment']==='D','preflight-free verify admitted');
+        });
+    throw new RuntimeException('CF03DatabaseReadUnavailable');
+} catch (RuntimeException $failure) {
+    evOk($failure->getMessage()==='CF03DatabaseReadUnavailable',
+        'external DB failure simulated after marker');
+}
+evOk(is_file($retry.'/verify.started'),'verify attempt sealed before DB failure');
+evStop(static function()use($retry,$private,$doc,$source){
+    Cf03Evidence::startVerify($retry,'D',$private,$doc,$source,
+        static function($baseline) { evOk(true,'unexpected second admission'); });
+},'CF03EvidenceExistsNoRetry');
 unlink($symlink);
-foreach (array($dir,$other) as $d) {
+foreach (array($dir,$other,$retry) as $d) {
     foreach (scandir($d) as $f) {
         if($f!=='.' && $f!=='..') { unlink($d.'/'.$f); }
     }
