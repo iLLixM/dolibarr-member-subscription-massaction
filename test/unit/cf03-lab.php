@@ -25,9 +25,15 @@ function c3config($id,$scenario='contribution',$agenda='on')
 {
     $e=Cf03LabContract::environments()[$id];
     $marker='CF03LAB-'.$id.'-ABCDEF123';
-    return array('scenario'=>$scenario,'member_id'=>271,'member_ref'=>'MEM2611-0271',
+    $config=array('scenario'=>$scenario,'member_id'=>271,'member_ref'=>'MEM2611-0271',
         'marker'=>$marker,'start'=>'2080-01-01','end'=>'2080-12-31',
         'amount'=>'120.00','agenda'=>$agenda);
+    if ($scenario==='invoice-existing') {
+        $config['invoice']=array('date'=>'2026-11-20','quantity'=>1.0,
+            'product'=>0,'vat'=>0.0,'term'=>1,'payment_mode'=>0,
+            'bank'=>0,'currency'=>'EUR');
+    }
+    return $config;
 }
 function c3make($id,$scenario,$agenda)
 {
@@ -50,11 +56,18 @@ function c3make($id,$scenario,$agenda)
         'deployed_source_hashes'=>array('product'=>str_repeat('f',64)),
         'deployment_kind'=>$id==='D'?'verified_deployed_copy':'source_checkout',
         'core_source_hashes'=>array('core'=>str_repeat('e',64)),
+        'schema_columns'=>Cf03LabContract::columnPolicy(),
         'config_sha256'=>str_repeat('c',64),
         'performance_schema'=>$env['ps']==='select'?'select_allowed':
             ($env['ps']==='denied'?'select_denied_1142':'not_required'),
         'agenda_enabled'=>$agenda==='on',
         'customer_exists'=>$scenario==='invoice-existing',
+        'customer'=>$scenario==='invoice-existing'
+            ? array('id'=>5,'entity'=>1,'client'=>1):null,
+        'invoice_agenda_flags'=>array('BILL_CREATE'=>false,
+            'BILL_VALIDATE'=>$agenda==='on','LINEBILL_INSERT'=>false),
+        'invoice_agenda_supported'=>true,
+        'invoice_agenda_events'=>array(),'invoice_agenda_resources'=>array(),
         'member'=>$m,'subscriptions'=>array(),
         'agenda_events'=>array(),'agenda_resources'=>array(),
         'invoices'=>array(),
@@ -76,13 +89,20 @@ function c3make($id,$scenario,$agenda)
         }
         if ($scenario==='invoice-existing') {
             $after['invoices'][]=array('id'=>60,'subscription_id'=>57,'fk_soc'=>5,
-                'entity'=>1,'type'=>0,'status'=>1,'paid'=>0,
+                'entity'=>1,'type'=>0,'status'=>1,'paid'=>0,'date'=>'2026-11-20',
+                'term'=>1,'payment_mode'=>0,'bank'=>0,'currency'=>'EUR',
                 'ref'=>'F-00060','total'=>'120.00',
-                'lines'=>array(array('id'=>61,'total'=>'120.00','marker'=>true)));
+                'lines'=>array(array('id'=>61,'total'=>'120.00','marker'=>true,
+                    'quantity'=>1.0,'product'=>0,'product_type'=>1,'vat'=>'0.0',
+                    'date_start'=>'2080-01-01 00:00:00')));
             foreach (array('facture','facturedet','element_element') as $name) {
                 $after['counts'][$name]++;
             }
             if ($agenda==='on') {
+                $after['invoice_agenda_events'][]=array('id'=>52,
+                    'code'=>'AC_BILL_VALIDATE','invoice_id'=>60);
+                $after['invoice_agenda_resources'][]=array('id'=>53,
+                    'agenda_id'=>52,'element_type'=>'user','actor_id'=>4);
                 $after['counts']['actioncomm']++;
                 $after['counts']['actioncomm_resources']++;
             }
@@ -125,6 +145,13 @@ c3stop(static function() {
 c3stop(static function() {
     Cf03LabContract::assertCoreVersion('22.0.5',null);
 },'unreadable version denied');
+// Prevent SQL drift before a live selected-table witness.
+$columns=Cf03LabContract::columnPolicy();
+Cf03LabContract::columnsComplete($columns);
+c3ok(true,'V22/V24 schema projection present');
+unset($columns['facturedet'][array_search('qty',$columns['facturedet'],true)]);
+c3stop(static function()use($columns){Cf03LabContract::columnsComplete($columns);},
+    'missing invoice quantity column rejected');
 $environments=Cf03LabContract::environments();
 c3ok(count($environments)===4,'four environments');
 c3ok($environments['A']['document_root']===$environments['C']['document_root']
@@ -195,6 +222,27 @@ $wrong=$after;$wrong['source_hashes']['php']=str_repeat('d',64);
         c3stop(static function()use($before,$wrong,$e,$id){
             Cf03LabContract::verify($before,$wrong,$e,$id);
         },'invoice marker');
+        $wrong=$after;$wrong['invoices'][0]['currency']='USD';
+        c3stop(static function()use($before,$wrong,$e,$id){
+            Cf03LabContract::verify($before,$wrong,$e,$id);
+        },'invoice currency mismatch');
+        $wrong=$after;$wrong['invoices'][0]['lines'][0]['quantity']=2.0;
+        c3stop(static function()use($before,$wrong,$e,$id){
+            Cf03LabContract::verify($before,$wrong,$e,$id);
+        },'invoice quantity mismatch');
+        $wrong=$after;$wrong['counts']['actioncomm']++;
+        c3stop(static function()use($before,$wrong,$e,$id){
+            Cf03LabContract::verify($before,$wrong,$e,$id);
+        },'unexplained invoice Agenda count denied');
+        $wrong=$after;$wrong['invoice_agenda_events'][]=array('id'=>60,
+            'code'=>'AC_BILL_CREATE','invoice_id'=>60);
+        c3stop(static function()use($before,$wrong,$e,$id){
+            Cf03LabContract::verify($before,$wrong,$e,$id);
+        },'unknown invoice Agenda event');
+        $wrong=$before;$wrong['invoice_agenda_supported']=false;
+        c3stop(static function()use($wrong,$e,$id){
+            Cf03LabContract::baseline($wrong,$e,$id);
+        },'unattributed line bill trigger denied');
         $wrong=$after;$wrong['invoices'][0]['fk_soc']=66;
         c3stop(static function()use($before,$wrong,$e,$id){
             Cf03LabContract::verify($before,$wrong,$e,$id);
