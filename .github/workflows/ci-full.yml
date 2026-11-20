@@ -100,6 +100,7 @@ jobs:
           php test/unit/cf02-contribution-witness.php
           php test/unit/cf03-lab.php
           php test/unit/cf03-evidence.php
+          php test/unit/cf03-source.php
           php test/unit/coreguarded-session.php
           node test/unit/loading.js
       - uses: actions/checkout@v4
