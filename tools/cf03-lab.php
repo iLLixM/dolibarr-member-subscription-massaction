@@ -42,6 +42,9 @@ function cf03Configure($id,array $env)
     $root=realpath($env['document_root']);
     Cf03LabContract::need($root!==false && is_file($root.'/conf/conf.php'),
         'CF03WrongDolibarrRoot');
+    // Bind the effective CLI runtime for this real A-D profile; the web
+    // worker's own runtime is separately attested by the Owner.
+    $phpMajorMinor=Cf03LabContract::assertPhpRuntime($id,PHP_VERSION);
     $versionPath=Cf03LabContract::versionSource($env['core_version']);
     Cf03LabContract::need(is_file($root.'/'.$versionPath)
         && !is_link($root.'/'.$versionPath),'CF03CoreVersionSourceUnavailable');
@@ -175,6 +178,7 @@ function cf03Configure($id,array $env)
         'config_sha256'=>hash_file('sha256',$root.'/conf/conf.php'),
         'dolibarr_version'=>$env['core_version'],
         'php_version'=>PHP_VERSION,
+        'php_major_minor'=>$phpMajorMinor,
         'module_directory'=>$module);
     return array($db,$out);
 }
@@ -346,6 +350,8 @@ function cf03State($db,array $context,array $expected)
         'core_source_hashes'=>$context['core_source_hashes'],
         'schema_columns'=>$context['schema_columns'],
         'config_sha256'=>$context['config_sha256'],
+        'php_version'=>$context['php_version'],
+        'php_major_minor'=>$context['php_major_minor'],
         'performance_schema'=>$context['performance_schema'],
         'member'=>array('id'=>(int)$m['rowid'],'ref'=>$m['ref'],
             'firstname'=>$m['firstname'],'lastname'=>$m['lastname'],
@@ -409,6 +415,7 @@ try {
             'version'=>$context['identity']['version'],
             'core_version'=>$context['dolibarr_version'],
             'php_version'=>$context['php_version'],
+            'php_major_minor'=>$context['php_major_minor'],
             'ps'=>$context['performance_schema'],
             'profile_sha256'=>$context['profile']['raw_hash'],
             'config_sha256'=>$context['config_sha256'],
