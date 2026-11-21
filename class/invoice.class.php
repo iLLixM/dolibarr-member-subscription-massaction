@@ -91,8 +91,12 @@ class MsmInvoiceService
 			if ($customerid <= 0) { throw new RuntimeException('MSMInvoiceFailed'); }
 		}
 		$customer = $this->customer();
-		if ($customer->fetch($customerid) <= 0 || (int) $customer->entity !== $plan['entity']) { throw new RuntimeException('MSMConsistencyError'); }
+		$this->owned(); // Before the Core customer readback.
+		$customerFetched = $customer->fetch($customerid);
+		$this->owned(); // Do not issue the member-link SELECT after lost ownership.
+		if ($customerFetched <= 0 || (int) $customer->entity !== $plan['entity']) { throw new RuntimeException('MSMConsistencyError'); }
 		$link = $this->one('SELECT fk_soc FROM '.$this->db->prefix().'adherent WHERE rowid = '.((int) $member->id));
+		$this->owned(); // Before moving on to invoice creation.
 		if (!$link || (int) $link->fk_soc !== $customerid) { throw new RuntimeException('MSMConsistencyError'); }
 		$member->socid = $member->fk_soc = $customerid; $member->thirdparty = $customer;
 		$invoice = $this->invoice();
@@ -127,10 +131,15 @@ class MsmInvoiceService
 	protected function verify($id, $customer, $subscription, array $row)
 	{
 		$p = $row['invoice'];
+		$this->owned();
 		$invoice = $this->one('SELECT entity, fk_soc, type, fk_statut, paye, total_ttc, ref, datef, fk_cond_reglement, fk_mode_reglement, fk_account, multicurrency_code FROM '.$this->db->prefix().'facture WHERE rowid = '.((int) $id));
+		$this->owned(); // Invoice row readback cannot authorize the next SELECT.
 		$line = $this->one('SELECT COUNT(*) AS n, SUM(qty) AS qty, SUM(total_ttc) AS total, MAX(description) AS description, MAX(fk_product) AS product, MAX(product_type) AS product_type, MAX(tva_tx) AS vat, MAX(date_start) AS date_start FROM '.$this->db->prefix().'facturedet WHERE fk_facture = '.((int) $id));
+		$this->owned(); // Line readback cannot authorize the next SELECT.
 		$link = $this->one("SELECT COUNT(*) AS n FROM ".$this->db->prefix()."element_element WHERE sourcetype = 'subscription' AND targettype = 'facture' AND fk_source = ".((int) $subscription).' AND fk_target = '.((int) $id));
+		$this->owned(); // Link readback cannot authorize the next SELECT.
 		$party = $this->one('SELECT client FROM '.$this->db->prefix().'societe WHERE rowid = '.((int) $customer));
+		$this->owned(); // Party readback must be checked before any further Core API.
 		if (!$invoice || (int) $invoice->entity !== $p['entity'] || (int) $invoice->fk_soc !== $customer || (int) $invoice->type !== 0
 			|| (int) $invoice->fk_statut !== 1 || (int) $invoice->paye !== 0 || !$invoice->ref || strpos($invoice->ref, 'PROV') !== false
 			|| abs((float) $invoice->total_ttc - $row['amount']) > 0.00000001

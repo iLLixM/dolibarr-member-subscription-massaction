@@ -157,11 +157,11 @@ class MsmBookingService
 	/** Only these observed, non-SQL business failures allow an owned Core rollback. */
 	protected function coreGuardedBusinessRollbackAllowed(Throwable $e, $stage = 'preflight')
 	{
-		// CF05-04 has not qualified any invoice/customer rollback origin. A generic
-		// message such as MSMConsistencyError can arise after invoice Core calls;
-		// its prior contribution-only qualification MUST NOT transfer to them.
-		if (in_array($stage, array('customer', 'invoice_create', 'invoice_line',
-			'invoice_validate', 'invoice_postconditions'), true)) { return false; }
+		// CF05-04 has not qualified invoice/customer error origins. Fail closed
+		// for all unrecognized/future stages, not only the currently named
+		// invoice stages; a generic MSMConsistencyError must not leak a
+		// contribution-only rollback qualification into financial operations.
+		if (!in_array($stage, array('preflight', 'subscription'), true)) { return false; }
 		return in_array($e->getMessage(), array('MSMChangedConfirmation', 'NotEnoughPermissions', 'MSMTransactionUnsupported', 'MSMConsistencyError'), true);
 	}
 	private function rollbackOwned($coreGuarded = false)

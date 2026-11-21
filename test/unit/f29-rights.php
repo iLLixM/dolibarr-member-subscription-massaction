@@ -60,7 +60,7 @@ require_once __DIR__.'/../../class/booking.class.php';
 class F29BookingProbe extends MsmBookingService
 {
     public function reload($user, $strict) { return $this->currentUser($user, $strict); }
-    public function mayRollback(Throwable $e) { return $this->coreGuardedBusinessRollbackAllowed($e); }
+    public function mayRollback(Throwable $e, $stage = 'preflight') { return $this->coreGuardedBusinessRollbackAllowed($e, $stage); }
 }
 $passed = 0;
 function f29Verify($yes, $label) { global $passed; if (!$yes) { throw new RuntimeException('FAIL: '.$label); } ++$passed; }
@@ -81,6 +81,27 @@ f29Verify($loaded instanceof User && $loaded->db === $db
     && $db->calls === array('user','group'), 'same real DoliDB restored on successful strict reload');
 f29Verify($service->mayRollback(new RuntimeException('NotEnoughPermissions')), 'normal permission refusal still qualified');
 f29Verify(!$service->mayRollback(new RuntimeException('MSMTransactionUnknown')), 'SQL failure forbids any business rollback');
+// CF05 F34-01: a qualified contribution/preflight business error must not
+// become a blanket CoreGuarded rollback permission at invoice/customer stages.
+foreach (array('preflight', 'subscription') as $stage) {
+    foreach (array('MSMChangedConfirmation', 'NotEnoughPermissions', 'MSMTransactionUnsupported', 'MSMConsistencyError') as $reason) {
+        f29Verify($service->mayRollback(new RuntimeException($reason), $stage),
+            'qualified pre-invoice business reason '.$reason.' at '.$stage);
+    }
+}
+foreach (array('customer', 'invoice_create', 'invoice_line', 'invoice_validate',
+    'invoice_postconditions', 'commit', 'future_financial_stage') as $stage) {
+    foreach (array('MSMConsistencyError', 'NotEnoughPermissions', 'MSMChangedConfirmation',
+        'MSMTransactionUnsupported', 'MSMInvoiceFailed') as $reason) {
+        f29Verify(!$service->mayRollback(new RuntimeException($reason), $stage),
+            'unqualified finance/future stage rejects Core rollback '.$stage.'/'.$reason);
+    }
+}
+foreach (array('SubscriptionBulkDatabaseError', 'MSMTransactionUnknown',
+    'MSMInvoiceFailed', 'MSMDatabaseObservationUnavailable') as $reason) {
+    f29Verify(!$service->mayRollback(new RuntimeException($reason), 'subscription'),
+        'unclassified SQL/transport/invoice reason has no Core rollback '.$reason);
+}
 foreach (array(0 => 'missing', -1 => 'SQL error', -3 => 'nested fetch error') as $ret => $description) {
     list($db,$service,$caller)=f29Fixture(); User::$result=$ret;
     f29Fails(static function()use($service,$caller){$service->reload($caller,true);},
