@@ -1,6 +1,20 @@
 name: Module subscriptions - Full regression
 on:
   workflow_dispatch:
+  # Full 21-job verification is mandatory for security-critical Phase 4 paths.
+  # Keep the nine-job standard PR CI for all unrelated changes.
+  pull_request:
+    paths:
+      - 'class/mail.class.php'
+      - 'class/invoicepdf.class.php'
+      - 'class/filebookingcheckpoint.class.php'
+      - 'lib/booking.lib.php'
+      - 'lib/booking_renderer.lib.php'
+      - 'test/unit/cf05-finance.php'
+      - 'test/unit/maildelivery.php'
+      - 'test/unit/postcommit.php'
+      - 'test/unit/invoicepdf.php'
+      - '.github/workflows/ci-full.yml'
 permissions:
   contents: read
 jobs:

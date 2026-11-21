@@ -117,18 +117,29 @@ class Cf05ProductionGateBooking extends Cf05FinanceBooking
 }
 class Cf05FinancePdfSpy
 {
-	public $calls=0;
+	public $calls=0; public $status='verified';
 	public function generate($identity,$user) {
 		$this->calls++;
-		return array('status'=>'verified','message'=>'MSMPdfVerified');
+		return array('status'=>$this->status,
+			'message'=>$this->status==='verified'?'MSMPdfVerified':'MSMPdfUnknown',
+			'name'=>'SYNTHETIC.pdf','size'=>32,'mtime'=>1791590400,
+			'sha256'=>str_repeat('a',64));
 	}
 }
 class Cf05FinanceMailSpy
 {
-	public $calls=0;
+	public $calls=0; public $status='transport';
+	public function sendWithEvidence($member,$row,$user,$selected,$invoice=null) {
+		$this->calls++;
+		$status=$selected?$this->status:'not_selected';
+		return array('mail'=>$status,
+			'attachment'=>$invoice===null?'not_required':
+				($status==='transport'?'verified_for_transport':
+					($status==='hook'?'verified_before_hook':($status==='unknown'?'unknown':'not_sent'))));
+	}
 	public function send($member,$row,$user,$selected,$invoice=null) {
 		$this->calls++;
-		return $selected ? 'transport' : 'not_selected';
+		return $selected?$this->status:'not_selected';
 	}
 }
 $cf05Tmp=sys_get_temp_dir().'/cf05-finance-'.bin2hex(random_bytes(12));
@@ -154,7 +165,9 @@ try {
 		array('name'=>'customer_fail','autocreate'=>true,'mode'=>'customer','change'=>false,'expected'=>'unknown'),
 		array('name'=>'invoice_create_fail','autocreate'=>true,'mode'=>'create','change'=>false,'expected'=>'unknown'),
 		array('name'=>'invoice_validate_fail','autocreate'=>true,'mode'=>'validate','change'=>false,'expected'=>'unknown'),
-		array('name'=>'invoice_depth','autocreate'=>true,'mode'=>'depth','change'=>false,'expected'=>'unknown')
+		array('name'=>'invoice_depth','autocreate'=>true,'mode'=>'depth','change'=>false,'expected'=>'unknown'),
+		array('name'=>'pdf_unknown','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success','pdf_status'=>'unknown'),
+		array('name'=>'mail_unknown','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success','mail_status'=>'unknown')
 	) as $case) {
 		$db=new Cf05FinanceDb(); $db->family='mysql'; $db->profileRaw=json_encode(array(
 			'version'=>1,'family'=>'mysql','profile'=>'CoreGuarded','nonce'=>str_repeat('b',32)));
@@ -183,9 +196,13 @@ try {
 		$sessionid='cf05'.bin2hex(random_bytes(8));
 		session_id($sessionid);
 		verify(session_start(),'CF05 local session start '.$case['name']);
+		$expectStop=isset($case['pdf_status'])||isset($case['mail_status']);
+		$ids=$expectStop?array(1,2):array(1);
+		$rows=$expectStop?array(1=>$row,2=>$row):array(1=>$row);
 		$state=array('phase'=>'confirm','revision'=>5,'owner'=>$user->id,'entity'=>1,
-			'ids'=>array(1),'profile'=>$binding,'options'=>$options,'rows'=>array(1=>$row),
-			'results'=>array(1=>array('status'=>'unknown','stop'=>false)),'overlap'=>array());
+			'ids'=>$ids,'profile'=>$binding,'options'=>$options,'rows'=>$rows,
+			'results'=>array(1=>array('status'=>'unknown','stop'=>false),
+				2=>array('status'=>'unknown','stop'=>false)),'overlap'=>array());
 		$_SESSION=array('msm_previews'=>array($key=>$state));
 		$checkpoint=new MsmFileBookingCheckpoint($key);
 		verify(session_write_close(),'CF05 persisted original confirm '.$case['name']);
@@ -206,6 +223,8 @@ try {
 			&& !$db->events && !$db->calls && $db->transaction_opened===0 && $db->saved===null,
 			'F36-01 production Booking denies fully confirmed CoreGuarded finance without any write '.$case['name']);
 		$pdf=new Cf05FinancePdfSpy(); $mail=new Cf05FinanceMailSpy();
+		if (isset($case['pdf_status'])) { $pdf->status=$case['pdf_status']; }
+		if (isset($case['mail_status'])) { $mail->status=$case['mail_status']; }
 		$done=msmProcessBooking($state,$flow,$mail,$user,$checkpoint,$pdf);
 		$r=$done['results'][1];
 		verify($r['status']===$case['expected'],'CF05 expected booking status '.$case['name']);
@@ -215,9 +234,26 @@ try {
 			verify(!$r['stop'] && ($r['completion'] ?? '')==='nonterminal_acknowledged'
 				&& ($r['invoice']['id'] ?? null)===42 && ($r['invoice']['customer_created'] ?? null)===$case['autocreate'],
 				'CF05 one guarded financial flow with confirmed nonterminal completion '.$case['name']);
-			verify($pdf->calls===1 && $mail->calls===1
-				&& ($r['invoice']['pdf']['status'] ?? '')==='verified' && $r['mail']==='transport',
-				'CF05 persisted PDF/mail effects only after accepted completion '.$case['name']);
+			if ($expectStop) {
+				verify($done['batch_stop'] && $done['results'][2]['status']==='not_processed'
+					&& $pdf->calls===1 && $db->transaction_opened===0
+					&& count(array_keys($db->events,'subscription',true))===1,
+					'CF05 Phase4 ambiguous postcommit effect stops next member without rollback '.$case['name']);
+				if (isset($case['pdf_status'])) {
+					verify($r['invoice']['pdf']['status']==='unknown' && $r['mail']==='not_processed'
+						&& $r['attachment_status']==='not_processed' && $mail->calls===0,
+						'CF05 Phase4 PDF uncertainty prevents SMTP and preserves file status');
+				} else {
+					verify($r['invoice']['pdf']['status']==='verified' && $r['mail']==='unknown'
+						&& $r['attachment_status']==='unknown' && $mail->calls===1,
+						'CF05 Phase4 uncertain SMTP preserves verified PDF and unknown attachment separately');
+				}
+			} else {
+				verify($pdf->calls===1 && $mail->calls===1
+					&& ($r['invoice']['pdf']['status'] ?? '')==='verified'
+					&& $r['mail']==='transport' && $r['attachment_status']==='verified_for_transport',
+					'CF05 Phase4 completion, verified PDF, attachment and mail evidence separate '.$case['name']);
+			}
 			verify($db->transaction_opened===0 && !in_array('rollback',$db->events,true),
 				'CF05 no second transaction owner '.$case['name']);
 		} elseif ($case['expected']==='failed') {
@@ -233,6 +269,11 @@ try {
 		verify(($_SESSION['msm_previews'][$key]['phase'] ?? null)==='done'
 			&& ($_SESSION['msm_previews'][$key]['results'][1]['status'] ?? null)===$case['expected'],
 			'CF05 durable terminal result no replay '.$case['name']);
+		if ($expectStop) {
+			verify(($_SESSION['msm_previews'][$key]['results'][2]['status'] ?? null)==='not_processed'
+				&& !empty($_SESSION['msm_previews'][$key]['batch_stop']),
+				'CF05 Phase4 postcommit ambiguity persisted before any next member');
+		}
 		session_destroy(); session_write_close();
 		@unlink($cf05Tmp.'/sess_'.$sessionid);
 	}
