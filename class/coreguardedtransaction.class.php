@@ -13,7 +13,7 @@ class MsmCoreGuardedEntryRejected extends RuntimeException {}
  * owner and calls Dolibarr's begin/commit/rollback. The accepted ADR-12 blind spots
  * are not represented as physical identity or Performance Schema evidence.
  */
-class MsmCoreGuardedTransaction
+class MsmCoreGuardedTransaction implements MsmActiveTransactionGuard
 {
 	private $db;
 	private $handle;

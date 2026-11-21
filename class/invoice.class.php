@@ -5,15 +5,20 @@
 require_once __DIR__.'/invoiceprofile.class.php';
 require_once __DIR__.'/databasestate.class.php';
 require_once __DIR__.'/transactionprofile.class.php';
+require_once __DIR__.'/coreguardedtransaction.class.php';
 /** Core business APIs only; the caller owns the outer transaction. */
 class MsmInvoiceService
 {
 	protected $db;
 	protected $databaseState;
-	public function __construct($db, MsmDatabaseState $databaseState = null)
+	/** The active guard is explicitly injected, never constructed or inferred here. */
+	protected $activeGuard;
+	public function __construct($db, MsmDatabaseState $databaseState, MsmActiveTransactionGuard $activeGuard)
 	{
-		$this->db = $db; $this->databaseState = $databaseState ?? new MsmDatabaseState($db);
-		if (!$this->databaseState->isFor($db)) { throw new InvalidArgumentException('MSMDatabaseUnsupported'); }
+		$this->db = $db; $this->databaseState = $databaseState; $this->activeGuard = $activeGuard;
+		if (!$this->databaseState->isFor($db) || !$this->activeGuard->isFor($db)) {
+			throw new InvalidArgumentException('MSMDatabaseUnsupported');
+		}
 	}
 	protected function one($sql)
 	{
@@ -41,9 +46,9 @@ class MsmInvoiceService
 	/** Check after every nested API call, before any further business operation. */
 	protected function owned()
 	{
-		$state = $this->databaseState->active();
+		$state = $this->activeGuard->active();
 		if ($state['state'] !== MsmDatabaseState::ACTIVE || !$state['fresh'] || !$state['owned']) { throw new RuntimeException('MSMTransactionUnknown'); }
-		$this->databaseState->requireSupportedIsolation($state);
+		$this->activeGuard->requireSupportedIsolation($state);
 	}
 	/** Encode confirmed plain text once for the HTML-capable Core invoice-line field. */
 	protected function invoiceDescription($description)
@@ -57,6 +62,14 @@ class MsmInvoiceService
 		$profile = new MsmTransactionProfile($this->db, $this->databaseState, (int) $conf->entity);
 		$current = $profile->current();
 		if (empty($current['features']['invoice']) || $current['reason'] !== '') { throw new RuntimeException('MSMProfileFeatureUnavailable'); }
+		// An explicitly injected guard must match the authoritative profile.
+		// In particular, a future CoreGuarded feature admission must never
+		// fall back to an Enhanced/P_S observer at this direct-service boundary.
+		if ($current['profile'] === 'CoreGuarded') {
+			if (!($this->activeGuard instanceof MsmCoreGuardedTransaction)) { throw new RuntimeException('MSMTransactionUnknown'); }
+		} elseif (!($this->activeGuard instanceof MsmDatabaseState)) {
+			throw new RuntimeException('MSMTransactionUnknown');
+		}
 	}
 	public function create($member, $subscription, array $row, $actor, array &$diagnostic)
 	{
@@ -71,14 +84,19 @@ class MsmInvoiceService
 			$name = $member->morphy === 'mor' ? $member->company : $fullname;
 			$alias = $member->morphy === 'mor' ? $fullname : $member->company;
 			$previous = $user;
+			$this->owned(); // Before nested Core Societe::create_from_member().
 			try { $user = $actor; $customerid = $customer->create_from_member($member, $name, $alias); }
 			finally { $user = $previous; }
 			$diagnostic['customer_id'] = max(0, (int) $customerid); $this->owned();
 			if ($customerid <= 0) { throw new RuntimeException('MSMInvoiceFailed'); }
 		}
 		$customer = $this->customer();
-		if ($customer->fetch($customerid) <= 0 || (int) $customer->entity !== $plan['entity']) { throw new RuntimeException('MSMConsistencyError'); }
+		$this->owned(); // Before the Core customer readback.
+		$customerFetched = $customer->fetch($customerid);
+		$this->owned(); // Do not issue the member-link SELECT after lost ownership.
+		if ($customerFetched <= 0 || (int) $customer->entity !== $plan['entity']) { throw new RuntimeException('MSMConsistencyError'); }
 		$link = $this->one('SELECT fk_soc FROM '.$this->db->prefix().'adherent WHERE rowid = '.((int) $member->id));
+		$this->owned(); // Before moving on to invoice creation.
 		if (!$link || (int) $link->fk_soc !== $customerid) { throw new RuntimeException('MSMConsistencyError'); }
 		$member->socid = $member->fk_soc = $customerid; $member->thirdparty = $customer;
 		$invoice = $this->invoice();
@@ -92,15 +110,20 @@ class MsmInvoiceService
 		$id = $invoice->create($actor); $diagnostic['invoice_id'] = max(0, (int) $id); $this->owned();
 		if ($id <= 0) { throw new RuntimeException('MSMInvoiceFailed'); }
 		$diagnostic['stage'] = 'invoice_line';
+		$this->owned(); // Before nested Core Facture::addline().
 		$line = $invoice->addline($this->invoiceDescription($row['description']), 0, $plan['quantity'], $plan['vat'], 0, 0, $plan['product'], 0, $row['start'], '', 0, 0, 0, $plan['price_base'], $row['amount'], $plan['type']);
 		$this->owned(); if ($line <= 0) { throw new RuntimeException('MSMInvoiceFailed'); }
 		$diagnostic['stage'] = 'invoice_validate';
+		$this->owned(); // Before nested Core Facture::validate().
 		$validated = $invoice->validate($actor); $this->owned();
 		if ($validated <= 0) { throw new RuntimeException('MSMInvoiceFailed'); }
 		$diagnostic['stage'] = 'invoice_postconditions';
+		$this->owned(); // Prevent further SQL if the last Core API changed context.
 		$this->verify($id, $customerid, $subscription, $row);
+		$this->owned(); // Persisted row checks must not redeem lost ownership.
 		$stored = $this->invoice();
 		if ($stored->fetch($id) <= 0) { throw new RuntimeException('MSMConsistencyError'); }
+		$this->owned();
 		return array('id' => (int) $id, 'ref' => (string) $stored->ref, 'entity' => $plan['entity'], 'customer_id' => $customerid,
 			'customer_created' => $plan['create_customer'], 'subscription_id' => (int) $subscription, 'member_id' => (int) $member->id,
 			'pdf_model' => $plan['pdf_model'], 'pdf' => 'pending');
@@ -108,10 +131,15 @@ class MsmInvoiceService
 	protected function verify($id, $customer, $subscription, array $row)
 	{
 		$p = $row['invoice'];
+		$this->owned();
 		$invoice = $this->one('SELECT entity, fk_soc, type, fk_statut, paye, total_ttc, ref, datef, fk_cond_reglement, fk_mode_reglement, fk_account, multicurrency_code FROM '.$this->db->prefix().'facture WHERE rowid = '.((int) $id));
+		$this->owned(); // Invoice row readback cannot authorize the next SELECT.
 		$line = $this->one('SELECT COUNT(*) AS n, SUM(qty) AS qty, SUM(total_ttc) AS total, MAX(description) AS description, MAX(fk_product) AS product, MAX(product_type) AS product_type, MAX(tva_tx) AS vat, MAX(date_start) AS date_start FROM '.$this->db->prefix().'facturedet WHERE fk_facture = '.((int) $id));
+		$this->owned(); // Line readback cannot authorize the next SELECT.
 		$link = $this->one("SELECT COUNT(*) AS n FROM ".$this->db->prefix()."element_element WHERE sourcetype = 'subscription' AND targettype = 'facture' AND fk_source = ".((int) $subscription).' AND fk_target = '.((int) $id));
+		$this->owned(); // Link readback cannot authorize the next SELECT.
 		$party = $this->one('SELECT client FROM '.$this->db->prefix().'societe WHERE rowid = '.((int) $customer));
+		$this->owned(); // Party readback must be checked before any further Core API.
 		if (!$invoice || (int) $invoice->entity !== $p['entity'] || (int) $invoice->fk_soc !== $customer || (int) $invoice->type !== 0
 			|| (int) $invoice->fk_statut !== 1 || (int) $invoice->paye !== 0 || !$invoice->ref || strpos($invoice->ref, 'PROV') !== false
 			|| abs((float) $invoice->total_ttc - $row['amount']) > 0.00000001

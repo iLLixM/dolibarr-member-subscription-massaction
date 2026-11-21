@@ -2,13 +2,14 @@
 /* Copyright (C) 2026 iLLixM
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
+require_once __DIR__.'/activetransactionguard.class.php';
 /** Physical observation only. The caller owns DoliDB begin/commit/rollback.
  * MariaDB offers a status snapshot, NOT MySQL's event/checkpoint continuity.
  * Checkpoints are endpoint evidence, not continuous tracking or crash recovery.
  * Unknown ownership stays latched until this observer/connection is discarded.
  * FAILED (open, rollback-capable) and BUSY are reserved backend states; no PgSQL backend.
  */
-class MsmDatabaseState
+class MsmDatabaseState implements MsmActiveTransactionGuard
 {
 	const IDLE = 'IDLE';
 	const ACTIVE = 'ACTIVE';
