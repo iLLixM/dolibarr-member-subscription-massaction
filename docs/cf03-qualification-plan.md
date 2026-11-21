@@ -2,6 +2,24 @@
 
 Status updated 2026-11-21: **POS02-A1 and POS02-A2 in environment A TECHNICAL PASS / COMPLETED; F32-W01-01 code finding independently CLOSED**. Later real Owner test results supersede the historical Stage-0/1 `no live test` wording below; other CF03 gates remain OPEN. Source baseline: main `786f271240d230b90fad77fe1c3397d1ec796f81` (2026-11-20). The active PR HEAD must be pinned separately at the time of each test. Binding scope: [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22), [ADR-0001](adr/ADR-0001-core-first-transaction-profiles.md), D-01/D-02 and E01–E15.
 
+## Phase 1 consolidation and pending approval (2026-11-21)
+
+The current PR #32 privacy pass pseudonymizes historical working-tree
+documents, fixtures and experimental sources. This changes archived bytes,
+so earlier hash claims retain only their pinned historical commit meaning.
+Current CI detects known private identifiers in tracked text. The CF03
+evidence parent may have group/other read/traverse access but no
+group/other write access; private files now are protected at creation.
+The webroot/site-root/checkout exclusion applies to A/B/C/D. Operator
+verification of HTTP aliases and filesystem trust remains separate.
+
+POS02-A1/A2 are consolidated as the existing Owner TECHNICAL PASS on
+the earlier witness SHA; F32-W01-01 remains CLOSED. RB01-A is
+INVALID/STOP as rollback proof; no repeat or status uplift is allowed.
+Current-HEAD offline CI and an independent exact-HEAD scope/security
+review must precede Owner decision on this tool PR. No full CF03-NORMAL,
+CF03-FAULT, CF05 or release qualification is inferred.
+
 ## Aktuelle Realtest- und Review-Disposition (21.11.2026)
 
 - **Code F32-W01-01 – CLOSED** durch den [unabhängigen finalen Delta-Review](evidence/cf03/PR32-F32-W01-01-POS02-final-delta-review.md), auf Code-/Test-HEAD `e7b911b707508e439f9acbfad43f5fd55d34cc44`: `llx_adherent_type.statut=1` ist ACTIVE, `0` ist INACTIVE. Standard-CI 9/9 plus Hosted-CI 1/1 PASS auf diesem SHA.
