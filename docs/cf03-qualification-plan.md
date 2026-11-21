@@ -1,6 +1,12 @@
 # CF-03 — Qualification plan and binding A-D environment matrix
 
-## Current CF03 disposition after PR #32 squash merge (2026-11-21)
+## Current CF03 admission after PR #34 CF05-01/02 merge (2026-11-21)
+
+**CF05-01/02 implemented and independently reviewed:** [PR #34](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/34) SQUASH-MERGED as `dc7a172bfd476467d7980cbf16a2657cfc1e729c`, reviewed source `11d7dd3cf4bdcf831aa87782b7466d2378fc733f`; F34-01/P2 and F34-02/P3 CLOSED, [9/9 synthetic CI PASS](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44948777072). The injected profile-aware Invoice guard and per-readback checks **do not mean** CoreGuarded financial options have been enabled. **CF05-03..07 and full CF03-NORMAL A–D remain OPEN**; no new authenticated invoice/customer/PDF/mail, real V23, 21-job release CI or exact D ZIP PASS has been produced.
+
+F32-MR-01/P2 remains **OWNER ACCEPTED, NOT FIXED**: all new real A/B/C witness executions are blocked until private target-user launcher plus read-only preflight is demonstrated. A/C must be serialized; all real write cases require fresh one-shot fixtures and separate Owner GO. RB01-A remains INVALID/STOP as rollback evidence; no replay.
+
+## Current CF03 disposition after PR #32 squash merge (2026-11-21; historical PR32 checkpoint)
 
 [PR #32](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/32) **MERGED by squash** as `425980c43a51a9f27073133212f18825ac6da248`, independent final review source `cbc97843fb017135739a39ea12ef26c7fa66dfdb` (9/9 standard + 1/1 hosted CI PASS). Review: **CHANGES REQUIRED** for unconditional merge due to F32-MR-01/P2 and F32-MR-02/P3; both explicitly **Owner-accepted as limitations, not fixed**.
 

@@ -1,5 +1,15 @@
 # ADR-0001 — Core-first transaction profiles
 
+## Post-PR #34 implementation addendum (2026-11-21; no ADR strategy revision)
+
+The **binding Owner architecture remains the revised ADR-06 and ADR-11 below**, with unchanged ADR-01–05/07–10/12 and D-01/D-02 safeguards. This addendum records implementation status, **not a new product or risk-waiver decision**.
+
+**CF05-01/02 is IMPLEMENTED / INDEPENDENTLY APPROVED / SQUASH-MERGED** via [PR #34](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/34), reviewed HEAD `11d7dd3cf4bdcf831aa87782b7466d2378fc733f`, resulting `main` commit `dc7a172bfd476467d7980cbf16a2657cfc1e729c`. The shared minimal `MsmActiveTransactionGuard` binds to the **same original DoliDB**; Booking injects its *same selected active instance* into Invoice. DB-family/transactional-engine metadata stays on a distinct `MsmDatabaseState`; no new transaction owner or CoreGuarded P_S requirement is introduced. `owned()` checks bracket each Core customer/invoice create/line/validate operation and individually secure the customer/member/invoice persisted readbacks.
+
+**Fail-closed risk boundary:** `coreGuardedBusinessRollbackAllowed()` now admits only previously qualified `preflight`/`subscription` stages with previously qualified business error reasons. Customer, invoice, commit and unknown/future stages remain rollback-ineligible/UNKNOWN/STOP until separately qualified by **CF05-04**. Independent delta review: **F34-01/P2 CLOSED**, **F34-02/P3 CLOSED**, **0 new P0–P3**, `APPROVED FOR DEVELOPMENT MERGE`; [CI #44948777072](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44948777072) **9/9 SUCCESS** on the exact reviewed HEAD. This is synthetic source-specific evidence, **not** new real A–D or COMMIT-event identity proof.
+
+**Feature and release boundaries remain:** CoreGuarded invoice/auto-Third-Party/sendmail (and unqualified PDF path) still **disabled** in server-side admission; **CF05-03..07** and CF03-NORMAL/21-job release matrix/ZIP/D hosted/R0-04/R0-07/Owner release GO remain OPEN. Real CF03-FAULT remains DEFERRED/OPEN. Keep [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22) open. For source-to-design mapping see [CF05 shared guard design](../cf05-shared-guard-design.md).
+
 ## Binding 2026-11-21 Owner amendment — ADR-06 and ADR-11
 
 **Current authority: [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22).** This amendment *prospectively supersedes* the 2026-11-18 contribution-only permanent functional target and fault-inclusive release-test timing. The dated CF-00 architectural work below is **historical**; its D-01/D-02 transaction/security mechanisms and ADR-01–05/07–10/12 remain binding. Refer to the [current development baseline](../current-development-baseline.md) for the implementation/evidence matrix.

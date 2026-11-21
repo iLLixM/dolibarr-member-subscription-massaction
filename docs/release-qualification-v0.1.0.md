@@ -12,7 +12,8 @@ One installable `v0.1.0` ZIP, without any release-candidate suffix in final pack
 
 | Gate | Evidence to be produced | Status |
 | --- | --- | --- |
-| CF05-01..07 | Focused profile-shared active guard, full financial feature gates, classified errors/rollback, controlled post-commit PDF/mail, Core call-graph/engine qualification, synthetic regressions, exact-head independent security review, Owner acceptance | **OPEN: full feature not implemented** |
+| CF05-01/02 | Shared active guard, same-instance Booking→Invoice dependency, Core-operation/readback checks, conservative rollback-stage negative tests and independent exact-head review | **DEVELOPMENT COMPLETE: PR #34 squash-merged; F34-01/02 CLOSED; 9/9 synthetic CI PASS. NOT full finance admission** |
+| CF05-03..07 | Server-authoritative full financial feature gates, qualified customer/invoice error origins, controlled post-commit PDF/mail, real Core/engine/trigger audit, focused implementation/security review and Owner acceptance | **OPEN: full feature NOT implemented/qualified** |
 | CF03-NORMAL | New, individually Owner-authorized real success cases A–D across Agenda ON/OFF, invoice-existing/auto-Third-Party, line/validation/link, PDF, selected attachment/isolated SMTP, small successful batch and independent DB/FS/delivery reconciliation | **OPEN: not inherited from POS01/POS02** |
 | CF03-SECURITY-BASELINE | Retained negative/security/fault synthetic regression, authenticated safe replay/rights tests, **21-job PHP/Core CI**, profile/guard/NO_CHAIN/terminal STOP assertions, independent exact-HEAD code/evidence review | **OPEN for full-feature code** |
 | CF03-RISK | Independent comparison of detectable/undetectable transaction outcomes, weaker CoreGuarded financial-object risk, environment/extension assumptions and **separate Owner acceptance** | **OPEN** |
@@ -23,9 +24,11 @@ One installable `v0.1.0` ZIP, without any release-candidate suffix in final pack
 
 Real destructive tests remain deferred **without relaxing runtime safety**; the release still requires synthetic security/transaction fault coverage and safe authenticated negative tests.
 
-## Reusable but strictly historical evidence
+## Reusable development-only and strictly historical evidence
 
 - [PR #29](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/29) = CoreGuarded contribution-only implementation; owner-operated POS01-C PASS, not invoice-qualified.
+- **[PR #34](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/34) = current CF05-01/02 implemented development foundation**, squash merge `dc7a172bfd476467d7980cbf16a2657cfc1e729c`, reviewed source `11d7dd3cf4bdcf831aa87782b7466d2378fc733f`, independent `APPROVED FOR DEVELOPMENT MERGE`, F34-01/P2 and F34-02/P3 CLOSED, [9/9 CI PASS](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44948777072). **Not** a financial feature admission, new A–D business integration, 21-job release proof or release GO.
+- [PR #33](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/33) = historical documentation strategy synchronization, squash merge `d0d0fddd5797a1424eb004d541d8036511193ec6`; F33-DOC-03/P3 PARTIAL / OWNER ACCEPTED as a nonblocking old prose deviation, not runtime permission.
 - [PR #32](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/32) = read-only witness/privacy/CI infrastructure; **squash merged 2026-11-21** to `425980c43a51a9f27073133212f18825ac6da248`, reviewed head `cbc97843fb017135739a39ea12ef26c7fa66dfdb`; 9/9 + 1/1 CI PASS. Accepted F32-MR-01 launcher prerequisite **not yet tested**, accepted F32-MR-02 historic prose deviation. POS02-A1/A2 Owner TECHNICAL PASS; RB01-A INVALID as rollback proof.
 - [PR #19](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/19) = **closed without merge**. Its earlier `v0.1.0` ZIP and hash are historical preparation only and must never be treated as the qualified new release artifact.
 - [Historical validation](phase4-implementation-validation.md) = bounded V22/V24 invoice, browser, database and SMTP evidence on other source/profile combinations. Neither a production qualification nor a substitute for new CF05 full workflow acceptance.

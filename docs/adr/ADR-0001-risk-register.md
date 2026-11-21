@@ -1,5 +1,18 @@
 # ADR-0001 — Transaction profile risk register
 
+## CF05-01/02 post-merge risk disposition (2026-11-21)
+
+[PR #34](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/34) implemented and independently validated the **shared active guard and readback boundaries** on reviewed HEAD `11d7dd3cf4bdcf831aa87782b7466d2378fc733f`, squash-merged in `dc7a172bfd476467d7980cbf16a2657cfc1e729c`; [standard CI 9/9 PASS](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44948777072). F34-01/P2 (Rollback-stage/guard/profile negatives) and F34-02/P3 (per-readback ownership checks) are **CLOSED**, with **no new P0–P3 findings** in the targeted final review. The effective technical protections were improved; the original risks are not erased or called release-qualified.
+
+| Risk boundary | After PR #34 | Remaining mandatory gate |
+| --- | --- | --- |
+| Multiple Invoice/Third Party Core APIs under the wrong context | **Same** DoliDB-bound profile-active guard injected by Booking; before/after ownership checks at Core create/line/validate and persisted customer/invoice readbacks | **CF05-03/06** admission and real V22/V24/Agenda/trigger/InnoDB call-graph verification; CF03-NORMAL A–D |
+| Incorrect CoreGuarded financial rollback classification | Positive allowlist only for qualified `preflight`/`subscription` stages, other stages `UNKNOWN/STOP` with no blind rollback; negative tests independently accepted | **CF05-04** finite source-qualified financial rollback origins and integrated synthetic negative tests |
+| Unverified PDF/SMTP or ambiguous completion | **Not enabled** by guard refactor; terminal `CHAIN`/`RELEASE` and unknown remain STOP | **CF05-05** correct post-commit checkpoint and independent file/mail acceptance |
+| Observer/evidence asymmetry | No second transaction manager and no CoreGuarded P_S requirement. Enhanced and MariaDB retain their distinctive observation strengths | ADR-12 residual remains accepted, not physically equivalent; separate risk and release acceptance |
+
+**Inherited operations:** F32-MR-01/P2 remains **OWNER ACCEPTED / NOT FIXED**; future real A/B/C witness use remains prohibited before private target-user launcher and verified read-only preflight. F32-MR-02/P3 and F33-DOC-03/P3 remain separately recorded historical documentation limitations. No old POS/RB case replay, live finance or release GO follows from this development merge.
+
 ## Current risk disposition and new financial scope (2026-11-21)
 
 **Current authority: [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22)** and the [current development baseline](../current-development-baseline.md). ADR-06 and ADR-11 were revised *prospectively*: full contribution/Third Party/invoice/PDF/mail is a **v0.1.0 delivery objective on all three profiles**, not current CoreGuarded implementation. The historical R01–R15 analyses below remain valuable but their `U` and `G` labels, prior contribution-only limit and 2026-11-18 fault timing must not be read as newer Owner policy. None is silently upgraded to PASS.
