@@ -4,7 +4,7 @@
 
 ## What is implemented, what is intended
 
-**Current development state:** PR #29 delivered bounded CoreGuarded contribution-only booking; PR #32 read-only CF03-W01 witness/CI/evidence infrastructure; PR #33 the documentation strategy baseline; **PR #34 merged CF05-01/02, the shared active Booking→Invoice guard, customer/invoice Core API checkpoints and individually guarded readbacks**. Earlier EnhancedMySQL and MariaDBSnapshot financial paths retain their historically admitted limits. **The full CoreGuarded finance flow is still NOT admitted**; none of the three profiles has fresh complete CF05-normal-case release qualification.
+**Current development state (post-PR35 main; PR36 draft correction not merged):** PR #29 delivered bounded CoreGuarded contribution-only booking; PR #32 read-only CF03-W01 witness/CI/evidence infrastructure; PR #33 the documentation strategy baseline; **PR #34 merged CF05-01/02, the shared active Booking→Invoice guard, customer/invoice Core API checkpoints and individually guarded readbacks**. Earlier EnhancedMySQL and MariaDBSnapshot financial paths retain their historically admitted limits. **PR #36** adds CoreGuarded customer/invoice error provenance and post-commit PDF/mail implementation but is **OPEN/DRAFT / independent follow-up pending**. Its **F36-01/P1** preliminary correction restores a **production-default-closed** feature gate; **F36-02/P2** tracks the conditional Dolibarr V22/V24 `Facture::validate()` PROV-directory rename before the outer Core COMMIT. This is a CF05-06 qualification requirement before financial admission, **not** currently demonstrated impact in the fresh-invoice path. **The full CoreGuarded finance flow is still NOT admitted**; none of the three profiles has fresh complete CF05-normal-case release qualification.
 
 **Release target v0.1.0:** full member bulk-subscription massaction with the **same business capability in CoreGuarded, EnhancedMySQL and MariaDBSnapshot**, under profile-specific observation strengths and exact qualifying environments.
 
@@ -12,7 +12,7 @@
 | --- | --- | --- |
 | Preview, eligibility, server-held confirmation and member selection | Required | Existing, read-only preview is not booking permission |
 | Contribution, member R16 end and configured standard Agenda | Required | CoreGuarded contribution-only development implementation; POS01-C/POS02-A1/A2 bounded real positives |
-| Existing Third Party invoice | Optional when confirmed | Historical B/C path, guarded by the merged CF05-01/02 shared active interface; **CoreGuarded feature remains disabled pending CF05-03..07** |
+| Existing Third Party invoice | Optional when confirmed | Historical B/C path; draft PR #36 implements CoreGuarded finance behind a **server-default-denied** qualification gate (F36-01 correction unreviewed); CF05-06/07 and owner admission still OPEN |
 | Create Third Party | Optional **only together with selected invoice** | Shared active guard and before/after `Societe::create_from_member()` boundary now implemented; still requires CF05-03..07 feature admission, qualified Core call graph and real A–D evidence |
 | Invoice line, validation and persisted links | Required when invoice selected | Historical B/C subset; profile-spanning CF05 acceptance pending |
 | Verified invoice PDF | Optional, strictly after suitable acknowledged DB completion | New CoreGuarded admission/checkpoint required; not DB-atomic |

@@ -57,6 +57,7 @@ class User
     }
 }
 require_once __DIR__.'/../../class/booking.class.php';
+require_once __DIR__.'/../../class/invoice.class.php';
 class F29BookingProbe extends MsmBookingService
 {
     public function reload($user, $strict) { return $this->currentUser($user, $strict); }
@@ -96,6 +97,19 @@ foreach (array('customer', 'invoice_create', 'invoice_line', 'invoice_validate',
         f29Verify(!$service->mayRollback(new RuntimeException($reason), $stage),
             'unqualified finance/future stage rejects Core rollback '.$stage.'/'.$reason);
     }
+}
+// CF05-04: only explicit pre-Core finance business origins are qualified.
+foreach (array('MSMChangedConfirmation','NotEnoughPermissions') as $reason) {
+    f29Verify($service->mayRollback(new MsmQualifiedCoreFinanceBusinessError($reason),'finance_precheck'),
+        'typed prefinance business reason '.$reason);
+    f29Verify(!$service->mayRollback(new RuntimeException($reason),'finance_precheck'),
+        'generic error cannot borrow finance rollback origin '.$reason);
+    f29Verify(!$service->mayRollback(new MsmQualifiedCoreFinanceBusinessError($reason),'invoice_create'),
+        'qualified business error never transfers to invoice stage '.$reason);
+}
+foreach (array('MSMInvoiceFailed','MSMConsistencyError','MSMTransactionUnknown') as $reason) {
+    f29Verify(!$service->mayRollback(new MsmQualifiedCoreFinanceBusinessError($reason),'finance_precheck'),
+        'unclassified finance error remains unknown '.$reason);
 }
 foreach (array('SubscriptionBulkDatabaseError', 'MSMTransactionUnknown',
     'MSMInvoiceFailed', 'MSMDatabaseObservationUnavailable') as $reason) {

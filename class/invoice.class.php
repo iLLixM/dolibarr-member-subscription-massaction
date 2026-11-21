@@ -6,6 +6,9 @@ require_once __DIR__.'/invoiceprofile.class.php';
 require_once __DIR__.'/databasestate.class.php';
 require_once __DIR__.'/transactionprofile.class.php';
 require_once __DIR__.'/coreguardedtransaction.class.php';
+require_once __DIR__.'/filebookingcheckpoint.class.php';
+/** Only the finite, pre-Core, non-SQL finance refusal may be rollback-qualified. */
+class MsmQualifiedCoreFinanceBusinessError extends RuntimeException {}
 /** Core business APIs only; the caller owns the outer transaction. */
 class MsmInvoiceService
 {
@@ -13,9 +16,12 @@ class MsmInvoiceService
 	protected $databaseState;
 	/** The active guard is explicitly injected, never constructed or inferred here. */
 	protected $activeGuard;
-	public function __construct($db, MsmDatabaseState $databaseState, MsmActiveTransactionGuard $activeGuard)
+	/** File-session capability from the Booking owner; never constructed by Invoice. */
+	protected $coreCheckpoint;
+	public function __construct($db, MsmDatabaseState $databaseState, MsmActiveTransactionGuard $activeGuard, MsmFileBookingCheckpoint $checkpoint = null)
 	{
 		$this->db = $db; $this->databaseState = $databaseState; $this->activeGuard = $activeGuard;
+		$this->coreCheckpoint = $checkpoint;
 		if (!$this->databaseState->isFor($db) || !$this->activeGuard->isFor($db)) {
 			throw new InvalidArgumentException('MSMDatabaseUnsupported');
 		}
@@ -55,12 +61,19 @@ class MsmInvoiceService
 	{
 		return htmlspecialchars($description, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', true);
 	}
+	/** Production always constructs the real authoritative profile. Test
+	 * doubles can supply an explicitly isolated synthetic qualification state
+	 * without bypassing the actual direct-service admission decision.
+	 */
+	protected function financeAdmissionProfile()
+	{
+		global $conf;
+		return new MsmTransactionProfile($this->db, $this->databaseState, (int) $conf->entity);
+	}
 	/** Directly callable service must recheck authoritative profile before any writes. */
 	protected function requireInvoiceAdmission()
 	{
-		global $conf;
-		$profile = new MsmTransactionProfile($this->db, $this->databaseState, (int) $conf->entity);
-		$current = $profile->current();
+		$current = $this->financeAdmissionProfile()->current();
 		if (empty($current['features']['invoice']) || $current['reason'] !== '') { throw new RuntimeException('MSMProfileFeatureUnavailable'); }
 		// An explicitly injected guard must match the authoritative profile.
 		// In particular, a future CoreGuarded feature admission must never
@@ -74,12 +87,34 @@ class MsmInvoiceService
 	public function create($member, $subscription, array $row, $actor, array &$diagnostic)
 	{
 		global $conf, $langs, $user;
+		$diagnostic['stage'] = 'finance_precheck';
 		$this->requireInvoiceAdmission();
 		$this->owned();
-		$plan = $row['invoice']; $diagnostic['stage'] = 'customer';
+		// No direct CoreGuarded invoice call without the original Controller's
+		// already-consumed, owner/entity/profile/row-bound one-shot capability.
+		if ($this->activeGuard instanceof MsmCoreGuardedTransaction) {
+			if ($this->coreCheckpoint === null) { throw new RuntimeException('MSMCoreGuardedSessionUnsupported'); }
+			$this->coreCheckpoint->requireFinanceContinuation((int) $member->id, $row, $actor);
+		}
+		if (!MsmPreviewService::canCreateSubscriptionWithOptions($actor, true, false)) {
+			throw new MsmQualifiedCoreFinanceBusinessError('NotEnoughPermissions');
+		}
+		$plan = $row['invoice'] ?? null;
+		if (!is_array($plan) || (int) ($plan['entity'] ?? 0) !== (int) $conf->entity
+			|| (int) $member->entity !== (int) $conf->entity
+			|| (empty($plan['create_customer']) && ((int) ($plan['customer_id'] ?? 0) <= 0
+				|| (int) $member->socid !== (int) $plan['customer_id']))) {
+			throw new MsmQualifiedCoreFinanceBusinessError('MSMChangedConfirmation');
+		}
 		$customerid = (int) $plan['customer_id'];
+		if ($plan['create_customer'] && (!empty($member->socid) || empty($row['autocreate'])
+			|| !$actor->hasRight('societe', 'creer'))) {
+			throw new MsmQualifiedCoreFinanceBusinessError('MSMChangedConfirmation');
+		}
+		// Any subsequent Core call, SQL failure or postcondition error is
+		// unqualified and remains UNKNOWN/STOP under CoreGuarded.
+		$diagnostic['stage'] = 'customer';
 		if ($plan['create_customer']) {
-			if (!empty($member->socid) || !$row['autocreate'] || !$actor->hasRight('societe', 'creer') || (int) $member->entity !== (int) $conf->entity) { throw new RuntimeException('MSMChangedConfirmation'); }
 			$customer = $this->customer(); $fullname = $member->getFullName($langs);
 			$name = $member->morphy === 'mor' ? $member->company : $fullname;
 			$alias = $member->morphy === 'mor' ? $fullname : $member->company;

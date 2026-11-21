@@ -56,6 +56,67 @@ try {
 	$_SESSION['msm_previews'][$key]['phase']='done';
 	verifySession(session_write_close(), 'persist completed phase');
 	denySession(static function()use($checkpoint,$binding,$user,$confirmed,$opts){$checkpoint->requireProcessing(7,$binding,$user,$confirmed,$opts);},'completed run denied');
+	// CF05: original CONFIRM → durable processing → one-shot finance → acknowledged
+	// NO_CHAIN result → independently checkpointed PDF and mail. No DB or SMTP.
+	$financeKey = str_repeat('d',32);
+	$financeRow = $rows[7]; $financeRow['invoice']=array('create_customer'=>true,'customer_id'=>0);
+	$financeRow['autocreate']=true; $financeRows=array(7=>$financeRow);
+	$financeOpts=array('invoice'=>true,'autocreate'=>true,'sendmail'=>true,
+		'description'=>'Synthetic contribution');
+	verifySession(session_start(), 'CF05 new synthetic finance confirmation');
+	$_SESSION['msm_previews'][$financeKey]=array('owner'=>18,'entity'=>1,'phase'=>'confirm','revision'=>10,
+		'profile'=>$binding,'ids'=>array(7),'options'=>$financeOpts,'rows'=>$financeRows,
+		'results'=>array(7=>array('status'=>'unknown','stop'=>false)));
+	$financeCheckpoint = new MsmFileBookingCheckpoint($financeKey);
+	verifySession(session_write_close(), 'CF05 persist finance confirmation');
+	verifySession(session_start(), 'CF05 consume original finance confirmation');
+	$_SESSION['msm_previews'][$financeKey]['phase']='processing';
+	$_SESSION['msm_previews'][$financeKey]['revision']=11;
+	verifySession(session_write_close(), 'CF05 persist finance consumption');
+	$financeExpected=$financeRow; $financeExpected['_profile']=$binding;
+	$financeCheckpoint->requireProcessing(7,$binding,$user,$financeExpected,$financeOpts);
+	$financeCheckpoint->requireFinanceContinuation(7,$financeRow,$user);
+	verifySession(true, 'CF05 same original owner one-shot finance capability admitted');
+	denySession(static function()use($financeCheckpoint,$financeRow,$user){
+		$financeCheckpoint->requireFinanceContinuation(7,$financeRow,$user);
+	}, 'CF05 duplicate finance API continuation denied');
+	denySession(static function()use($financeCheckpoint,$financeRow,$user){
+		$financeCheckpoint->requireFinanceContinuation(8,$financeRow,$user);
+	}, 'CF05 foreign member denied');
+	$wrongRow=$financeRow; $wrongRow['fingerprint']='changed';
+	$otherKey = new MsmFileBookingCheckpoint($financeKey);
+	denySession(static function()use($otherKey,$financeRow,$user){
+		$otherKey->requireFinanceContinuation(7,$financeRow,$user);
+	}, 'CF05 new capability from consumed file session denied');
+	denySession(static function()use($financeCheckpoint){
+		$financeCheckpoint->requirePostCommitEffect(7,'pdf');
+	}, 'CF05 PDF denied before acknowledged nonterminal result');
+	verifySession(session_start(), 'CF05 record accepted nonterminal invoice');
+	$_SESSION['msm_previews'][$financeKey]['results'][7]=array(
+		'status'=>'success','completion'=>'nonterminal_acknowledged','stop'=>false,
+		'invoice'=>array('id'=>42,'pdf'=>array('status'=>'unknown')),'mail'=>'unknown');
+	verifySession(session_write_close(), 'CF05 persist accepted nonterminal checkpoint');
+	$financeCheckpoint->requirePostCommitEffect(7,'pdf');
+	denySession(static function()use($financeCheckpoint){
+		$financeCheckpoint->requirePostCommitEffect(7,'pdf');
+	},'CF05 PDF replay blocked');
+	denySession(static function()use($financeCheckpoint){
+		$financeCheckpoint->requirePostCommitEffect(7,'mail');
+	},'CF05 mail blocked without verified invoice PDF');
+	verifySession(session_start(), 'CF05 store verified invoice PDF');
+	$_SESSION['msm_previews'][$financeKey]['results'][7]['invoice']['pdf']=array('status'=>'verified');
+	verifySession(session_write_close(), 'CF05 persist verified invoice PDF');
+	$financeCheckpoint->requirePostCommitEffect(7,'mail');
+	denySession(static function()use($financeCheckpoint){
+		$financeCheckpoint->requirePostCommitEffect(7,'mail');
+	},'CF05 mail resend blocked');
+	verifySession(session_start(), 'CF05 change completion to terminal');
+	$_SESSION['msm_previews'][$financeKey]['results'][7]['completion']='terminal_acknowledged';
+	verifySession(session_write_close(), 'CF05 terminal result persisted');
+	$otherKey = new MsmFileBookingCheckpoint($financeKey);
+	denySession(static function()use($otherKey){
+		$otherKey->requirePostCommitEffect(7,'mail');
+	},'CF05 no new postcommit capability after consumed state');
 	verifySession(session_start(), 'reopen for test cleanup');
 	session_destroy(); session_write_close();
 } finally {

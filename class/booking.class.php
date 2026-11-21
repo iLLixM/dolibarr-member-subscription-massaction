@@ -17,6 +17,8 @@ class MsmBookingService
 	private $activeTransaction;
 	private $coreTransaction;
 	private $coreTerminal = false;
+	/** Only the controller-created, consumed file-session capability may enter CoreGuarded finance. */
+	private $coreCheckpoint;
 	public function __construct($db, MsmDatabaseState $databaseState = null)
 	{
 		$this->db = $db; $this->databaseState = $databaseState ?? new MsmDatabaseState($db);
@@ -43,7 +45,7 @@ class MsmBookingService
 		}
 	}
 	/** Every invoice factory receives the SAME already-selected active guard; metadata remains separate. */
-	protected function invoicing() { require_once __DIR__.'/invoice.class.php'; return new MsmInvoiceService($this->db, $this->databaseState, $this->activeTransaction); }
+	protected function invoicing() { require_once __DIR__.'/invoice.class.php'; return new MsmInvoiceService($this->db, $this->databaseState, $this->activeTransaction, $this->coreCheckpoint); }
 	protected function member($id)
 	{
 		require_once __DIR__.'/bookingmember.class.php';
@@ -157,10 +159,15 @@ class MsmBookingService
 	/** Only these observed, non-SQL business failures allow an owned Core rollback. */
 	protected function coreGuardedBusinessRollbackAllowed(Throwable $e, $stage = 'preflight')
 	{
-		// CF05-04 has not qualified invoice/customer error origins. Fail closed
-		// for all unrecognized/future stages, not only the currently named
-		// invoice stages; a generic MSMConsistencyError must not leak a
-		// contribution-only rollback qualification into financial operations.
+		// A *typed*, explicitly raised business refusal before the first finance
+		// Core API is the only new CF05-04 qualification. Arbitrary messages from
+		// Societe/Facture/SQL are NOT sufficient, even if their text is identical.
+		if ($stage === 'finance_precheck') {
+			return $e instanceof MsmQualifiedCoreFinanceBusinessError
+				&& in_array($e->getMessage(), array('MSMChangedConfirmation', 'NotEnoughPermissions'), true);
+		}
+		// Previously qualified preflight/contribution reasons remain unchanged.
+		// All later customer/invoice/commit/unknown stages fail closed.
 		if (!in_array($stage, array('preflight', 'subscription'), true)) { return false; }
 		return in_array($e->getMessage(), array('MSMChangedConfirmation', 'NotEnoughPermissions', 'MSMTransactionUnsupported', 'MSMConsistencyError'), true);
 	}
@@ -183,6 +190,7 @@ class MsmBookingService
 		// Never touch a transaction owned by another caller.
 		if ((int) $this->db->transaction_opened !== 0) { $result['status'] = 'unknown'; $result['stop'] = true; return $result; }
 		$owned = false; $beginAttempted = false; $committing = false; $invoice = null;
+		$this->coreCheckpoint = null;
 		$coreGuarded = false;
 		$this->activeTransaction = $this->databaseState;
 		$diagnostic = array('stage' => 'preflight', 'subscription_id' => 0, 'invoice_id' => 0, 'customer_id' => 0);
@@ -196,7 +204,9 @@ class MsmBookingService
 				if (!($checkpoint instanceof MsmFileBookingCheckpoint)) { throw new RuntimeException('MSMCoreGuardedSessionUnsupported'); }
 				MsmFileBookingCheckpoint::requireRuntime();
 				$checkpoint->requireProcessing((int) $id, $expected['_profile'], $user, $expected, $options);
-				if (!empty($options['invoice']) || !empty($options['autocreate']) || !empty($options['sendmail'])) { throw new RuntimeException('MSMProfileFeatureUnavailable'); }
+				// The same consumed one-shot capability is required by every
+				// subsequently invoked CoreGuarded Invoice service instance.
+				$this->coreCheckpoint = $checkpoint;
 			}
 			$initial = $this->activeTransaction->beforeBegin();
 			if ($initial['state'] !== MsmDatabaseState::IDLE || !$initial['fresh']) {

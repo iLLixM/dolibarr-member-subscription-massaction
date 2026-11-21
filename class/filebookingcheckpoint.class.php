@@ -10,6 +10,8 @@ final class MsmFileBookingCheckpoint
 	private $session;
 	private $confirmedOrigin;
 	private $attempted = array();
+	private $financeAttempted = array();
+	private $postEffects = array();
 	public function __construct($key)
 	{
 		if (!is_string($key) || !preg_match('/^[a-f0-9]{32}$/D', $key)) { throw new RuntimeException('MSMSessionFailure'); }
@@ -99,6 +101,70 @@ final class MsmFileBookingCheckpoint
 		// Once admitted, even an unsuccessful Core BEGIN may have an unknown
 		// acknowledgement. This in-process capability cannot be reused.
 		$this->attempted[$id] = true;
+	}
+	/** No SQL and no new permission grant: the originally consumed, in-process
+	 * capability is the only possible CoreGuarded Invoice continuation.
+	 */
+	public function requireFinanceContinuation($id, array $row, $user)
+	{
+		$this->requireBinding();
+		$origin = $this->confirmedOrigin;
+		if (!isset($this->attempted[$id]) || isset($this->financeAttempted[$id])
+			|| !is_array($origin) || empty($origin['options']['invoice'])
+			|| ($origin['profile']['profile'] ?? null) !== 'CoreGuarded'
+			|| (int) ($origin['owner'] ?? 0) !== (int) ($user->id ?? 0)
+			|| !isset($origin['rows'][$id]['invoice'])
+			|| !is_string($origin['rows'][$id]['fingerprint'] ?? null)
+			|| !hash_equals($origin['rows'][$id]['fingerprint'], (string) ($row['fingerprint'] ?? ''))
+			|| empty($row['invoice'])
+			|| !empty($row['autocreate']) !== !empty($origin['options']['autocreate'])) {
+			throw new RuntimeException('MSMCoreGuardedSessionUnsupported');
+		}
+		$this->financeAttempted[$id] = true; // Never another Invoice attempt.
+	}
+	/** Independently read the last durable one-shot result before a post-COMMIT
+	 * effect. Never reopen a consumed run to replay a PDF or SMTP operation.
+	 */
+	public function requirePostCommitEffect($id, $kind)
+	{
+		$this->requireBinding();
+		if (!in_array($kind, array('pdf', 'mail'), true)
+			|| !isset($this->attempted[$id]) || !is_array($this->confirmedOrigin)
+			|| isset($this->postEffects[$id][$kind])) {
+			throw new RuntimeException('MSMSessionFailure');
+		}
+		$origin = $this->confirmedOrigin;
+		set_error_handler(static function () { throw new RuntimeException('MSMSessionFailure'); });
+		try {
+			if (!session_start()) { throw new RuntimeException('MSMSessionFailure'); }
+			$state = $_SESSION['msm_previews'][$this->key] ?? null;
+			$result = is_array($state) ? ($state['results'][$id] ?? null) : null;
+			$invoice = is_array($result) ? ($result['invoice'] ?? null) : null;
+			if (!is_array($state) || ($state['phase'] ?? null) !== 'processing'
+				|| ($state['revision'] ?? null) !== $origin['revision'] + 1
+				|| ($state['profile'] ?? null) !== $origin['profile']
+				|| ($state['owner'] ?? null) !== $origin['owner']
+				|| ($state['entity'] ?? null) !== $origin['entity']
+				|| ($state['options'] ?? null) !== $origin['options']
+				|| !is_array($result) || ($result['status'] ?? null) !== 'success'
+				|| ($result['completion'] ?? null) !== 'nonterminal_acknowledged'
+				|| !empty($result['stop'])
+				|| ($kind === 'pdf' && (empty($origin['options']['invoice'])
+					|| !is_array($invoice) || (int) ($invoice['id'] ?? 0) < 1
+					|| ($invoice['pdf']['status'] ?? null) !== 'unknown'))
+				|| ($kind === 'mail' && (empty($origin['options']['sendmail'])
+					|| ($result['mail'] ?? null) !== 'unknown'
+					|| (!empty($origin['options']['invoice']) && (!is_array($invoice)
+						|| ($invoice['pdf']['status'] ?? null) !== 'verified'))))) {
+				throw new RuntimeException('MSMSessionFailure');
+			}
+		} finally {
+			if (session_status() === PHP_SESSION_ACTIVE && !session_write_close()) {
+				throw new RuntimeException('MSMSessionFailure');
+			}
+			restore_error_handler();
+		}
+		$this->postEffects[$id][$kind] = true;
 	}
 	public function __invoke(array $updated)
 	{
