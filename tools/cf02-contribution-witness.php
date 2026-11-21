@@ -25,7 +25,8 @@ function cf02Args($argv) {
         $a['start'] ?? null, $a['end'] ?? null, $a['amount'] ?? null, $a['agenda'] ?? null, $a['member-ref'] ?? null);
     $path = $a['evidence-dir'] ?? '';
     if ($mode !== 'check-only' || $path !== '') {
-        cf02Need(preg_match('~^/var/lib/dolibarr-test-results/cf02-pos01-[a-z0-9-]{6,40}$~D', $path) === 1
+        cf02Need(is_string(getenv('CF02_EVIDENCE_ROOT')) && getenv('CF02_EVIDENCE_ROOT') !== ''
+            && preg_match('~^'.preg_quote(getenv('CF02_EVIDENCE_ROOT'),'~').'/cf02-pos01-[a-z0-9-]{6,40}$~D', $path) === 1
             && !is_link($path), 'CF02UnsafeEvidencePath');
     }
     return array($mode,$e,$path);
@@ -101,7 +102,8 @@ function cf02Snapshot($db, $e) {
         'agenda_resources'=>$resources,'counts'=>$counts,'source_hashes'=>$sources);
 }
 function cf02EvidenceDir($path, $create) {
-    $parent='/var/lib/dolibarr-test-results';
+    $parent=getenv('CF02_EVIDENCE_ROOT');
+    cf02Need(is_string($parent) && $parent !== '' && $parent[0] === '/', 'CF02EvidenceParentUnavailable');
     cf02Need(is_dir($parent) && realpath($parent)===$parent && !is_link($parent),'CF02EvidenceParentUnavailable');
     if (!file_exists($path)) {
         cf02Need($create && mkdir($path,0700),'CF02EvidenceDirectoryUnavailable');

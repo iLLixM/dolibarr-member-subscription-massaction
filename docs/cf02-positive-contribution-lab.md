@@ -2,7 +2,7 @@
 
 **POS01-C PASS.** The Owner executed a separate single authenticated massaction on new synthetic member **58** / `MEM2611-0058`, marker `CF02LAB-20261120C1`, exact 2080 dates, EUR 120, Agenda ON, invoice/customer/mail OFF, at final reviewed implementation SHA `290782dfdf6d6048b801843b5e1c4e464ac3bfdc`. Existing unmodified read-only witness modes `--check-only`, `--baseline`, `--verify` each returned **PASS**. Real contribution #67, standard Agenda #103 plus actor resource, correct Core R16 end, preserved label marker, and only expected guarded-table count deltas were independently reconciled from private artifacts. Owner frontend: **1 successful / 0 skipped / 0 failed / 0 unknown; Core commit confirmed** (application acknowledgement, not independent physical event identity). Baseline integrity SHA-256 `1546d1cba936270859b4dfa1011641e3f89b614ee49cf8180bda67cd3ae952bb`. The extra F29 rights-proxy file hash was stable before/after. Full sanitized details: [POS01-C positive acceptance evidence](evidence/cf02/pos01-c-owner-positive-2026-11-20.md).
 
-**Do not rerun member 58 or overwrite `/var/lib/dolibarr-test-results/cf02-pos01-20261120c1`.** The original POS01-A/B procedures below remain historical, and their witness STOP results are not converted into PASS. CF-03 negative and cross-profile work and release/Owner GO remain open. PR #29 later normally merged as `f0b1e6d40ff55abb1e7555c800caea0fdd1fe90d`.
+**Do not rerun member 58 or overwrite `<PRIVATE_EVIDENCE_ROOT>/cf02-pos01-20261120c1`.** The original POS01-A/B procedures below remain historical, and their witness STOP results are not converted into PASS. CF-03 negative and cross-profile work and release/Owner GO remain open. PR #29 later normally merged as `f0b1e6d40ff55abb1e7555c800caea0fdd1fe90d`.
 
 ---
 
@@ -38,7 +38,7 @@ booking happens separately through Dolibarr's genuine authenticated UI.
 - In POS01, leave standard Agenda MEMBER_SUBSCRIPTION_CREATE enabled and use
   `--agenda=on`. If the selected module/Agenda configuration differs, STOP.
 - Preserve evidence exclusively under
-  `/var/lib/dolibarr-test-results/cf02-pos01-20261120a1` (private mode 0700).
+  `<PRIVATE_EVIDENCE_ROOT>/cf02-pos01-20261120a1` (private mode 0700).
   The separate baseline digest and a one-time `verify.started` marker block
   accidental evidence overwrite/repeated verification.
 
@@ -53,7 +53,7 @@ git status --short
 MEMBER_ID=56
 MEMBER_REF=MEM2611-0056
 MARKER=CF02LAB-20261120A1
-EVIDENCE_DIR=/var/lib/dolibarr-test-results/cf02-pos01-20261120a1
+EVIDENCE_DIR=<PRIVATE_EVIDENCE_ROOT>/cf02-pos01-20261120a1
 
 sudo -u www-data env CF02_DOLIBARR_ROOT=<PRIVATE_MYSQL_INSTALLATION> \
   /usr/bin/php -d xdebug.mode=off tools/cf02-contribution-witness.php \

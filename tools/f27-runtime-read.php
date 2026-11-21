@@ -1,26 +1,27 @@
 <?php
-/* Copyright (C) 2026 iLLixM <iLLixM@proton.me>
+/* Copyright (C) 2026 iLLixM
  * SPDX-License-Identifier: GPL-3.0-or-later
  * Owner-operated, read-only relevant runtime snapshot. No main/login, callbacks,
  * business API, session read/start, SMTP/PDF, SQL-trigger inventory or Lab DML.
  */
 if (PHP_SAPI !== 'cli' || ($argv[1] ?? '') !== '--read-only') { exit(77); }
 ini_set('display_errors','0'); ini_set('log_errors','0'); error_reporting(E_ALL & ~E_DEPRECATED); ob_start();
-$target='/var/lib/dolibarr-test-results/f27-final-runtime-20261119.json';
+$target=getenv('F27_EVIDENCE_PATH');
+if (!is_string($target) || !preg_match('~^/[A-Za-z0-9_./-]+$~D',$target)) { exit(77); }
 $finished=false;register_shutdown_function(static function()use(&$finished){if(!$finished){while(ob_get_level())ob_end_clean();echo json_encode(array('status'=>'STOP','reason'=>'Protected Core reader terminated before sanitized completion; no retry'))."\n";}});
 if (file_exists($target)) { $finished=true; ob_end_clean(); echo json_encode(array('status'=>'STOP','reason'=>'Evidence exists; do not overwrite/repeat'))."\n"; exit(1); }
 class F27ReadStop extends RuntimeException {}
 function f27Need($ok,$message) { if(!$ok)throw new F27ReadStop($message); }
 $report=array('kind'=>'READ-ONLY LIVE CONFIGURATION; callbacks selected, not executed','time'=>gmdate('c'),'status'=>'STOP');$db=null;
 try {
-	$root='/home/marcel/dolibarr-i105-v24-mysql/htdocs'; chdir($root);
+	$root=getenv('F27_DOCUMENT_ROOT'); f27Need(is_string($root) && realpath($root)===$root,'Private Core root required'); chdir($root);
 	require_once $root.'/filefunc.inc.php';
 	require_once $root.'/core/class/conf.class.php';
 	require_once $root.'/core/class/translate.class.php';
 	require_once $root.'/core/lib/security.lib.php';
 	require_once $root.'/core/db/mysqli.class.php';
 	mysqli_report(MYSQLI_REPORT_OFF);
-	f27Need($dolibarr_main_db_name==='dolibarr_i105_v24'&&$dolibarr_main_db_host==='127.0.0.1'&&(int)$dolibarr_main_db_port===3307&&$dolibarr_main_db_prefix==='llx_','Reference identity mismatch');
+	f27Need($dolibarr_main_db_name===getenv('F27_DB_NAME')&&$dolibarr_main_db_host===getenv('F27_DB_HOST')&&(int)$dolibarr_main_db_port===(int)getenv('F27_DB_PORT')&&$dolibarr_main_db_prefix==='llx_','Reference identity mismatch');
 	$conf=new Conf();
 	foreach(array('host','port','name','user','pass','type','prefix','character_set')as$field){$var='dolibarr_main_db_'.$field;$conf->db->$field=$$var??'';}
 	$conf->db->dolibarr_main_db_collation=$dolibarr_main_db_collation??'utf8mb4_unicode_ci';
@@ -41,7 +42,7 @@ try {
 	f27Need($db->ok,'Reference database unavailable');
 	$rows=static function($sql)use($db){$r=$db->query($sql);f27Need($r instanceof mysqli_result,'Read failed');$a=$r->fetch_all(MYSQLI_ASSOC);$r->free();return $a;};
 	$identity=$rows('SELECT DATABASE() AS db,VERSION() AS version,@@autocommit AS autocommit,@@SESSION.completion_type AS completion_type')[0];
-	f27Need($identity['db']==='dolibarr_i105_v24'&&$identity['version']==='8.4.13'&&DOL_VERSION==='24.0.3','Runtime version mismatch');$report['identity']=$identity;$report['php']=PHP_VERSION;$report['driver']=mysqli_get_client_info();
+	f27Need($identity['db']===getenv('F27_DB_NAME')&&$identity['version']==='8.4.13'&&DOL_VERSION==='24.0.3','Runtime version mismatch');$report['identity']=$identity;$report['php']=PHP_VERSION;$report['driver']=mysqli_get_client_info();
 	// Refuse executing unknown local-constant or logger implementations in a reader.
 	$pre=$rows('SELECT '.$db->decrypt('name').' AS name,'.$db->decrypt('value').' AS value FROM llx_const WHERE '.$db->decrypt('name').' IN (\'LOCAL_CONSTS_FILES\',\'SYSLOG_HANDLERS\',\'MAIN_MODULE_MULTICOMPANY\') AND entity IN (0,1) ORDER BY entity');$v=array();foreach($pre as$r)$v[$r['name']]=dolDecrypt($r['value']);
 	f27Need(empty($v['LOCAL_CONSTS_FILES'])&&empty($v['MAIN_MODULE_MULTICOMPANY']),'Local override/multicompany requires separate bounded reader');

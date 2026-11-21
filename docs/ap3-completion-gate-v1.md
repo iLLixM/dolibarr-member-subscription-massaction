@@ -36,7 +36,7 @@ See the [ADR contract](adr/ADR-0001-core-first-transaction-profiles.md).
 | Actual HTTP bootstrap | Protected I105 `main.inc.php`, authenticated synthetic user `msm-i105` (actor2) |
 | Actual HTTP reference | I105 V24.0.3, `<PRIVATE_MYSQL_SCHEMA>`;13 business-table hashes/counts equal before/after |
 | HTTP SAPI | Temporary PHP `cli-server`, loopback only; **not Apache SAPI qualification** |
-| HTTP sessions | Actual I105 `files` handler/path under `dolibarr-i105-v24-mysql-data/sessions` |
+| HTTP sessions | Actual I105 `files` handler/path under `<PRIVATE_SESSION_ROOT>` |
 | HTTP logger | Actual configured pinned `mod_syslog_file`, SYSLOG_LEVEL4 |
 | CLI logger | Same genuine pinned file exporter, explicit DEBUG7 to exercise post-end export |
 
