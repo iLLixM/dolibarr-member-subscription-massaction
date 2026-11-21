@@ -14,7 +14,10 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 TRACKED = subprocess.check_output(["git", "ls-files", "-z"], cwd=ROOT).split(b"\0")
 SUFFIXES = {".php", ".md", ".txt", ".json", ".py", ".sh", ".js", ".yml",
-            ".yaml", ".csv", ".lang", ".ini", ".xml", ".env"}
+            ".yaml", ".csv", ".lang", ".ini", ".xml", ".env", ".started",
+            ".sql", ".log", ".conf", ".toml", ".lock"}
+SPECIAL_FILENAMES = {".gitignore", ".gitattributes", ".editorconfig",
+                     "Dockerfile", "Makefile"}
 # Split sensitive patterns in source so the scanner does not match itself.
 BANNED = [
     "mar" + "cel",
@@ -29,13 +32,14 @@ BANNED = [
 ]
 HOME_PATH = re.compile(re.escape("/" + "home/") + r"[A-Za-z0-9._-]+")
 MAC_HOME = re.compile(re.escape("/" + "Users/") + r"[A-Za-z0-9._-]+")
+WINDOWS_HOME = re.compile(r"[A-Za-z]:\\\\Users\\\\[A-Za-z0-9._-]+", re.IGNORECASE)
 issues = []
 scanned = 0
 for name in TRACKED:
     if not name:
         continue
     relative = pathlib.Path(name.decode("utf-8", "strict"))
-    if relative.suffix.lower() not in SUFFIXES:
+    if relative.suffix.lower() not in SUFFIXES and relative.name not in SPECIAL_FILENAMES:
         continue
     scanned += 1
     try:
@@ -45,7 +49,7 @@ for name in TRACKED:
         continue
     for number, line in enumerate(content.splitlines(), 1):
         lower = line.lower()
-        if any(token.lower() in lower for token in BANNED) or HOME_PATH.search(line) or MAC_HOME.search(line):
+        if any(token.lower() in lower for token in BANNED) or HOME_PATH.search(line) or MAC_HOME.search(line) or WINDOWS_HOME.search(line):
             issues.append(f"{relative}:{number}: private environment identifier")
 if issues:
     print("FAIL: privacy scan detected private operator/environment material", file=sys.stderr)
