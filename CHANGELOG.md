@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### 2026-11-21 – Core-first full-function product baseline and PR #32 closure
+
+- Owner-revised [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22): **v0.1.0 full massaction workflow across CoreGuarded, EnhancedMySQL and MariaDBSnapshot**. Revised ADR-06 removes contribution-only as a permanent target, **not** as a current safety gate: CoreGuarded invoicing/auto-third-party/PDF/mail are still closed until CF05-01..07.
+- Revised ADR-11: focused CF05 implementation/security review, full real **normal/success** integration A–D and retained synthetic security tests/21-job PHP/Core matrix required for the release. Destructive real **CF03-FAULT** tests move to a later iteration, stay OPEN/NOT EXECUTED and do not relax UNKNOWN/STOP contracts.
+- [PR #32](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/32) **squash-merged** on 2026-11-21 into `main` as `425980c43a51a9f27073133212f18825ac6da248`: CF03 read-only witnesses, one-shot private evidence, positive/negative synthetic tests and current-tree privacy remediation. Reviewed source `cbc97843fb017135739a39ea12ef26c7fa66dfdb` had 9/9 standard + 1/1 hosted CI PASS; production behavior unchanged.
+- Independent merge review recorded F32-MR-01/P2 (sudo environment handoff) and F32-MR-02/P3 (historical evidence-parent prose), **both explicitly Owner-accepted as limitations, not fixes**. Real A/B/C witness use remains blocked pending private launcher/read-only preflight; source/code document the real evidence-parent write restriction.
+- CF03 POS02-A1/A2 **Owner TECHNICAL PASS**, earlier exact-source F32-W01-01 CLOSED. RB01-A **INVALID/STOP as rollback evidence**: an ordinary contribution persisted, never silently reclassify or repeat. No full finance/ZIP/release GO follows from these development milestones.
+- Documentation alignment clarifies current-vs-historical evidence and [release gates](docs/release-qualification-v0.1.0.md); no functional code, fresh real case or release package is created by this docs-only change.
+
 - CF-02 / PR #29: implement bounded CoreGuarded contribution-only booking,
   server-side direct-service feature restrictions, transaction/terminal STOP
   and file-session admission. Independent final review of exact HEAD
