@@ -4,9 +4,10 @@
 
 The public **current file tree** must not contain operator personal usernames, home paths,
 private database schema/account identifiers, private hostnames or a personal contact email.
-A source-based fail-closed CI guard is implemented in `tools/check-private-data.py`. It scans
-tracked text sources, documentation, snapshot text and experimental tools, including
-historical material, for known private labels and personal home paths.
+Source and documentation were pseudonymized as a one-time remediation. No
+persistent list of private operator identifiers is retained in repository
+code, tests or CI configuration. Future changes must use operator-neutral
+placeholders rather than real local identities.
 
 `tools/cf03-lab.lib.php` obtains A/B identities and the approved C account from private
 operator-only environment values. `CF03_EVIDENCE_ROOT` supplies the real A/B/C evidence
@@ -64,23 +65,9 @@ remains a final check, not the first privacy boundary. These changes are
 restricted to CF03 read-only evidence handling; they do not grant a business-
 test or merge GO. Synthetic regression covers all profiles and umask 0000.
 
-The public current-tree privacy scan is only a bounded denylist/pattern guard,
-not a complete PII detector or history purge. It must be exercised on the
-exact PR HEAD; independent code/evidence-scope review remains mandatory.
+This is a one-time source-remediation policy, not a standing forbidden-term
+dictionary. Independent code/evidence-scope review remains mandatory.
 No source fingerprints, historical hashes or original evidence are restamped.
-
-## CI coverage addition
-
-The privacy scanner now also audits tracked historical one-shot marker
-files, git configuration text, additional common source/log extensions
-and Windows-style home paths. The offline regression in
-`test/unit/privacy-guard.py` builds an isolated temporary Git repository,
-verifies a harmless placeholder PASS and verifies forbidden personal,
-Linux-home, Windows-home, marker-file, gitignore and account examples
-STOP. It runs in the standard nine-job CI, optional 21-job CI and
-targeted PHP8.3/V22 hosted workflow. Neither scanner nor test has
-network, database or business-write access. This scanner cannot assert
-that all identifiers are absent or remove old Git objects.
 
 ## Review scope and remaining limits
 
