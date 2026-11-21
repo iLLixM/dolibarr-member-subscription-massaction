@@ -430,7 +430,7 @@ c3stop(static function()use($hosted,$common){
             '--evidence-dir=/synthetic/../unsafe/cf03-d-testfixture1')));
 },'traversal root denied','CF03UnsafeEvidenceRoot');
 $invoiceArgs=array('cf03-lab.php','--check-only','--environment=C',
-    '--db-user=enhanced_user','--scenario=invoice-existing',
+    '--db-user=enhanced_application','--scenario=invoice-existing',
     '--member-id=271','--member-ref=MEM2611-0271',
     '--marker=CF03LAB-C-ABCDEF123','--start=2080-01-01',
     '--end=2080-12-31','--amount=120.00','--agenda=on','--actor-id=4');
