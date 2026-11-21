@@ -62,25 +62,23 @@ final class Cf03Evidence
         // writes can replace a private case directory and break one-shot trust.
         self::need((fileperms($root) & 0022) === 0,
             'CF03EvidenceParentUnsafePermissions');
-        // The parent is not required to be owned by the CLI UID or mode 0700.
-        // Group/other write is forbidden. Case/file and D webroot checks remain.
-        if ($environment === 'D') {
-            $doc = realpath($documentRoot);
-            $source = realpath($checkout);
-            self::need($doc !== false && $source !== false,
-                'CF03EvidenceIsolationUnknown');
-            // Permit an owner-private sibling of htdocs on jailed hosting,
-            // but never the site root itself, inside htdocs or an ancestor
-            // of the webroot or source checkout. Public alias exposure must
-            // additionally be ruled out by the hosting operator.
-            self::need($root !== dirname($doc)
-                && !self::within($root, $doc)
-                && !self::within($root, $source)
-                && !self::within($doc, $root)
-                && !self::within($source, $root),
-                'CF03EvidenceInsideWebOrSource');
-
-        }
+        // The parent need not be owned by the CLI UID or use mode 0700.
+        // Group/other write is forbidden; cases/files retain 0700/0600.
+        // Reject webroot/checkout exposure in ALL profiles (not only hosted D).
+        $doc = realpath($documentRoot);
+        $source = realpath($checkout);
+        self::need($doc !== false && $source !== false,
+            'CF03EvidenceIsolationUnknown');
+        // A private sibling of htdocs can be used on jailed hosting, but
+        // neither a site root, an ancestor nor a descendant of the webroot
+        // or checkout is an eligible evidence parent. Operators must still
+        // independently exclude HTTP aliases and untrusted ancestors.
+        self::need($root !== dirname($doc)
+            && !self::within($root, $doc)
+            && !self::within($root, $source)
+            && !self::within($doc, $root)
+            && !self::within($source, $root),
+            'CF03EvidenceInsideWebOrSource');
     }
 
     public static function directory($dir, $create, $environment, $root, $doc, $checkout)
@@ -168,9 +166,19 @@ final class Cf03Evidence
             && is_string($value) && strlen($value) <= 524288,
             'CF03EvidenceWriteForbidden');
         $path = $dir.'/'.$filename;
-        $fp = @fopen($path, 'x');
+        // fopen('x') uses 0666 minus the ambient umask. Never write private
+        // evidence while it could temporarily be created as mode 0644/0666.
+        $previousUmask = umask(0077);
+        try {
+            $fp = @fopen($path, 'x');
+        } finally {
+            umask($previousUmask);
+        }
         self::need($fp !== false, 'CF03EvidenceExistsNoRetry');
         try {
+            $stat = fstat($fp);
+            self::need($stat !== false && ($stat['mode'] & 0077) === 0,
+                'CF03EvidenceWriteFailure');
             $len = strlen($value);
             $written = 0;
             while ($written < $len) {
