@@ -1,5 +1,15 @@
 # Required risk-based test strategy
 
+## Updated v0.1.0 test gates (2026-11-21)
+
+The current [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22) architecture/release decision supersedes the original blanket real destructive fault-test timing; all runtime UNKNOWN/STOP and safe synthetic/HTTP security contracts remain in force.
+
+- **For each CF05 implementation PR:** focused security/transaction/rights/direct-service/profile/one-guard/invoice error-classification/post-commit regressions and independent **exact-head** implementation review; keep PHP >=7.4 syntax and profile B/C behavior.
+- **For v0.1.0:** full authenticated real **CF03-NORMAL A/B/C/D** positive flows (existing and invoice-created Third Party, line/validation/link, PDF/SMTP verified attachment, member Agenda ON/OFF and small successful batch) with independent DB/filesystem/delivery evidence; all 21 pinned PHP/Core synthetic CI jobs, safe negative browser/security cases, independent risk review and Owner acceptance.
+- **Later iteration:** destructive real `CF03-FAULT` cases, including ROLLBACK/lost ACK/reconnect/SQL errors, concurrency, destructive replay and controlled PDF/SMTP faults, remain **OPEN/NOT EXECUTED**. No runtime fault handling is waived; no prior invalid RB01-A rollback is promoted to PASS.
+- **Operator gate:** [PR #32](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/32) is squash-merged, but F32-MR-01 (accepted limitation) requires a private, least-privilege A/B/C target-user launcher and successful read-only preflight **before new real witness execution**. A/C tests must be strictly serialized; every business write requires its own Owner GO.
+- **Release:** new v0.1.0 ZIP without RC suffix, exact D hosted ZIP test, R0-04/R0-07 and separate Owner release GO. Synthetic CI and old POS01/POS02 do not qualify the new full workflow.
+
 This is the default validation contract for subsequent phases. User authorization and
 safe test-environment boundaries remain mandatory; this document does not authorize
 business writes, migrations or changes to accounts, rights or configuration.

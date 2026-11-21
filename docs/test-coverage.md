@@ -1,5 +1,22 @@
 # Reading the existing requirement matrix
 
+## Updated CF05 / CF03 coverage interpretation (2026-11-21)
+
+The historic **71 Cxx requirement rows** in [requirements.csv](requirements.csv) preserve original requirements and their dated implementation/test mapping. They are **not a substitute for the new CF05-01..07 gates in [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22)**. During CF05 implementation, extend existing test IDs/evidence links without inventing a completed test status or renumbering the original requirements.
+
+| Evidence family | Current interpretation |
+| --- | --- |
+| Historical Enhanced/MariaDB invoice/unit/browser | Bounded on pinned earlier code/profile; does **not** prove current full multi-profile financial workflow |
+| CF02 POS01-C | Owner real positive CoreGuarded contribution only |
+| CF03 POS02-A1/A2 | Owner TECHNICAL PASS for CoreGuarded contribution/Agenda ON/OFF, not invoice/physical event |
+| CF03 F32-W01-01 | Independent CLOSED on earlier reviewed source |
+| CF03 RB01-A | INVALID/STOP as rollback proof; a normal contribution persisted |
+| PR32 CF03 witness CI | 9/9 standard + 1/1 hosted at original head; synthetic only; squash-merged to `main` |
+| CF05 / CF03-NORMAL / release | **OPEN**, must use new exact source and Owner-approved real normal cases A–D plus independent evidence/21-job/full ZIP gates |
+| CF03-FAULT real injections | **DEFERRED / OPEN / NOT EXECUTED**; synthetic fault contract still in release scope |
+
+The Owner explicitly accepted F32-MR-01/P2 (private target-user launcher missing) and F32-MR-02/P3 (historical parent/root prose drift) as **limitations**, not fixes or blanket security waivers. See [current development baseline](current-development-baseline.md), [CF03 plan](cf03-qualification-plan.md) and [test strategy](test-strategy.md).
+
 The 71 IDs and original columns in `requirements.csv` remain authoritative. Implemented/partial rows identify actual components, existing assertion labels,
 real test references and explicit coverage gaps. No parallel requirement list is kept.
 
@@ -384,7 +401,7 @@ The new pure `test/unit/cf03-lab.php` exercises the four environment policy cont
 
 `tools/cf03-lab.php` provides separate owner-run **read-only** A-D preflight/check-only/baseline/verify. Baseline/verify write only private evidence files, and the actual authenticated UI booking remains a separate owner action. This general witness is not the historical A-only POS01 witness. In particular, preflight's Performance Schema SELECT permission does **not** prove active EnhancedMySQL observer event continuity; selected invoice-row counts do **not** establish full invoice/Agenda/PDF/mail equivalence; and CoreGuarded POS database readback is **not** independent physical event identity or HTTP acknowledgement.
 
-A and C are **one installation and same schema with manual serialized credential/profile switching**; D's separate installed ZIP module copy is admitted only when nine selected runtime source hashes agree with the checked-out CF-03 files (not a full ZIP audit); they are not independent or concurrent DB environments. B's application username and D's concrete runtime coordinates remain to be supplied and independently checked. Issue #22 CF-03 gates (six items), complete real MySQL fault/concurrency/batch/replay, current-source MariaDB and Enhanced invoices, hosted V22 ZIP installation, selected postcommit effects and full-HEAD independent review remain **OPEN / NOT EXECUTED**. The existing requirements.csv remains the sole requirements matrix. See [matrix](cf03-qualification-plan.md), [operator runbook](cf03-operator-runbook.md) and [Stage 0/1 review handoff](cf03-stage01-review-handoff.md).
+A and C are **one installation and same schema with manual serialized credential/profile switching**; at the **historical 2026-11-20 Stage-1 checkpoint**, D's separate deployed module copy used **nine selected runtime-PHP hashes** (not a full ZIP audit); **that file count is superseded** by the merged PR #32 witness's deterministic bounded module production-PHP inventory and version-specific critical Core dependency manifest (still not an exact ZIP installation proof); they are not independent or concurrent DB environments. B's application username and D's concrete runtime coordinates remain to be supplied and independently checked. Issue #22 CF-03 gates (six items), complete real MySQL fault/concurrency/batch/replay, current-source MariaDB and Enhanced invoices, hosted V22 ZIP installation, selected postcommit effects and full-HEAD independent review remain **OPEN / NOT EXECUTED**. The existing requirements.csv remains the sole requirements matrix. See [matrix](cf03-qualification-plan.md), [operator runbook](cf03-operator-runbook.md) and [Stage 0/1 review handoff](cf03-stage01-review-handoff.md).
 
 ## CF03-W01 Paket B follow-up regressions (2026-11-20)
 

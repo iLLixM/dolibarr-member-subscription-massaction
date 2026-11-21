@@ -1,5 +1,7 @@
 # PR #32 – CF03 Phase 1 consolidated evidence and independent merge-review handoff
 
+> **Archived PR #32 handoff, superseded after merger (2026-11-21).** PR #32 was **squash-merged** to `main` at `425980c43a51a9f27073133212f18825ac6da248`. Reviewed original PR head `cbc97843fb017135739a39ea12ef26c7fa66dfdb`; standard CI 9/9 and hosted 1/1 PASS. The independent final review concluded **CHANGES REQUIRED** for unconditional merge, with F32-MR-01/P2 (`sudo env_reset` private environment) and F32-MR-02/P3 (obsolete evidence-parent wording). The Owner expressly accepted both **as limitations, not fixes** and executed the squash merge. A/B/C witness operation remains gated on a private launcher/read-only preflight. The historical request for a future merge verdict below is not the present PR status. [Current development baseline](current-development-baseline.md) supersedes its old timeline.
+
 **Date:** 2026-11-21
 **Branch:** `feature/cf03-qualification`; **base:** `main`.
 **Review subject:** final PR #32 HEAD as fetched live at review time, including all privacy and evidence-root commits. This handoff deliberately does **not** freeze or pre-approve an intermediate SHA.

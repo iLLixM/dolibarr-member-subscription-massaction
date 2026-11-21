@@ -1,5 +1,7 @@
 # Repository privacy and historical evidence handling (2026-11-21)
 
+> **PR #32 final status (2026-11-21):** Current-tree pseudonymization/evidence tooling was **squash-merged** as `425980c43a51a9f27073133212f18825ac6da248`, reviewed source `cbc97843fb017135739a39ea12ef26c7fa66dfdb`. No permanent private-term blacklist is kept in source/CI. F32-MR-01/P2 target-user private environment launcher and F32-MR-02/P3 historic root-prose deviation were **expressly Owner-accepted, not technically fixed**. The latter's **actual runtime** boundary is canonical evidence parent with no group/other write, case 0700/file 0600, operator root for A/B/C and full A–D webroot/source exclusion. Current-tree anonymization **does not purge old Git commits or PR/Issue discussions**. Historic original artifact hashes do not certify the redacted bytes. See [current baseline](current-development-baseline.md).
+
 ## Current working tree
 
 The public **current file tree** must not contain operator personal usernames, home paths,

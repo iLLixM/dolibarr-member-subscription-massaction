@@ -1,8 +1,21 @@
 # CF-03 — Qualification plan and binding A-D environment matrix
 
-Status updated 2026-11-21: **POS02-A1 and POS02-A2 in environment A TECHNICAL PASS / COMPLETED; F32-W01-01 code finding independently CLOSED**. Later real Owner test results supersede the historical Stage-0/1 `no live test` wording below; other CF03 gates remain OPEN. Source baseline: main `786f271240d230b90fad77fe1c3397d1ec796f81` (2026-11-20). The active PR HEAD must be pinned separately at the time of each test. Binding scope: [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22), [ADR-0001](adr/ADR-0001-core-first-transaction-profiles.md), D-01/D-02 and E01–E15.
+## Current CF03 disposition after PR #32 squash merge (2026-11-21)
 
-## Phase 1 consolidation and pending approval (2026-11-21)
+[PR #32](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/32) **MERGED by squash** as `425980c43a51a9f27073133212f18825ac6da248`, independent final review source `cbc97843fb017135739a39ea12ef26c7fa66dfdb` (9/9 standard + 1/1 hosted CI PASS). Review: **CHANGES REQUIRED** for unconditional merge due to F32-MR-01/P2 and F32-MR-02/P3; both explicitly **Owner-accepted as limitations, not fixed**.
+
+- **F32-MR-01 / P2 – operational admission gate:** The A/B/C commands use `sudo -u www-data`, which can strip mandatory private `CF03_*` variables under `env_reset`. No successful protected launcher proof was recorded. **Until a private, least-privilege target-user launcher has passed read-only preflight, no further real A/B/C witness execution is admitted.** No blanket `sudo -E`, private data in arguments or public logs.
+- **F32-MR-02 / P3 – historical prose corrected below:** A/B/C evidence parent is supplied via `CF03_EVIDENCE_ROOT`, **not** a fixed repository path; a canonical parent must have effective CLI read/write **but no group/other WRITE**, while read/traverse can be shared. Cases remain 0700, files 0600, exclusive no-retry. This was an **accepted documentation deviation at merge**, not a runtime fix.
+- **Legacy evidence:** F32-W01-01 independently CLOSED on earlier head, POS02-A1/A2 Owner TECHNICAL PASS for bounded contribution-only/Agenda ON/OFF, RB01-A **INVALID/STOP** as rollback proof (ordinary contribution persisted). Earlier A–D preflights were 4/4 Owner PASS on older source, not current-HEAD PASS. No rebooking or second verify of used cases.
+- **Current qualification contract from Issue #22:** **CF05** must implement full contribution/optional invoice/Third Party/PDF/mail on all three profiles. Then **CF03-NORMAL** must independently verify real normal/success workflows A/B/C/D, including small successful batch, isolated SMTP and exact D ZIP integration. Retain synthetic fault/security and 21-job CI; real destructive **CF03-FAULT** is deferred to a later iteration, explicitly OPEN/NOT EXECUTED. No fresh real A/B/C/D full-feature, release or physical event identity claimed.
+
+For active requirements use the [current development baseline](current-development-baseline.md), [operator runbook](cf03-operator-runbook.md), [architecture ADR](adr/ADR-0001-core-first-transaction-profiles.md) and [release map](release-qualification-v0.1.0.md). D must separately exclude HTTP aliases and untrusted mounts/ancestors. A/C share database/webroot and remain serial.
+
+**Historical evidence checkpoint (2026-11-21; underlying pre-merge source baseline dated 2026-11-20):** **POS02-A1 and POS02-A2 in environment A TECHNICAL PASS / COMPLETED; F32-W01-01 code finding independently CLOSED**. Later real Owner test results supersede the historical Stage-0/1 `no live test` wording below; other CF03 gates remain OPEN. Source baseline: main `786f271240d230b90fad77fe1c3397d1ec796f81` (2026-11-20). The active PR HEAD must be pinned separately at the time of each test. Binding scope: [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22), [ADR-0001](adr/ADR-0001-core-first-transaction-profiles.md), D-01/D-02 and E01–E15.
+
+> **Historical status and planning snapshots (2026-11-20 to pre-merge 2026-11-21):** Sections below describing PR #32 as Draft, previously outstanding preflights/reviews, an A/B/C fixed evidence root or the original contribution-only CoreGuarded post-commit admission represent the **dated checkpoint named by each section**, not current requirements or permission to operate. The current disposition above and the [Issue #22 development baseline](current-development-baseline.md) govern. Earlier source hashes/evidence retain their historical scope; all used one-shot fixtures remain ineligible for reuse.
+
+## Historical Phase 1 consolidation and pending approval (2026-11-21; before PR #32 merge)
 
 The current PR #32 privacy pass pseudonymizes historical working-tree
 documents, fixtures and experimental sources. This changes archived bytes,
@@ -36,7 +49,7 @@ CF03-FAULT, CF05 or release qualification is inferred.
 
 The initial D `CF03WrongDolibarrRoot` remains a historical preflight tool STOP, now resolved by the V22 filefunc version detection. **D's `deployment_kind=source_checkout`: no ZIP-origin/installation PASS is claimed.** Real HTTP, positive/negative booking, faults/rollback, invoice, active Enhanced observer, concurrency/replay and hosted private evidence-root qualification remain **NOT EXECUTED**. Full sanitized details in [Owner A–D preflight evidence](evidence/cf03/stage01-owner-preflight-2026-11-20.md). This later evidence supersedes dated `NOT EXECUTED` preflight markers below for current Stage 0 status; all six Issue #22 CF-03 acceptance checkboxes remain OPEN.
 
-## CF03-W01 Operator Readiness Hardening (2026-11-21) – CURRENT STATUS
+## CF03-W01 Operator Readiness Hardening – historical intermediate checkpoint (2026-11-21, before merge)
 
 The original independent W01 tooling review closed all eleven F32-W01-01..11 findings on source HEAD `3511175fc33489e7e8e89e4ae13f36db8e87aa62`. A later independent overall review identified **F32-GR-01** (invalid missing-actor runbook example, P2), **F32-GR-02** (PHP CLI runtime not bound to the case, P3), stale operator documentation and **F32-W01-12** (Reader mock emits PHP warnings, P3). These targeted items are now implemented as one *Operator Readiness Hardening* delta; **the new HEAD is not automatically independently approved**.
 
@@ -46,15 +59,15 @@ Real A/B/C lab environments now bind **PHP CLI 8.2.x** and hosted D binds **PHP 
 
 **No current-HEAD live A–D DB/HTTP business results, active C instrumentation, D private HTTP-exposure proof, full ZIP proof, fault/concurrency/replay proof, Issue #22 closure, merge, release or production GO are implied.** The earlier 4/4 read-only preflights belong to a different source SHA. New independent delta review, fresh A–D read-only preflights, case-specific Owner approvals and immutable evidence remain required. Sections headed "Stage 0/1" below retain historically dated source and progress context; where they conflict, this current status and the operator runbook govern.
 
-## CF03-W01 tool hardening (2026-11-20)
+## Historical CF03-W01 tool hardening checkpoint (2026-11-20)
 
 The read-only A–D preflights completed **4/4 Owner PASS** on earlier source. Following that qualification, CF03-W01 adds [private hosted evidence and invoice checks](cf03-w01-validation.md): a strictly explicit, private D evidence root (A/B/C unchanged), one-shot checksum/ownership/mode/file-list integrity, sorted V22/V24 SQL column fingerprints, a stricter single existing-customer invoice header/line/Agenda count witness, pure negative unit tests, and a targeted PHP 8.3/V22.0.5 CI lane without broadening standard PR CI. **No real W01 readback/booking/invoice test has been conducted**; earlier preflight evidence does not automatically qualify changed W01 code and must be rechecked before real scenario admission.
 
-The invoice witness deliberately rejects unsupported `LINEBILL_INSERT` event attribution; separate live invoice/customer/PDF/SMTP/observer tests remain necessary. All six CF-03 Issue #22 checkboxes remain OPEN, the PR remains DRAFT, and Owner merge/release GO remains separate.
+The invoice witness deliberately rejects unsupported `LINEBILL_INSERT` event attribution; separate live invoice/customer/PDF/SMTP/observer tests remain necessary. All six CF-03 Issue #22 checkboxes were OPEN and PR #32 was DRAFT **at this 2026-11-20 checkpoint**; the Owner merge/release decisions remained separate.
 
-## CF03-W01 Paket B remediation (2026-11-20)
+## Historical CF03-W01 Paket B remediation checkpoint (2026-11-20)
 
-Owner-approved bounded runtime-source and business-contract correction in Draft PR #32: F32-W01-02 (deterministic PHP inventory of module production sources + scenario-relevant pinned Dolibarr V22/V24 Core subset; matching deployed module source copy, no ZIP attestation), F32-W01-06 (configured invoice product `fk_product_type` 0/1), F32-W01-07 (only customers `client=1/3`), F32-W01-08 (read-only validation of active entity-1 authenticated operator and Core Agenda event author/owner/resource), and F32-W01-09 (exactly one invoice unit). All five now have targeted positive/negative synthetic regressions. Together with Paket A, this is **implementation evidence only**: independent delta review of **all ten** F32-W01 findings and Owner A–D re-preflight are still pending. Previous Owner A–D preflights belong to pre-W01 source. Realtest families all remain **NO-GO**, PR #32 stays DRAFT, and Issue #22's six CF-03 qualification checkboxes remain OPEN. See [W01 validation](cf03-w01-validation.md).
+Owner-approved bounded runtime-source and business-contract correction in **then-Draft PR #32 (2026-11-20)**: F32-W01-02 (deterministic PHP inventory of module production sources + scenario-relevant pinned Dolibarr V22/V24 Core subset; matching deployed module source copy, no ZIP attestation), F32-W01-06 (configured invoice product `fk_product_type` 0/1), F32-W01-07 (only customers `client=1/3`), F32-W01-08 (read-only validation of active entity-1 authenticated operator and Core Agenda event author/owner/resource), and F32-W01-09 (exactly one invoice unit). All five now have targeted positive/negative synthetic regressions. Together with Paket A, this is **implementation evidence only**: independent delta review of **all ten** F32-W01 findings and Owner A–D re-preflight are still pending. Previous Owner A–D preflights belong to pre-W01 source. Realtest families were **NO-GO** and PR #32 **DRAFT at this dated checkpoint**; Issue #22's six CF-03 qualification checkboxes remained OPEN. See [W01 validation](cf03-w01-validation.md).
 
 ## 1. Binding environment assignments
 
@@ -79,9 +92,9 @@ A/C test windows must be mutually exclusive: finish and preserve one case and it
 
 **Environment D:** a hosted system is not inherently safe for destructive faults. Use only approved synthetic members, ordinary positive/negative UI flows and test ZIP; no deliberate deadlock/connection kill/global configuration manipulations unless independently approved isolation and recovery exist. The V22 target/source patch must be verified; no assumed document root/port/user.
 
-## Evidence-root permission policy (2026-11-21)
+## Evidence-root permission policy (2026-11-21; F32-MR-02 correction)
 
-Current W01 test-only witness accepts an existing canonical non-symlink **root** when the effective PHP CLI user has read and write access. Root mode 0700 and owner equality are no longer required; **individual case directories and evidence files still require 0700 / 0600** and one-shot integrity. This deliberately weakens the parent-directory trust guarantee where other users can write to the root; independent Owner isolation/permissions assessment and a bounded security delta review are required before real RB01 injection. A/B/C root path remains fixed; D additionally excludes webroot/checkout overlap and must be protected against public HTTP exposure.
+The **current** W01 witness admits an existing canonical non-symlink evidence parent with effective CLI read/write permissions **only if group/other WRITE bits are absent** (mode mask `0022` rejected). Group/other read/traverse can be allowed; parent ownership/mode 0700 is **not** mandatory. Private case directories must be mode **0700** and owner-bound; evidence files **0600**, created under a restrictive `umask 0077` and mode-checked **before first write**, then exclusively one-shot. In A/B/C the parent comes from the **private operator-set `CF03_EVIDENCE_ROOT`**, never a fixed public repository path; D supplies its separately protected root. All A/B/C/D roots must be outside the webroot/site root and source checkout, including ancestor/descendant overlap. Operator must additionally exclude public HTTP aliases and untrusted ACL/mount/ancestor/same-UID access. **F32-MR-02/P3 was Owner-accepted as historical documentation drift at PR32 merge**, not as permission for writable parent directories.
 
 ## 2. Safety and evidence contract for Stage 0–1
 
@@ -105,7 +118,7 @@ Current W01 test-only witness accepts an existing canonical non-symlink **root**
 
 For `contribution` or `no-change`, `datefin` must be NULL in the fresh baseline; for invoice the member must have an existing linked customer. For every scenario, `Synthetic` given name, a unique `CF03LAB-[A-D]-...` surname marker and marker-derived `@example.invalid` address, a fresh Core-generated reference, entity 1, validated status, active type and expected amount, no prior contribution or linked invoices are required. The selected date range in this initial witness is between 2050 and 2099. Historical members **56/57/58 and subscriptions 65/66/67 must never be reused**.
 
-For A/B/C the installed module must resolve to the current checkout. For D a verified deployed ZIP module **copy** is also admitted: nine selected deployed product PHP file hashes must equal the current CF-03 checkout; the complete package manifest and installation process still require separate HOST01/R0-04 evidence. Each preflight also fingerprints the installed Dolibarr Core `version.inc.php`, `Adherent`, `User` and `DoliDBMysqli` source files; the baseline-to-verify window rejects drift in those Core hashes, not just module files. A matching version string alone is not taken as a source identity proof.
+For A/B/C the installed module must resolve to the current checkout. At the **2026-11-20 Stage-1 checkpoint**, D's separately deployed module **copy** check compared nine selected product-PHP file hashes; this was **not** a ZIP manifest or installation proof. The merged PR #32 witness instead uses a deterministic bounded module production-PHP inventory and a version-specific critical Core manifest; do not reuse the historical nine-file count as a current attestation contract. HOST01/R0-04 exact-package qualification remains separate. Each preflight also fingerprints the installed Dolibarr Core `version.inc.php`, `Adherent`, `User` and `DoliDBMysqli` source files; the baseline-to-verify window rejects drift in those Core hashes, not just module files. A matching version string alone is not taken as a source identity proof.
 
 A/C normal one-shot tests require NO_CHAIN. CHAIN/RELEASE, isolation setting variants, 1213/1205, actual concurrent HTTP/SQL, unexpected commits, connection replacement, lost ACK and terminal/partial-batch behavior need **separate test harnesses** with special case admission and stricter controlled injection isolation. Do not change this NO_CHAIN witness to accept those states as a shortcut.
 
@@ -121,7 +134,10 @@ Limitations: The POS01 witness is pinned to A, a specific restricted account and
 
 **Stage-1 deliverables:** reusable A-D pure policy `tools/cf03-lab.lib.php`; read-only `tools/cf03-lab.php`; offline `test/unit/cf03-lab.php`; nine-profile plus optional full-CI unit invocation; this matrix, operational runbook, review/coverage documentation. No product booking/transaction implementation change and **no live CF-03 PASS**.
 
-## 4. Planned risk-based CF-03 gates
+## 4. Historical Stage-1 risk-based CF-03 gate matrix (2026-11-20; not current v0.1.0 admission)
+
+> **Historic scope:** The following matrix records the originally planned Stage-1 witness coverage and its admission state on **2026-11-20**, before CF05 and before the 2026-11-21 ADR-06/ADR-11 revision. In particular, the original POST01 entry excluded CoreGuarded **only because its invoice/PDF/mail feature gates were contribution-only at that time**; this exclusion is **not** the v0.1.0 product target. Current policy requires qualified post-commit PDF/mail in **A/B/C/D following CF05**, subject to suitable acknowledged nonterminal completion, checkpoint, independent real CF03-NORMAL evidence and release gates. Refer to the [current A-D and CF05 matrix](current-development-baseline.md#next-deliverables-and-release-gates) and [v0.1.0 release qualification](release-qualification-v0.1.0.md). Historical `NOT EXECUTED` markers are not retroactive acceptance.
+
 
 | Gate | Cases | Environment | Stage-1 evidence |
 | --- | --- | --- | --- |
@@ -135,16 +151,16 @@ Limitations: The POS01 witness is pinned to A, a specific restricted account and
 | MDB01 | Actual current-source MariaDBSnapshot contribution and invoice regression | B | Partial contribution/invoice-existing witness prepared; no real test |
 | ENH01 | Actual EnhancedMySQL P_S/event/transaction and invoice regression | C | Read-only P_S SELECT precheck prepared; no actual observer or invoice run |
 | HOST01 | V22.0.5 hosted test ZIP install, limited account, UI booking/security | D | Environment parameterized; exact artifact/build/deploy tooling still needed |
-| POST01 | Authorized PDF/SMTP after accepted DB booking, never in CG | B/C | Not covered by DB witness; separate file/mail evidence required |
+| POST01 | Authorized PDF/SMTP after accepted DB booking; **CoreGuarded excluded at the 2026-11-20 contribution-only checkpoint** | **B/C at this historical checkpoint**; A/D target after CF05 | Not covered by DB witness; separate file/mail evidence required |
 | CI01 | Nine-profile standard PR and later 21-profile full synthetic matrix | CI | CF-03 pure unit linked to both workflows |
 | RV01 | Independent review of exact HEAD, evidence and residual risks | All | NOT EXECUTED; Owner merge/release GO separate |
 
 The six Issue #22 CF-03 checkboxes **stay unchecked** until qualified with complete documented boundaries. Stage-1 test-preparation completion is not a gate completion.
 
-## 5. Next safe steps and boundaries
+## 5. Historical Stage-1 next-step checklist (2026-11-20; not current operational instructions)
 
 1. On the CF-03 branch, verify nine-profile PR CI (and unit harness under PHP 7.4 and 8.2). No CF-03 real business test at this gate.
 2. Owner/operator collects the A-D Preflight JSON independently, never uploads conf.php, credentials or raw member data.
 3. Owner sets A and C accounts and matching profiles **manually**, one exclusive test window at a time. Both share unchanged schema; snapshots must be completed before switching.
-4. After review of four preflight results, prepare separate authorized targeted UI/fault/invoice/ZIP operator procedures with fresh fixtures and explicit safe action permits. Repeat existing positive case only when it adds evidence.
-5. Before final PR merge, rerun affected CI and independently review implementation/evidence; CF-04 final v0.1.0 package/Owner GO remains open.
+4. After review of four preflight results, prepare separate authorized targeted UI/fault/invoice/ZIP operator procedures with fresh fixtures and explicit safe action permits. A scenario may only be retested using a **fresh, previously unused fixture, a new one-shot evidence case and separate, explicit Owner authorization** where additional evidence is necessary. **Never rebook, re-verify, reset or overwrite any previously consumed POS01/POS02/RB01 case**, even when its prior outcome was STOP/INVALID.
+5. At this historical checkpoint, the then-pending PR #32 merge required affected CI and independent review; PR #32 has since been squash-merged. The current CF05, exact v0.1.0 package and separate Owner release gates remain OPEN.
