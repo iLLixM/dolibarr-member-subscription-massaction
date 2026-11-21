@@ -45,6 +45,30 @@ history rewrite and migration of SHA-anchored audit references; even then remote
 forks and external mirrors cannot be guaranteed purged. Treat previously exposed
 values as disclosed and rotate credentials if any actual secret was published.
 
+## Phase 1 evidence-root recheck (2026-11-21)
+
+The bounded permission decision remains unchanged: a trusted, canonical parent
+may be readable/traversable by other users but must not be group/other writable;
+the single-use case directory is 0700 and every file is 0600. The operator
+must exclude HTTP aliases, untrusted ancestors, network mounts and
+same-UID/privileged interference. These are environmental limits, not
+claims of stronger physical isolation.
+
+The CF03 witness now enforces exclusion of the live webroot, its site root,
+its ancestors/descendants and the source checkout in ALL profiles A/B/C/D,
+rather than only D. It rejects an unavailable realpath. It also opens each
+one-shot evidence file under a temporarily restrictive process umask (0077),
+restores the previous umask immediately after fopen and checks the new file
+mode BEFORE the first data write. The earlier chmod(0600) after writing
+remains a final check, not the first privacy boundary. These changes are
+restricted to CF03 read-only evidence handling; they do not grant a business-
+test or merge GO. Synthetic regression covers all profiles and umask 0000.
+
+The public current-tree privacy scan is only a bounded denylist/pattern guard,
+not a complete PII detector or history purge. It must be exercised on the
+exact PR HEAD; independent code/evidence-scope review remains mandatory.
+No source fingerprints, historical hashes or original evidence are restamped.
+
 ## Review scope and remaining limits
 
 This privacy work does not change production booking/transaction/invoice algorithms.
