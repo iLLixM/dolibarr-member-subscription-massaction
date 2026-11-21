@@ -7,7 +7,8 @@ Status updated 2026-11-21: **POS02-A1 and POS02-A2 in environment A TECHNICAL PA
 The current PR #32 privacy pass pseudonymizes historical working-tree
 documents, fixtures and experimental sources. This changes archived bytes,
 so earlier hash claims retain only their pinned historical commit meaning.
-Current CI detects known private identifiers in tracked text. The CF03
+The one-time anonymization contains no retained list of sensitive identifiers
+and no standing private-term CI scanner; privacy review inspects source directly. The CF03
 evidence parent may have group/other read/traverse access but no
 group/other write access; private files now are protected at creation.
 The webroot/site-root/checkout exclusion applies to A/B/C/D. Operator
