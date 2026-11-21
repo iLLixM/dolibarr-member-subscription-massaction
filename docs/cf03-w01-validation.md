@@ -2,6 +2,12 @@
 
 **Implementation status:** Test-only hardening in [Draft PR #32](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/32). Earlier Owner A–D read-only preflights PASS; **no new real DB booking, invoice, rollback or HTTP test executed for W01**. Issue #22 CF-03 gates remain OPEN.
 
+## F32-W01-01 – member-type status correction after POS02-A1 check-only (2026-11-21)
+
+The Owner's initial real A `--check-only` after ENV02 STOPped with `CF03MemberTypeMismatch` for a valid paid member type. Pinned Dolibarr V22.0.5 and V24.0.3 `AdherentType::LibStatut()` and the module's production `MsmPreviewService::validateEligibility()` agree: **`llx_adherent_type.statut=1` means ACTIVE and `0` means INACTIVE**. The earlier W01 witness, unit fixtures and historical Paket A text incorrectly reversed this contract.
+
+This focused test-tool-only correction changes the W01 baseline type check, unit positive/negative fixtures and real `cf03State()` SQL-reader fixture, adds a dedicated inactive-type STOP regression and corrects the historical note below. **F32-W01-01 must be independently re-reviewed at the new exact source SHA.** The previously approved real W01 test-tool admission does not automatically extend to this changed source. Standard/hosted CI and fresh A preflight/check-only are prerequisites to any POS02-A1 baseline or real UI booking. No real DB modification, booking, module business logic change, auto-retry, merge or release is implied.
+
 ## CF03-W01 Operator Readiness Hardening – targeted 2026-11-21 implementation
 
 An independent overall review at original HEAD `3511175fc33489e7e8e89e4ae13f36db8e87aa62` confirmed technical W01 test-tool readiness but identified F32-GR-01 (runbook missing required actor for Agenda ON), F32-GR-02 (unbound PHP CLI runtime), historic source/Agenda status wording and F32-W01-12 (P3 Reader warning). The Owner accepted a **single bounded remediation**. It does not create new production booking functions or change Core-first architecture.
@@ -43,7 +49,7 @@ Following the Owner's explicit choice of a **bounded, scenario-specific runtime 
 
 The independent W01 review on PR HEAD `460b75d28bedfc9f4397c0cbf314d56964e638e1` ruled **CHANGES REQUIRED / NO REAL-TEST RELEASE**, with four P1 and six P2 findings. This branch has since received a **scoped Paket A correction**, which does **not** constitute independent finding closure or real-test admission.
 
-Paket A covers F32-W01-01 (Dolibarr V22/V24 paid member type `statut=0` active), F32-W01-05 (`adherent_type.entity=1` and `subscription='1'`), F32-W01-03 (0700/effective-CLI-owner evidence-root requirement for **all A/B/C/D**), F32-W01-04 (valid case baseline and expected state admitted, then exclusive `verify.started` **before any fresh runtime/DB/config/source access**; after this seal, early STOP attempts write a non-overwriting `verdict.json`), and the focused F32-W01-10 negative-assertion helper (requires exact `CF03...` STOP reason, not merely the prefix).
+Paket A covers F32-W01-01 (historically incorrectly treated `statut=0` as active; later corrected to `statut=1` for V22/V24), F32-W01-05 (`adherent_type.entity=1` and `subscription='1'`), F32-W01-03 (0700/effective-CLI-owner evidence-root requirement for **all A/B/C/D**), F32-W01-04 (valid case baseline and expected state admitted, then exclusive `verify.started` **before any fresh runtime/DB/config/source access**; after this seal, early STOP attempts write a non-overwriting `verdict.json`), and the focused F32-W01-10 negative-assertion helper (requires exact `CF03...` STOP reason, not merely the prefix).
 
 A/B/C retain the previously fixed `/var/lib/dolibarr-test-results` path, but the Owner must **manually** ensure it is a canonical directory owned by the actual PHP-CLI effective user with mode 0700 before any baseline/verify; the tool does not chmod/chown a shared parent. An installation that previously worked with a group/world-accessible parent must now STOP rather than silently accept a weak evidence root. No direct local DB, HTTP action or filesystem configuration change was made by the developer.
 
