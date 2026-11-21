@@ -155,7 +155,7 @@ final class MsmFileBookingCheckpoint
 				|| ($kind === 'mail' && (empty($origin['options']['sendmail'])
 					|| ($result['mail'] ?? null) !== 'unknown'
 					|| (!empty($origin['options']['invoice']) && (!is_array($invoice)
-						|| ($invoice['pdf']['status'] ?? null) !== 'verified')))) {
+						|| ($invoice['pdf']['status'] ?? null) !== 'verified'))))) {
 				throw new RuntimeException('MSMSessionFailure');
 			}
 		} finally {
