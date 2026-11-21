@@ -1,5 +1,13 @@
 # ADR-0001 — Core-first transaction profiles
 
+## PR #36 source-verified implementation addendum (2026-11-21; NOT a new ADR decision)
+
+[PR #36](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/36) was **SQUASH-MERGED** on 2026-11-21 as `d0b15785c60b74aa7ad59a1c687db94193d159c6`; independently reviewed source `33cb3da3b389f9df2870bc8c6223c86a959cb467` and merge have **identical Git tree `6cc4834b9fe5100aca99126885791b3aeff12fef`**. External verdict **`APPROVED FOR DEVELOPMENT MERGE`**, **F36-01/P1 CLOSED** and **F36-02/P2 OPEN / CF05-06 REQUIRED**, no new P0–P3 delta findings. [standard CI 9/9 PASS](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44956004981) and [hosted PHP8.3/V22.0.5 CI 1/1 PASS](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44956004947) refer to the **exact reviewed head**; their positives are **synthetic**, not new real full-finance test evidence.
+
+**ADR-06/11 remain binding as amended by Owner in Issue #22**: full finance on CoreGuarded is a development/release *target*, **not** an authorization to operate it. PR #36 added the complete guarded CoreGuarded invoice/Third-Party, typed business error/owned rollback and checkpointed PDF/mail code without a second transaction owner, a CoreGuarded P_S fallback or a persistent journal. **Production `MsmTransactionProfile::coreGuardedFinanceQualified()` still returns `false`**: contribution booking is admitted, while invoice/autocreate/sendmail remain **server-default-denied**, including Preview/Booking/direct Invoice paths. EnhancedMySQL and MariaDBSnapshot retain their historical admitted scope.
+
+**F36-02/P2 remains OPEN for CF05-06 before any finance admission**: V22/V24 `Facture::validate()` conditionally renames a `PROV` directory before outer COMMIT. Filesystem effects cannot be SQL-rolled back; actual reachability with fresh module invoices and any mitigation/configuration exclusion remain unqualified. See [CF05-06 plan](../cf05-06-standard-core-qualification-plan.md). CF05-07, CF03-NORMAL A–D, 21-job release CI, real D exact ZIP and separate Owner finance/release GO remain OPEN. Earlier PR34 and historical ADR decisions below retain their original evidence scope.
+
 ## Post-PR #34 implementation addendum (2026-11-21; no ADR strategy revision)
 
 The **binding Owner architecture remains the revised ADR-06 and ADR-11 below**, with unchanged ADR-01–05/07–10/12 and D-01/D-02 safeguards. This addendum records implementation status, **not a new product or risk-waiver decision**.
