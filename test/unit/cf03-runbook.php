@@ -8,6 +8,23 @@ if (PHP_SAPI!=='cli') { exit(64); }
 require_once __DIR__.'/../../tools/cf03-lab.lib.php';
 $runbook=file_get_contents(__DIR__.'/../../docs/cf03-operator-runbook.md');
 if (!is_string($runbook)) { throw new RuntimeException('CF03RunbookNotReadable'); }
+// Unit-only environment; never use production host or account identities.
+foreach (array(
+    'CF03_A_DOCUMENT_ROOT'=>'/opt/cf03-fixture/mysql/htdocs',
+    'CF03_A_DATA_ROOT'=>'/opt/cf03-fixture/mysql/data',
+    'CF03_A_DB_HOST'=>'127.0.0.1',
+    'CF03_A_DB_PORT'=>'3307',
+    'CF03_A_DB_NAME'=>'cf03_mysql_fixture',
+    'CF03_A_DB_USER'=>'cf03_limited_fixture',
+    'CF03_A_WEB_URL'=>'http://127.0.0.1:8091/',
+    'CF03_B_DOCUMENT_ROOT'=>'/opt/cf03-fixture/mariadb/htdocs',
+    'CF03_B_DATA_ROOT'=>'/opt/cf03-fixture/mariadb/data',
+    'CF03_B_DB_HOST'=>'127.0.0.1',
+    'CF03_B_DB_PORT'=>'3306',
+    'CF03_B_DB_NAME'=>'cf03_mariadb_fixture',
+    'CF03_B_WEB_URL'=>'http://127.0.0.1:8090/',
+    'CF03_C_DB_USER'=>'enhanced_application'
+) as $key=>$value) { putenv($key.'='.$value); }
 $passed=0;
 function runbookOk($condition,$label)
 {

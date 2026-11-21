@@ -218,7 +218,7 @@ foreach (array(
     'CF03_B_DB_PORT'=>'3306',
     'CF03_B_DB_NAME'=>'cf03_mariadb_fixture',
     'CF03_B_WEB_URL'=>'http://127.0.0.1:8090/',
-    'CF03_C_DB_USER'=>'cf03_enhanced_fixture'
+    'CF03_C_DB_USER'=>'enhanced_application'
 ) as $key=>$value) { putenv($key.'='.$value); }
 $environments=Cf03LabContract::environments();
 c3ok(count($environments)===4,'four environments');
