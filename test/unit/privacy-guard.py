@@ -30,7 +30,7 @@ with tempfile.TemporaryDirectory(prefix="msm-privacy-unit-") as scratch:
         ("fixture.txt", "Windows C:\\Users\\" + forbidden + "\\project", False),
         ("evidence.started", "local /home/" + forbidden + "/workspace", False),
         (".gitignore", "private /home/" + forbidden, False),
-        ("fixture.json", '{"account":"dolibarr" + "_i105"}', False),
+        ("fixture.json", '{"account":"' + ("dolibarr" + "_i105") + '"}', False),
     )
     for name, body, accepted in cases:
         for stale in ("fixture.md", "fixture.php", "fixture.txt",
