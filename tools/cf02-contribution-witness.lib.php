@@ -1,12 +1,12 @@
 <?php
-/* Copyright (C) 2026 iLLixM <iLLixM@proton.me>
+/* Copyright (C) 2026 iLLixM <iLLixM>
  * SPDX-License-Identifier: GPL-3.0-or-later
  * Pure, fail-closed comparison of read-only lab snapshots. Never opens a DB.
  */
 final class Cf02ContributionWitnessContract
 {
-    const SCHEMA = 'dolibarr_i105_v24';
-    const ACCOUNT = 'dolibarr_i105_v24_limited@10.0.2.100';
+    const SCHEMA = 'cf03_mysql_fixture';
+    const ACCOUNT = 'cf03_restricted_fixture@127.0.0.1';
     const MARKER_PATTERN = '/^CF02LAB-[A-Z0-9]{8,16}$/D';
     const COUNTS = array('adherent', 'subscription', 'actioncomm', 'actioncomm_resources',
         'societe', 'socpeople', 'facture', 'facturedet', 'element_element',

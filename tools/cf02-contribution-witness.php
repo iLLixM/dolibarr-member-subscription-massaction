@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2026 iLLixM <iLLixM@proton.me>
+/* Copyright (C) 2026 iLLixM <iLLixM>
  * SPDX-License-Identifier: GPL-3.0-or-later
  * CLI only; read-only independent MySQL witness for Owner-operated HTTP booking.
  */
@@ -134,8 +134,8 @@ try {
     cf02Need(($dolibarr_main_db_type??'')==='mysqli'
         && ($dolibarr_main_db_host??'')==='127.0.0.1'
         && (int)($dolibarr_main_db_port??0)===3307
-        && ($dolibarr_main_db_name??'')==='dolibarr_i105_v24'
-        && ($dolibarr_main_db_user??'')==='dolibarr_i105_v24_limited'
+        && ($dolibarr_main_db_name??'')==='cf03_mysql_fixture'
+        && ($dolibarr_main_db_user??'')==='cf03_restricted_fixture'
         && ($dolibarr_main_db_prefix??'llx_')==='llx_','CF02WrongDatabaseTarget');
     try {
         mysqli_report(MYSQLI_REPORT_ERROR|MYSQLI_REPORT_STRICT);

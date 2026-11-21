@@ -31,7 +31,7 @@ def run(kind, output):
     path = Path(output)
     if path.exists() or Path(output+'.started').exists():
         raise RuntimeError('Prior evidence exists; do not repeat automatically')
-    Path(output+'.started').write_text(json.dumps({'kind': kind, 'target': 'isolated msmsh01lab connection only'}))
+    Path(output+'.started').write_text(json.dumps({'kind': kind, 'target': 'isolated cf03_restricted_lab_fixture connection only'}))
     listener = socket.socket()
     listener.bind(('127.0.0.1', 0))
     listener.listen(1)

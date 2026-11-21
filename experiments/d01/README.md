@@ -8,8 +8,8 @@ No complete Core-Guarded adapter, business qualification or release is supplied.
 
 Use pinned V24.0.3 Core `5c6c7ff6a5112413b1c27221c8d11750afad56f8` and PHP8.2.35
 with mysqli/mysqlnd against loopback MySQL8.4.13. Existing artificial InnoDB table
-`msmsh01lab.probe(id,label,n)` must be separately Owner-provisioned. Account
-`msmsh01lab@%` has only SELECT/INSERT/UPDATE/DELETE on that schema; no P_S or admin
+`cf03_restricted_lab_fixture.probe(id,label,n)` must be separately Owner-provisioned. Account
+`cf03_restricted_lab_fixture@%` has only SELECT/INSERT/UPDATE/DELETE on that schema; no P_S or admin
 rights. `D01_CONFIG` may point to a private0600 app.json with host/port/database/user/
 password fields; default `~/.config/dolibarr-sh01/app.json`. Endpoint/schema/account
 are checked; credentials never appear in arguments, output or Git. No privileged

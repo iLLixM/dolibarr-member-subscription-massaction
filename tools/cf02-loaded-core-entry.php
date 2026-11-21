@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2026 iLLixM <iLLixM@proton.me>
+/* Copyright (C) 2026 iLLixM <iLLixM>
  * SPDX-License-Identifier: GPL-3.0-or-later
  * Bounded CLI-only loaded-Core gate. Does not create business objects.
  */
@@ -29,8 +29,8 @@ try {
     require_once DOL_DOCUMENT_ROOT.'/core/db/mysqli.class.php';
     require_once dirname(__DIR__).'/class/coreguardedtransaction.class.php';
     if (($dolibarr_main_db_type ?? '') !== 'mysqli'
-        || ($dolibarr_main_db_name ?? '') !== 'dolibarr_i105_v24'
-        || ($dolibarr_main_db_user ?? '') !== 'dolibarr_i105_v24_limited') {
+        || ($dolibarr_main_db_name ?? '') !== 'cf03_mysql_fixture'
+        || ($dolibarr_main_db_user ?? '') !== 'cf03_restricted_fixture') {
         throw new LogicException('Wrong DB type/schema/account: do not run a Core transaction');
     }
     $conf = new Conf();

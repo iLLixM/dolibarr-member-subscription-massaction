@@ -6,7 +6,7 @@ try {
  ap3CliLogger(__DIR__.'/../../build-output/ap3-private/file-logger.log');ap3MonitorStart();
  $d=ap3Connect(null,'independent');$rows=ap3Snapshot($d);
  ap3Need(!array_filter($rows,static function($r){return (int)$r['id']>=6000&&(int)$r['id']<=6999;}),'AP3 fixture range occupied; no rerun');
- $grants=array_map(static function($r){return array_values($r)[0];},ap3Rows($d,'SHOW GRANTS'));ap3Need(count($grants)===2&&strpos($grants[1],'SELECT, INSERT, UPDATE, DELETE ON `msmsh01lab`.*')!==false,'Unexpected lab grants');
+ $grants=array_map(static function($r){return array_values($r)[0];},ap3Rows($d,'SHOW GRANTS'));ap3Need(count($grants)===2&&strpos($grants[1],'SELECT, INSERT, UPDATE, DELETE ON `cf03_restricted_lab_fixture`.*')!==false,'Unexpected lab grants');
  $r=$d->query('SELECT THREAD_ID FROM performance_schema.events_transactions_current WHERE 1=0');$ps=$d->db->errno;ap3Need($r===false&&$ps===1142,'Expected P_S denial');
  $logger=ap3LoggerProfile();ap3Need($logger['supported'],'File logger preflight');
  $core=array();foreach(array('core/db/DoliDB.class.php','core/db/mysqli.class.php','core/lib/functions.lib.php','core/modules/syslog/mod_syslog_file.php') as $f)$core[$f]=hash_file('sha256',DOL_DOCUMENT_ROOT.'/'.$f);
