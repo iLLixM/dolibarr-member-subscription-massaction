@@ -5,15 +5,20 @@
 require_once __DIR__.'/invoiceprofile.class.php';
 require_once __DIR__.'/databasestate.class.php';
 require_once __DIR__.'/transactionprofile.class.php';
+require_once __DIR__.'/coreguardedtransaction.class.php';
 /** Core business APIs only; the caller owns the outer transaction. */
 class MsmInvoiceService
 {
 	protected $db;
 	protected $databaseState;
-	public function __construct($db, MsmDatabaseState $databaseState = null)
+	/** The active guard is explicitly injected, never constructed or inferred here. */
+	protected $activeGuard;
+	public function __construct($db, MsmDatabaseState $databaseState, MsmActiveTransactionGuard $activeGuard)
 	{
-		$this->db = $db; $this->databaseState = $databaseState ?? new MsmDatabaseState($db);
-		if (!$this->databaseState->isFor($db)) { throw new InvalidArgumentException('MSMDatabaseUnsupported'); }
+		$this->db = $db; $this->databaseState = $databaseState; $this->activeGuard = $activeGuard;
+		if (!$this->databaseState->isFor($db) || !$this->activeGuard->isFor($db)) {
+			throw new InvalidArgumentException('MSMDatabaseUnsupported');
+		}
 	}
 	protected function one($sql)
 	{
@@ -41,9 +46,9 @@ class MsmInvoiceService
 	/** Check after every nested API call, before any further business operation. */
 	protected function owned()
 	{
-		$state = $this->databaseState->active();
+		$state = $this->activeGuard->active();
 		if ($state['state'] !== MsmDatabaseState::ACTIVE || !$state['fresh'] || !$state['owned']) { throw new RuntimeException('MSMTransactionUnknown'); }
-		$this->databaseState->requireSupportedIsolation($state);
+		$this->activeGuard->requireSupportedIsolation($state);
 	}
 	/** Encode confirmed plain text once for the HTML-capable Core invoice-line field. */
 	protected function invoiceDescription($description)
@@ -57,6 +62,14 @@ class MsmInvoiceService
 		$profile = new MsmTransactionProfile($this->db, $this->databaseState, (int) $conf->entity);
 		$current = $profile->current();
 		if (empty($current['features']['invoice']) || $current['reason'] !== '') { throw new RuntimeException('MSMProfileFeatureUnavailable'); }
+		// An explicitly injected guard must match the authoritative profile.
+		// In particular, a future CoreGuarded feature admission must never
+		// fall back to an Enhanced/P_S observer at this direct-service boundary.
+		if ($current['profile'] === 'CoreGuarded') {
+			if (!($this->activeGuard instanceof MsmCoreGuardedTransaction)) { throw new RuntimeException('MSMTransactionUnknown'); }
+		} elseif (!($this->activeGuard instanceof MsmDatabaseState)) {
+			throw new RuntimeException('MSMTransactionUnknown');
+		}
 	}
 	public function create($member, $subscription, array $row, $actor, array &$diagnostic)
 	{
@@ -71,6 +84,7 @@ class MsmInvoiceService
 			$name = $member->morphy === 'mor' ? $member->company : $fullname;
 			$alias = $member->morphy === 'mor' ? $fullname : $member->company;
 			$previous = $user;
+			$this->owned(); // Before nested Core Societe::create_from_member().
 			try { $user = $actor; $customerid = $customer->create_from_member($member, $name, $alias); }
 			finally { $user = $previous; }
 			$diagnostic['customer_id'] = max(0, (int) $customerid); $this->owned();
@@ -92,15 +106,20 @@ class MsmInvoiceService
 		$id = $invoice->create($actor); $diagnostic['invoice_id'] = max(0, (int) $id); $this->owned();
 		if ($id <= 0) { throw new RuntimeException('MSMInvoiceFailed'); }
 		$diagnostic['stage'] = 'invoice_line';
+		$this->owned(); // Before nested Core Facture::addline().
 		$line = $invoice->addline($this->invoiceDescription($row['description']), 0, $plan['quantity'], $plan['vat'], 0, 0, $plan['product'], 0, $row['start'], '', 0, 0, 0, $plan['price_base'], $row['amount'], $plan['type']);
 		$this->owned(); if ($line <= 0) { throw new RuntimeException('MSMInvoiceFailed'); }
 		$diagnostic['stage'] = 'invoice_validate';
+		$this->owned(); // Before nested Core Facture::validate().
 		$validated = $invoice->validate($actor); $this->owned();
 		if ($validated <= 0) { throw new RuntimeException('MSMInvoiceFailed'); }
 		$diagnostic['stage'] = 'invoice_postconditions';
+		$this->owned(); // Prevent further SQL if the last Core API changed context.
 		$this->verify($id, $customerid, $subscription, $row);
+		$this->owned(); // Persisted row checks must not redeem lost ownership.
 		$stored = $this->invoice();
 		if ($stored->fetch($id) <= 0) { throw new RuntimeException('MSMConsistencyError'); }
+		$this->owned();
 		return array('id' => (int) $id, 'ref' => (string) $stored->ref, 'entity' => $plan['entity'], 'customer_id' => $customerid,
 			'customer_created' => $plan['create_customer'], 'subscription_id' => (int) $subscription, 'member_id' => (int) $member->id,
 			'pdf_model' => $plan['pdf_model'], 'pdf' => 'pending');

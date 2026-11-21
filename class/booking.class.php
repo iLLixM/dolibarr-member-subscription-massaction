@@ -42,7 +42,8 @@ class MsmBookingService
 			throw new RuntimeException($state['reason'] ?: 'MSMTransactionUnknown');
 		}
 	}
-	protected function invoicing() { require_once __DIR__.'/invoice.class.php'; return new MsmInvoiceService($this->db, $this->databaseState); }
+	/** Every invoice factory receives the SAME already-selected active guard; metadata remains separate. */
+	protected function invoicing() { require_once __DIR__.'/invoice.class.php'; return new MsmInvoiceService($this->db, $this->databaseState, $this->activeTransaction); }
 	protected function member($id)
 	{
 		require_once __DIR__.'/bookingmember.class.php';
@@ -154,8 +155,13 @@ class MsmBookingService
 	}
 	/** Roll back only our own context; ambiguous depth/connection failures stop the batch. */
 	/** Only these observed, non-SQL business failures allow an owned Core rollback. */
-	protected function coreGuardedBusinessRollbackAllowed(Throwable $e)
+	protected function coreGuardedBusinessRollbackAllowed(Throwable $e, $stage = 'preflight')
 	{
+		// CF05-04 has not qualified any invoice/customer rollback origin. A generic
+		// message such as MSMConsistencyError can arise after invoice Core calls;
+		// its prior contribution-only qualification MUST NOT transfer to them.
+		if (in_array($stage, array('customer', 'invoice_create', 'invoice_line',
+			'invoice_validate', 'invoice_postconditions'), true)) { return false; }
 		return in_array($e->getMessage(), array('MSMChangedConfirmation', 'NotEnoughPermissions', 'MSMTransactionUnsupported', 'MSMConsistencyError'), true);
 	}
 	private function rollbackOwned($coreGuarded = false)
@@ -253,7 +259,7 @@ class MsmBookingService
 			$safe = false;
 			if ($coreGuarded) {
 				$beginAttempted = $beginAttempted || $this->activeTransaction->beginAttempted();
-				$qualifiedBusinessError = $this->coreGuardedBusinessRollbackAllowed($e);
+				$qualifiedBusinessError = $this->coreGuardedBusinessRollbackAllowed($e, $diagnostic['stage']);
 				// No S error mappings have been qualified yet. Unknown SQL, 1213/1205,
 				// nested failures or connection faults NEVER authorize a foreign rollback.
 				if ($owned && !$committing && $qualifiedBusinessError) {
