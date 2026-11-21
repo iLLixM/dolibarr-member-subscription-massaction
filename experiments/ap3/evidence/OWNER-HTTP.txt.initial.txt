@@ -1,7 +1,7 @@
 AP3 Owner-only protected HTTP/session qualification (one invocation; no rerun)
 
 Source checkout: /tmp/dolibarr-ap3-completion-gate
-Invocation as marcel (do NOT put sudo before Python):
+Invocation as operator (do NOT put sudo before Python):
 
 python3 /tmp/dolibarr-ap3-completion-gate/experiments/ap3/owner-http.py --run-approved
 
@@ -9,7 +9,7 @@ Read owner-http.py, owner-server.php, http-router.php, completion.php and core.p
 The Python controller first asks, without echo, for the existing I105 Dolibarr
 password of synthetic user msm-i105. Do not send that password or any cookie/token
 to the agent. It then invokes sudo -u www-data PHP; enter sudo's password locally.
-No root PHP, admin SQL or new grant is used. Agent marcel cannot read the protected
+No root PHP, admin SQL or new grant is used. Agent operator cannot read the protected
 I105 conf/session path; that is the reason this invocation remains with the Owner.
 
 The bridge checks pinned Core source hashes and reads only hashes/counts from13
@@ -27,7 +27,7 @@ file. The random routing capability, password, cookies and CSRF are in memory on
 Never run owner-server.php alone or print its first PRIVATE IPC response. Runtime
 and sanitized result files are retained under a new private www-data /tmp path.
 
-Only new artificial probe rows6200..6228 in restricted msmsh01lab are written.
+Only new artificial probe rows6200..6228 in restricted cf03_restricted_lab_fixture are written.
 No existing SH-01/D-01/CLI-AP3 fixtures are reused. No membership, customer, invoice,
 PDF, SMTP, KILL, DDL, global setting, existing-user privilege or Core transaction
 method is changed. NO_CHAIN/CHAIN/RELEASE are set once per newly opened lab test

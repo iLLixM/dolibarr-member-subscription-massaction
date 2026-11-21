@@ -14,7 +14,7 @@ Read OWNER-HTTP.txt for the unchanged scope, plus these corrections:
   no Apache, container, database or other service is stopped. It refuses a failed
   cleanup. No unconditional kill or restart.
 
-Run as marcel (Python asks for existing msm-i105 password, then sudo locally):
+Run as operator (Python asks for existing msm-i105 password, then sudo locally):
 python3 /tmp/dolibarr-ap3-completion-gate/experiments/ap3/owner-http-r1.py --run-approved
 
 No new permission scope: isolated rows6200..6228, initial new-connection Completion

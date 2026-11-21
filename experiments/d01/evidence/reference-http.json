@@ -1,5 +1,5 @@
 {
-  "reference": "http://i105-v24.localhost:8091/",
+  "reference": "http://127.0.0.1:8091/",
   "status": 200,
   "Dolibarr_marker": true,
   "version_24_0_3_marker": true,

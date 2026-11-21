@@ -34,7 +34,7 @@ def main():
     cpath = Path(os.environ.get('AP3_CONFIG', str(Path.home() / '.config/dolibarr-sh01/app.json')))
     if cpath.stat().st_mode & 0o077: raise Stop('Protected lab app config required')
     lab = json.loads(cpath.read_text())
-    if (lab['host'], lab['port'], lab['database'], lab['user']) != ('127.0.0.1',3307,'msmsh01lab','msmsh01lab'):
+    if (lab['host'], lab['port'], lab['database'], lab['user']) != ('127.0.0.1',3307,'cf03_restricted_lab_fixture','cf03_restricted_lab_fixture'):
         raise Stop('Restricted lab identity mismatch')
     password = getpass.getpass('Existing I105 Dolibarr password for msm-i105 (never printed): ')
     marker.open('x').write(json.dumps({'mode':'Owner-authorized temporary protected authenticated HTTP/lab proof','no_rerun':True})+'\n')
@@ -54,7 +54,7 @@ def main():
         jar = http.cookiejar.CookieJar();opener = urllib.request.build_opener(urllib.request.ProxyHandler({}),NoRedirect(),urllib.request.HTTPCookieProcessor(jar))
         def request(query='', data=None):
             url = base+route+query
-            headers = {'Host':'i105-v24.localhost:8091','Referer':'http://i105-v24.localhost:8091'+route,'Connection':'close'}
+            headers = {'Host':'127.0.0.1:8091','Referer':'http://127.0.0.1:8091'+route,'Connection':'close'}
             req = urllib.request.Request(url,urllib.parse.urlencode(data).encode() if data is not None else None,headers)
             try:
                 with opener.open(req,timeout=25) as response: return response.status,response.read(1000000)

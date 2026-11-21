@@ -4,7 +4,7 @@
  * No main.inc.php, application conf.php, business bootstrap or product adapter.
  */
 if (PHP_SAPI !== 'cli') { exit(77); }
-$root = getenv('D01_CORE') ?: '/home/marcel/dolibarr-i105-v24-mysql';
+$root = getenv('D01_CORE') ?: '/opt/private-fixture/mysql';
 if (trim(shell_exec('git -C '.escapeshellarg($root).' rev-parse HEAD')) !== '5c6c7ff6a5112413b1c27221c8d11750afad56f8') { throw new LogicException('Unpinned Core'); }
 define('DOL_DOCUMENT_ROOT', $root.'/htdocs');
 define('DOL_URL_ROOT', '');
@@ -50,7 +50,7 @@ function d01Config()
  $p = getenv('D01_CONFIG') ?: getenv('HOME').'/.config/dolibarr-sh01/app.json';
  d01Assert(is_file($p) && (fileperms($p) & 0077) === 0, 'Protected app config required');
  $c = json_decode(file_get_contents($p), true, 512, JSON_THROW_ON_ERROR);
- d01Assert($c['host'] === '127.0.0.1' && $c['port'] === 3307 && $c['database'] === 'msmsh01lab' && $c['user'] === 'msmsh01lab', 'Restricted lab only');
+ d01Assert($c['host'] === '127.0.0.1' && $c['port'] === 3307 && $c['database'] === 'cf03_restricted_lab_fixture' && $c['user'] === 'cf03_restricted_lab_fixture', 'Restricted lab only');
  return $c;
 }
 function d01Connect()
@@ -58,7 +58,7 @@ function d01Connect()
  $c = d01Config(); $d = new D01Core('mysqli', $c['host'], $c['user'], $c['password'], $c['database'], $c['port']); unset($c);
  d01Assert($d->connected && $d->database_selected, 'Restricted lab unavailable');
  $m = d01Rows($d, 'SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac')[0];
- d01Assert($m['db'] === 'msmsh01lab' && $m['account'] === 'msmsh01lab@%' && $m['version'] === '8.4.13' && $m['ac'] === '1', 'Lab identity/preconditions mismatch');
+ d01Assert($m['db'] === 'cf03_restricted_lab_fixture' && $m['account'] === 'cf03_restricted_lab_fixture@%' && $m['version'] === '8.4.13' && $m['ac'] === '1', 'Lab identity/preconditions mismatch');
  return $d;
 }
 function d01Rows($d, $sql)
