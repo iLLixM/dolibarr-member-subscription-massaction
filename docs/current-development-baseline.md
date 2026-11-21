@@ -95,13 +95,17 @@ A reviewer's earlier inability to access raw POS02 bytes and the Owner's later t
 
 | Order | Work package | Required output |
 | --- | --- | --- |
-| 1 – COMPLETE (dev) | **CF05-01/02** | **MERGED / independently approved** via PR #34: minimum active guard, same-instance Booking→Invoice injection, Core API/readback checks, B/C synthetic regression. **Not** full financial feature admission |
-| 2 – COMPLETE (dev code) | **CF05-03/04** | PR #36 merged behind default-closed CoreGuarded finance gate: rights/profile/direct-service admission, finite typed pre-Core finance rollback. **Operational admission OPEN** |
-| 3 – CF05-05 dev code merged; CF05-06 OPEN | **CF05-05/06** | Nonterminal checkpointed PDF/mail synthetic code merged; **next CF05-06** V22/V24 Core/trigger/engine/filesystem qualification including F36-02 |
-| 4 – OPEN | **CF05-07** | Final source/real integration/security review, Owner risk acceptance and distinct finance-admission change/GO after CF05-06 |
-| 5 | **CF03-NORMAL** | Unique Owner-authorized real full-workflow normal cases A/B/C/D: contribution+Agenda ON/OFF, invoice existing/new Third Party, validated line/link, PDF, isolated SMTP including attachment, small successful multi-member flow and independent DB/file/delivery postconditions |
-| 6 | **CF03-SECURITY-BASELINE** | Synthetic transaction/security/rights/CAS/CSRF/replay/NO_CHAIN/CHAIN/RELEASE regressions, safe authenticated negatives and **21-job** PHP/Core matrix; independent evidence/risk review |
-| 7 | **Release / Issue #20** | Fresh v0.1.0 ZIP **without RC suffix**, source-matched manifest/checksum, **real D ZIP installation**, R0-04 exact-package integration, R0-07 independent review, explicit separate Owner release GO |
+| 1 – COMPLETE (dev) | **CF05-01/02** | **MERGED / independently approved** via PR #34: shared active guard and Core/readback checks. **Not** a finance or real-integration GO |
+| 2 – COMPLETE (dev code) | **CF05-03/04** | PR #36 merged invoice/Third-Party and typed pre-Core financial error logic; **production CoreGuarded finance remains default-denied** |
+| 3 – CF05-05 dev code merged; CF05-06 OPEN | **CF05-05/06** | Synthetic checkpointed PDF/mail code merged; **FIRST qualify** V22/V24 Core/trigger/engine/filesystem paths, F36-02 and any required mitigation/exclusion |
+| 4 – OPEN, test-only | **Isolated real-test admission** | **Only after CF05-06:** independently reviewed, narrowly bounded **test-only** CoreGuarded finance admission in an authorized isolated environment, with separate Owner case GO; **not a productive server-side unlock** |
+| 5 – OPEN | **CF03-NORMAL A–D** | **Before productive finance admission:** new authorized one-shot real success flows, existing/new Third Party, Agenda ON/OFF, invoice line/link/PDF/isolated SMTP, source-matched hosted D test ZIP and independently checked DB/file/delivery evidence |
+| 6 – OPEN | **CF03-SECURITY-BASELINE** | Retain negative/security/transaction/CAS/CSRF/replay/NO_CHAIN/terminal STOP regressions, safe authenticated negatives and the **21-job** PHP/Core release CI |
+| 7 – OPEN | **CF05-07 and Owner risk acceptance** | **After CF03-NORMAL A–D:** independent exact-source Core/transaction/security and observed-real-evidence review; explicit Owner full-finance risk acceptance |
+| 8 – OPEN | **Productive CoreGuarded finance admission** | **Only after the above gates:** separate reviewed Owner-authorized server admission change; reverify changed exact source and its security/real-evidence applicability. No admin/POST bypass |
+| 9 – OPEN | **Release / Issue #20** | Fresh v0.1.0 ZIP **without RC suffix**, source-matched manifest/checksum, **real D exact ZIP**/R0-04 integration, R0-07 independent review and **separate Owner release GO** |
+
+**F37-DOC-01 sequencing rule:** The development merge and an independently reviewed, Owner-limited **isolated testing admission** are distinct from the later **productive finance admission**. Real CF03-NORMAL A–D and final CF05-07/Owner acceptance must precede a productive CoreGuarded finance unlock. A new test-only admission design must not bypass the normal production default-deny gate or turn a test fixture into an ordinary runtime switch.
 
 **CF03-FAULT (deferred):** real destructive post-DML rollback, implicit end, lost ACK/connection, SQL 1568/1213/1205, nested-depth, concurrency, destructive replay/interruption and controlled PDF/SMTP fault campaigns are **OPEN/NOT EXECUTED**. They require later isolated harness review and case-specific Owner GO; this deferral never relaxes runtime safety or permits treating an UNKNOWN as success.
 
