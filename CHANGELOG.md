@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Phase-4 development in PR #38 – checkpointed PDF/attachment/mail evidence, offline regression
+
+- [PR #38](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/38) (draft, **not merged or production-admitted**) distinguishes the acknowledged Core completion, verified/stale/unknown PDF file, separately verified invoice attachment and actual mail transport/hook outcomes, without conflating a hooked send with delivery. The existing mail `send()` API remains compatible; `sendWithEvidence()` supplies independently reported attachment status.
+- Under the qualified test-only CoreGuarded path, uncertain PDF generation or SMTP/hook outcomes retain the already committed business result, mark downstream effects uncertain or not processed and **STOP subsequent member actions** without blind regeneration, resend, rollback or compensation.
+- Add offline tests of invalid/changed PDF and hook outcomes, post-commit UNKNOWN STOP, one-shot original file-session checkpoints and B/C regression boundaries. Trigger the existing **21-job full PHP/Core matrix** for this sensitive file family while keeping ordinary PR CI at nine jobs.
+- **No actual CoreGuarded finance unlock**: `MsmTransactionProfile::coreGuardedFinanceQualified()` is still production `false`; F36-02 remains OPEN / CF05-06, real A–D and release gates remain OPEN.
+
 ### 2026-11-21 – Phase-3 CoreGuarded finance code merged, productive admission OFF (PR #36)
 
 - [PR #36](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/36) **SQUASH-MERGED** as `d0b15785c60b74aa7ad59a1c687db94193d159c6`, reviewed HEAD `33cb3da3b389f9df2870bc8c6223c86a959cb467`, identical Git tree `6cc4834b9fe5100aca99126885791b3aeff12fef`. Independent `APPROVED FOR DEVELOPMENT MERGE`; F36-01/P1 **CLOSED**, F36-02/P2 **OPEN / CF05-06 REQUIRED**; no new P0–P3.
