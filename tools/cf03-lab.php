@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2026 iLLixM <iLLixM@proton.me>
+/* Copyright (C) 2026 iLLixM
  * SPDX-License-Identifier: GPL-3.0-or-later
  * CLI read-only lab preflight and one-shot independently reconciled witness.
  * Never books, creates, updates, deletes, retries, or changes DB configuration.

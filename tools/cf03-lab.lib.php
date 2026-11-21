@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2026 iLLixM <iLLixM@proton.me>
+/* Copyright (C) 2026 iLLixM
  * SPDX-License-Identifier: GPL-3.0-or-later
  * Pure CF-03 operator contract: no DB connection and no business SQL.
  */
