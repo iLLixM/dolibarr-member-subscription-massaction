@@ -54,7 +54,7 @@ function c3make($id,$scenario,$agenda)
             'completion'=>'NO_CHAIN'),
         'profile'=>array('name'=>$env['profile'],'family'=>$env['family'],
             'raw_hash'=>str_repeat('a',64)),
-        'engines'=>$engines,'type'=>array('id'=>2,'status'=>0,'entity'=>1,
+        'engines'=>$engines,'type'=>array('id'=>2,'status'=>1,'entity'=>1,
             'subscription'=>'1','amount'=>'120.00000000'),
         'source_hashes'=>array('php'=>str_repeat('b',64)),
         'source_manifest_version'=>'CF03-W01-MODULE-PHP-1',
@@ -228,7 +228,7 @@ foreach(array('A','B','C','D') as $id) {
             Cf03LabContract::baseline($before,$e,$id);
             c3ok(Cf03LabContract::verify($before,$after,$e,$id)['status']==='PASS',
                 'scenario '.$id.' '.$scenario.' '.$agenda);
-            foreach (array('status'=>1,'entity'=>2,'subscription'=>'0') as $key=>$bad) {
+            foreach (array('status'=>0,'entity'=>2,'subscription'=>'0') as $key=>$bad) {
                 $wrongType=$before;
                 $wrongType['type'][$key]=$bad;
                 c3stop(static function()use($wrongType,$e,$id) {
