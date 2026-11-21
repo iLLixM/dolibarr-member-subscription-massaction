@@ -100,13 +100,33 @@ function msmProcessBooking(array $state, $service, $mailer, $user, callable $sav
 			if (!empty($state['options']['invoice'])) {
 				$state['results'][$id]['invoice']['pdf'] = array('status' => 'unknown', 'message' => 'MSMPdfInterrupted');
 				if (!msmSaveBookingCheckpoint($state, $save, $coreGuarded)) { msmStopUnprocessed($state, $id); return $state; }
+				if ($coreGuarded) {
+					try { $save->requirePostCommitEffect((int) $id, 'pdf'); }
+					catch (Throwable $e) { $state['checkpoint_failed'] = true; msmStopUnprocessed($state, $id); return $state; }
+				}
 				$state['results'][$id]['invoice']['pdf'] = $pdf !== null
 					? $pdf->generate($state['results'][$id]['invoice'], $user)
 					: array('status' => 'failed', 'message' => 'MSMPdfGenerationFailed');
 				if (!msmSaveBookingCheckpoint($state, $save, $coreGuarded)) { msmStopUnprocessed($state, $id); return $state; }
 			}
 			$invoice = $state['results'][$id]['invoice'] ?? null;
-			$state['results'][$id]['mail'] = $coreGuarded ? 'not_selected' : $mailer->send($member, $row, $user, $state['options']['sendmail'], $invoice);
+			if ($coreGuarded) {
+				if (empty($state['options']['sendmail'])) {
+					$state['results'][$id]['mail'] = 'not_selected';
+				} elseif ($invoice !== null && ($invoice['pdf']['status'] ?? null) !== 'verified') {
+					// Never dispatch any hook/SMTP when the invoice PDF cannot
+					// be independently verified as the confirmed attachment.
+					$state['results'][$id]['mail'] = 'attachment_missing';
+				} else {
+					// 'unknown' was durably persisted before PDF/SMTP work.
+					if (!msmSaveBookingCheckpoint($state, $save, true)) { msmStopUnprocessed($state, $id); return $state; }
+					try { $save->requirePostCommitEffect((int) $id, 'mail'); }
+					catch (Throwable $e) { $state['checkpoint_failed'] = true; msmStopUnprocessed($state, $id); return $state; }
+					$state['results'][$id]['mail'] = $mailer->send($member, $row, $user, true, $invoice);
+				}
+			} else {
+				$state['results'][$id]['mail'] = $mailer->send($member, $row, $user, $state['options']['sendmail'], $invoice);
+			}
 			if (!msmSaveBookingCheckpoint($state, $save, $coreGuarded)) { msmStopUnprocessed($state, $id); return $state; }
 		}
 	}
