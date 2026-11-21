@@ -7,7 +7,7 @@
 
 ```sh
 sudo -u www-data env \
-  CF02_DOLIBARR_ROOT=/home/marcel/dolibarr-i105-v24-mysql \
+  CF02_DOLIBARR_ROOT=<PRIVATE_MYSQL_INSTALLATION> \
   CF02_ACK_EMPTY_TRANSACTION=YES \
   /usr/bin/php -d xdebug.mode=off \
   tools/cf02-loaded-core-entry.php --empty-transaction

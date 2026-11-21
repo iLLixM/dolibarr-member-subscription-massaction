@@ -28,13 +28,13 @@ See the [ADR contract](adr/ADR-0001-core-first-transaction-profiles.md).
 | Core | Dolibarr V24.0.3, `5c6c7ff6a5112413b1c27221c8d11750afad56f8` |
 | PHP / native driver | PHP 8.2.35; mysqli / mysqlnd 8.2.35; Xdebug 3.2 function monitor |
 | MySQL | Community Server 8.4.13, TCP loopback 3307, autocommit=1 |
-| Restricted test account/schema | `msmsh01lab`, only schema SELECT/INSERT/UPDATE/DELETE plus USAGE |
+| Restricted test account/schema | `<PRIVATE_RESTRICTED_LAB>`, only schema SELECT/INSERT/UPDATE/DELETE plus USAGE |
 | P_S denial | Direct negative inspection returns1142 for events_transactions_current; not an application prerequisite |
 | Artificial table | Existing isolated InnoDB `probe`; only new AP3 rows6000–6999 eligible |
 | Test-module source baseline | `c79830976a5f1e1bd57d51005ff34c10c424e36f`; experimental functions only |
 | Referenced live I105 module | `0999efb4aafca43d90ce12e38d370662ad0c63a1`, unchanged; not deployed to current main |
 | Actual HTTP bootstrap | Protected I105 `main.inc.php`, authenticated synthetic user `msm-i105` (actor2) |
-| Actual HTTP reference | I105 V24.0.3, `dolibarr_i105_v24`;13 business-table hashes/counts equal before/after |
+| Actual HTTP reference | I105 V24.0.3, `<PRIVATE_MYSQL_SCHEMA>`;13 business-table hashes/counts equal before/after |
 | HTTP SAPI | Temporary PHP `cli-server`, loopback only; **not Apache SAPI qualification** |
 | HTTP sessions | Actual I105 `files` handler/path under `dolibarr-i105-v24-mysql-data/sessions` |
 | HTTP logger | Actual configured pinned `mod_syslog_file`, SYSLOG_LEVEL4 |

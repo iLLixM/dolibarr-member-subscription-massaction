@@ -5,7 +5,7 @@
 ## Identity and provenance
 
 - **Source HEAD tested:** `290782dfdf6d6048b801843b5e1c4e464ac3bfdc`; PR #29 independently reviewed at this exact HEAD and [normally merged](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/29) by merge commit `f0b1e6d40ff55abb1e7555c800caea0fdd1fe90d`.
-- **Reference runtime:** Dolibarr V24.0.3, PHP 8.2, Oracle MySQL 8.4.13, isolated `dolibarr_i105_v24`, restricted effective account `dolibarr_i105_v24_limited@10.0.2.100`, `CoreGuarded`, `NO_CHAIN`, `autocommit=1`, selected InnoDB tables; Agenda ON, invoice/customer/mail OFF.
+- **Reference runtime:** Dolibarr V24.0.3, PHP 8.2, Oracle MySQL 8.4.13, isolated `<PRIVATE_MYSQL_SCHEMA>`, restricted effective account `<RESTRICTED_ACCOUNT>@<PRIVATE_HOST>`, `CoreGuarded`, `NO_CHAIN`, `autocommit=1`, selected InnoDB tables; Agenda ON, invoice/customer/mail OFF.
 - **Fixture:** new synthetic member ID **58**, Core reference `MEM2611-0058`, marker `CF02LAB-20261120C1`, active member type ID **2** / EUR **120.00**, no prior subscriptions, no linked customer.
 - **Procedure:** Owner-operated `tools/cf02-contribution-witness.php --check-only` and `--baseline`, each `PASS`; exactly one authenticated manual Dolibarr massaction confirmation; then a single `--verify` producing **PASS**. The witness reads on an independent connection and does not execute business DML or HTTP.
 - **Browser result, Owner-reported:** `Transaction profile used: CoreGuarded`, **1 successful · 0 skipped · 0 failed · 0 unknown**, total EUR **120.00**, subscription **#67**, “Successful: Subscription saved; commit confirmed.” Confirmation email not selected.

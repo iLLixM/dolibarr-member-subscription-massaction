@@ -20,9 +20,9 @@ booking happens separately through Dolibarr's genuine authenticated UI.
 
 ## Exact safety contract
 
-- Only the local environment at 127.0.0.1:3307 with database
-  `dolibarr_i105_v24`, effective account
-  `dolibarr_i105_v24_limited@10.0.2.100`, and CoreGuarded profile is admitted.
+- Only the local environment at <PRIVATE_MYSQL_ENDPOINT> with database
+  `<PRIVATE_MYSQL_SCHEMA>`, effective account
+  `<RESTRICTED_ACCOUNT>@<PRIVATE_HOST>`, and CoreGuarded profile is admitted.
 - Select one **newly created synthetic member**, never an existing real member:
   **technical ID `56` and Core-generated reference `MEM2611-0056`**.
   A member login is **not required**. For an independent synthetic marker,
@@ -55,7 +55,7 @@ MEMBER_REF=MEM2611-0056
 MARKER=CF02LAB-20261120A1
 EVIDENCE_DIR=/var/lib/dolibarr-test-results/cf02-pos01-20261120a1
 
-sudo -u www-data env CF02_DOLIBARR_ROOT=/home/marcel/dolibarr-i105-v24-mysql \
+sudo -u www-data env CF02_DOLIBARR_ROOT=<PRIVATE_MYSQL_INSTALLATION> \
   /usr/bin/php -d xdebug.mode=off tools/cf02-contribution-witness.php \
   --check-only --member-id="$MEMBER_ID" --member-ref="$MEMBER_REF" --marker="$MARKER" \
   --start=2080-01-01 --end=2080-12-31 --amount=120.00 --agenda=on
@@ -72,7 +72,7 @@ Only after reviewing Step 1 and separately approving the single synthetic
 business write, run **once** with all previous parameters unchanged:
 
 ```sh
-sudo -u www-data env CF02_DOLIBARR_ROOT=/home/marcel/dolibarr-i105-v24-mysql \
+sudo -u www-data env CF02_DOLIBARR_ROOT=<PRIVATE_MYSQL_INSTALLATION> \
   /usr/bin/php -d xdebug.mode=off tools/cf02-contribution-witness.php \
   --baseline --member-id="$MEMBER_ID" --member-ref="$MEMBER_REF" --marker="$MARKER" \
   --start=2080-01-01 --end=2080-12-31 --amount=120.00 --agenda=on \
@@ -84,7 +84,7 @@ Expected `status=PASS`, writing only protected `baseline.json` and
 
 ## Step 3 – exactly one Owner-operated authenticated UI action
 
-In `http://i105-v24.localhost:8091/`, select **only** the newly created
+In `http://<PRIVATE_MYSQL_WEB_ENDPOINT>/`, select **only** the newly created
 synthetic member, open the existing module mass action, review the date
 range, amount, marker-containing description and off invoice/customer/mail
 options, and manually confirm **once**. Record the UI result without
@@ -94,7 +94,7 @@ STOP on unexpected preview, warning, profile switch or inconsistent state.
 ## Step 4 – one independent readback
 
 ```sh
-sudo -u www-data env CF02_DOLIBARR_ROOT=/home/marcel/dolibarr-i105-v24-mysql \
+sudo -u www-data env CF02_DOLIBARR_ROOT=<PRIVATE_MYSQL_INSTALLATION> \
   /usr/bin/php -d xdebug.mode=off tools/cf02-contribution-witness.php \
   --verify --member-id="$MEMBER_ID" --member-ref="$MEMBER_REF" --marker="$MARKER" \
   --start=2080-01-01 --end=2080-12-31 --amount=120.00 --agenda=on \

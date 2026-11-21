@@ -25,13 +25,13 @@ settings or to reintroduce a completion-value admission whitelist.
 | Dolibarr | V24.0.3, Core `5c6c7ff6a5112413b1c27221c8d11750afad56f8` |
 | PHP / driver | CLI 8.2.35 / direct mysqli, mysqlnd 8.2.35 |
 | MySQL | 8.4.13, MySQL Community Server - GPL, loopback TCP 3307 |
-| Isolated schema/account | `msmsh01lab`, `msmsh01lab@%`; existing Owner-provisioned SH-01 lab, new D-01-only rows |
-| Grants | USAGE; SELECT, INSERT, UPDATE, DELETE on `msmsh01lab`.* only; no roles/additional grants seen in SHOW GRANTS |
+| Isolated schema/account | `<PRIVATE_RESTRICTED_LAB>`, `<PRIVATE_RESTRICTED_LAB>@%`; existing Owner-provisioned SH-01 lab, new D-01-only rows |
+| Grants | USAGE; SELECT, INSERT, UPDATE, DELETE on `<PRIVATE_RESTRICTED_LAB>`.* only; no roles/additional grants seen in SHOW GRANTS |
 | P_S | Explicit negative preflight SELECT denied with native 1142 / Core `DB_ERROR_1142`; no P_S used by entry/tests |
 | Initial session | autocommit=1, session REPEATABLE-READ, completion_type=NO_CHAIN |
 | Table | Existing artificial `probe(id,label,n)`, InnoDB; no DDL or schema changes |
 | Module baseline | `6247704815cf532ec632616011133c646aa00005`; no module booking/backend executed |
-| I105 reference | HTTP 200, unauthenticated GET; V24.0.3 source; installed module checkout `0999efb4aafca43d90ce12e38d370662ad0c63a1`, not main/CF-01; no test writes to `dolibarr_i105_v24` |
+| I105 reference | HTTP 200, unauthenticated GET; V24.0.3 source; installed module checkout `0999efb4aafca43d90ce12e38d370662ad0c63a1`, not main/CF-01; no test writes to `<PRIVATE_MYSQL_SCHEMA>` |
 
 Genuine Core `Conf`, `Translate`, `functions.lib.php`, `DoliDB` and `DoliDBMysqli`
 are loaded. **No mocked Core transactions and no SH-01 depth/marker model.** Most

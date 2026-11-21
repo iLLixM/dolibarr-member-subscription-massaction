@@ -13,7 +13,7 @@ checks also consistently printed the exact HEAD.
 
 ## B – Synthetics with local pinned Dolibarr V24.0.3 source
 
-Runner: `DOLIBARR_TEST_ROOT=/home/marcel/dolibarr-i105-v24-mysql sh tools/cf02-run-synthetic.sh`.
+Runner: `DOLIBARR_TEST_ROOT=<PRIVATE_MYSQL_INSTALLATION> sh tools/cf02-run-synthetic.sh`.
 
 - CoreGuarded bounded adapter: **88 assertions PASS** (synthetic, not live MySQL).
 - Durable file-session admission: **19 assertions PASS** (real local file I/O; no HTTP/DB).
@@ -37,8 +37,8 @@ Runner: `tools/cf02-lab-readonly.sh --check-only`.
 | --- | --- |
 | Git HEAD | `f205f9a7c2954670fe6f0e42fb78051a9ba6fa04` |
 | Server | MySQL 8.4.13, TCP localhost:3307 |
-| Database | `dolibarr_i105_v24` |
-| Effective account | `dolibarr_i105_v24_limited@10.0.2.100` |
+| Database | `<PRIVATE_MYSQL_SCHEMA>` |
+| Effective account | `<RESTRICTED_ACCOUNT>@<PRIVATE_HOST>` |
 | Roles | NONE |
 | Autocommit / completion | 1 / NO_CHAIN |
 | Global grants | USAGE only |
@@ -51,7 +51,7 @@ checks. This is not a scan of every reachable trigger or third-party table.
 
 ## D – Loaded Dolibarr Core, real restricted MySQL preflight
 
-Runner: `sudo -u www-data env CF02_DOLIBARR_ROOT=/home/marcel/dolibarr-i105-v24-mysql /usr/bin/php -d xdebug.mode=off tools/cf02-loaded-core-entry.php --check-only`.
+Runner: `sudo -u www-data env CF02_DOLIBARR_ROOT=<PRIVATE_MYSQL_INSTALLATION> /usr/bin/php -d xdebug.mode=off tools/cf02-loaded-core-entry.php --check-only`.
 
 Owner-reported JSON:
 ```json

@@ -288,7 +288,7 @@ separate from that reviewed implementation/evidence HEAD and changes no tests or
 requirement assignments. New-HEAD PR/push CI is recorded separately in PR #16.
 
 - F16-01: **CLOSED – OWNER ACCEPTED**. The I105 URL was an assignment error;
-  `doli24.test:8090`, V24.0.3/PHP8.2.35/MariaDB10.11.19 is the accepted target.
+  `<PRIVATE_MARIADB_WEB_ENDPOINT>`, V24.0.3/PHP8.2.35/MariaDB10.11.19 is the accepted target.
   No I105 rerun or installation-equivalence claim.
 - F16-02: **RESOLVED WITH DOCUMENTED SCOPE – OWNER-CONFIRMED HTTP TEST**.
   A later authenticated manual Owner browser booking created 100/100 subscriptions,
