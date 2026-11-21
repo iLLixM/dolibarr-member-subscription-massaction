@@ -219,6 +219,10 @@ hosted_case --check-only
 
 Only after successful private-root/HTTP-exposure checks and separate Owner admission: `hosted_case --baseline --evidence-root="$EVIDENCE_ROOT" --evidence-dir="$EVIDENCE_DIR"`, one permitted UI action, then `hosted_case --verify --evidence-root="$EVIDENCE_ROOT" --evidence-dir="$EVIDENCE_DIR"` exactly once. No retry or cleanup after STOP.
 
+## RB01-A — real rollback qualification (preparation only)
+
+The existing `--scenario=no-change` snapshot is **read-only selected-state evidence, not proof of a physical rollback or that Core DML occurred**. A real after-Core-DML business rollback requires an **independently reviewed test-only injection build on an isolated disposable A clone**, a unique fixture, a reviewed one-shot trace, separately admitted real UI operation and fresh independent row/file readback. **No RB01-A injection harness is implemented or approved by this W01 runbook.** See [RB01-A architecture and safety contract](cf03-rb01-a-harness-design.md) and [step-by-step operator procedure](cf03-rb01-a-operator-runbook.md).
+
 ## 3. Interpretation and incident handling
 
 - `PASS preflight`: bounded runtime/privilege/config/source inspection. **No business case ran.**

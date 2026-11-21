@@ -100,7 +100,7 @@ Limitations: The POS01 witness is pinned to A, a specific restricted account and
 | --- | --- | --- | --- |
 | ENV01 | Read-only runtime/source/account/profile/rights attestation | A–D | Tool prepared; real runs NOT EXECUTED |
 | POS02 | New single-member Core contribution, Agenda ON and OFF | A, D / B/C optional | **A1+A2 TECHNICAL PASS / COMPLETED** on pinned test SHA; D and optional B/C outstanding |
-| RB01 | Real safe rollback post-Core DML, independent selected-table/file reconciliation | A, B/C | `no-change` snapshot partial tool ready; controlled injection NOT IMPLEMENTED |
+| RB01 | Real safe rollback post-Core DML, independent selected-table/file reconciliation | A, B/C | [RB01-A test-harness design](cf03-rb01-a-harness-design.md) and [step-by-step runbook](cf03-rb01-a-operator-runbook.md) prepared; read-only `no-change` witness exists; controlled real injection NOT IMPLEMENTED / NO-GO |
 | ERR01 | 1568, 1213, 1205, depth/reconnection, UNKNOWN/STOP | A + synthetics | Existing synthetic contracts; real harness NOT IMPLEMENTED |
 | BATCH01 | NO_CHAIN multi-member, CHAIN/RELEASE terminal | A | Requires separate multi-member and terminal witness; NOT IMPLEMENTED |
 | CONC01 | Controlled locks/competitor and R16 | A, B/C | Design only; NOT IMPLEMENTED |
