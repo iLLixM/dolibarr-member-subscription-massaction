@@ -52,9 +52,12 @@ final class Cf03Evidence
         self::need(is_dir($root) && !is_link($root)
             && realpath($root) === $root && is_readable($root)
             && is_writable($root), 'CF03EvidenceParentUnavailable');
-        // The existing root needs effective read/write access only; additional
-        // owner/mode restrictions are reserved for each one-shot case directory
-        // and its files. Canonical path, symlink and D webroot gates stay intact.
+        // Read/traverse for other principals is allowed; untrusted parent
+        // writes can replace a private case directory and break one-shot trust.
+        self::need((fileperms($root) & 0022) === 0,
+            'CF03EvidenceParentUnsafePermissions');
+        // The parent is not required to be owned by the CLI UID or mode 0700.
+        // Group/other write is forbidden. Case/file and D webroot checks remain.
         if ($environment === 'D') {
             $doc = realpath($documentRoot);
             $source = realpath($checkout);

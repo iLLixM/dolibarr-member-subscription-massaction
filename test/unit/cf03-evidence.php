@@ -78,14 +78,20 @@ evStop(static function()use($symlink,$private,$doc,$source) {
 },'CF03UnsafeEvidenceDirectory');
 $open=$root.'/open';
 evOk(mkdir($open,0700),'create synthetic evidence root');
-// Root ownership and group/other mode bits are intentionally not a gate.
-// Only the effective PHP user's read/write ability is required, for A/B/C/D.
+// Group/other read is permitted, but parent write by other principals STOPs.
 foreach (array('A','B','C','D') as $envName) {
-    foreach (array(0700,0755,0770,0777) as $permissions) {
-        evOk(chmod($open,$permissions),'set root mode');
+    foreach (array(0700,0750,0755) as $permissions) {
+        evOk(chmod($open,$permissions),'set safe root mode');
         clearstatcache(true,$open);
         Cf03Evidence::privateRoot($open,$envName,$doc,$source);
-        evOk(true,'readable/writable evidence root accepted '.$envName.' '.decoct($permissions));
+        evOk(true,'readable evidence parent accepted '.$envName.' '.decoct($permissions));
+    }
+    foreach (array(0770,0777) as $permissions) {
+        evOk(chmod($open,$permissions),'set unsafe parent mode');
+        clearstatcache(true,$open);
+        evStop(static function()use($open,$envName,$doc,$source) {
+            Cf03Evidence::privateRoot($open,$envName,$doc,$source);
+        },'CF03EvidenceParentUnsafePermissions');
     }
 }
 // The actual effective read/write result, not the mode alone, governs STOP.
@@ -100,7 +106,7 @@ if (!is_readable($open) || !is_writable($open)) {
     Cf03Evidence::privateRoot($open,'A',$doc,$source);
     evOk(true,'privileged effective access is authoritative');
 }
-evOk(chmod($open,0777),'restore writable root for private case test');
+evOk(chmod($open,0755),'restore readable root for private case test');
 clearstatcache(true,$open);
 $permissiveCase=$open.'/cf03-d-openroot01';
 Cf03Evidence::directory($permissiveCase,true,'D',$open,$doc,$source);

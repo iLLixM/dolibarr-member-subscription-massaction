@@ -57,36 +57,49 @@ final class Cf03LabContract
         }
     }
 
+    /** A and C share the same source/schema. Only the approved DB user differs.
+     * Actual paths, hosts, accounts and schemas belong in an untracked local
+     * operator environment, never in the public Git tree.
+     */
+    private static function operatorValue($id, $name)
+    {
+        $value=getenv('CF03_'.$id.'_'.$name);
+        return $value===false || $value==='' ? null : $value;
+    }
+
     public static function environments()
     {
+        $doc=self::operatorValue('A','DOCUMENT_ROOT');
+        $data=self::operatorValue('A','DATA_ROOT');
+        $host=self::operatorValue('A','DB_HOST');
+        $port=self::operatorValue('A','DB_PORT');
+        $schema=self::operatorValue('A','DB_NAME');
+        $url=self::operatorValue('A','WEB_URL');
         return array(
             'A' => array('family'=>'mysql', 'profile'=>'CoreGuarded', 'version'=>'8.4.13',
-                'document_root'=>'/home/marcel/dolibarr-i105-v24-mysql/htdocs',
-                'data_root'=>'/home/marcel/dolibarr-i105-v24-mysql-data',
-                'db_host'=>'127.0.0.1', 'db_port'=>3307, 'db_name'=>'dolibarr_i105_v24',
-                'db_user'=>'dolibarr_i105_v24_limited', 'core_version'=>'24.0.3',
-                'php_target'=>'8.2',
-                'web_url'=>'http://i105-v24.localhost:8091/', 'ps'=>'denied'),
+                'document_root'=>$doc, 'data_root'=>$data,
+                'db_host'=>$host, 'db_port'=>$port, 'db_name'=>$schema,
+                'db_user'=>self::operatorValue('A','DB_USER'), 'core_version'=>'24.0.3',
+                'php_target'=>'8.2', 'web_url'=>$url, 'ps'=>'denied'),
             'B' => array('family'=>'mariadb', 'profile'=>'MariaDBSnapshot', 'version'=>'10.11.19',
-                'document_root'=>'/home/marcel/dolibarr-v24/htdocs',
-                'data_root'=>'/home/marcel/dolibarr-v24-data',
-                'db_host'=>'localhost', 'db_port'=>3306, 'db_name'=>'dolibarr_db_v24',
-                'db_user'=>null, 'core_version'=>'24.0.3',
-                'php_target'=>'8.2',
-                'web_url'=>'http://doli24.test:8090/', 'ps'=>'not_required'),
+                'document_root'=>self::operatorValue('B','DOCUMENT_ROOT'),
+                'data_root'=>self::operatorValue('B','DATA_ROOT'),
+                'db_host'=>self::operatorValue('B','DB_HOST'),
+                'db_port'=>self::operatorValue('B','DB_PORT'),
+                'db_name'=>self::operatorValue('B','DB_NAME'),
+                'db_user'=>self::operatorValue('B','DB_USER'),
+                'core_version'=>'24.0.3', 'php_target'=>'8.2',
+                'web_url'=>self::operatorValue('B','WEB_URL'), 'ps'=>'not_required'),
             'C' => array('family'=>'mysql', 'profile'=>'EnhancedMySQL', 'version'=>'8.4.13',
-                'document_root'=>'/home/marcel/dolibarr-i105-v24-mysql/htdocs',
-                'data_root'=>'/home/marcel/dolibarr-i105-v24-mysql-data',
-                'db_host'=>'127.0.0.1', 'db_port'=>3307, 'db_name'=>'dolibarr_i105_v24',
-                'db_user'=>null, 'core_version'=>'24.0.3',
-                'php_target'=>'8.2',
-                'web_url'=>'http://i105-v24.localhost:8091/', 'ps'=>'select'),
+                'document_root'=>$doc, 'data_root'=>$data,
+                'db_host'=>$host, 'db_port'=>$port, 'db_name'=>$schema,
+                'db_user'=>self::operatorValue('C','DB_USER'), 'core_version'=>'24.0.3',
+                'php_target'=>'8.2', 'web_url'=>$url, 'ps'=>'select'),
             'D' => array('family'=>'mysql', 'profile'=>'CoreGuarded', 'version'=>'8.4.13',
                 'document_root'=>null, 'data_root'=>null,
                 'db_host'=>null, 'db_port'=>null, 'db_name'=>null,
                 'db_user'=>null, 'core_version'=>'22.0.5',
-                'php_target'=>'8.3',
-                'web_url'=>null, 'ps'=>'denied')
+                'php_target'=>'8.3', 'web_url'=>null, 'ps'=>'denied')
         );
     }
 
@@ -177,7 +190,7 @@ final class Cf03LabContract
             && (int)$env['db_port']<=65535,'CF03InvalidEnvironmentParameter');
         $env['db_port']=(int)$env['db_port'];
         if ($id==='C') {
-            self::need($env['db_user']!=='dolibarr_i105_v24_limited','CF03EnhancedMustUseSeparateAccount');
+            self::need(is_string($all['A']['db_user']) && $env['db_user']!==$all['A']['db_user'],'CF03EnhancedMustUseSeparateAccount');
         }
         if ($mode!=='preflight') {
             self::need(in_array($opts['scenario']??null,
