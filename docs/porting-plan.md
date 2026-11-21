@@ -1,5 +1,7 @@
 # Functional porting baseline
 
+> **Current scope supersession (2026-11-21):** This is an archived Phase 1/3B porting report. Its statements that booking or invoice/PDF/email are *future* or *permanently deferred* are historical. [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22) requires the complete contribution/optional invoice/Third Party/PDF/mail massaction for v0.1.0 across all three profiles; CF05 is the outstanding implementation gate. There is **no** persistent module journal, exactly-once recovery or automatic retries in this scope. The original 71 requirement IDs are preserved in [requirements.csv](requirements.csv); use the [current baseline](current-development-baseline.md) for active statuses, not this historical stage snapshot.
+
 Phase 1 revision 2 is the accepted architecture: an independent wizard entered through
 `memberlist` / `addMoreMassActions` / `doMassActions`. The future result notice uses
 `printFieldPreListTitle` when needed. No core hooks are patched. Phase 3B adds a module-owned Adherent subclass solely to observe update_end_date failures (R16).

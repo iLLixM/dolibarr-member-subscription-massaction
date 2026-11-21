@@ -1,5 +1,7 @@
 # Phase 4 — Invoice implementation and validation plan
 
+> **2026-11-21 update — historical Phase 4A/4B–4E plan.** Phase 4 was subsequently implemented and tested on bounded historical V22/V24 profiles. The new binding [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22) calls for **CF05-01..07** to extend the complete business massaction to *all three transaction profiles*, especially currently contribution-only CoreGuarded. Reuse O1–O7 business semantics where still valid; **do not** treat the 2026-11-10 proposed milestones or their `NOT EXECUTED` labels as the latest implementation status. The [current development baseline](current-development-baseline.md) defines shared guard, finite qualified rollback, post-commit PDF/mail, D-02 V22/V24 Core/trigger qualification and full-feature A–D real normal-case gates. No code, side effects or real test are authorized by this historical plan.
+
 Status: **PHASE 4A FINALIZED – OWNER DECISIONS INCORPORATED – READY FOR PHASE 4B PLANNING**, design only, 2026-11-10. Previous architecture commit: `b28e5f9`.
 Baseline: `5c511b7a2c6dee6d810ffc0c1469d1539d7e5a1c`.
 Read with [architecture and source evidence](phase4-invoice-architecture.md), [71-row authoritative matrix](requirements.csv) and [test strategy](test-strategy.md).

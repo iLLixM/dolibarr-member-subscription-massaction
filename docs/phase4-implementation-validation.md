@@ -1,5 +1,7 @@
 # Phase 4 implementation validation
 
+> **2026-11-21 current-versus-historical evidence note:** The dated V22/V24/G2/G3/G4/C3/I107/MDB/CF01/CF02 results in this file retain their exact source profiles and historical validity. [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22) now requires **full financial contribution/Third Party/invoice/PDF/mail capabilities** on CoreGuarded, EnhancedMySQL and MariaDBSnapshot for v0.1.0. PR #32 was **squash-merged** as `425980c43a51a9f27073133212f18825ac6da248` for **read-only witnesses/evidence/privacy**, not CF05. CF05-01..07, complete real **CF03-NORMAL A/B/C/D**, retained 21-job security CI, exact D ZIP and release gates are **OPEN**. Destructive real CF03-FAULT tests are **deferred OPEN/NOT EXECUTED**, without weakening runtime safety. Older contribution-only statements are history, not current feature target; current CoreGuarded invoice gates remain disabled. See [current baseline](current-development-baseline.md).
+
 ## D-01 evidence and conditional Option A closure — 2026-11-18
 
 AP2 documentary base: accepted main `3bc9e4653778cdc870d79e2f5b7e025bc9ca036a`,

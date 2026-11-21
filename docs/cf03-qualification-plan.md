@@ -1,5 +1,16 @@
 # CF-03 — Qualification plan and binding A-D environment matrix
 
+## Current CF03 disposition after PR #32 squash merge (2026-11-21)
+
+[PR #32](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/32) **MERGED by squash** as `425980c43a51a9f27073133212f18825ac6da248`, independent final review source `cbc97843fb017135739a39ea12ef26c7fa66dfdb` (9/9 standard + 1/1 hosted CI PASS). Review: **CHANGES REQUIRED** for unconditional merge due to F32-MR-01/P2 and F32-MR-02/P3; both explicitly **Owner-accepted as limitations, not fixed**.
+
+- **F32-MR-01 / P2 – operational admission gate:** The A/B/C commands use `sudo -u www-data`, which can strip mandatory private `CF03_*` variables under `env_reset`. No successful protected launcher proof was recorded. **Until a private, least-privilege target-user launcher has passed read-only preflight, no further real A/B/C witness execution is admitted.** No blanket `sudo -E`, private data in arguments or public logs.
+- **F32-MR-02 / P3 – historical prose corrected below:** A/B/C evidence parent is supplied via `CF03_EVIDENCE_ROOT`, **not** a fixed repository path; a canonical parent must have effective CLI read/write **but no group/other WRITE**, while read/traverse can be shared. Cases remain 0700, files 0600, exclusive no-retry. This was an **accepted documentation deviation at merge**, not a runtime fix.
+- **Legacy evidence:** F32-W01-01 independently CLOSED on earlier head, POS02-A1/A2 Owner TECHNICAL PASS for bounded contribution-only/Agenda ON/OFF, RB01-A **INVALID/STOP** as rollback proof (ordinary contribution persisted). Earlier A–D preflights were 4/4 Owner PASS on older source, not current-HEAD PASS. No rebooking or second verify of used cases.
+- **Current qualification contract from Issue #22:** **CF05** must implement full contribution/optional invoice/Third Party/PDF/mail on all three profiles. Then **CF03-NORMAL** must independently verify real normal/success workflows A/B/C/D, including small successful batch, isolated SMTP and exact D ZIP integration. Retain synthetic fault/security and 21-job CI; real destructive **CF03-FAULT** is deferred to a later iteration, explicitly OPEN/NOT EXECUTED. No fresh real A/B/C/D full-feature, release or physical event identity claimed.
+
+For active requirements use the [current development baseline](current-development-baseline.md), [operator runbook](cf03-operator-runbook.md), [architecture ADR](adr/ADR-0001-core-first-transaction-profiles.md) and [release map](release-qualification-v0.1.0.md). D must separately exclude HTTP aliases and untrusted mounts/ancestors. A/C share database/webroot and remain serial.
+
 Status updated 2026-11-21: **POS02-A1 and POS02-A2 in environment A TECHNICAL PASS / COMPLETED; F32-W01-01 code finding independently CLOSED**. Later real Owner test results supersede the historical Stage-0/1 `no live test` wording below; other CF03 gates remain OPEN. Source baseline: main `786f271240d230b90fad77fe1c3397d1ec796f81` (2026-11-20). The active PR HEAD must be pinned separately at the time of each test. Binding scope: [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22), [ADR-0001](adr/ADR-0001-core-first-transaction-profiles.md), D-01/D-02 and E01–E15.
 
 ## Phase 1 consolidation and pending approval (2026-11-21)
@@ -79,9 +90,9 @@ A/C test windows must be mutually exclusive: finish and preserve one case and it
 
 **Environment D:** a hosted system is not inherently safe for destructive faults. Use only approved synthetic members, ordinary positive/negative UI flows and test ZIP; no deliberate deadlock/connection kill/global configuration manipulations unless independently approved isolation and recovery exist. The V22 target/source patch must be verified; no assumed document root/port/user.
 
-## Evidence-root permission policy (2026-11-21)
+## Evidence-root permission policy (2026-11-21; F32-MR-02 correction)
 
-Current W01 test-only witness accepts an existing canonical non-symlink **root** when the effective PHP CLI user has read and write access. Root mode 0700 and owner equality are no longer required; **individual case directories and evidence files still require 0700 / 0600** and one-shot integrity. This deliberately weakens the parent-directory trust guarantee where other users can write to the root; independent Owner isolation/permissions assessment and a bounded security delta review are required before real RB01 injection. A/B/C root path remains fixed; D additionally excludes webroot/checkout overlap and must be protected against public HTTP exposure.
+The **current** W01 witness admits an existing canonical non-symlink evidence parent with effective CLI read/write permissions **only if group/other WRITE bits are absent** (mode mask `0022` rejected). Group/other read/traverse can be allowed; parent ownership/mode 0700 is **not** mandatory. Private case directories must be mode **0700** and owner-bound; evidence files **0600**, created under a restrictive `umask 0077` and mode-checked **before first write**, then exclusively one-shot. In A/B/C the parent comes from the **private operator-set `CF03_EVIDENCE_ROOT`**, never a fixed public repository path; D supplies its separately protected root. All A/B/C/D roots must be outside the webroot/site root and source checkout, including ancestor/descendant overlap. Operator must additionally exclude public HTTP aliases and untrusted ACL/mount/ancestor/same-UID access. **F32-MR-02/P3 was Owner-accepted as historical documentation drift at PR32 merge**, not as permission for writable parent directories.
 
 ## 2. Safety and evidence contract for Stage 0–1
 

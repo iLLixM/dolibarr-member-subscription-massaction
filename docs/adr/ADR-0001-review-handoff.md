@@ -1,5 +1,7 @@
 # ADR-0001 — Independent architecture review handoff (CF-00)
 
+> **Historical CF-00 reviewer handoff (2026-11-18), not the current roadmap.** The independent CF-00 findings were later resolved/accepted within their original source scope. Issue #22's **2026-11-21 Owner amendments to ADR-06 and ADR-11** supersede the original contribution-only permanent scope and fault-test timing; see [current baseline](../current-development-baseline.md) and [ADR-0001 current amendment](ADR-0001-core-first-transaction-profiles.md#binding-2026-11-21-owner-amendment--adr-06-and-adr-11). PR #32 is squash-merged as `425980c43a51a9f27073133212f18825ac6da248`; CF05 is required before v0.1.0. The historical F23 review instructions below are preserved, not restarted.
+
 **CF-00 OWNER-ACCEPTED – APPROVED FOR DOCUMENTATION MERGE (2026-11-18)**
 
 CF-00 closure: [PR #23](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/23),

@@ -1,5 +1,24 @@
 # ADR-0001 — Core-first transaction profiles
 
+## Binding 2026-11-21 Owner amendment — ADR-06 and ADR-11
+
+**Current authority: [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22).** This amendment *prospectively supersedes* the 2026-11-18 contribution-only permanent functional target and fault-inclusive release-test timing. The dated CF-00 architectural work below is **historical**; its D-01/D-02 transaction/security mechanisms and ADR-01–05/07–10/12 remain binding. Refer to the [current development baseline](../current-development-baseline.md) for the implementation/evidence matrix.
+
+| Decision | Current binding position | Qualification boundary |
+| --- | --- | --- |
+| **ADR-06 — REVISED** | The v0.1.0 massaction must offer the **same complete business capability** in `CoreGuarded`, `EnhancedMySQL` and `MariaDBSnapshot`: contribution, member R16/Agenda, optional existing Third Party invoice, explicit new Third Party **only with invoice**, line/validation/link, optional verified PDF and contribution email/attachment. | **Target, not current permission.** CoreGuarded's existing invoice/customer/PDF/mail feature gates stay **disabled until CF05-01..07** implements and qualifies the complete path. No unreviewed UI-only unlock. |
+| **ADR-11 — REVISED** | Mandatory focused CF05 implementation and independent exact-head transaction/security review; retained synthetic transaction/rights/session/security cases **including 21 PHP/Core CI jobs**; real Owner-authorized **normal/success** full workflows in A/B/C/D; independent DB/file/SMTP postconditions, Owner risk acceptance and exact new v0.1.0 ZIP/R0-04/R0-07 release gate. | Purposeful **real destructive fault tests** belong to later `CF03-FAULT` and remain **OPEN / NOT EXECUTED**. Synthetic fault safety and safe authenticated negative tests remain mandatory now; an unmitigated known P0/P1 never becomes accepted merely because real injection is deferred. |
+
+**CF05 shared-guard implementation:** exactly **one active profile-specific guard** is carried from `MsmBookingService` through `MsmInvoiceService`/Third Party/line/validation checkpoints, inside one outer Core DoliDB transaction **per member**. Metadata/engine qualification is separate; CoreGuarded must not acquire an Enhanced P_S dependency. Expand the *actual* qualified Dolibarr V22/V24 Core/Agenda/trigger/side-effect call graph (including `COMPANY_CREATE`, optional `CONTACT_CREATE`, `BILL_CREATE`, `LINEBILL_INSERT`, `BILL_VALIDATE`). This is not a universal arbitrary-extension guarantee.
+
+**Error/completion:** D-01 preflight → `SET TRANSACTION ISOLATION LEVEL REPEATABLE READ` → immediate Core BEGIN → locks → fresh reads; no intervening SQL. A single known-owned rollback is available **only** for a specifically qualified business error with demonstrably intact original context; SQL/deadlock/timeout/depth/connection/end uncertainty → **UNKNOWN/STOP**, no foreign rollback, automatic retry or compensation. Terminal `CHAIN`/`RELEASE` stops before module PDF/mail and further members; only a qualified acknowledged **nonterminal** completion plus dependable checkpoint permits separate post-commit document/delivery side effects.
+
+**As-of implementation:** [PR #29](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/29) implemented bounded CoreGuarded contribution-only. [PR #32](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/32) was **squash-merged 2026-11-21** as `425980c43a51a9f27073133212f18825ac6da248` and provides **read-only witnesses/CI/evidence/privacy**, not CF05. Its independent review's `CHANGES REQUIRED` was addressed by explicitly accepted **F32-MR-01/P2 operational** and **F32-MR-02/P3 documentation** limitations, **not** by claiming fixes or independent approval. A/B/C real witness use still requires a privately verified target-user launcher; no such proof is yet recorded.
+
+**Evidence/governance:** POS02-A1/A2 = bounded Owner **TECHNICAL PASS**, F32-W01-01 = independent **CLOSED** at earlier SHA, RB01-A = **INVALID/STOP as rollback proof** (real contribution persisted). Historical source claims and SHA values remain pinned; the new full-function A–D, 21-job, D exact ZIP and Owner release gates are **OPEN**. No physical-event identity claim in CoreGuarded (ADR-12); no whole-batch/SMTP atomicity/exactly-once guarantee. No release or live writes are authorized by this amendment.
+
+---
+
 **CF-00 OWNER-ACCEPTED – APPROVED FOR DOCUMENTATION MERGE (2026-11-18)**
 
 CF-00 closure: [PR #23](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/23),

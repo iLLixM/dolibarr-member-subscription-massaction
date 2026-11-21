@@ -1,5 +1,28 @@
 # ADR-0001 — Transaction profile risk register
 
+## Current risk disposition and new financial scope (2026-11-21)
+
+**Current authority: [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22)** and the [current development baseline](../current-development-baseline.md). ADR-06 and ADR-11 were revised *prospectively*: full contribution/Third Party/invoice/PDF/mail is a **v0.1.0 delivery objective on all three profiles**, not current CoreGuarded implementation. The historical R01–R15 analyses below remain valuable but their `U` and `G` labels, prior contribution-only limit and 2026-11-18 fault timing must not be read as newer Owner policy. None is silently upgraded to PASS.
+
+**Additional financial/operational exposure requiring CF05 qualification:**
+
+| Risk | New/expanded impact | Mandatory countermeasure and acceptance |
+| --- | --- | --- |
+| Multi-object DB chain | Contribution succeeds but Third Party, invoice, line/link or validation is incomplete or from a different transaction | Exactly one outer DoliDB owner and **one shared active profile guard** for each member; independent persisted DB postconditions; qualified Core/Agenda/trigger/InnoDB call graph |
+| Weak CoreGuarded physical evidence | ACK/context cannot independently prove same physical transaction event; multiple financial rows amplify residual uncertainty | Retain ADR-12's explicit limit; finite error provenance; only specifically qualified owned rollback; all other ambiguity UNKNOWN/STOP without compensating DML |
+| Premature or terminal completion | `CHAIN`/`RELEASE`, lost ACK or changed connection could cause unsafe new SQL, PDF/mail or next-member work | Known terminal/unknown → STOP; post-commit only after suitable acknowledged nonterminal Core completion and DB-independent checkpoint; no forced session DB settings |
+| PDF/SMTP side effects | Files/mail can outlive failed DB transaction or be sent twice | Non-atomic separate statuses; PDF/path/hash/attachment/recipient validation; no automatic regeneration/redelivery, manual reconciliation |
+| Profile/call-graph bypass | Direct Invoice/Third Party service or client feature flags could enable unqualified writes | Server-owned profile, revision/CAS, member/entity/rights/consent/CSRF, direct service guards, no Enhanced→CoreGuarded fallback; fail-closed unsupported Core/hooks |
+| Operator witness use – F32-MR-01/P2 | `sudo env_reset` can omit required A/B/C private `CF03_*` variables | **Owner ACCEPTED limitation**, but **new real A/B/C witness use blocked** until protected, least-privilege target-user launcher passes read-only preflight; no private values committed |
+| Evidence parent text – F32-MR-02/P3 | Old prose could misstate file trust boundary | **Owner ACCEPTED historical documentation deviation**. Code and current runbook normative: canonical evidence parent without group/other write; A/B/C private environment root; case 0700/file 0600 and one-shot |
+| Qualification/release status | Old contribution-only POS01/POS02 or synthetic CI mistaken for full invoice/ZIP approval | Independent exact-source review, full real **CF03-NORMAL** A–D, retained synthetic fault/security and **21-job** CI, new exact v0.1.0 ZIP, real D package install, R0-04/R0-07 and separate Owner release GO |
+
+**Test-timing distinction:** real destructive fault/rollback, lost ACK/connection, deadlock/timeout, destructive concurrency/replay and controlled PDF/SMTP fault injection are deferred to later `CF03-FAULT` (**OPEN/NOT EXECUTED**) by revised ADR-11; this **does not waive** any runtime UNKNOWN/STOP, safe synthetic negative or known P0/P1 safety gate. RB01-A's observed persisted contribution is **INVALID/STOP** as rollback proof, not an executed rollback. A/C share one database/webroot and require strictly serial owner profile/account switching.
+
+**PR32 current history:** final reviewed head `cbc97843fb017135739a39ea12ef26c7fa66dfdb`, squash commit `425980c43a51a9f27073133212f18825ac6da248`; 9/9 standard and 1/1 hosted CI PASS, **not** new A–D real financial or physical-event proof. Earlier archived privacy-redacted evidence bytes cannot inherit original SHA claims. The independently reviewed 0×P0/P1, P2+P3 findings are Owner-accepted exceptions, not external approval.
+
+---
+
 **CF-00 OWNER-ACCEPTED – APPROVED FOR DOCUMENTATION MERGE (2026-11-18)**
 
 CF-00 closure: [PR #23](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/23),

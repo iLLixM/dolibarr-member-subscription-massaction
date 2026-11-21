@@ -1,5 +1,7 @@
 # Phase 4 — Optional invoice integration architecture
 
+> **Current status and provenance (2026-11-21):** The Phase 4 design below describes historical invoice implementation and bounded V22/V24/Core integration evidence, **not** proof of the new complete profile-spanning v0.1.0 massaction. [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22) now requires invoice/Third Party/PDF/mail on **CoreGuarded, EnhancedMySQL and MariaDBSnapshot**, implemented via **CF05** with the *same active guard* across Booking/Invoice/Third Party and one outer DoliDB transaction per member. CoreGuarded invoice/customer/PDF/mail is currently gated off. Qualified known business rollback only while owned context is proven intact; otherwise UNKNOWN/STOP. Post-commit PDF/mail require suitable nonterminal completion and checkpoint; terminal CHAIN/RELEASE STOP. Original O1–O7 and dated source evidence remain historical and retain their exact boundaries. [Current feature/design baseline](current-development-baseline.md) and [release gates](release-qualification-v0.1.0.md) supersede any conflicting older implementation/future-test status.
+
 ## Current implementation context — 2026-11-14
 
 Phase 4 is implemented. The historical bounded V22 G2/G3/G4 approvals and the
