@@ -12,7 +12,8 @@ The historic **71 Cxx requirement rows** in [requirements.csv](requirements.csv)
 | CF03 F32-W01-01 | Independent CLOSED on earlier reviewed source |
 | CF03 RB01-A | INVALID/STOP as rollback proof; a normal contribution persisted |
 | PR32 CF03 witness CI | 9/9 standard + 1/1 hosted at original head; synthetic only; squash-merged to `main` |
-| CF05 / CF03-NORMAL / release | **OPEN**, must use new exact source and Owner-approved real normal cases A–D plus independent evidence/21-job/full ZIP gates |
+| CF05-01/02 shared active guard and invoice checkpoints | **IMPLEMENTED / independently approved / SQUASH-MERGED** in [PR #34](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/34), reviewed SHA `11d7dd3cf4bdcf831aa87782b7466d2378fc733f`; F34-01/P2 and F34-02/P3 CLOSED; `f29-rights.php` **113** and `invoice.php` **301** synthetic assertions PASS; 9/9 standard CI, no real qualification |
+| CF05-03..07 / CF03-NORMAL / release | **OPEN**, new exact-source full financial feature admission, Owner-approved A–D normal cases, independent evidence, 21-job CI and exact ZIP/D install gates required |
 | CF03-FAULT real injections | **DEFERRED / OPEN / NOT EXECUTED**; synthetic fault contract still in release scope |
 
 The Owner explicitly accepted F32-MR-01/P2 (private target-user launcher missing) and F32-MR-02/P3 (historical parent/root prose drift) as **limitations**, not fixes or blanket security waivers. See [current development baseline](current-development-baseline.md), [CF03 plan](cf03-qualification-plan.md) and [test strategy](test-strategy.md).

@@ -1,6 +1,6 @@
 # CF05-01/02 – Shared active transaction guard (implementation handoff)
 
-**Effective development baseline:** Issue #22 (Owner, 2026-11-21). **Scope:** focused implementation of CF05-01 and CF05-02 only. This is **not** a finance enablement, CF05-03..07 completion, live test permission or release approval.
+**Effective development baseline:** Issue #22 (Owner, 2026-11-21). **Status: CF05-01/02 IMPLEMENTED, independently reviewed and SQUASH-MERGED** in [PR #34](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/34) (`main` merge `dc7a172bfd476467d7980cbf16a2657cfc1e729c`, reviewed PR HEAD `11d7dd3cf4bdcf831aa87782b7466d2378fc733f`). Independent final verdict `APPROVED FOR DEVELOPMENT MERGE`, **F34-01/P2 and F34-02/P3 CLOSED**, no new findings; [exact-head CI](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44948777072) **9/9 PASS**. **No** finance enablement, CF05-03..07 completion, live test permission or release approval.
 
 ## One transaction owner; two distinct responsibilities
 
@@ -39,12 +39,15 @@ Existing EnhancedMySQL event and MariaDB snapshot observers retain their own act
 - **CF05-07:** full PHP/Core synthetic regression, independent exact-head security review, Owner acceptance, then separately authorized **real CF03-NORMAL A/B/C/D**. Real CF03-FAULT is still deferred/OPEN, not a PASS.
 - **Release:** a new v0.1.0 ZIP, actual hosted D installation, R0-04, R0-07 and separate Owner release GO remain OPEN.
 
-## Regressions expected in this PR
+## Implemented synthetic regression evidence (reviewed PR #34 HEAD)
 
 - Both metadata observer and guard are bound to the same original DoliDB; foreign guard injection must STOP.
 - Production factory always hands the **same active guard instance** to the Invoice service, not a newly made guard.
 - Independent metadata checks and active ownership checkpoints; CoreGuarded direct owned checks must not make P_S queries.
 - Before/after checks around customer/invoice/create/line/validate; at any invalidated guard checkpoint **no next Core API**, no automatic replay.
 - Existing EnhancedMySQL/MariaDBSnapshot invoice integration doubles and profiles remain unchanged; PHP >=7.4 syntax; no new DB tables/migrations or released financial feature flags.
+- **F34-01:** negative tests verify qualified rollback only for previously admitted `preflight`/`subscription` reasons; customer/invoice/commit/unknown stages are excluded. They also inject active-guard loss *before* each Core write, and run actual non-overridden direct Invoice admission on a mismatched guard type **with the same DoliDB**.
+- **F34-02:** `Societe::fetch()`, member-link SELECT and all four Invoice persisted readbacks have individual active-guard boundaries. Fault injection after each readback proves that no later SELECT or Core call follows an observed loss.
+- **Executed test evidence:** `test/unit/f29-rights.php` **113/113 PASS** and `test/unit/invoice.php` **301/301 PASS**, verified in independent [9-job standard CI](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44948777072). The direct rollback-classifier test and existing Booking catch regressions were accepted as sufficient **for the isolated CF05-01/02 test finding**; they do not qualify a new financial rollback origin or simulate an authorized real CoreGuarded invoice booking.
 
 **Review limitation:** This pure implementation and synthetic test suite does not prove real Customer/Invoice/Agenda transactional semantics on restricted MySQL, physical transaction event identity, a qualified CoreGuarded financial rollback, real V22/V24 invoice outcome or ZIP/release admission.

@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### 2026-11-21 – CF05-01/02 shared active guard merged (PR #34)
+
+- [PR #33](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/33) squash-merged the documentation baseline as `d0d0fddd5797a1424eb004d541d8036511193ec6` after independent review. Historical documentation exception F33-DOC-03/P3 remained PARTIAL / OWNER ACCEPTED; it is not a runtime feature waiver.
+- [PR #34](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/34) **squash-merged** to `main` as `dc7a172bfd476467d7980cbf16a2657cfc1e729c` (reviewed PR HEAD `11d7dd3cf4bdcf831aa87782b7466d2378fc733f`). CF05-01/02 uses **one shared active profile guard** between Booking and Invoice with separate DB metadata/engine checks and no second transaction manager/Performance Schema fallback for CoreGuarded.
+- Explicit transaction checks surround `Societe::create_from_member()`, `Facture::create()`, `Facture::addline()`, `Facture::validate()` and every persisted Invoice readback. CoreGuarded rollback classification admits only previously qualified `preflight`/`subscription` stages; customer/invoice/unknown stages remain `UNKNOWN/STOP`.
+- Independent exact-HEAD delta review concluded **APPROVED FOR DEVELOPMENT MERGE**; F34-01/P2 and F34-02/P3 **CLOSED**, no new findings. Standard [CI #44948777072](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44948777072) **9/9 PASS** on the reviewed head; `test/unit/f29-rights.php` **113** and `test/unit/invoice.php` **301** synthetic assertions PASS.
+- **No release or real financial admission:** CoreGuarded invoice/autocreate/sendmail gates stay OFF. CF05-03..07, real CF03-NORMAL A–D, release 21-profile CI, new exact ZIP and Owner GO remain OPEN. Real destructive CF03-FAULT remains deferred/OPEN. No one-shot fixture re-use.
+
+
 ### 2026-11-21 – Core-first full-function product baseline and PR #32 closure
 
 - Owner-revised [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22): **v0.1.0 full massaction workflow across CoreGuarded, EnhancedMySQL and MariaDBSnapshot**. Revised ADR-06 removes contribution-only as a permanent target, **not** as a current safety gate: CoreGuarded invoicing/auto-third-party/PDF/mail are still closed until CF05-01..07.

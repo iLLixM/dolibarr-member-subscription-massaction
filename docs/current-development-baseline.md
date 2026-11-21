@@ -1,10 +1,10 @@
 # Current development baseline, architecture and roadmap
 
-**Effective: 2026-11-21, after squash merge of PR #32.** This document is a navigational consolidation of the **binding Owner strategy in [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22)** and the release decisions in [Issue #20](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/20). If a dated historical document disagrees, the newer Owner decision in Issue #22 controls *prospectively*. This is documentation, **not a change of architecture authority, feature flags or runtime code**.
+**Effective: 2026-11-21, after squash merges of PR #32, PR #33 and PR #34.** This document is a navigational consolidation of the **binding Owner strategy in [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22)** and the release decisions in [Issue #20](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/20). If a dated historical document disagrees, the newer Owner decision in Issue #22 controls *prospectively*. This is documentation, **not a change of architecture authority, feature flags or runtime code**.
 
 ## What is implemented, what is intended
 
-**Current development state:** PR #29 delivered bounded CoreGuarded contribution-only booking. PR #32 delivered the separate read-only CF03-W01 witness, CI/evidence and privacy infrastructure. Earlier EnhancedMySQL and MariaDBSnapshot financial paths exist within their historically admitted limits. **PR #32 did not implement the complete CoreGuarded financial flow**, and none of the three profiles currently has fresh full-feature CF05 acceptance.
+**Current development state:** PR #29 delivered bounded CoreGuarded contribution-only booking; PR #32 read-only CF03-W01 witness/CI/evidence infrastructure; PR #33 the documentation strategy baseline; **PR #34 merged CF05-01/02, the shared active Booking→Invoice guard, customer/invoice Core API checkpoints and individually guarded readbacks**. Earlier EnhancedMySQL and MariaDBSnapshot financial paths retain their historically admitted limits. **The full CoreGuarded finance flow is still NOT admitted**; none of the three profiles has fresh complete CF05-normal-case release qualification.
 
 **Release target v0.1.0:** full member bulk-subscription massaction with the **same business capability in CoreGuarded, EnhancedMySQL and MariaDBSnapshot**, under profile-specific observation strengths and exact qualifying environments.
 
@@ -12,8 +12,8 @@
 | --- | --- | --- |
 | Preview, eligibility, server-held confirmation and member selection | Required | Existing, read-only preview is not booking permission |
 | Contribution, member R16 end and configured standard Agenda | Required | CoreGuarded contribution-only development implementation; POS01-C/POS02-A1/A2 bounded real positives |
-| Existing Third Party invoice | Optional when confirmed | Historical B/C path; **CoreGuarded feature is disabled pending CF05** |
-| Create Third Party | Optional **only together with selected invoice** | Requires CF05 shared guard, verified Core call graph and new real A–D evidence |
+| Existing Third Party invoice | Optional when confirmed | Historical B/C path, guarded by the merged CF05-01/02 shared active interface; **CoreGuarded feature remains disabled pending CF05-03..07** |
+| Create Third Party | Optional **only together with selected invoice** | Shared active guard and before/after `Societe::create_from_member()` boundary now implemented; still requires CF05-03..07 feature admission, qualified Core call graph and real A–D evidence |
 | Invoice line, validation and persisted links | Required when invoice selected | Historical B/C subset; profile-spanning CF05 acceptance pending |
 | Verified invoice PDF | Optional, strictly after suitable acknowledged DB completion | New CoreGuarded admission/checkpoint required; not DB-atomic |
 | Contribution email and verified invoice attachment if applicable | Optional after permitted completion/checkpoint | Delivery is separately evidenced; not DB-atomic or retryable automatically |
@@ -48,9 +48,18 @@ These are **mandatory runtime contracts**, including during the deferred real fa
 
 ## Revised binding ADR decisions
 
-- **ADR-06 (revised 2026-11-21):** CoreGuarded is **not permanently contribution-only**. The v0.1.0 financial function is authorized as a *development and qualification target* but its current feature gates remain closed until CF05-01..07 code, synthetic review, real normal-case admission and Owner acceptance.
+- **ADR-06 (revised 2026-11-21):** CoreGuarded is **not permanently contribution-only**. The v0.1.0 financial function remains the target; **CF05-01/02 is implemented and merged**, but current financial gates stay closed pending CF05-03..07, full-feature normal-case qualification and Owner acceptance.
 - **ADR-11 (revised 2026-11-21):** full v0.1.0 requires focused CF05 PR(s), retained synthetic security/transaction regressions **including 21 PHP/Core jobs**, independently assessed real **normal/success** A–D workflows, exact-source independent code/security and operational risk review, real hosted D ZIP acceptance and separate release approval. **Real destructive/fault injections are moved to a later CF03-FAULT iteration** and stay OPEN / NOT EXECUTED; safe synthetic fault and authenticated negative tests remain release requirements.
 - **ADR-01–05, 07–10 and 12** remain binding. In particular CoreGuarded's weaker physical evidence is an explicit Owner-accepted residual, not a claim of equivalence or a waiver for known P0/P1 data-integrity issues.
+
+## CF05-01/02 merged implementation checkpoint
+
+- **[PR #34](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/34): SQUASH-MERGED** on 2026-11-21 as `dc7a172bfd476467d7980cbf16a2657cfc1e729c` into `main`. Independently reviewed source `11d7dd3cf4bdcf831aa87782b7466d2378fc733f`, base `d0d0fddd5797a1424eb004d541d8036511193ec6` after [PR #33](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/33). Five PR commits, eight changed files; this merge is the reviewed **CF05-01/02 development stage**, not CF05-03..07 or full v0.1.0 admission.
+- **Implemented:** `MsmActiveTransactionGuard` (`isFor`, `active`, `requireSupportedIsolation`) is implemented by `MsmCoreGuardedTransaction` and `MsmDatabaseState`; Booking passes **the same active instance and original DoliDB** into Invoice. The original `MsmDatabaseState` remains separate for DB-family/InnoDB metadata; there is **no second transaction manager or general Performance Schema requirement** for CoreGuarded. Active guard checks surround `Societe::create_from_member()`, `Facture::create()`, `Facture::addline()`, `Facture::validate()` and the individual customer/member/invoice readbacks.
+- **Fail-closed stage classification:** CoreGuarded business rollback eligibility is restricted to previously qualified `preflight`/`subscription` stages **and** existing qualified error reasons; `customer`, all `invoice_*`, unknown/future stages and unclassified errors remain `UNKNOWN/STOP` without automatic foreign rollback/retry. **CF05-04** must separately qualify any newly permitted invoice/customer rollback origins with intact owned context.
+- **Independent follow-up verdict:** `APPROVED FOR DEVELOPMENT MERGE`; **F34-01 / P2 CLOSED**, **F34-02 / P3 CLOSED**, no new P0–P3. [CI #44948777072](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44948777072) **9/9 PASS** on the exact reviewed PR HEAD (PHP 7.4/8.2, pinned Dolibarr V22/V23/V24). `test/unit/f29-rights.php`: **113** assertions, `test/unit/invoice.php`: **301** assertions, synthetic only. No post-squash real database/HTTP qualification or physical transaction event identity is claimed.
+- **Feature gates unchanged:** `class/transactionprofile.class.php`, Booking and direct Invoice admission still **disable** CoreGuarded invoice, optional automatic third party and mail; PDF/mail is not now qualified or activated by the interface alone. **Next work starts at CF05-03/04**, then CF05-05/06 and CF05-07, real CF03-NORMAL A–D and release prerequisites. See [implementation architecture](cf05-shared-guard-design.md).
+- **Historical PR #33 documentation:** merged in `d0d0fddd5797a1424eb004d541d8036511193ec6`; F33-DOC-01/02 CLOSED, F33-DOC-03 PARTIAL / OWNER ACCEPTED as two non-blocking old-prose inconsistencies. Historic evidence and text exceptions are not runtime behavior changes.
 
 ## PR #32 merge and operator restrictions
 
@@ -77,7 +86,7 @@ A reviewer's earlier inability to access raw POS02 bytes and the Owner's later t
 
 | Order | Work package | Required output |
 | --- | --- | --- |
-| 1 | **CF05-01/02** | Common minimal active profile-aware guard contract; pass the *same guard* from Booking through Invoice/Third Party; retain B/C regression |
+| 1 – COMPLETE (dev) | **CF05-01/02** | **MERGED / independently approved** via PR #34: minimum active guard, same-instance Booking→Invoice injection, Core API/readback checks, B/C synthetic regression. **Not** full financial feature admission |
 | 2 | **CF05-03/04** | Consistent server-authoritative enablement on all modules/services, finite qualified rollback/error-provenance classification |
 | 3 | **CF05-05/06** | Safe PDF/mail after acknowledged nonterminal end with checkpoints, exact Core/standard trigger and InnoDB/side-effect audit |
 | 4 | **CF05-07** | Focused PHP >=7.4-compatible implementation/security tests, exact-head independent review and Owner acceptance |
@@ -87,6 +96,6 @@ A reviewer's earlier inability to access raw POS02 bytes and the Owner's later t
 
 **CF03-FAULT (deferred):** real destructive post-DML rollback, implicit end, lost ACK/connection, SQL 1568/1213/1205, nested-depth, concurrency, destructive replay/interruption and controlled PDF/SMTP fault campaigns are **OPEN/NOT EXECUTED**. They require later isolated harness review and case-specific Owner GO; this deferral never relaxes runtime safety or permits treating an UNKNOWN as success.
 
-[Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22) remains **OPEN** after the PR32 merge. Historical [PR #19](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/19) closed **without merge**; its prepared ZIP/hash is not current release evidence. [Issue #20](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/20) contains dated pre-refresh wording; the revised 2026-11-21 Issue #22 scope takes precedence. The Owner retains the unreserved module ID `584620` for v0.1.0 and the Owner-confirmed V22/V23/V24 compatibility statement, without inventing real V23 test evidence.
+[Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22) remains **OPEN** after the PR34 development merge. Historical [PR #19](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/19) closed **without merge**; its prepared ZIP/hash is not current release evidence. [Issue #20](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/20) contains dated pre-refresh wording; the revised 2026-11-21 Issue #22 scope takes precedence. The Owner retains the unreserved module ID `584620` for v0.1.0 and the Owner-confirmed V22/V23/V24 compatibility statement, without inventing real V23 test evidence.
 
 **No code admission, real business write, package or release is authorized by this documentation-only update.**
