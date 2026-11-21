@@ -69,6 +69,19 @@ not a complete PII detector or history purge. It must be exercised on the
 exact PR HEAD; independent code/evidence-scope review remains mandatory.
 No source fingerprints, historical hashes or original evidence are restamped.
 
+## CI coverage addition
+
+The privacy scanner now also audits tracked historical one-shot marker
+files, git configuration text, additional common source/log extensions
+and Windows-style home paths. The offline regression in
+`test/unit/privacy-guard.py` builds an isolated temporary Git repository,
+verifies a harmless placeholder PASS and verifies forbidden personal,
+Linux-home, Windows-home, marker-file, gitignore and account examples
+STOP. It runs in the standard nine-job CI, optional 21-job CI and
+targeted PHP8.3/V22 hosted workflow. Neither scanner nor test has
+network, database or business-write access. This scanner cannot assert
+that all identifiers are absent or remove old Git objects.
+
 ## Review scope and remaining limits
 
 This privacy work does not change production booking/transaction/invoice algorithms.
