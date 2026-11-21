@@ -8,6 +8,23 @@ After an Owner-observed RB01-A baseline STOP `CF03EvidenceRootNotPrivate` on an 
 
 This is a **new security-relevant tool delta** after the earlier W01 and F32-W01-01 reviewed code HEAD. It neither reopens the independently CLOSED member-type finding **F32-W01-01**, nor retroactively changes the POS02-A1/A2 PASS evidence from earlier immutable snapshots. Before a new *real* RB01 test, use the newly pinned tool SHA, rerun targeted CI and require bounded independent validation of the changed filesystem trust assumption and separate RB01 injection/Owner gates. The prior `CF03EvidenceRootNotPrivate` STOP must be retained as historical operator evidence; do not delete or reuse a consumed case.
 
+## Phase 1 evidence isolation hardening and merge-review scope (2026-11-21)
+
+The latest privacy/evidence delta preserves the approved readable, non-group-
+writable evidence parent; case 0700 and file 0600 are mandatory. A/B/C/D now
+share the webroot/checkout exclusion check, including the site root.
+The evidence writer creates private files under temporary umask 0077 and
+verifies their mode before any write, restoring the ambient umask.
+Synthetic tests cover all four environments and ambient umask 0000.
+
+The positive POS02-A1/A2 TECHNICAL PASS and F32-W01-01 CLOSED remain
+tied to their original reviewed source SHA; no evidence operation is retried.
+RB01-A remains INVALID as a rollback proof, with a persisted contribution.
+Historical redacted D01/AP3/CF02 artifacts must not inherit prior byte hashes.
+A complete exact-HEAD independent privacy/evidence and merge-readiness
+review is still required: implementation claims are not independent approval
+or authority for real tests, PR merge or release.
+
 ## Abschließende Disposition F32-W01-01 und POS02-A1/A2 (21.11.2026)
 
 **F32-W01-01 – CLOSED (independent code review).** Der externe [finale Delta-Review](evidence/cf03/PR32-F32-W01-01-POS02-final-delta-review.md) bestätigt `llx_adherent_type.statut=1` ACTIVE / `0` INACTIVE für Dolibarr V22.0.5 und V24.0.3 sowie die korrekte Witness-Prüfung, positiven/negativen Tests und den echten `cf03State()`-SQL-Reader-Mappingpfad. **Standard-CI 9/9 und Hosted-CI 1/1 PASS** auf dem Original-Code-/Test-HEAD `e7b911b707508e439f9acbfad43f5fd55d34cc44`; keine neuen P0–P3 Code-Findings.
