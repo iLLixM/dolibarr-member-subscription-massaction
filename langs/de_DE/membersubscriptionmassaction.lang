@@ -153,3 +153,13 @@ MSMNotProcessedTotal=Nicht bearbeitet: %s
 MSMTerminalBatchStop=Der Stapel wurde gestoppt. Bestätigte Datenbankergebnisse bleiben gültig. Übrige Mitglieder wurden nicht bearbeitet; es erfolgt keine automatische Wiederholung.
 MSMCoreGuardedSessionUnsupported=Core-Guarded benötigt einen unterstützten lokalen Datei-Session-Checkpoint. Die Buchung wird verweigert.
 MSMCoreGuardedLoggerUnsupported=Core-Guarded benötigt den unterstützten lokalen Standard-Dateilogger. Die Buchung wird verweigert.
+
+MSMAttachmentStatus=Anlagenstatus
+MSMAttachment_verified_for_transport=PDF-Anlage unmittelbar vor Standardtransport geprüft; Zustellung nicht bestätigt.
+MSMAttachment_verified_before_hook=PDF-Anlage vor Hook geprüft; tatsächliche Anlage/Zustellung durch Hook nicht bestätigt.
+MSMAttachment_missing=Bestätigte Rechnungs-PDF als Anlage nicht verfügbar; kein Versand.
+MSMAttachment_not_sent=Keine Anlage transportiert; Mailversand nicht erfolgreich bestätigt.
+MSMAttachment_not_selected=Anlage nicht ausgewählt.
+MSMAttachment_not_required=Keine Rechnungsanlage erforderlich.
+MSMAttachment_not_processed=Anlagenverarbeitung aufgrund eines STOP nicht begonnen.
+MSMAttachment_unknown=Anlagenstatus ungeklärt; kein automatischer Neuversand.

@@ -64,6 +64,24 @@ class MsmSubscriptionMail
 		$result = $member->sendEmail($message, $subject, $paths, $mimes, $names, '', '', 0, $ishtml, '', "X-Dolibarr-Info: member subscription module\r\n");
 		return $result > 0 ? 'transport' : 'failed';
 	}
+	/** Separate attachment verification from mail transport/hook outcomes.
+	 * 'verified_for_transport' is not a delivery receipt; a hook is never
+	 * reported as having sent the attachment. Keep the legacy send() contract.
+	 */
+	public function sendWithEvidence($member, array $row, $user, $selected, array $invoice = null)
+	{
+		$status = $this->send($member, $row, $user, $selected, $invoice);
+		$attachment = 'not_required';
+		if ($invoice !== null) {
+			$attachment = 'not_sent';
+			if ($status === 'transport') { $attachment = 'verified_for_transport'; }
+			elseif ($status === 'hook') { $attachment = 'verified_before_hook'; }
+			elseif ($status === 'attachment_missing') { $attachment = 'missing'; }
+			elseif ($status === 'unknown') { $attachment = 'unknown'; }
+			elseif ($status === 'not_selected') { $attachment = 'not_selected'; }
+		}
+		return array('mail' => $status, 'attachment' => $attachment);
+	}
 	public function send($member, array $row, $user, $selected, array $invoice = null)
 	{
 		global $hookmanager, $langs;

@@ -61,6 +61,11 @@ function msmRenderBooking(array $state, $key, array $access = array())
 					$html .= '<div>'.msmText('MSMPdfStatus').': '.msmText($pdf['message']).'</div>';
 					if ($pdf['status'] === 'verified') { $counts['pdf']++; } else { $counts['pdfwarning']++; }
 				}
+				if (isset($result['attachment_status'])) {
+					$attachment = $result['attachment_status'];
+					if (!in_array($attachment, array('verified_for_transport', 'verified_before_hook', 'missing', 'not_sent', 'not_selected', 'not_required', 'not_processed', 'unknown'), true)) { $attachment = 'unknown'; }
+					$html .= '<div>'.msmText('MSMAttachmentStatus').': '.msmText('MSMAttachment_'.$attachment).'</div>';
+				}
 				$html .= '<div>'.msmText('MSMMail_'.$result['mail']).'</div>';
 				if (in_array($result['mail'], array('transport', 'hook'), true)) { $counts[$result['mail']]++; }
 				elseif (!in_array($result['mail'], array('not_selected', 'not_processed'), true)) { $counts['mailwarning']++; }
