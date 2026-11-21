@@ -1,7 +1,7 @@
 # PR #32 – Independent F32-W01-01 Delta-Review & POS02 Evidence Acceptance
 
-**Review date:** 21 November 2026  
-**Role:** Independent Senior PHP/Dolibarr Developer, Security & Integration Reviewer  
+**Review date:** 21 November 2026
+**Role:** Independent Senior PHP/Dolibarr Developer, Security & Integration Reviewer
 **Mode:** Strictly read-only; no repository changes, real DB/HTTP action, replay, cleanup, merge, release or issue transition.
 
 ## A. Executive summary and decision
