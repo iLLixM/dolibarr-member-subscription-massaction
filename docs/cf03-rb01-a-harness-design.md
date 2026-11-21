@@ -48,7 +48,7 @@ The test-only patch itself (including controller subclass selection and marker w
 | Versions/source | V24.0.3, MySQL 8.4.13, PHP CLI 8.2.x; reviewed base, exact test-only overlay/source and deployed hashes pinned |
 | Profile/settings | CoreGuarded, `autocommit=1`, `NO_CHAIN`, InnoDB business and Agenda tables, Member Agenda OFF; no profile/setting changes inside evidence window |
 | Isolation | Single operator, no scheduled tasks, background business writers or open public access; side-effectful third-party hooks disabled in this isolated clone and documented |
-| Mail/files | Mail transport disabled at external boundary, no PDF/invoice selected; private evidence root 0700 and individual files 0600, no public aliases |
+| Mail/files | Mail transport disabled at external boundary, no PDF/invoice selected; canonical non-symlink evidence root effectively readable/writable by CLI user (no mandatory root owner/mode); **case directory 0700 and evidence files 0600**; no public aliases or untrusted parent writers by separate Owner attestation |
 | Fixture | New synthetic ID/ref/marker/email, active paid type `statut=1`, EUR 120.00, `datefin=NULL`, no existing contribution/customer link |
 | Executable test harness | Pre-reviewed test-only branch/build, one-shot injection and explicit prior case-specific Owner-GO |
 
@@ -56,7 +56,7 @@ A mere database export imported under a **different** schema/port/document root 
 
 ## 5. Evidence, independent reconciliation and expected outcome
 
-- **Owner and build:** dated prior GO; isolation attestation; server UUID contrast; backup/restore rehearsal; tested source/harness SHA; deployment/module/core hash inventory; private root permissions; unique fixture ID and marker.
+- **Owner and build:** dated prior GO; isolation attestation; server UUID contrast; backup/restore rehearsal; tested source/harness SHA; deployment/module/core hash inventory; **effective root read/write and separate untrusted-writer risk attestation**, plus private 0700/0600 case artifacts; unique fixture ID and marker.
 - **W01 support (read-only):** `--preflight` PASS; `--scenario=no-change --agenda=off`, `--check-only` PASS; one `--baseline`; after a single authorized UI action, one `--verify` with expected outcome `selected_database_state_unchanged`.
 - **Separate rollback trace:** injection marker proves the dedicated test-only subclass reached the post-Core-DML checkpoint. Capture Core transaction ownership/depth and connection identity before/after the permitted Core rollback, qualified error, acknowledgement, controller UI result, whether COMMIT was attempted, and whether the marker was consumed. Keep sensitive details private.
 - **Independent DB readback:** fresh **separate** SQL connection after request completion; exact fixture member fields and `datefin` unchanged; no subscription/Agenda/linked invoice for fixture; all **12** monitored table counts unchanged, plus selected-row/key snapshots or digests of Core and potentially touched tables, not counts alone.

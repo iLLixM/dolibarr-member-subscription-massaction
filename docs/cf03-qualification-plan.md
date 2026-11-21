@@ -56,6 +56,10 @@ A/C test windows must be mutually exclusive: finish and preserve one case and it
 
 **Environment D:** a hosted system is not inherently safe for destructive faults. Use only approved synthetic members, ordinary positive/negative UI flows and test ZIP; no deliberate deadlock/connection kill/global configuration manipulations unless independently approved isolation and recovery exist. The V22 target/source patch must be verified; no assumed document root/port/user.
 
+## Evidence-root permission policy (2026-11-21)
+
+Current W01 test-only witness accepts an existing canonical non-symlink **root** when the effective PHP CLI user has read and write access. Root mode 0700 and owner equality are no longer required; **individual case directories and evidence files still require 0700 / 0600** and one-shot integrity. This deliberately weakens the parent-directory trust guarantee where other users can write to the root; independent Owner isolation/permissions assessment and a bounded security delta review are required before real RB01 injection. A/B/C root path remains fixed; D additionally excludes webroot/checkout overlap and must be protected against public HTTP exposure.
+
 ## 2. Safety and evidence contract for Stage 0–1
 
 `tools/cf03-lab.php` implements a bounded **read-only operator witness**:

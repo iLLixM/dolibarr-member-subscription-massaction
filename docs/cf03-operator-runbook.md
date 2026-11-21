@@ -85,7 +85,7 @@ Expect actual Dolibarr 22.0.5 source, actual CoreGuarded profile in entity 1, In
 
 ## CF03-W01 hardened evidence and invoice operator prerequisites
 
-The W01 library now requires a **manually provisioned private evidence root for hosted D**. A/B/C retain the existing protected `/var/lib/dolibarr-test-results` parent. D's `--baseline` and `--verify` require **both** `--evidence-root=/ACTUAL/PRIVATE/PATH` and `--evidence-dir=/ACTUAL/PRIVATE/PATH/cf03-d-unique-case-01` with the same values in both calls. The root must already exist, be private (0700), owned by the effective PHP CLI user, have a canonical non-symlink path, and lie outside every served webroot and checkout. A separately owned private directory beside htdocs is permitted only after the hosting operator independently rules out HTTP alias/public backup exposure; the site parent directory itself remains forbidden. No sudo, chown, mkdir of the parent or account/profile change is performed by the witness. No evidence options may be supplied to `--preflight` or `--check-only`. The hosting environment must expose PHP POSIX effective-user inspection; otherwise fail closed. Never select a path that might be publicly downloadable.
+The W01 library requires an **existing canonical, non-symlink evidence root readable and writable by the effective PHP CLI user**. A/B/C retain the fixed `/var/lib/dolibarr-test-results` parent. D's `--baseline` and `--verify` require **both** `--evidence-root=/ACTUAL/SAFE/PATH` and `--evidence-dir=/ACTUAL/SAFE/PATH/cf03-d-unique-case-01` with identical values per call. **The root has no mandatory ownership or mode-0700 check; group/other read permissions are accepted.** The tool still creates the individual case directory at 0700 and its evidence files at 0600 and preserves strict one-shot integrity checks. For D, the root must remain outside the webroot/checkout and their ancestors; hosting operators must separately exclude HTTP alias/public backup exposure. The tool does not create or chmod/chown the parent or switch accounts. Evidence options remain forbidden for `--preflight` and `--check-only`. **Security tradeoff:** a parent writable by untrusted users may permit case-directory replacement despite private case permissions. Prefer restricting such write access administratively; this risk is no longer rejected by the root guard.
 
 **Only after specific Owner authorization of a real business case**: check-only PASS → baseline once → one authenticated UI action → verify once. Verification enforces exactly the two original baseline files, 0600 file modes, checksum integrity, stable DB/profile/conf/module/Core/SQL schema context, and creates `verify.started` before readback. No replay or cleanup even after a partial write.
 
@@ -93,9 +93,9 @@ For `--scenario=invoice-existing` (B/C only), supply the actual UI-confirmed `--
 
 See [CF03-W01 implementation and assurance limits](cf03-w01-validation.md). The operator is **not authorized to book an invoice or contribution solely by the existence of these CLI options**.
 
-## Paket A gate — private parent and one-shot verify
+## Paket A gate — accessible evidence parent and private one-shot case
 
-After Paket A, **A/B/C and D all require a private Evidence parent** owned by the effective PHP-CLI user, canonical/non-symlink, and mode 0700. A/B/C keep the existing fixed `/var/lib/dolibarr-test-results` parent; provisioning or correcting it is a separate manual Owner action, not a witness operation. D continues to use its explicit private `--evidence-root`, under the previously documented non-HTTP-exposed hosting requirements.
+Current contract for **A/B/C/D**: the already existing root must be canonical, non-symlink, and **effectively readable and writable** by the CLI user; no root owner/mode restriction is enforced. A/B/C keep the fixed `/var/lib/dolibarr-test-results`; D supplies an explicit root and retains the no-web-exposure restrictions. **The newly created case directory and every evidence file remain owner-restricted (0700 / 0600), with exclusive writes and single-use verify.** The Owner provisions and assesses the parent separately; the tool never modifies it.
 
 A valid, admitted case's `--verify` now creates `verify.started` **before database connection, profile inspection or source hash checks**. After that point, any STOP is terminal for the Case ID, including database or configuration failure; when possible `verdict.json` carries the STOP, but the exclusive marker remains authoritative. No retry, file deletion, directory replacement, rebooking or automatic cleanup. An invalid baseline is not admitted as a valid case.
 
@@ -189,7 +189,7 @@ Before any `invoice_case --baseline --evidence-dir="$EVIDENCE_DIR"` and authenti
 
 ## 2.2 Contract-validated hosted D contribution pattern
 
-This is a **placeholder** pattern, not a disclosure of hosting credentials or an authorization to book. The same real CLI PHP user must own a pre-provisioned mode-0700 evidence parent outside all public HTTP paths, and the hosting operator must attest no alias/backup exposure. The source-checkout/preflight evidence does **not** prove ZIP installation.
+This is a **placeholder** pattern, not a disclosure of hosting credentials or an authorization to book. The pre-provisioned evidence **root** must be effectively readable/writable by the CLI PHP user, with canonical non-symlink path outside all public HTTP paths; parent owner/mode are not checked. Each **case directory** and its files remain 0700/0600. Hosting operators must attest no alias/backup exposure or untrusted-writer replacement risk. The source-checkout/preflight evidence does **not** prove ZIP installation.
 
 <!-- CF03-CASE-D -->
 ```sh

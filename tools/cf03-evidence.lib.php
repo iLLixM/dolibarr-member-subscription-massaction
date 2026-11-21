@@ -2,7 +2,7 @@
 /* Copyright (C) 2026 iLLixM <iLLixM@proton.me>
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
- * CF-03 private one-shot evidence store. No database operations or HTTP.
+ * CF-03 one-shot evidence store with private case directories. No DB or HTTP.
  * No implicit evidence-root discovery and no retry or artifact overwrite.
  */
 final class Cf03Evidence
@@ -52,12 +52,9 @@ final class Cf03Evidence
         self::need(is_dir($root) && !is_link($root)
             && realpath($root) === $root && is_readable($root)
             && is_writable($root), 'CF03EvidenceParentUnavailable');
-        // Same trust boundary for A/B/C and D: a writable public parent can
-        // replace the case directory even when its own mode is 0700.
-        self::need((fileperms($root) & 0077) === 0
-            && function_exists('posix_geteuid')
-            && fileowner($root) === posix_geteuid(),
-            'CF03EvidenceRootNotPrivate');
+        // The existing root needs effective read/write access only; additional
+        // owner/mode restrictions are reserved for each one-shot case directory
+        // and its files. Canonical path, symlink and D webroot gates stay intact.
         if ($environment === 'D') {
             $doc = realpath($documentRoot);
             $source = realpath($checkout);

@@ -77,22 +77,44 @@ evStop(static function()use($symlink,$private,$doc,$source) {
     Cf03Evidence::directory($symlink,false,'D',$private,$doc,$source);
 },'CF03UnsafeEvidenceDirectory');
 $open=$root.'/open';
-evOk(mkdir($open,0777),'create root to deny');
-chmod($open,0755);
-// The historic defect accepted a public A/B/C parent while D STOPped.
+evOk(mkdir($open,0700),'create synthetic evidence root');
+// Root ownership and group/other mode bits are intentionally not a gate.
+// Only the effective PHP user's read/write ability is required, for A/B/C/D.
 foreach (array('A','B','C','D') as $envName) {
-    foreach (array(0777,0770,0755) as $permissions) {
-        chmod($open,$permissions);
+    foreach (array(0700,0755,0770,0777) as $permissions) {
+        evOk(chmod($open,$permissions),'set root mode');
         clearstatcache(true,$open);
-        evStop(static function()use($open,$envName,$doc,$source) {
-            Cf03Evidence::privateRoot($open,$envName,$doc,$source);
-        },'CF03EvidenceRootNotPrivate');
+        Cf03Evidence::privateRoot($open,$envName,$doc,$source);
+        evOk(true,'readable/writable evidence root accepted '.$envName.' '.decoct($permissions));
     }
-    chmod($open,0700);
-    clearstatcache(true,$open);
-    Cf03Evidence::privateRoot($open,$envName,$doc,$source);
-    evOk(true,'private evidence parent allowed '.$envName);
 }
+// The actual effective read/write result, not the mode alone, governs STOP.
+// Privileged CI users may still have access with mode 0500.
+evOk(chmod($open,0500),'set restricted root mode');
+clearstatcache(true,$open);
+if (!is_readable($open) || !is_writable($open)) {
+    evStop(static function()use($open,$doc,$source) {
+        Cf03Evidence::privateRoot($open,'A',$doc,$source);
+    },'CF03EvidenceParentUnavailable');
+} else {
+    Cf03Evidence::privateRoot($open,'A',$doc,$source);
+    evOk(true,'privileged effective access is authoritative');
+}
+evOk(chmod($open,0777),'restore writable root for private case test');
+clearstatcache(true,$open);
+$permissiveCase=$open.'/cf03-d-openroot01';
+Cf03Evidence::directory($permissiveCase,true,'D',$open,$doc,$source);
+evOk((fileperms($permissiveCase) & 0077)===0,
+    'case directory remains private under permissive root');
+Cf03Evidence::json($permissiveCase,'baseline.json',array('case'=>'root-policy'));
+evOk((fileperms($permissiveCase.'/baseline.json') & 0077)===0,
+    'baseline file remains private under permissive root');
+$rootLink=$root.'/root-link';
+evOk(symlink($open,$rootLink),'create linked evidence root');
+evStop(static function()use($rootLink,$doc,$source) {
+    Cf03Evidence::privateRoot($rootLink,'D',$doc,$source);
+},'CF03EvidenceParentUnavailable');
+unlink($rootLink);
 
 // Simulate DB failure AFTER a valid case is permanently sealed.
 // A later verify for the same case MUST STOP before any external DB work.
@@ -123,6 +145,8 @@ foreach (array($dir,$other,$retry) as $d) {
     }
     rmdir($d);
 }
+unlink($permissiveCase.'/baseline.json');
+rmdir($permissiveCase);
 rmdir($open);
 rmdir($private);
 rmdir($source);

@@ -14,7 +14,7 @@
 - [ ] The clone's correct PHP Web/CLI runtime, restricted DB identity, CoreGuarded profile, source/deployment and session/syslog prerequisites are attested; external SMTP/notifications are blocked.
 - [ ] A uniquely identified **test-only** injection build has been implemented, synthetic-negative-tested and independently reviewed. It is **not installed on the regular A/C instance**.
 - [ ] The reviewed injection point is exactly **after successful parent `verifyStored()` / Core DML and before the first COMMIT attempt**, qualified as `MSMConsistencyError`. It may be armed for one exact member/marker/consumed confirmation only.
-- [ ] Private W01 evidence root and **separate** injection/control-evidence root are provisioned and protected, with no web exposure or symlinks.
+- [ ] A canonical non-symlink W01 evidence root with **effective CLI read/write access** and a **separate** protected injection/control-evidence root exist, with no web exposure. The parent need not be owner-only; untrusted-writer/replacement risks must be independently ruled out. Individual W01 case directories/files remain 0700/0600.
 - [ ] A written **prior case-specific Owner-GO** names actual cloned instance, reviewed harness SHA, member/ref/marker, possible business writes, one permitted UI action and recovery/STOP contact.
 - [ ] No other application operation, profile/account switch, PHP source deployment, data cleanup or hook/config change occurs between baseline and final readback.
 
