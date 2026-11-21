@@ -117,9 +117,10 @@ class Cf05ProductionGateBooking extends Cf05FinanceBooking
 }
 class Cf05FinancePdfSpy
 {
-	public $calls=0; public $status='verified';
+	public $calls=0; public $status='verified'; public $throws=false;
 	public function generate($identity,$user) {
 		$this->calls++;
+		if ($this->throws) { throw new RuntimeException('Synthetic PDF interruption after attempted effect'); }
 		return array('status'=>$this->status,
 			'message'=>$this->status==='verified'?'MSMPdfVerified':'MSMPdfUnknown',
 			'name'=>'SYNTHETIC.pdf','size'=>32,'mtime'=>1791590400,
@@ -128,9 +129,10 @@ class Cf05FinancePdfSpy
 }
 class Cf05FinanceMailSpy
 {
-	public $calls=0; public $status='transport';
+	public $calls=0; public $status='transport'; public $throws=false;
 	public function sendWithEvidence($member,$row,$user,$selected,$invoice=null) {
 		$this->calls++;
+		if ($this->throws) { throw new RuntimeException('Synthetic uncertain SMTP after attempted effect'); }
 		$status=$selected?$this->status:'not_selected';
 		return array('mail'=>$status,
 			'attachment'=>$invoice===null?'not_required':
@@ -167,7 +169,9 @@ try {
 		array('name'=>'invoice_validate_fail','autocreate'=>true,'mode'=>'validate','change'=>false,'expected'=>'unknown'),
 		array('name'=>'invoice_depth','autocreate'=>true,'mode'=>'depth','change'=>false,'expected'=>'unknown'),
 		array('name'=>'pdf_unknown','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success','pdf_status'=>'unknown'),
-		array('name'=>'mail_unknown','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success','mail_status'=>'unknown')
+		array('name'=>'mail_unknown','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success','mail_status'=>'unknown'),
+		array('name'=>'pdf_throws','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success','pdf_throw'=>true),
+		array('name'=>'mail_throws','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success','mail_throw'=>true)
 	) as $case) {
 		$db=new Cf05FinanceDb(); $db->family='mysql'; $db->profileRaw=json_encode(array(
 			'version'=>1,'family'=>'mysql','profile'=>'CoreGuarded','nonce'=>str_repeat('b',32)));
@@ -196,7 +200,8 @@ try {
 		$sessionid='cf05'.bin2hex(random_bytes(8));
 		session_id($sessionid);
 		verify(session_start(),'CF05 local session start '.$case['name']);
-		$expectStop=isset($case['pdf_status'])||isset($case['mail_status']);
+		$expectStop=isset($case['pdf_status'])||isset($case['mail_status'])
+			|| !empty($case['pdf_throw']) || !empty($case['mail_throw']);
 		$ids=$expectStop?array(1,2):array(1);
 		$rows=$expectStop?array(1=>$row,2=>$row):array(1=>$row);
 		$state=array('phase'=>'confirm','revision'=>5,'owner'=>$user->id,'entity'=>1,
@@ -225,6 +230,8 @@ try {
 		$pdf=new Cf05FinancePdfSpy(); $mail=new Cf05FinanceMailSpy();
 		if (isset($case['pdf_status'])) { $pdf->status=$case['pdf_status']; }
 		if (isset($case['mail_status'])) { $mail->status=$case['mail_status']; }
+		if (!empty($case['pdf_throw'])) { $pdf->throws=true; }
+		if (!empty($case['mail_throw'])) { $mail->throws=true; }
 		$done=msmProcessBooking($state,$flow,$mail,$user,$checkpoint,$pdf);
 		$r=$done['results'][1];
 		verify($r['status']===$case['expected'],'CF05 expected booking status '.$case['name']);
@@ -239,7 +246,7 @@ try {
 					&& $pdf->calls===1 && $db->transaction_opened===0
 					&& count(array_keys($db->events,'subscription',true))===1,
 					'CF05 Phase4 ambiguous postcommit effect stops next member without rollback '.$case['name']);
-				if (isset($case['pdf_status'])) {
+				if (isset($case['pdf_status']) || !empty($case['pdf_throw'])) {
 					verify($r['invoice']['pdf']['status']==='unknown' && $r['mail']==='not_processed'
 						&& $r['attachment_status']==='not_processed' && $mail->calls===0,
 						'CF05 Phase4 PDF uncertainty prevents SMTP and preserves file status');
