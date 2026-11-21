@@ -97,6 +97,22 @@ For `--scenario=invoice-existing` (B/C only), supply the actual UI-confirmed `--
 
 See [CF03-W01 implementation and assurance limits](cf03-w01-validation.md). The operator is **not authorized to book an invoice or contribution solely by the existence of these CLI options**.
 
+### Phase 1 shared evidence-root security delta (2026-11-21)
+
+The parent policy allows read/traverse but forbids group/other write. In
+**all four** environments, the evidence root must be strictly outside the
+Dolibarr webroot/site root and outside the checked-out source (neither
+ancestor nor descendant). The operator must separately exclude aliases,
+symlinks in untrusted path ancestors, network mounts and HTTP exposure;
+ordinary path checks cannot prove arbitrary web-server routing.
+
+Evidence creation uses a temporary 0077 process umask. Each new file is
+checked as private BEFORE any contents are written, and the previous
+umask is restored after opening. The existing mode 0600 file and mode
+0700 case-directory conditions and one-shot/no-retry guard remain.
+No existing case, in particular POS02-A1/A2 or RB01-A, may be reused.
+This documentation does not approve further live execution.
+
 ## Paket A gate — accessible evidence parent and private one-shot case
 
 Current contract for **A/B/C/D**: the already existing root must be canonical, non-symlink, and **effectively readable and writable** by the CLI user; no root owner/mode-0700 restriction is enforced, but group/other write is forbidden. A/B/C use the operator-configured `CF03_EVIDENCE_ROOT`; D supplies an explicit root and retains the no-web-exposure restrictions. **The newly created case directory and every evidence file remain owner-restricted (0700 / 0600), with exclusive writes and single-use verify.** The Owner provisions and assesses the parent separately; the tool never modifies it.
