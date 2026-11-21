@@ -1,5 +1,7 @@
 # CF05-01/02 – Shared active transaction guard (implementation record)
 
+> **Post-PR #36 status:** CF05-01/02 below is the historical PR #34 implementation contract; [PR #36](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/36) subsequently merged the Phase-3 finance, typed-error and postcommit code (`d0b15785c60b74aa7ad59a1c687db94193d159c6`), with **CoreGuarded production finance still OFF** and **F36-02/P2 OPEN**. See [Phase-3 record](cf05-phase3-finance-admission.md) and [CF05-06 next qualification](cf05-06-standard-core-qualification-plan.md).
+
 **Effective development baseline:** Issue #22 (Owner, 2026-11-21). **Status: CF05-01/02 IMPLEMENTED, independently reviewed and SQUASH-MERGED** in [PR #34](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/34) (`main` merge `dc7a172bfd476467d7980cbf16a2657cfc1e729c`, reviewed PR HEAD `11d7dd3cf4bdcf831aa87782b7466d2378fc733f`). Independent final verdict `APPROVED FOR DEVELOPMENT MERGE`, **F34-01/P2 and F34-02/P3 CLOSED**, no new findings; [exact-head CI](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44948777072) **9/9 PASS**. **No** finance enablement, CF05-03..07 completion, live test permission or release approval.
 
 ## One transaction owner; two distinct responsibilities
@@ -19,7 +21,7 @@ It intentionally has **no** `begin()`, `commit()`, `rollback()` or `completed()`
 
 The Invoice service receives both the *metadata observer* and the *active guard*, with database-identity checks on each. It uses the injected active guard's `active()` and `requireSupportedIsolation()` exclusively for owned-context validation:
 
-1. Direct service entry: authoritative feature/profile admission; CoreGuarded currently **feature-denied** (CF05-03 pending). A future CoreGuarded invoice admission additionally requires a CoreGuarded guard, not `MsmDatabaseState`.
+1. Direct service entry: authoritative feature/profile admission; CoreGuarded remains **feature-denied in production after PR #36** (finance business code merged; CF05-06/07 and Owner admission still pending). The implemented CoreGuarded invoice path additionally requires a CoreGuarded guard, not `MsmDatabaseState`.
 2. Active guard before customer processing and **immediately before and after** `Societe::create_from_member()`.
 3. Active guard before and after `Facture::create()`.
 4. Active guard before and after `Facture::addline()`.
@@ -32,9 +34,9 @@ Existing EnhancedMySQL event and MariaDB snapshot observers retain their own act
 
 ## Explicit non-goals and remaining CF05 gates
 
-- **CF05-03:** coherent server-authoritative feature enablement across profile/Preview/controller/Booking/direct services. CoreGuarded invoice/customer/PDF/mail remain **OFF**.
-- **CF05-04:** strict, finite error origin and verified owned-context rollback qualification for the newly reached Core customer/invoice APIs.
-- **CF05-05:** post-commit PDF/SMTP after suitable acknowledged nonterminal completion and dependable checkpoint; terminal CHAIN/RELEASE stop.
+- **CF05-03:** full finance implementation merged in PR #36 but production CoreGuarded admission remains **default-denied**; distinct qualification and Owner approval remain.
+- **CF05-04:** finite typed pre-financial-Core business origin/owned-context rollback implemented in PR #36; unqualified Core customer/invoice/SQL failures still `UNKNOWN/STOP`.
+- **CF05-05:** post-commit PDF/SMTP checkpoint gating implemented and synthetically tested in PR #36, **not enabled/real-qualified under CoreGuarded**; terminal `CHAIN`/`RELEASE` STOP.
 - **CF05-06:** exact V22/V24 Core/Agenda/COMPANY_CREATE/CONTACT_CREATE/BILL_CREATE/LINEBILL_INSERT/BILL_VALIDATE/engine and side-effect call-graph qualification.
 - **CF05-07:** full PHP/Core synthetic regression, independent exact-head security review, Owner acceptance, then separately authorized **real CF03-NORMAL A/B/C/D**. Real CF03-FAULT is still deferred/OPEN, not a PASS.
 - **Release:** a new v0.1.0 ZIP, actual hosted D installation, R0-04, R0-07 and separate Owner release GO remain OPEN.

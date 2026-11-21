@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### 2026-11-21 – Phase-3 CoreGuarded finance code merged, productive admission OFF (PR #36)
+
+- [PR #36](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/36) **SQUASH-MERGED** as `d0b15785c60b74aa7ad59a1c687db94193d159c6`, reviewed HEAD `33cb3da3b389f9df2870bc8c6223c86a959cb467`, identical Git tree `6cc4834b9fe5100aca99126885791b3aeff12fef`. Independent `APPROVED FOR DEVELOPMENT MERGE`; F36-01/P1 **CLOSED**, F36-02/P2 **OPEN / CF05-06 REQUIRED**; no new P0–P3.
+- Booking owns the sole DoliDB transaction; the original shared guard and consumed confirmation/file-session capability protect new CoreGuarded invoice/linked Third-Party operations. Typed **pre-financial-Core** business errors may qualify one original owned rollback only with intact verified context; other customer/invoice/Core/SQL/connection failures remain `UNKNOWN/STOP`, with no replay or compensation.
+- Implemented acknowledged nonterminal post-COMMIT PDF/mail checkpoint gates, but file/SMTP effects are **not DB-atomic**. Production CoreGuarded `invoice`, `autocreate`, `sendmail` are **default-denied** by the authoritative profile until subsequent separate qualification/Owner GO; contribution admission remains. Positive finance orchestration is synthetic and test-only.
+- Exact reviewed source [CI 9/9](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44956004981) + [Hosted CI 1/1](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44956004947) SUCCESS, with selected independent log assertions 101 CF01, 303 Invoice and 78 CF05 (synthetic). Conditional `Facture::validate()` provisional `PROV` directory rename remains **F36-02/P2 OPEN** for CF05-06. Real A–D, 21-job CI, ZIP/hosted D and release GO remain OPEN.
+
 ### 2026-11-21 – CF05-01/02 shared active guard merged (PR #34)
 
 - [PR #33](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/33) squash-merged the documentation baseline as `d0d0fddd5797a1424eb004d541d8036511193ec6` after independent review. Historical documentation exception F33-DOC-03/P3 remained PARTIAL / OWNER ACCEPTED; it is not a runtime feature waiver.
