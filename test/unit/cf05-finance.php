@@ -24,6 +24,13 @@ class Cf05FinanceDb extends InvoiceDatabaseDouble
 		return parent::query($sql);
 	}
 }
+/** TEST-ONLY qualification: future CoreGuarded feature admission, not reachable
+ * through the production profile factory, admin config, POST or ordinary UI.
+ */
+class Cf05QualifiedFinanceProfile extends FixtureTransactionProfile
+{
+	protected function coreGuardedFinanceQualified() { return true; }
+}
 /** Faithful bounded synthetic guard: never calls P_S or invents event identity. */
 class Cf05FinanceGuard extends MsmCoreGuardedTransaction
 {
@@ -70,12 +77,20 @@ class Cf05FinanceGuard extends MsmCoreGuardedTransaction
 }
 class Cf05FinanceInvoice extends MsmInvoiceService
 {
+	protected function financeAdmissionProfile() {
+		global $conf;
+		return new Cf05QualifiedFinanceProfile($this->db,$this->databaseState,(int)$conf->entity);
+	}
 	protected function invoice() { return new InvoiceObjectDouble($this->db); }
 	protected function customer() { return new InvoiceCustomerDouble($this->db); }
 }
 class Cf05FinanceBooking extends BookingServiceDouble
 {
 	private $guard;
+	protected function profiles() {
+		global $conf;
+		return new Cf05QualifiedFinanceProfile($this->profileDb,$this->databaseState,(int)$conf->entity);
+	}
 	protected function coreTransaction() {
 		if ($this->guard === null) { $this->guard=new Cf05FinanceGuard($this->profileDb); }
 		return $this->guard;
@@ -87,6 +102,17 @@ class Cf05FinanceBooking extends BookingServiceDouble
 		$checkpoint->setAccessible(true);
 		return new Cf05FinanceInvoice($this->profileDb,$this->databaseState,
 			$guard->getValue($this),$checkpoint->getValue($this));
+	}
+}
+/** Unmodified, real production profile admission for a confirmed file-session.
+ * It must deny finance before Core BEGIN even when the stored confirmation
+ * is valid and the PreviewUser has the usual rights.
+ */
+class Cf05ProductionGateBooking extends Cf05FinanceBooking
+{
+	protected function profiles() {
+		global $conf;
+		return new MsmTransactionProfile($this->profileDb,$this->databaseState,(int)$conf->entity);
 	}
 }
 class Cf05FinancePdfSpy
@@ -151,7 +177,8 @@ try {
 		$user=new PreviewUser();
 		$options=array('invoice'=>true,'autocreate'=>$case['autocreate'],
 			'sendmail'=>true,'description'=>'Synthetic fee');
-		$binding=FixtureTransactionProfile::context($db,$user);
+		$qualifiedProfile=new Cf05QualifiedFinanceProfile($db,new SyntheticDatabaseState($db),1);
+		$binding=$qualifiedProfile->binding($qualifiedProfile->current(),$user,0);
 		$key=bin2hex(random_bytes(16));
 		$sessionid='cf05'.bin2hex(random_bytes(8));
 		session_id($sessionid);
@@ -166,6 +193,18 @@ try {
 		$state['phase']='processing'; $state['revision']=6;
 		$_SESSION['msm_previews'][$key]=$state;
 		verify(session_write_close(),'CF05 persist consumption '.$case['name']);
+		// F36-01: a real (non-test-qualified) CoreGuarded profile rejects this
+		// otherwise valid processing/confirmed session and fully privileged user.
+		// No member, Third Party, invoice, rollback or DB transaction may start.
+		$productionProfile=new MsmTransactionProfile($db,new SyntheticDatabaseState($db),1);
+		$closedBinding=$productionProfile->binding($productionProfile->current(),$user,0);
+		$closedExpected=$row; $closedExpected['_profile']=$closedBinding;
+		$closedFlow=new Cf05ProductionGateBooking($db);
+		$closedFlow->object=$flow->object; $closedFlow->reader=$flow->reader;
+		$denied=$closedFlow->book(1,$closedExpected,$options,$user,false,$checkpoint);
+		verify($denied['message']==='MSMProfileFeatureUnavailable' && $denied['stop']
+			&& !$db->events && !$db->calls && $db->transaction_opened===0 && $db->saved===null,
+			'F36-01 production Booking denies fully confirmed CoreGuarded finance without any write '.$case['name']);
 		$pdf=new Cf05FinancePdfSpy(); $mail=new Cf05FinanceMailSpy();
 		$done=msmProcessBooking($state,$flow,$mail,$user,$checkpoint,$pdf);
 		$r=$done['results'][1];

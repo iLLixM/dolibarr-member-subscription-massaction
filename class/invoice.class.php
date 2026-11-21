@@ -61,12 +61,19 @@ class MsmInvoiceService
 	{
 		return htmlspecialchars($description, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', true);
 	}
+	/** Production always constructs the real authoritative profile. Test
+	 * doubles can supply an explicitly isolated synthetic qualification state
+	 * without bypassing the actual direct-service admission decision.
+	 */
+	protected function financeAdmissionProfile()
+	{
+		global $conf;
+		return new MsmTransactionProfile($this->db, $this->databaseState, (int) $conf->entity);
+	}
 	/** Directly callable service must recheck authoritative profile before any writes. */
 	protected function requireInvoiceAdmission()
 	{
-		global $conf;
-		$profile = new MsmTransactionProfile($this->db, $this->databaseState, (int) $conf->entity);
-		$current = $profile->current();
+		$current = $this->financeAdmissionProfile()->current();
 		if (empty($current['features']['invoice']) || $current['reason'] !== '') { throw new RuntimeException('MSMProfileFeatureUnavailable'); }
 		// An explicitly injected guard must match the authoritative profile.
 		// In particular, a future CoreGuarded feature admission must never

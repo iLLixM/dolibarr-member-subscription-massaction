@@ -33,6 +33,13 @@ class MsmTransactionProfile
 		if ($family === 'mariadb') { return array('MariaDBSnapshot'); }
 		throw new RuntimeException('MSMDatabaseUnsupported');
 	}
+	/** F36-01 / ADR-06: development code is NOT an Owner qualification GO.
+	 * There is intentionally no admin constant, HTTP parameter or DB setting
+	 * that can enable CoreGuarded finance in the released production profile.
+	 * A separate reviewed, Owner-authorized admission change is required.
+	 * Only a clearly named synthetic fixture subclass may override this seam.
+	 */
+	protected function coreGuardedFinanceQualified() { return false; }
 	/** Missing MySQL history is ambiguous, including fresh activation/reactivation. */
 	public function current()
 	{
@@ -48,9 +55,11 @@ class MsmTransactionProfile
 			} else { $reason = 'MSMProfileInvalid'; }
 		}
 		$enabled = in_array($profile, array('CoreGuarded', 'EnhancedMySQL', 'MariaDBSnapshot'), true);
-		// CF05-03: the configured CoreGuarded profile now admits the same server-
-		// confirmed business options. It does NOT gain P_S/event equivalence.
-		$extended = $enabled;
+		// F36-01: preserve the implemented CoreGuarded finance path while its
+		// actual server-side admission remains CLOSED until CF05-06/07, real
+		// qualification and separate Owner approval. Never infer eligibility
+		// merely from an otherwise valid CoreGuarded profile selection.
+		$extended = $enabled && ($profile !== 'CoreGuarded' || $this->coreGuardedFinanceQualified());
 		return array('family' => $family, 'profile' => $profile, 'revision' => self::revision($raw),
 			'features' => array('booking' => $enabled, 'invoice' => $extended, 'autocreate' => $extended, 'sendmail' => $extended), 'reason' => $reason);
 	}

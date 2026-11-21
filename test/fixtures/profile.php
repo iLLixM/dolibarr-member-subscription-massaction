@@ -22,7 +22,7 @@ class FixtureTransactionProfile extends MsmTransactionProfile
 		$raw = self::raw($db); $c = $raw === null ? array() : json_decode($raw, true);
 		$name = $c['profile'] ?? ($db->family === 'mariadb' ? 'MariaDBSnapshot' : '');
 		$enabled = in_array($name, array('CoreGuarded', 'EnhancedMySQL', 'MariaDBSnapshot'), true);
-		$extended = $enabled; // CF05-03: mirror current server feature admission.
+		$extended = $enabled && $name !== 'CoreGuarded'; // F36-01: mirror production default-deny.
 		return array('family' => $db->family, 'profile' => $name, 'revision' => hash('sha256', $raw === null ? 'missing' : 'configured:'.$raw),
 			'features' => array('booking' => $enabled, 'invoice' => $extended, 'autocreate' => $extended, 'sendmail' => $extended), 'owner' => (int) $user->id, 'entity' => (int) $conf->entity, 'confirmation_revision' => 0);
 	}
