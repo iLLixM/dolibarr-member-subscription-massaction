@@ -1,0 +1,43 @@
+# CF05 Phase 4 – Post-commit PDF, attachment and mail evidence / offline qualification
+
+**Status: DRAFT DEVELOPMENT IN [PR #38](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/38), NOT PRODUCTION-ADMITTED OR INDEPENDENTLY APPROVED (2026-11-21).**
+
+## Binding baseline and scope
+
+The product requirement is the complete v0.1.0 business flow on CoreGuarded, EnhancedMySQL and MariaDBSnapshot, with different transaction observability strengths. Binding decisions are [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22), revised ADR-06/11/12 and D-01/D-02, the [Phase-3 implementation record](cf05-phase3-finance-admission.md) and the [CF05-06 standard-Core qualification plan](cf05-06-standard-core-qualification-plan.md). [PR #37](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/37) is already squash-merged into `main` at `effc49e9543060fa6232be099b5a4c62e5234c5f`.
+
+**No admission change:** `MsmTransactionProfile::coreGuardedFinanceQualified()` returns **false** for the production CoreGuarded profile. Contribution-only booking is admitted; invoice, invoice-linked auto-Third-Party and mail remain **server-default-denied**. CoreGuarded financial positives run only with an explicitly **test-only qualified profile**, never an ordinary runtime/admin/HTTP switch. This Phase-4 development PR does not close **F36-02/P2** or CF05-06/07, authorize actual A–D real finance tests, or approve the release.
+
+Phase-3 already implemented the shared active guard, the single Booking-owned Core DoliDB transaction, before/after Core API checks, qualified **pre-financial-Core** business error rollback and independent file-session one-shot postcommit PDF/mail gates. Phase 4 **hardens status fidelity, ambiguous after-effect STOP and offline security evidence** without duplicating the existing PDF and mail services or adding a DB journal, a second transaction manager, physical CoreGuarded event-equivalence, automatic retry or compensation.
+
+## Acknowledged completion → durable checkpoint → externally non-atomic effects
+
+1. **Core completion:** A member's business result and `completion` are computed from the original active guard's acknowledged **nonterminal** commit/rollback. `UNKNOWN`, unacknowledged, `CHAIN` or `RELEASE` terminal cases STOP; no PDF/SMTP or next-member activity is permitted.
+2. **Durable result:** The controller has consumed the original confirmation; a fixed `MsmFileBookingCheckpoint` independently re-reads the file-session state, original owner/entity/profile/options and per-member successful nonterminal result. The immutable original in-process capability is rechecked immediately before each selected PDF/mail effect.
+3. **PDF file:** The invoice service rechecks user permissions and persisted invoice/subscription identity. The PDF adapter rejects stale files, symlinks/unsafe paths, unexpected metadata, invalid signatures/MIME and changed hashes; only a verified descriptor is persisted. A CoreGuarded `unknown` PDF outcome (including a thrown generator error) **stops** the batch, marks selected mail/attachment `not_processed` and does not regenerate or send.
+4. **Attachment:** The mail adapter resolves and hashes the verified PDF again before hooks and immediately before standard delivery. In Phase 4 the result stores a separate `attachment_status`. For a standard `transport` result, `verified_for_transport` means **file integrity was checked before transport**, not that the email was delivered. For a positive mail hook, `verified_before_hook` means **only the pre-hook file was verified**; the hook's actual attachment or delivery is **NOT** known. Failure/uncertainty remains independently visible.
+5. **Mail:** The original `MsmSubscriptionMail::send()` return status remains compatible for existing B/C callers. The CoreGuarded path uses `sendWithEvidence()` for `mail` plus `attachment` outcome and preserves `transport` (handoff, not delivery), `hook` (takeover, not delivery), `failed`, `missing`, `disabled`, `denied`, `attachment_missing`, and `unknown`. A CoreGuarded `unknown` mail/hook outcome retains the committed DB/PDF status, persists `unknown` and **stops next members without auto-resending**.
+6. **Result UI:** Business completion, PDF descriptor status, attachment evidence and mail/hook outcome are separately displayed. No result is collapsed into a generic success or auto-retry instruction.
+
+A successful **business COMMIT is not undone** because a later file or SMTP operation failed. Likewise an accepted transport/hook status is **not** evidence of delivery, exactly-once SMTP or filesystem/DB atomicity. The file-session checkpoint prevents automatic replay, but an external effect can remain ambiguous following a crash.
+
+## Offline regression and CI plan
+
+| Family | Required synthetic evidence | What it does NOT prove |
+| --- | --- | --- |
+| Production feature admission | The normal CoreGuarded profile denies finance even with full rights, confirmed preview and one-shot session; historical B/C paths remain unchanged | Real A/D finance authorization or Core semantics |
+| Original transaction and completion | Shared active guard and finite rollback origins; nonterminal proof before after-effects; terminal/UNKNOWN means no further API | Physical CoreGuarded transaction-event identity |
+| PDF file | Verified identity, entity root, metadata and SHA, stale/unsafe/symlink/changed PDF rejection, negative/exception/missing/invalid generation | A real V22/V24 generated invoice PDF on a real DB |
+| Attachment and hooks | Verified before hook and again before standard transport; hook outcome separated from attachment transport; changed/missing file and hook exception | Proof that hooks dispatched an attachment or email was delivered |
+| One-shot checkpoints and stop | Fixed file-session readback before each side effect; postcommit PDF/mail unknown stops next member, no repeat/resend, successful member retained | Atomic file+DB+SMTP transactions or crash recovery |
+| PHP/Core version coverage | Standard **9-job** PR lane and triggered **21-job** full matrix on Phase-4 security changes, pinned V22/V23/V24 with PHP7.4/8.2 | Real A/B/C/D, 21-job release on a **future modified release SHA**, full hosted ZIP or PHP8.3 coverage |
+
+Focused test files: `test/unit/coreguarded-session.php`, `test/unit/cf05-finance.php`, `test/unit/maildelivery.php`, `test/unit/invoicepdf.php`, `test/unit/postcommit.php`, `test/unit/terminal.php`, `test/unit/profile.php`. CI workflows `.github/workflows/ci.yml` (nine standard jobs) and `.github/workflows/ci-full.yml` (21 existing pinned profile jobs). The full matrix is triggered on PR diffs touching the PDF/mail/checkpoint/orchestration/fixture/CI security family; **unrelated documentation PRs are still nine-job standard**. A targeted hosted PHP8.3/V22.0.5 lane remains separately available/triggered according to its existing CI path/dispatch policy.
+
+**Source review gate:** An independent Senior PHP/Dolibarr + Security/Transaction reviewer must inspect the exact PR final source HEAD, especially postcommit durable state sequencing, exception/no-retry behavior, attachment/hook truthfulness and compatibility of existing B/C paths. No review or CI result is represented as approved until GitHub displays the matching full SHA and success status. The PR is intentionally DRAFT.
+
+## Mandatory later qualification
+
+**F36-02/P2 stays OPEN / CF05-06 REQUIRED:** V22.0.5/V24.0.3 `Facture::validate()` can conditionally rename a `PROV` document directory before the outer DB COMMIT; fresh-module reachability, trigger/contact/Agenda and supported configuration/mitigation must be independently qualified **before any production finance unlock**. Next: CF05-06 source analysis and mitigation if needed; separate, reviewed and Owner-authorized **isolated testing-only** CoreGuarded finance admission; fresh, Owner-GO real CF03-NORMAL A–D with separately verified DB/file/isolated SMTP; final CF05-07 independent and Owner evidence acceptance; **only then** a separately reviewed product finance-admission change. The full 21-job CI must also pass against the **final release source**. Exact-source v0.1.0 ZIP, hosted D and R0-04/R0-07 plus separate Owner release GO remain open.
+
+F32-MR-01 protected A/B/C private PHP-CLI launcher and **read-only preflight**, A/C serialization and never-replayed one-shot fixtures remain binding. Real destructive CF03-FAULT stays DEFERRED / OPEN / NOT EXECUTED; no Owner real-write/finance/release permission is inferred from Phase 4.
