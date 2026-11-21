@@ -1,6 +1,15 @@
 # CF-03 — Qualification plan and binding A-D environment matrix
 
-Status: **Stage 0 inventory and Stage 1 read-only witness scaffolding committed; no live CF-03 operator test executed or authorized by this document**. Source baseline: main `786f271240d230b90fad77fe1c3397d1ec796f81` (2026-11-20). The active PR HEAD must be pinned separately at the time of each test. Binding scope: [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22), [ADR-0001](adr/ADR-0001-core-first-transaction-profiles.md), D-01/D-02 and E01–E15.
+Status updated 2026-11-21: **POS02-A1 and POS02-A2 in environment A TECHNICAL PASS / COMPLETED; F32-W01-01 code finding independently CLOSED**. Later real Owner test results supersede the historical Stage-0/1 `no live test` wording below; other CF03 gates remain OPEN. Source baseline: main `786f271240d230b90fad77fe1c3397d1ec796f81` (2026-11-20). The active PR HEAD must be pinned separately at the time of each test. Binding scope: [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22), [ADR-0001](adr/ADR-0001-core-first-transaction-profiles.md), D-01/D-02 and E01–E15.
+
+## Aktuelle Realtest- und Review-Disposition (21.11.2026)
+
+- **Code F32-W01-01 – CLOSED** durch den [unabhängigen finalen Delta-Review](evidence/cf03/PR32-F32-W01-01-POS02-final-delta-review.md), auf Code-/Test-HEAD `e7b911b707508e439f9acbfad43f5fd55d34cc44`: `llx_adherent_type.statut=1` ist ACTIVE, `0` ist INACTIVE. Standard-CI 9/9 plus Hosted-CI 1/1 PASS auf diesem SHA.
+- **POS02-A1 – TECHNICAL PASS** (A, CoreGuarded, Mitglied #59, Subscription #68, EUR 120, Member-Agenda ON, +1 Agenda-Event/-Resource, keine Rechnung).
+- **POS02-A2 – TECHNICAL PASS** (A, CoreGuarded, Mitglied #60, Subscription #69, EUR 120, Member-Agenda OFF, +0 Agenda-Events/-Resources, keine Rechnung).
+- **POS02-A Positivtestreihe – COMPLETED.** [Technischer Abschlussbericht](evidence/cf03/CF03-POS02-A1-A2-technischer-Abschlussbericht-2026-11-21.md) mit bytebasiert geprüften hochgeladenen Evidence-Kopien, Baseline-SHA256, One-shot-Marker, Kontextkonsistenz und exakt zwölf Tabellenzähler-Deltas. Die Owner-Dispositionsentscheidung priorisiert diesen späteren technischen PASS.
+- **Review-Grenze:** Der unverändert archivierte externe Reviewbericht hatte die POS02-Fälle mangels damals zugänglicher Roh-Evidence mit `INSUFFICIENT EVIDENCE` bewertet. Er bestätigte **F32-W01-01 CLOSED**. Die spätere technische Evidence-Prüfung und Owner-Statusfestlegung begründen POS02-PASS; sie dürfen nicht als spätere externe Reviewer-Anerkennung ausgegeben werden. Ein eigenständiger zeitlich vorausgehender Owner-GO-Nachweis wurde nicht vorgelegt.
+- **Sonstige Gates:** RB01, ERR01, BATCH01, CONC01, REPLAY01, MDB01, ENH01, HOST01, POST01, vollständige 21-Profil-CI und finaler RV01 bleiben offen. A/C teilen dasselbe Schema und müssen weiterhin seriell betrieben werden. Keine Wiederholung einer realen Buchung oder Verify und keine Roh-Evidence im öffentlichen Repo.
 
 ## Owner A–D preflight disposition (2026-11-20)
 
@@ -90,7 +99,7 @@ Limitations: The POS01 witness is pinned to A, a specific restricted account and
 | Gate | Cases | Environment | Stage-1 evidence |
 | --- | --- | --- | --- |
 | ENV01 | Read-only runtime/source/account/profile/rights attestation | A–D | Tool prepared; real runs NOT EXECUTED |
-| POS02 | New single-member Core contribution, Agenda ON and OFF | A, D / B/C optional | Single-member witness prepared; execution NOT EXECUTED |
+| POS02 | New single-member Core contribution, Agenda ON and OFF | A, D / B/C optional | **A1+A2 TECHNICAL PASS / COMPLETED** on pinned test SHA; D and optional B/C outstanding |
 | RB01 | Real safe rollback post-Core DML, independent selected-table/file reconciliation | A, B/C | `no-change` snapshot partial tool ready; controlled injection NOT IMPLEMENTED |
 | ERR01 | 1568, 1213, 1205, depth/reconnection, UNKNOWN/STOP | A + synthetics | Existing synthetic contracts; real harness NOT IMPLEMENTED |
 | BATCH01 | NO_CHAIN multi-member, CHAIN/RELEASE terminal | A | Requires separate multi-member and terminal witness; NOT IMPLEMENTED |
