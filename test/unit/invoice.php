@@ -94,7 +94,7 @@ function invoiceBookingFixture($create = false)
 	$member = new BookingMemberDouble($db); $member->id = 1; $member->entity = 1; $member->typeid = 1; $member->socid = $db->customerId; $member->morphy = 'phy'; $member->company = ''; $member->firstname = 'Synthetic'; $member->lastname = 'Invoice';
 	$row['invoice'] = array('customer_id' => $db->customerId, 'create_customer' => $create, 'entity' => 1, 'date' => '2026-11-10', 'term' => 1, 'payment_mode' => 0, 'bank' => 0, 'currency' => 'EUR', 'pdf_model' => 'crabe', 'product' => 0, 'vat' => 0, 'quantity' => 1, 'price_base' => 'TTC', 'type' => 1);
 	$row['autocreate'] = $create;
-	$service = new InvoiceBookingDouble($db); $service->object = $member; $service->reader = new BookingPreviewDouble(); $service->reader->row = $row; $service->adapter = new InvoiceServiceDouble($db, $service->observer());
+	$service = new InvoiceBookingDouble($db); $service->object = $member; $service->reader = new BookingPreviewDouble(); $service->reader->row = $row; $service->adapter = new InvoiceServiceDouble($db, $service->observer(), $service->observer());
 	return array($db, $service, $row);
 }
 // FIX01: no consistent metadata read before customer/product lock acquisition.
@@ -223,7 +223,7 @@ class FaultInvoiceService extends InvoiceServiceDouble
 }
 foreach (array('customer','create','line','validate') as $stage) {
 	list($db, $service, $row) = invoiceBookingFixture(true); $db->family = 'mysql';
-	$service->adapter = new FaultInvoiceService($db, $service->observer()); $service->adapter->replaceAt = $stage;
+	$service->adapter = new FaultInvoiceService($db, $service->observer(), $service->observer()); $service->adapter->replaceAt = $stage;
 	$r = $service->book(1, $row, $opts, new PreviewUser(), false);
 	verify($r['status'] === 'unknown' && $r['stop'] && !in_array('rollback', $db->events, true), 'invoice API event replacement unknown/stop '.$stage);
 	$expectedCalls = array('customer-create','invoice-create','invoice-line','invoice-validate');
@@ -240,9 +240,92 @@ foreach (array($service->invoiceFactory(), $service->invoiceFactory()) as $fresh
 verify($db->event->EVENT_ID === $token && !$db->markers, 'all production invoice factories share unchanged owned context');
 $db->rollback(); verify($service->observer()->completed('ROLLBACK', true)['state'] === 'IDLE', 'factory own rollback setup complete');
 $otherDb = new BookingDatabase(); $otherState = new SyntheticDatabaseState($otherDb);
-foreach (array(MsmBookingService::class, MsmInvoiceService::class) as $serviceClass) {
-	fails(static function () use ($db,$otherState,$serviceClass) { new $serviceClass($db, $otherState); }, 'MSMDatabaseUnsupported');
+fails(static function () use ($db,$otherState) { new MsmBookingService($db, $otherState); }, 'MSMDatabaseUnsupported');
+fails(static function () use ($db,$otherState) { new MsmInvoiceService($db, $otherState, $otherState); }, 'MSMDatabaseUnsupported');
+fails(static function () use ($db,$otherState) { new MsmInvoiceService($db, new SyntheticDatabaseState($db), $otherState); }, 'MSMDatabaseUnsupported');
+// CF05-01/02: metadata observation and transaction ownership are different
+// objects for CoreGuarded. The real Booking factory must reuse its current
+// exact guard, and direct Invoice construction may never substitute another DB.
+$activeProperty = new ReflectionProperty(MsmBookingService::class, 'activeTransaction');
+$activeProperty->setAccessible(true);
+$invoiceGuardProperty = new ReflectionProperty(MsmInvoiceService::class, 'activeGuard');
+$invoiceGuardProperty->setAccessible(true);
+$invoiceMetaProperty = new ReflectionProperty(MsmInvoiceService::class, 'databaseState');
+$invoiceMetaProperty->setAccessible(true);
+$db = new BookingDatabase(); $db->family = 'mysql';
+$service = new FactoryBookingFixture($db); $metadata = $service->observer();
+$guardForCore = new class($db) extends MsmCoreGuardedTransaction {
+	private $fixtureDb;
+	public $probeCount = 0;
+	public $supportedCount = 0;
+	public function __construct($db) { $this->fixtureDb = $db; parent::__construct($db); }
+	public function active() {
+		$this->probeCount++;
+		return array('state'=>MsmDatabaseState::ACTIVE,'fresh'=>true,'owned'=>true);
+	}
+	public function requireSupportedIsolation(array $state) { $this->supportedCount++; }
+};
+$activeProperty->setValue($service, $guardForCore);
+$factories = array($service->invoiceFactory(), $service->invoiceFactory());
+foreach ($factories as $invoiceService) {
+	verify($invoiceGuardProperty->getValue($invoiceService) === $guardForCore,
+		'CF05 factory passes identical active CoreGuarded guard');
+	verify($invoiceMetaProperty->getValue($invoiceService) === $metadata,
+		'CF05 invoice metadata remains separate original database observer');
+	$ownedCheck->invoke($invoiceService);
 }
+verify($guardForCore->probeCount === 2 && $guardForCore->supportedCount === 2,
+	'CF05 CoreGuarded invoice ownership uses only injected guard');
+verify(!array_filter($db->queries, static function($q){return stripos($q, 'performance_schema') !== false;}),
+	'CF05 CoreGuarded invoice checkpoints never use Performance Schema');
+$otherDb = new BookingDatabase();
+fails(static function() use($db,$metadata,$otherDb) {
+	new MsmInvoiceService($db, $metadata, new MsmCoreGuardedTransaction($otherDb));
+}, 'MSMDatabaseUnsupported');
+
+// Strict synthetic checkpoints: the same injected guard is queried before
+// and after EACH Core operation. Losing it at any one boundary must prevent
+// the next business operation and cannot silently fall back to metadata.
+class Cf05BoundaryGuard implements MsmActiveTransactionGuard
+{
+	private $db;
+	public $blockedAfter = '';
+	public $probes = 0;
+	public $isolationChecks = 0;
+	public function __construct($db) { $this->db = $db; }
+	public function isFor($db) { return $this->db === $db; }
+	public function active() {
+		$this->probes++;
+		if ($this->blockedAfter !== '' && in_array($this->blockedAfter, $this->db->calls, true)) {
+			return array('state'=>MsmDatabaseState::UNKNOWN,'fresh'=>false,'owned'=>false);
+		}
+		return array('state'=>MsmDatabaseState::ACTIVE,'fresh'=>true,'owned'=>true);
+	}
+	public function requireSupportedIsolation(array $state) { $this->isolationChecks++; }
+}
+foreach (array('customer-create','invoice-create','invoice-line','invoice-validate') as $stage) {
+	list($db,$booking,$row)=invoiceBookingFixture(true);
+	$spy = new Cf05BoundaryGuard($db); $spy->blockedAfter = $stage;
+	$service = new InvoiceServiceDouble($db, $booking->observer(), $spy);
+	$member = $booking->object;
+	$diagnostic = array('stage'=>'preflight','subscription_id'=>9,'invoice_id'=>0,'customer_id'=>0);
+	fails(static function() use($service,$member,$row,&$diagnostic) {
+		$service->create($member,9,$row,new PreviewUser(),$diagnostic);
+	},'MSMTransactionUnknown');
+	$expectedCalls = array('customer-create','invoice-create','invoice-line','invoice-validate');
+	verify($db->calls === array_slice($expectedCalls,0,array_search($stage,$expectedCalls,true)+1),
+		'CF05 no subsequent Core API after guard loss '.$stage);
+	verify($spy->probes > 1 && $spy->isolationChecks === $spy->probes-1,
+		'CF05 direct-service guard checked at each boundary '.$stage);
+}
+list($db,$booking,$row)=invoiceBookingFixture(true);
+$spy = new Cf05BoundaryGuard($db);
+$service = new InvoiceServiceDouble($db, $booking->observer(), $spy);
+$member = $booking->object;
+$diagnostic = array('stage'=>'preflight','subscription_id'=>9,'invoice_id'=>0,'customer_id'=>0);
+$created = $service->create($member,9,$row,new PreviewUser(),$diagnostic);
+verify($created['id'] === 42 && $spy->probes >= 10 && $spy->probes === $spy->isolationChecks,
+	'CF05 complete customer/invoice chain uses shared guard before and after Core calls');
 // Early read-only table readiness is invoice-selective; final lock checks remain.
 foreach (array('ecm_files', 'product') as $unsupportedTable) {
 	list($db, $service, $row) = invoiceBookingFixture(); $db->family = 'mysql'; $db->nonTransactionalTable = $unsupportedTable;
