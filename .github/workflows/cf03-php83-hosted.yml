@@ -55,4 +55,5 @@ jobs:
           php test/unit/f29-book-flow.php
           php test/unit/invoiceprofile.php
           php test/unit/invoice.php
+          php test/unit/cf05-finance.php
           php test/unit/request.php

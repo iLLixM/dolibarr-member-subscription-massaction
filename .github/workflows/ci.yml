@@ -87,6 +87,7 @@ jobs:
           php test/unit/maildelivery.php
           php test/unit/invoiceprofile.php
           php test/unit/invoice.php
+          php test/unit/cf05-finance.php
           php test/unit/invoicepdf.php
           php test/unit/postcommit.php
           php test/unit/userreload.php
