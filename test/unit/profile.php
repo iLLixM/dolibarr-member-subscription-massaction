@@ -77,8 +77,10 @@ foreach(array('', '{}', 'bad',profileRaw('mysql','invalid'),profileRaw('mariadb'
 list($pd,$ps)=profileStore('mysql',profileRaw('mysql','CoreGuarded'));$pd->psDenied=true;
 $c=$ps->current();$b=$ps->binding($c,$user,0);
 verify($ps->admit($b,$user,array('invoice'=>false))['features']['booking'], 'CF02 CoreGuarded contributes without P_S');
-fails(static function()use($ps,$b,$user){$ps->admit($b,$user,array('invoice'=>true));},'MSMProfileFeatureUnavailable');
-fails(static function()use($ps,$b,$user){$ps->admit($b,$user,array('sendmail'=>true));},'MSMProfileFeatureUnavailable');
+verify($c['features']['invoice'] && $c['features']['autocreate'] && $c['features']['sendmail'],
+	'CF05-03 CoreGuarded invoice, invoice-linked auto-third-party and mail server-admitted');
+verify($ps->admit($b,$user,array('invoice'=>true,'autocreate'=>true,'sendmail'=>true))['profile']==='CoreGuarded',
+	'CF05-03 server-authoritative CoreGuarded option binding');
 verify(!array_filter($pd->queries,static function($q){return stripos($q,'performance_schema')!==false;}),'CF01 CoreGuarded blocked without P_S fallback');
 // Admin authorization/CSRF/field/family checks execute before config mutation.
 list($pd,$ps)=profileStore();$revision=$ps->current()['revision'];$session=array('token'=>'synthetic-csrf');

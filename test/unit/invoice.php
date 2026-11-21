@@ -392,11 +392,22 @@ $admission->invoke($admitted);
 verify(true, 'F34-01 matching Enhanced profile and guard remain admitted');
 $profileDb->profileName = 'CoreGuarded';
 fails(static function()use($admission,$admitted){$admission->invoke($admitted);},
-	'MSMProfileFeatureUnavailable');
-fails(static function()use($admission,$profileService){$admission->invoke($profileService);},
-	'MSMProfileFeatureUnavailable');
+	'MSMTransactionUnknown');
+$admission->invoke($profileService);
 verify(!$profileDb->calls && !$profileDb->events,
-	'F34-01 CoreGuarded invoice remains feature-disabled for both guard types');
+	'CF05-03 CoreGuarded permits only matching active guard and performs no writes');
+$guardProbe = new class($profileDb) extends MsmCoreGuardedTransaction {
+	public function active() { return array('state'=>MsmDatabaseState::ACTIVE,'fresh'=>true,'owned'=>true); }
+	public function requireSupportedIsolation(array $state) {}
+};
+$noCapability = new MsmInvoiceService($profileDb, $profileMeta, $guardProbe);
+$expectedPlan = array('invoice'=>array('customer_id'=>4,'entity'=>1,'create_customer'=>false));
+fails(static function()use($noCapability,$expectedPlan){
+	$diagnostic=array('stage'=>'preflight'); $member=(object)array('id'=>1,'entity'=>1,'socid'=>4);
+	$noCapability->create($member,9,$expectedPlan,new PreviewUser(),$diagnostic);
+}, 'MSMCoreGuardedSessionUnsupported');
+verify(!$profileDb->calls && !$profileDb->events,
+	'CF05-03 direct CoreGuarded finance must have consumed file-session capability');
 
 // F34-02: after customer fetch, loss of the injected active guard must
 // prevent even the NEXT member-link readback. The synthetic Core double
