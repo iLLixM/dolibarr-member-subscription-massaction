@@ -326,8 +326,13 @@ $wrong=$after;$wrong['source_hashes']['php']=str_repeat('d',64);
     }
 }
 c3stop(static function(){
-    Cf03LabContract::arguments(array('cf03-lab.php','--preflight','--environment=C',
-        '--db-user=cf03_limited_fixture'));
+    // Test the effective A/C account separation, not an override mismatch.
+    putenv('CF03_C_DB_USER=cf03_limited_fixture');
+    try {
+        Cf03LabContract::arguments(array('cf03-lab.php','--preflight','--environment=C'));
+    } finally {
+        putenv('CF03_C_DB_USER=enhanced_application');
+    }
 },'C must not use A limited account','CF03EnhancedMustUseSeparateAccount');
 c3stop(static function(){
     Cf03LabContract::arguments(array('cf03-lab.php','--baseline','--environment=A',
