@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'tools/cf03-*'
+      - 'tools/check-private-data.py'
       - 'test/unit/cf03-*'
       - '.github/workflows/cf03-php83-hosted.yml'
   workflow_dispatch:
@@ -16,6 +17,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Repository privacy guard
+        run: python3 tools/check-private-data.py
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
