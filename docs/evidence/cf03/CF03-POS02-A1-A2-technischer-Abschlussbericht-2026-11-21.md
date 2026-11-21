@@ -51,7 +51,7 @@ Die Prüfsummen wurden **aus den Rohbytes der hochgeladenen `baseline.json`-Date
 | Evidence | POS02-A1 | POS02-A2 |
 | --- | --- | --- |
 | Upload-Files | `baseline(4).json`, `baseline(4).sha256`, `verify(4).started`, `after(4).json`, `verdict(4).json` | `baseline(5).json`, `baseline(5).sha256`, `verify(5).started`, `after(5).json`, `verdict(5).json` |
-| Originales privates Fallverzeichnis | `/var/lib/dolibarr-test-results/cf03-a-pos02-a1-20261121` | `/var/lib/dolibarr-test-results/cf03-a-pos02-a2-20261121` |
+| Originales privates Fallverzeichnis | `<PRIVATE_EVIDENCE_ROOT>/cf03-a-pos02-a1-20261121` | `<PRIVATE_EVIDENCE_ROOT>/cf03-a-pos02-a2-20261121` |
 | Neuberechneter SHA-256 von `baseline.json` | `760574c203e9035c8e59d8d582e862cb839f3e91e1d71197eccb190e75fde94e` | `ad468b74394e0f54718fab5aa657b097e25e042ffa2ab077b57cbfec7e733387` |
 | Baseline (UTC) | `2026-11-21T00:58:56+00:00` | `2026-11-21T08:00:24+00:00` |
 | Verify-Marker und After (UTC) | `2026-11-21T01:01:34+00:00` | `2026-11-21T08:02:25+00:00` |

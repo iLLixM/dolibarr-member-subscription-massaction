@@ -46,7 +46,7 @@ Create one new member **using normal Dolibarr UI** in the isolated clone; do not
 | UI options | only one member, invoice OFF, mail OFF, customer auto-create OFF |
 
 Unique suggested marker (use only if absent): `CF03LAB-A-RB01A120261121`.
-Suggested W01 evidence path: `/var/lib/dolibarr-test-results/cf03-a-rb01-a1-20261121`.
+Suggested W01 evidence path: `<PRIVATE_EVIDENCE_ROOT>/cf03-a-rb01-a1-20261121`.
 Separate injection trace path: a **different sibling/private directory**, not inside the W01 case directory.
 
 ## Phase 3 — Read-only preparation commands
@@ -60,7 +60,7 @@ RB01_REVIEWED_SHA=REPLACE_WITH_REVIEWED_TEST_ONLY_HEAD
 RB01_MEMBER_ID=0
 RB01_MEMBER_REF=REPLACE_WITH_NEW_CORE_MEMBER_REF
 RB01_MARKER=CF03LAB-A-RB01A120261121
-RB01_EVIDENCE_DIR=/var/lib/dolibarr-test-results/cf03-a-rb01-a1-20261121
+RB01_EVIDENCE_DIR=<PRIVATE_EVIDENCE_ROOT>/cf03-a-rb01-a1-20261121
 
 # Do not advance unless HEAD is the separately reviewed test-only source.
 test "$RB01_REVIEWED_SHA" != REPLACE_WITH_REVIEWED_TEST_ONLY_HEAD || exit 1
@@ -87,7 +87,7 @@ rb01_a_witness() {
     --amount=120.00 --agenda=off
 }
 
-# Standard A witness: only if the isolated namespace matches all operator-bound A identities.
+# Standard A witness: only if the isolated namespace matches the strictly provided private A identities.
 sudo -u www-data /usr/bin/php -d xdebug.mode=off \
   tools/cf03-lab.php --preflight --environment=A
 rb01_a_witness --check-only

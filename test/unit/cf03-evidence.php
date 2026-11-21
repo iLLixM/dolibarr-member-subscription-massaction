@@ -21,6 +21,7 @@ function evStop($callback,$reason)
     }
     throw new RuntimeException('Missing expected STOP: '.$reason);
 }
+putenv('CF03_EVIDENCE_ROOT=/tmp/cf03-evidence-unit-fixture');
 $root=sys_get_temp_dir().'/cf03-evidence-unit-'.bin2hex(random_bytes(8));
 evOk(@mkdir($root,0700),'create sandbox');
 $site=$root.'/website';

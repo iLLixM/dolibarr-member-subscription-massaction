@@ -7,7 +7,13 @@
  */
 final class Cf03Evidence
 {
-    const DEFAULT_ROOT = '/var/lib/dolibarr-test-results';
+    /** Owner-only local configuration: no development evidence path in Git. */
+    private static function defaultRoot()
+    {
+        $value = getenv('CF03_EVIDENCE_ROOT');
+        self::need($value !== false && $value !== '', 'CF03MissingEvidenceRoot');
+        return self::absolute($value);
+    }
 
     public static function need($condition, $reason)
     {
@@ -29,7 +35,7 @@ final class Cf03Evidence
         self::need(in_array($environment, array('A','B','C','D'), true),
             'CF03UnknownEnvironment');
         $root = $environment === 'D' ? self::absolute($suppliedRoot)
-            : self::DEFAULT_ROOT;
+            : self::defaultRoot();
         self::need($environment === 'D' || $suppliedRoot === null,
             'CF03EvidenceRootNotPermitted');
         self::absolute($dir);

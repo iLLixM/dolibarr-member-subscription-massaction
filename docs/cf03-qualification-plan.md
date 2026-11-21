@@ -70,7 +70,7 @@ Current W01 test-only witness accepts an existing canonical non-symlink **root**
 
 - `--preflight`: local trusted config and module path, Dolibarr major/minor, effective schema/account, expected server family/version, `autocommit=1`, `completion_type=NO_CHAIN`, profile value in entity 1, required InnoDB tables and P_S permission check; hashes the local config file and critical source files but never prints credentials.
 - `--check-only`: preflight plus one never-booked synthetic-member, member type/Agenda/engine/count validation. It writes no files and performs no business SQL.
-- `--baseline`: same read-only checks and a one-shot `baseline.json` with `baseline.sha256`, **outside webroot** under `/var/lib/dolibarr-test-results/cf03-[a-d]-...`, mode 0700. Zero booking calls.
+- `--baseline`: same read-only checks and a one-shot `baseline.json` with `baseline.sha256`, **outside webroot** under `<PRIVATE_EVIDENCE_ROOT>/cf03-[a-d]-...`, mode 0700. Zero booking calls.
 - `--verify`: independently queries the DB after the **separate Owner-operated authentic UI operation**, checks baseline integrity, writes a one-time `verify.started` marker, protected `after.json` and `verdict.json`. No retry or automatic cleanup. The tool never performs the web booking.
 - All SELECTs are constructed from constant SQL plus validated numeric member ID; no write SQL, `FOR UPDATE`, DDL, migration, account switch, mail, HTTP, PDF, request replay or DB transaction is issued.
 

@@ -6,7 +6,7 @@ Tools: `tools/cf03-lab.php` and `tools/cf03-lab.lib.php`. They do **not** reuse 
 
 ## 0. Source and operator prerequisites
 
-**Private operator setup (not committed):** export `CF03_WORKTREE` with the actual local checkout path. For A, export `CF03_A_DOCUMENT_ROOT`, `CF03_A_DATA_ROOT`, `CF03_A_DB_HOST`, `CF03_A_DB_PORT`, `CF03_A_DB_NAME`, `CF03_A_DB_USER`, `CF03_A_WEB_URL`. For B, export the corresponding `CF03_B_*` fields (including `CF03_B_DB_USER` if not passed as `--db-user`). For C, use the same A webroot/schema/host with the explicitly different `CF03_C_DB_USER`. Never commit actual values; use a locally protected launcher with restricted permissions, and run as the effective PHP CLI identity. The witness stops if required values are missing. Versions/profiles remain pinned and cannot be overridden by those variables.
+**Private operator setup (not committed):** export `CF03_WORKTREE` with the actual local checkout path. For A/B/C, export `CF03_EVIDENCE_ROOT` to the actual previously provisioned trusted evidence parent (do not commit its value). For A, export `CF03_A_DOCUMENT_ROOT`, `CF03_A_DATA_ROOT`, `CF03_A_DB_HOST`, `CF03_A_DB_PORT`, `CF03_A_DB_NAME`, `CF03_A_DB_USER`, `CF03_A_WEB_URL`. For B, export the corresponding `CF03_B_*` fields (including `CF03_B_DB_USER` if not passed as `--db-user`). For C, use the same A webroot/schema/host with the explicitly different `CF03_C_DB_USER`. Never commit actual values; use a locally protected launcher with restricted permissions, and run as the effective PHP CLI identity. The witness stops if required values are missing. Versions/profiles remain pinned and cannot be overridden by those variables.
 
 
 
@@ -89,7 +89,7 @@ Expect actual Dolibarr 22.0.5 source, actual CoreGuarded profile in entity 1, In
 
 ## CF03-W01 hardened evidence and invoice operator prerequisites
 
-The W01 library requires an **existing canonical, non-symlink evidence root readable and writable by the effective PHP CLI user, and NOT group/other writable**. A/B/C retain the fixed `/var/lib/dolibarr-test-results` parent. D's `--baseline` and `--verify` require **both** `--evidence-root=/ACTUAL/SAFE/PATH` and `--evidence-dir=/ACTUAL/SAFE/PATH/cf03-d-unique-case-01` with identical values per call. **The root has no mandatory ownership or mode-0700 check; group/other read permissions are accepted, but group/other write permissions are rejected.** The tool still creates the individual case directory at 0700 and its evidence files at 0600 and preserves strict one-shot integrity checks. For D, the root must remain outside the webroot/checkout and their ancestors; hosting operators must separately exclude HTTP alias/public backup exposure. The tool does not create or chmod/chown the parent or switch accounts. Evidence options remain forbidden for `--preflight` and `--check-only`. **Security requirement:** the tool rejects group/other-writable parents because untrusted users could replace private case entries. Hosting ACLs/mount permissions and public aliases require additional operator assessment.
+The W01 library requires an **explicit operator-owned `CF03_EVIDENCE_ROOT` for A/B/C** and an existing canonical, non-symlink evidence root readable and writable by the effective PHP CLI user, **without group/other write permission**. A/B/C use the explicitly configured private `CF03_EVIDENCE_ROOT` parent. D's `--baseline` and `--verify` require **both** `--evidence-root=/ACTUAL/SAFE/PATH` and `--evidence-dir=/ACTUAL/SAFE/PATH/cf03-d-unique-case-01` with identical values per call. **The root has no mandatory ownership or mode-0700 check; group/other read permissions are accepted, but group/other write permissions are rejected.** The tool still creates the individual case directory at 0700 and its evidence files at 0600 and preserves strict one-shot integrity checks. For D, the root must remain outside the webroot/checkout and their ancestors; hosting operators must separately exclude HTTP alias/public backup exposure. The tool does not create or chmod/chown the parent or switch accounts. Evidence options remain forbidden for `--preflight` and `--check-only`. **Security requirement:** the tool rejects group/other-writable parents because untrusted users could replace private case entries. Hosting ACLs/mount permissions and public aliases require additional operator assessment.
 
 **Only after specific Owner authorization of a real business case**: check-only PASS → baseline once → one authenticated UI action → verify once. Verification enforces exactly the two original baseline files, 0600 file modes, checksum integrity, stable DB/profile/conf/module/Core/SQL schema context, and creates `verify.started` before readback. No replay or cleanup even after a partial write.
 
@@ -99,7 +99,7 @@ See [CF03-W01 implementation and assurance limits](cf03-w01-validation.md). The 
 
 ## Paket A gate — accessible evidence parent and private one-shot case
 
-Current contract for **A/B/C/D**: the already existing root must be canonical, non-symlink, and **effectively readable and writable** by the CLI user; no root owner/mode-0700 restriction is enforced, but group/other write is forbidden. A/B/C keep the fixed `/var/lib/dolibarr-test-results`; D supplies an explicit root and retains the no-web-exposure restrictions. **The newly created case directory and every evidence file remain owner-restricted (0700 / 0600), with exclusive writes and single-use verify.** The Owner provisions and assesses the parent separately; the tool never modifies it.
+Current contract for **A/B/C/D**: the already existing root must be canonical, non-symlink, and **effectively readable and writable** by the CLI user; no root owner/mode-0700 restriction is enforced, but group/other write is forbidden. A/B/C use the operator-configured `CF03_EVIDENCE_ROOT`; D supplies an explicit root and retains the no-web-exposure restrictions. **The newly created case directory and every evidence file remain owner-restricted (0700 / 0600), with exclusive writes and single-use verify.** The Owner provisions and assesses the parent separately; the tool never modifies it.
 
 A valid, admitted case's `--verify` now creates `verify.started` **before database connection, profile inspection or source hash checks**. After that point, any STOP is terminal for the Case ID, including database or configuration failure; when possible `verdict.json` carries the STOP, but the exclusive marker remains authoritative. No retry, file deletion, directory replacement, rebooking or automatic cleanup. An invalid baseline is not admitted as a valid case.
 
@@ -129,7 +129,7 @@ MEMBER_ID=REPLACE_WITH_NEW_NUMERIC_ID
 MEMBER_REF=REPLACE_WITH_CORE_REFERENCE
 ACTOR_ID=REPLACE_WITH_AUTHENTICATED_UI_ROWID
 MARKER=CF03LAB-A-20261120A1
-EVIDENCE_DIR=/var/lib/dolibarr-test-results/cf03-a-20261120a1
+EVIDENCE_DIR=<PRIVATE_EVIDENCE_ROOT>/cf03-a-20261120a1
 
 common() {
   sudo -u www-data /usr/bin/php -d xdebug.mode=off \
@@ -173,7 +173,7 @@ INVOICE_TERM=REPLACE_WITH_CONFIRMED_PAYMENT_TERM_ID
 INVOICE_PAYMENT_MODE=REPLACE_WITH_CONFIRMED_PAYMENT_MODE_ID_OR_0
 INVOICE_BANK=REPLACE_WITH_CONFIRMED_BANK_ID_OR_0
 INVOICE_CURRENCY=REPLACE_WITH_CONFIRMED_CURRENCY
-EVIDENCE_DIR=/var/lib/dolibarr-test-results/REPLACE_WITH_UNIQUE_CASE_DIR
+EVIDENCE_DIR=<PRIVATE_EVIDENCE_ROOT>/REPLACE_WITH_UNIQUE_CASE_DIR
 invoice_case() {
   sudo -u www-data /usr/bin/php -d xdebug.mode=off tools/cf03-lab.php "$@" \
     --environment="$ENVIRONMENT" --db-user="$DB_USER" \

@@ -334,7 +334,7 @@ c3stop(static function(){
         '--scenario=invoice-existing','--member-id=1',
         '--member-ref=MEM2611-0271','--marker=CF03LAB-A-ABCDEF123',
         '--start=2080-01-01','--end=2080-12-31','--amount=120',
-        '--agenda=on','--evidence-dir=/var/lib/dolibarr-test-results/cf03-a-testunit'));
+        '--agenda=on','--evidence-dir=/tmp/cf03-evidence-unit-fixture/cf03-a-testunit'));
 },'CoreGuarded invoice denied','CF03CoreGuardedInvoiceForbidden');
 c3stop(static function(){
     Cf03LabContract::arguments(array('cf03-lab.php','--preflight','--environment=A',
