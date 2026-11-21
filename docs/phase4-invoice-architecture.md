@@ -26,7 +26,7 @@ below are preserved; generic V24 references below mean the earlier V24.0.0 sourc
 
 ## 1. Baseline, evidence and scope
 
-The module baseline is `5c511b7a2c6dee6d810ffc0c1469d1539d7e5a1c`, the merged Phase 3B development baseline, not a production release. The clean worktree is `/home/marcel/dolibarr-member-subscription-massaction-phase4`, branch `feature/phase4-invoice-architecture`. The annotated tag `baseline/phase3b-dolibarr-22.0.5`, module main, Phase 3B checkout and the test installation's existing Phase 3B symlink are preserved.
+The module baseline is `5c511b7a2c6dee6d810ffc0c1469d1539d7e5a1c`, the merged Phase 3B development baseline, not a production release. The clean worktree is `<PRIVATE_OPERATOR_HOME>/dolibarr-member-subscription-massaction-phase4`, branch `feature/phase4-invoice-architecture`. The annotated tag `baseline/phase3b-dolibarr-22.0.5`, module main, Phase 3B checkout and the test installation's existing Phase 3B symlink are preserved.
 
 Source references used throughout:
 

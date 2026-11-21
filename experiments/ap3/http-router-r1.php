@@ -8,7 +8,7 @@ $memory=@shmop_open((int)getenv('AP3_SHM_KEY'),'a',0,0);if(!$memory){http_respon
 $path=parse_url($_SERVER['REQUEST_URI']??'',PHP_URL_PATH);
 if(!is_array($private)||!hash_equals($private['route'],$path??'')||($_SERVER['REMOTE_ADDR']??'')!=='127.0.0.1'){http_response_code(404);exit;}
 if(!in_array($_SERVER['REQUEST_METHOD'],array('GET','POST'),true)){http_response_code(405);exit;}
-$core='/home/marcel/dolibarr-i105-v24-mysql/htdocs';
+$core='/opt/private-fixture/mysql/htdocs';
 // Use actual protected I105 config, PHP file session path and genuine authentication.
 chdir($core);define('CSRFCHECK_WITH_TOKEN','1');define('NOREQUIREMENU','1');
 require $core.'/main.inc.php';
@@ -18,7 +18,7 @@ header('Content-Type: application/json');header('Cache-Control: no-store');
 function ap3HttpOut($v){echo json_encode($v,JSON_UNESCAPED_SLASHES);}
 try {
  ap3Need(session_status()===PHP_SESSION_ACTIVE,'Authenticated session not active');
- $profile=array('php'=>PHP_VERSION,'sapi'=>PHP_SAPI,'dolibarr'=>DOL_VERSION,'session_handler'=>ini_get('session.save_handler'),'session_path_is_I105'=>session_save_path()==='/home/marcel/dolibarr-i105-v24-mysql-data/sessions','logger'=>ap3LoggerProfile(),'actor'=>(int)$user->id,'business_bootstrap'=>'genuine authenticated main.inc.php; no business API called');
+ $profile=array('php'=>PHP_VERSION,'sapi'=>PHP_SAPI,'dolibarr'=>DOL_VERSION,'session_handler'=>ini_get('session.save_handler'),'session_path_is_I105'=>session_save_path()==='/opt/private-fixture/mysql-data/sessions','logger'=>ap3LoggerProfile(),'actor'=>(int)$user->id,'business_bootstrap'=>'genuine authenticated main.inc.php; no business API called');
  $action=$_POST['ap3_action']??$_GET['ap3_action']??'inspect';
  if($action==='inspect'){
   ap3HttpOut(array('status'=>'AUTHENTICATED','csrf'=>newToken(),'profile'=>$profile));return;

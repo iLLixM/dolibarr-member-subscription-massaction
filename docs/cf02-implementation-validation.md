@@ -40,8 +40,8 @@ Use tools/cf02-lab-readonly.sh --check-only for a read-only SQL privilege/config
 
 ### Example restricted-MySQL operator invocation
 
-    CF02_DB_FAMILY=mysql CF02_DB_NAME=dolibarr_i105_v24 \
-    CF02_DB_USER=dolibarr_i105_v24_limited CF02_DB_HOST=127.0.0.1 \
+    CF02_DB_FAMILY=mysql CF02_DB_NAME=<PRIVATE_MYSQL_SCHEMA> \
+    CF02_DB_USER=<RESTRICTED_ACCOUNT> CF02_DB_HOST=127.0.0.1 \
     CF02_DB_PORT=3307 sh tools/cf02-lab-readonly.sh --check-only
 
 Do not paste passwords, cookies, session identifiers, raw member records or private DB exports into CI or versioned evidence.
@@ -88,7 +88,7 @@ locally but has **NOT EXECUTED** against the real database by the author.
 
 Run in the operator's isolated MySQL V24.0.3 installation, as the web-account:
 
-    sudo -u www-data env CF02_DOLIBARR_ROOT=/home/marcel/dolibarr-i105-v24-mysql \
+    sudo -u www-data env CF02_DOLIBARR_ROOT=<PRIVATE_MYSQL_INSTALLATION> \
       /usr/bin/php -d xdebug.mode=off tools/cf02-loaded-core-entry.php --check-only
 
 Only after verifying the output and intended target, optionally execute the

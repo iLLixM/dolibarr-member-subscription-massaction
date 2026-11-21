@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2026 iLLixM <iLLixM@proton.me>
+/* Copyright (C) 2026 iLLixM <iLLixM>
  * SPDX-License-Identifier: GPL-3.0-or-later
  * CLI only; read-only independent MySQL witness for Owner-operated HTTP booking.
  */
@@ -25,7 +25,8 @@ function cf02Args($argv) {
         $a['start'] ?? null, $a['end'] ?? null, $a['amount'] ?? null, $a['agenda'] ?? null, $a['member-ref'] ?? null);
     $path = $a['evidence-dir'] ?? '';
     if ($mode !== 'check-only' || $path !== '') {
-        cf02Need(preg_match('~^/var/lib/dolibarr-test-results/cf02-pos01-[a-z0-9-]{6,40}$~D', $path) === 1
+        cf02Need(is_string(getenv('CF02_EVIDENCE_ROOT')) && getenv('CF02_EVIDENCE_ROOT') !== ''
+            && preg_match('~^'.preg_quote(getenv('CF02_EVIDENCE_ROOT'),'~').'/cf02-pos01-[a-z0-9-]{6,40}$~D', $path) === 1
             && !is_link($path), 'CF02UnsafeEvidencePath');
     }
     return array($mode,$e,$path);
@@ -101,7 +102,8 @@ function cf02Snapshot($db, $e) {
         'agenda_resources'=>$resources,'counts'=>$counts,'source_hashes'=>$sources);
 }
 function cf02EvidenceDir($path, $create) {
-    $parent='/var/lib/dolibarr-test-results';
+    $parent=getenv('CF02_EVIDENCE_ROOT');
+    cf02Need(is_string($parent) && $parent !== '' && $parent[0] === '/', 'CF02EvidenceParentUnavailable');
     cf02Need(is_dir($parent) && realpath($parent)===$parent && !is_link($parent),'CF02EvidenceParentUnavailable');
     if (!file_exists($path)) {
         cf02Need($create && mkdir($path,0700),'CF02EvidenceDirectoryUnavailable');
@@ -134,8 +136,8 @@ try {
     cf02Need(($dolibarr_main_db_type??'')==='mysqli'
         && ($dolibarr_main_db_host??'')==='127.0.0.1'
         && (int)($dolibarr_main_db_port??0)===3307
-        && ($dolibarr_main_db_name??'')==='dolibarr_i105_v24'
-        && ($dolibarr_main_db_user??'')==='dolibarr_i105_v24_limited'
+        && ($dolibarr_main_db_name??'')==='cf03_mysql_fixture'
+        && ($dolibarr_main_db_user??'')==='cf03_restricted_fixture'
         && ($dolibarr_main_db_prefix??'llx_')==='llx_','CF02WrongDatabaseTarget');
     try {
         mysqli_report(MYSQLI_REPORT_ERROR|MYSQLI_REPORT_STRICT);

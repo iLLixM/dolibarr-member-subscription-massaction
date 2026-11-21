@@ -26,7 +26,7 @@ traces, matrix, hashes and PARTIAL classification are unchanged historical evide
 
 Real loaded V24.0.3 Core `5c6c7ff6a5112413b1c27221c8d11750afad56f8` database libraries,
 PHP8.2.35/mysqli/mysqlnd8.2.35, MySQL Community8.4.13, InnoDB and restricted
-`msmsh01lab` DML-only account (P_S SELECT denied1142):37 completed measurements/
+`<PRIVATE_RESTRICTED_LAB>` DML-only account (P_S SELECT denied1142):37 completed measurements/
 controls plus1 PARTIAL. Ordered SET RR → genuine Core BEGIN works;16 behavioral
 isolation combinations,1568 foreign refusal,2 coordinated locking/read-view cases,
 6 completion cases and real lost COMMIT/ROLLBACK replies are documented. There are
@@ -207,7 +207,7 @@ The external review conclusion is not a formal GitHub review vote.
 
 | Finding | Current status and scope |
 | --- | --- |
-| F16-01 | **CLOSED – OWNER ACCEPTED.** The Owner confirms that the originally intended I105 URL reference was an error in preparing the assignment. The actually used `http://doli24.test:8090` / Dolibarr V24.0.3 / PHP 8.2.35 / MariaDB 10.11.19 environment is correct and expressly accepted. No I105 requalification is required. This accepts the target; it does not assert that I105 and this installation are identical. |
+| F16-01 | **CLOSED – OWNER ACCEPTED.** The Owner confirms that the originally intended I105 URL reference was an error in preparing the assignment. The actually used `http://<PRIVATE_MARIADB_WEB_ENDPOINT>` / Dolibarr V24.0.3 / PHP 8.2.35 / MariaDB 10.11.19 environment is correct and expressly accepted. No I105 requalification is required. This accepts the target; it does not assert that I105 and this installation are identical. |
 | F16-02 | **RESOLVED WITH DOCUMENTED SCOPE – OWNER-CONFIRMED HTTP TEST.** In a later authenticated manual browser run, the Owner reports 100/100 subscriptions created without invoices or email, approximately 6 seconds from booking confirmation to result display. This is a distinct Owner-confirmed HTTP observation, not the earlier automated CLI campaign or an independent reproduction. No new HTTP raw traces, HAR, session-write instrumentation or independent SQL reconciliation of that manual run is claimed. |
 | F16-03 | **P3, non-merge-blocking; remains open.** Raw selection IDs are strictly validated before the size check, so extremely large authenticated input still incurs O(N) validation/memory cost before rejection. Member/preview business queries remain avoided. No robustness change in this follow-up. |
 | F16-04 | **P3, non-merge-blocking; remains open.** The original archive proves 100 added Agenda events/resources by counts/hashes, but does not independently reconstruct every individual foreign-key assignment. Runtime checks, original evidence and this reconstruction limit remain distinct; no additional SQL check was executed. |
@@ -1050,8 +1050,8 @@ ten existing parameters. PHP 7.4-compatible syntax is retained.
 ### Executed T1/T2 evidence
 
 Local PHP **8.2.35**. Set `DOLIBARR_TEST_ROOT` to the pinned Core checkout and run
-`php test/unit/<runner>.php`. V22 used `/home/marcel/dolibarr-bulk-test`; V24 used
-`/home/marcel/dolibarr-v24`. The final sequence per Core was `invoice`,
+`php test/unit/<runner>.php`. V22 used `<PRIVATE_OPERATOR_HOME>/dolibarr-bulk-test`; V24 used
+`<PRIVATE_MARIADB_INSTALLATION>`. The final sequence per Core was `invoice`,
 `invoiceprofile`, `maildelivery`, `invoicepdf`, `postcommit`.
 `invoice` includes `booking`, which includes `preview`; these were not also run
 standalone in the final sequence. Counts below are per component, not summed
@@ -1088,7 +1088,7 @@ Initial fixture-only failures (missing country cache / VAT hook contract) were
 resolved by matching the actual Core APIs; existing regression assertions remain.
 
 Sanitized command output, exits, exact Core/implementation SHAs and PHP file hashes
-are retained locally in `/home/marcel/dolibarr-c21-validation-20261113/results.json`.
+are retained locally in `<PRIVATE_OPERATOR_HOME>/dolibarr-c21-validation-20261113/results.json`.
 No private runtime data or original V22 evidence was copied into this document.
 The authoritative matrix retains all 71 IDs, 18 columns and its first ten
 historical fields; only directly affected current traceability fields are extended.
@@ -1145,7 +1145,7 @@ not summed again. Standalone contracts/language parity: 98 PASS; synthetic
 JavaScript: 6 PASS; PHP lint and full PR diff whitespace: PASS.
 Commands remain those in the C2.1 section; `invoice` includes booking/preview.
 Sanitized local command/negative-test evidence is retained outside the repository
-in `/home/marcel/dolibarr-c21-validation-20261113/pr6-followup-local.json`.
+in `<PRIVATE_OPERATOR_HOME>/dolibarr-c21-validation-20261113/pr6-followup-local.json`.
 The synthetic Git fixture was temporary; its construction and command results
 are recorded in that evidence. No real database connection, business write,
 Core PDF or SMTP was exercised.
@@ -1230,12 +1230,12 @@ The following commands were executed on review-correction implementation commit 
 | --- | --- |
 | `php test/unit/run.php` | PASS — 87 synthetic contract assertions |
 | `node test/unit/loading.js` | PASS — 6 synthetic DOM assertions |
-| `DOLIBARR_TEST_ROOT=/home/marcel/dolibarr php test/unit/booking.php` | PASS — 387 preview/calendar assertions and 87 booking/mail assertions |
-| `DOLIBARR_TEST_ROOT=/home/marcel/dolibarr php test/unit/maildelivery.php` | PASS — 17 mail-adapter assertions |
-| `DOLIBARR_TEST_ROOT=/home/marcel/dolibarr php test/unit/invoiceprofile.php` | PASS — 387 included preview/calendar assertions and 24 profile assertions |
-| `DOLIBARR_TEST_ROOT=/home/marcel/dolibarr php test/unit/invoice.php` | PASS — 387 included preview/calendar, 87 included booking/mail and 34 invoice assertions |
-| `DOLIBARR_TEST_ROOT=/home/marcel/dolibarr php test/unit/invoicepdf.php` | PASS — 387 included preview/calendar, 87 included booking/mail and 16 isolated PDF assertions |
-| `DOLIBARR_TEST_ROOT=/home/marcel/dolibarr php test/unit/postcommit.php` | PASS — 387 included preview/calendar, 87 included booking/mail and 13 checkpoint assertions |
+| `DOLIBARR_TEST_ROOT=<PRIVATE_OPERATOR_HOME>/dolibarr php test/unit/booking.php` | PASS — 387 preview/calendar assertions and 87 booking/mail assertions |
+| `DOLIBARR_TEST_ROOT=<PRIVATE_OPERATOR_HOME>/dolibarr php test/unit/maildelivery.php` | PASS — 17 mail-adapter assertions |
+| `DOLIBARR_TEST_ROOT=<PRIVATE_OPERATOR_HOME>/dolibarr php test/unit/invoiceprofile.php` | PASS — 387 included preview/calendar assertions and 24 profile assertions |
+| `DOLIBARR_TEST_ROOT=<PRIVATE_OPERATOR_HOME>/dolibarr php test/unit/invoice.php` | PASS — 387 included preview/calendar, 87 included booking/mail and 34 invoice assertions |
+| `DOLIBARR_TEST_ROOT=<PRIVATE_OPERATOR_HOME>/dolibarr php test/unit/invoicepdf.php` | PASS — 387 included preview/calendar, 87 included booking/mail and 16 isolated PDF assertions |
+| `DOLIBARR_TEST_ROOT=<PRIVATE_OPERATOR_HOME>/dolibarr php test/unit/postcommit.php` | PASS — 387 included preview/calendar, 87 included booking/mail and 13 checkpoint assertions |
 | PHP lint over every module PHP file | PASS |
 | `git diff --check` | PASS |
 | Requirements CSV integrity | PASS — 71 unique IDs, 18 columns, original first ten columns preserved |
@@ -1756,7 +1756,7 @@ constant/decryption SELECT is intentionally not exported as a raw SQL log.
 
 | Observation | Actual snapshot / consequence for the bounded path |
 | --- | --- |
-| Identity | Dolibarr24.0.3, Core `5c6c7ff6a5112413b1c27221c8d11750afad56f8`, PHP8.2.35, mysqlnd8.2.35, MySQL8.4.13, `dolibarr_i105_v24`; reader's fresh connection autocommit1 / NO_CHAIN. This is observation, not an admission whitelist. |
+| Identity | Dolibarr24.0.3, Core `5c6c7ff6a5112413b1c27221c8d11750afad56f8`, PHP8.2.35, mysqlnd8.2.35, MySQL8.4.13, `<PRIVATE_MYSQL_SCHEMA>`; reader's fresh connection autocommit1 / NO_CHAIN. This is observation, not an admission whitelist. |
 | Agenda | Enabled; MEMBER_SUBSCRIPTION_CREATE automatic event on; automatic file copying off. Standard contribution dispatch therefore selects the known Agenda-create branch. |
 | Logevents | Both MEMBER_SUBSCRIPTION_CREATE and ACTION_CREATE flags off; the all-events trigger returns before event DML. |
 | Notification / Blockedlog / Workflow | Disabled; not selected by the current Core dispatcher. No claim that their enabled effects have been qualified. |

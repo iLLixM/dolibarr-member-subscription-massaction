@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2026 iLLixM <iLLixM@proton.me>
+/* Copyright (C) 2026 iLLixM <iLLixM>
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 if(PHP_SAPI!=='cli'){exit(64);}
@@ -9,7 +9,7 @@ function wOk($cond,$reason){global $pass;if(!$cond){throw new RuntimeException($
 function wDeny($f,$reason){try{$f();}catch(RuntimeException $e){wOk(strpos($e->getMessage(),'CF02')===0,$reason);return;}throw new RuntimeException('Not denied: '.$reason);}
 function wMake($agenda) {
  $e=Cf02ContributionWitnessContract::parameters('271','CF02LAB-ABCDEF12','2080-01-01','2080-12-31','120.00',$agenda,'MEM2611-0271');
- $b=array('identity'=>array('schema'=>'dolibarr_i105_v24','account'=>'dolibarr_i105_v24_limited@10.0.2.100',
+ $b=array('identity'=>array('schema'=>'cf03_mysql_fixture','account'=>'cf03_restricted_fixture@127.0.0.1',
   'version'=>'8.4.13','autocommit'=>'1','completion'=>'NO_CHAIN'),
   'profile'=>array('family'=>'mysql','profile'=>'CoreGuarded','raw_hash'=>str_repeat('a',64)),
   'member'=>array('id'=>271,'ref'=>'MEM2611-0271','login'=>null,'firstname'=>'Synthetic','lastname'=>'CF02LAB-ABCDEF12',

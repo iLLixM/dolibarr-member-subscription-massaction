@@ -10,6 +10,11 @@ php test/unit/coreguarded.php
 php test/unit/f29-rights.php
 php test/unit/coreguarded-session.php
 php test/unit/cf02-contribution-witness.php
+php test/unit/cf03-lab.php
+php test/unit/cf03-reader.php
+php test/unit/cf03-runbook.php
+php test/unit/cf03-evidence.php
+php test/unit/cf03-source.php
 php test/unit/run.php
 php test/unit/database.php
 node test/unit/loading.js
@@ -24,4 +29,4 @@ if [ -n "${DOLIBARR_TEST_ROOT:-}" ]; then
 else
   echo 'NOT EXECUTED: pinned-Core fixture tests (set DOLIBARR_TEST_ROOT to the checkout containing htdocs/).'
 fi
-echo 'CF-02 synthetics complete; database/HTTP/Agenda/rollback/concurrency live evidence remains NOT EXECUTED.'
+echo 'CF-02 and CF-03 pure synthetics complete; CF-03 live A-D preflight/HTTP/business/fault work remains NOT EXECUTED.'

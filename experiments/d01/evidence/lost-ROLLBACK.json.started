@@ -1,1 +1,1 @@
-{"kind": "ROLLBACK", "target": "isolated msmsh01lab connection only"}
+{"kind": "ROLLBACK", "target": "isolated cf03_restricted_lab_fixture connection only"}

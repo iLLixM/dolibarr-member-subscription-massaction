@@ -6,3 +6,10 @@
 /build-output/
 
 /.test-core/
+
+# Local lab credentials and operator-only deployment bindings
+.env
+.env.*
+*.private.env
+.cf03-private*
+.private/

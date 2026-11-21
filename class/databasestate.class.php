@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2026 iLLixM <iLLixM@proton.me>
+/* Copyright (C) 2026 iLLixM
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 /** Physical observation only. The caller owns DoliDB begin/commit/rollback.

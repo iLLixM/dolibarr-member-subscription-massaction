@@ -24,7 +24,7 @@ entries expose function/caller only, not arguments. Original STOPs remain visibl
 
 Prerequisites: pinned Core24.0.3/commit5c6c7ff; PHP8.2.35 with mysqli/mysqlnd,
 Xdebug function monitor and shmop; existing isolated MySQL8.4.13 schema/account
-`msmsh01lab` with only schema DML rights; no P_S grant; existing artificial
+`cf03_restricted_lab_fixture` with only schema DML rights; no P_S grant; existing artificial
 InnoDB `probe(id,label,n)`. Do not create grants or reuse an application database.
 Protected app JSON is supplied locally, mode0600, outside Git (`AP3_CONFIG` may
 select it). Its password is never printed. No credential example is published.

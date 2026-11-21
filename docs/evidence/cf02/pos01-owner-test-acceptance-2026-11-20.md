@@ -2,7 +2,7 @@
 
 **Provenance:** Owner-supplied console output, a manual authenticated Dolibarr browser result, and independently compared sanitized witness JSON artifacts in the project conversation. The original private evidence files remain with the operator. This document is a **sanitized reconciliation**, not a replacement for their preserved bytes, a new script execution, or a claim of physical transaction/event identity.
 
-**Exact POS01-A/B tested source HEAD:** `c2347f610efc1c4c160dd0b21ffaf095753e7e40` (operator ran `git rev-parse HEAD` before B; eight witness-recorded source SHA-256 fields were identical before and after B). Target was Dolibarr V24.0.3/PHP 8.2/MySQL 8.4.13, isolated `dolibarr_i105_v24`, restricted `dolibarr_i105_v24_limited`, configured CoreGuarded and `NO_CHAIN`.
+**Exact POS01-A/B tested source HEAD:** `c2347f610efc1c4c160dd0b21ffaf095753e7e40` (operator ran `git rev-parse HEAD` before B; eight witness-recorded source SHA-256 fields were identical before and after B). Target was Dolibarr V24.0.3/PHP 8.2/MySQL 8.4.13, isolated `<PRIVATE_MYSQL_SCHEMA>`, restricted `<RESTRICTED_ACCOUNT>`, configured CoreGuarded and `NO_CHAIN`.
 
 ## Scope and chronology
 

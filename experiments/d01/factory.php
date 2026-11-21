@@ -11,7 +11,7 @@ try {
   $c=d01Config();$d=getDoliDBInstance('mysqli',$c['host'],$c['user'],$c['password'],$c['database'],$c['port']);unset($c);
   d01Assert(get_class($d)==='DoliDBMysqli' && get_class($d->db)==='mysqli','Exact factory types');
   $identity=d01Rows($d,'SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac')[0];
-  d01Assert($identity['db']==='msmsh01lab'&&$identity['account']==='msmsh01lab@%'&&$identity['version']==='8.4.13'&&$identity['ac']==='1'&&$d->transaction_opened===0,'Factory identity');
+  d01Assert($identity['db']==='cf03_restricted_lab_fixture'&&$identity['account']==='cf03_restricted_lab_fixture@%'&&$identity['version']==='8.4.13'&&$identity['ac']==='1'&&$d->transaction_opened===0,'Factory identity');
   $handle=$d->db;$cid=$handle->thread_id;
   d01Q($d,'SET TRANSACTION ISOLATION LEVEL REPEATABLE READ');
   $begin=$d->begin();
