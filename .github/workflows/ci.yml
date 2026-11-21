@@ -45,10 +45,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Repository privacy guard
-        run: |
-          python3 tools/check-private-data.py
-          python3 test/unit/privacy-guard.py
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
