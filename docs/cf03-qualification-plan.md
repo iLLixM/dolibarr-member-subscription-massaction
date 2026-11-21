@@ -39,10 +39,14 @@ Owner-approved bounded runtime-source and business-contract correction in Draft 
 
 ## 1. Binding environment assignments
 
+**Privacy revision (2026-11-21):** Repository documentation contains only pseudonymous host, database and filesystem references. The real A/B/C identities are now supplied by private `CF03_A_*`, `CF03_B_*` and `CF03_C_DB_USER` environment variables at execution time; A/C are still pinned to the same actual host/schema/webroot with distinct approved users. Historic SHA-256 and test PASS claims are retained as historical evidence; do not equate redacted Markdown to the original private console bytes. For operational details see [CF03 operator runbook](cf03-operator-runbook.md).
+
+
+
 | Environment | Profile | Installed Dolibarr / PHP | MySQL / MariaDB | Web / document root | Schema/account | Evidence level |
 | --- | --- | --- | --- | --- | --- | --- |
-| **A – MySQL restricted / V24** | `CoreGuarded` | V24.0.3; PHP 8.2 in historical POS01-C, verify afresh | MySQL 8.4.13 | `http://i105-v24.localhost:8091/`, `/home/marcel/dolibarr-i105-v24-mysql/htdocs` | `127.0.0.1:3307`, `dolibarr_i105_v24`, `dolibarr_i105_v24_limited` | Historical POS01-C PASS on PR29 source; **new CF-03 NOT EXECUTED** |
-| **B – MariaDB / V24** | `MariaDBSnapshot` | V24.0.3; PHP runtime to verify | MariaDB 10.11.19 | `http://doli24.test:8090/`, `/home/marcel/dolibarr-v24/htdocs` | `localhost:3306`, `dolibarr_db_v24`; user to be supplied as CLI expected identity | Historical MDB-TEST-01 on older source, **new CF-03 NOT EXECUTED** |
+| **A – MySQL restricted / V24** | `CoreGuarded` | V24.0.3; PHP 8.2 in historical POS01-C, verify afresh | MySQL 8.4.13 | `http://<PRIVATE_MYSQL_WEB_ENDPOINT>/`, `<PRIVATE_MYSQL_V24_DOCROOT>` | `<PRIVATE_MYSQL_ENDPOINT>`, `<PRIVATE_MYSQL_SCHEMA>`, `<RESTRICTED_DB_USER>` | Historical POS01-C PASS on PR29 source; **new CF-03 NOT EXECUTED** |
+| **B – MariaDB / V24** | `MariaDBSnapshot` | V24.0.3; PHP runtime to verify | MariaDB 10.11.19 | `http://<PRIVATE_MARIADB_WEB_ENDPOINT>/`, `<PRIVATE_MARIADB_V24_DOCROOT>` | `<PRIVATE_MARIADB_ENDPOINT>`, `<PRIVATE_MARIADB_SCHEMA>`; user to be supplied as CLI expected identity | Historical MDB-TEST-01 on older source, **new CF-03 NOT EXECUTED** |
 | **C – MySQL enhanced / V24** | `EnhancedMySQL` | **same Dolibarr install and webroot as A** | **same MySQL 8.4.13 server and same schema as A** | **same web URL, document and data root as A** | **same host/port/schema as A, manually changed application DB user**; enhanced user name to be supplied as CLI expected identity | Available by Owner; technical profile/PS/HTTP preflight **NOT EXECUTED** |
 | **D – MySQL hosted / V22** | `CoreGuarded` targeted, must confirm live configuration | V22.0.5 targeted; PHP runtime to verify | MySQL 8.4.13 targeted | Owner confirms environment available; URL, root, data path to supply during preflight | Host, port, schema and restricted user to supply explicitly; no guesses | Available by Owner; hosted ZIP/install/real DB **NOT EXECUTED** |
 

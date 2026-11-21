@@ -21,7 +21,7 @@ Sein zeitlich überschnittener **kombinierter** POS02-Entscheid `INSUFFICIENT EV
 - Geprüfter Operator-/PR-HEAD: `e7b911b707508e439f9acbfad43f5fd55d34cc44` (laut Operator-Shell; zum Dokumentationszeitpunkt GitHub-PR-HEAD identisch, OPEN/DRAFT).
 - Vorheriger W01-Review-HEAD: `3f2c08024b88d031055c27aba980e7156b4a2957`. Die technische W01-Review-Zulassung dieses älteren HEAD wurde wegen der korrigierten F32-W01-01-Statusannahme nicht automatisch auf den Test-HEAD übertragen.
 - CI auf Test-HEAD: Standard 9/9 SUCCESS (https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44846591125), Hosted 1/1 SUCCESS (https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44846591170). Die optionale vollständige 21-Profil-Matrix ist dadurch nicht belegt.
-- Testumgebung A: Dolibarr 24.0.3, PHP CLI 8.2.35, MySQL 8.4.13, `dolibarr_i105_v24`, effektiver eingeschränkter DB-Account `dolibarr_i105_v24_limited@10.0.2.100`, Profil `CoreGuarded`, `autocommit=1`, `NO_CHAIN`, P_S `select_denied_1142`.
+- Testumgebung A: Dolibarr 24.0.3, PHP CLI 8.2.35, MySQL 8.4.13, `<PRIVATE_MYSQL_SCHEMA>`, effektiver eingeschränkter DB-Account `<RESTRICTED_DB_USER>@<PRIVATE_HOST>`, Profil `CoreGuarded`, `autocommit=1`, `NO_CHAIN`, P_S `select_denied_1142`.
 - Evidenzquelle: hier im Chat dokumentierte Shell-/Web-Frontend-Ergebnisprotokolle des Owners; zehn hier hochgeladene Dateien mit `baseline.json`, `baseline.sha256`, `verify.started`, `after.json`, `verdict.json` für jeden Fall. Kein eigenständiger Browser- oder MySQL-Zugriff während dieser Auswertung.
 
 ## 2. Testfälle und Resultate

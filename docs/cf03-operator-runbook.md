@@ -6,17 +6,21 @@ Tools: `tools/cf03-lab.php` and `tools/cf03-lab.lib.php`. They do **not** reuse 
 
 ## 0. Source and operator prerequisites
 
+**Private operator setup (not committed):** export `CF03_WORKTREE` with the actual local checkout path. For A, export `CF03_A_DOCUMENT_ROOT`, `CF03_A_DATA_ROOT`, `CF03_A_DB_HOST`, `CF03_A_DB_PORT`, `CF03_A_DB_NAME`, `CF03_A_DB_USER`, `CF03_A_WEB_URL`. For B, export the corresponding `CF03_B_*` fields (including `CF03_B_DB_USER` if not passed as `--db-user`). For C, use the same A webroot/schema/host with the explicitly different `CF03_C_DB_USER`. Never commit actual values; use a locally protected launcher with restricted permissions, and run as the effective PHP CLI identity. The witness stops if required values are missing. Versions/profiles remain pinned and cannot be overridden by those variables.
+
+
+
 Use the new CF-03 worktree from the GitHub PR. Verify the exact checked-out 40-character SHA and installed module source. For A/B/C, the PHP tool requires the live module to resolve to this exact worktree; **D additionally permits a separately deployed module copy only when the complete selected production-PHP inventory and SHA-256 values match this checkout**. This is not a complete package-manifest or install audit. Complete the entire baseline–manual-operation–verify window on the same SHA and config; no Git checkout, module update, profile switch, PHP-process credentials change, or concurrent business writes in between.
 
 ```sh
-cd /home/marcel/dolibarr-member-subscription-massaction-cf03 || exit 1
+cd ${CF03_WORKTREE:?set_private_worktree_path} || exit 1
 git rev-parse HEAD
 git status --short
 /usr/bin/php -v
 /usr/bin/php test/unit/cf03-lab.php
 ```
 
-If the project uses a different CF-03 worktree location, adjust the first `cd` line. The tool only accesses the current checkout, the Dolibarr `conf.php` for the selected local environment and one independent read-only mysqli connection. It does not log DB passwords, CSRF tokens or cookies.
+The source checkout is selected exclusively through the operator-owned `CF03_WORKTREE`. The tool only accesses the current checkout, the Dolibarr `conf.php` for the selected local environment and one independent read-only mysqli connection. It does not log DB passwords, CSRF tokens or cookies.
 
 All operator calls should use the same trusted PHP binary and the actual Apache/PHP execution identity where possible. The POS01-C reference used `sudo -u www-data` with PHP 8.2. Do not treat a PHP-CLI check as proof that the Apache worker has already reloaded credentials. Privileged output directories must be created/owned in advance by the operator, not by a web-accessible process.
 
@@ -31,11 +35,11 @@ sudo -u www-data /usr/bin/php -d xdebug.mode=off \
   tools/cf03-lab.php --preflight --environment=A
 ```
 
-Expect `status=PASS`, profile `CoreGuarded`, effective MySQL account starting with `dolibarr_i105_v24_limited@`, server `8.4.13`, `performance_schema=select_denied_1142`, and no data writes. A STOP means no booking and no account auto-fix.
+Expect `status=PASS`, profile `CoreGuarded`, effective MySQL account starting with `<RESTRICTED_DB_USER>@`, server `8.4.13`, `performance_schema=select_denied_1142`, and no data writes. A STOP means no booking and no account auto-fix.
 
 ### B — MariaDB V24
 
-The exact DB user (without password) comes from the operator's own `/home/marcel/dolibarr-v24/htdocs/conf/conf.php`.
+The exact DB user (without password) comes from the operator's own `<PRIVATE_MARIADB_V24_DOCROOT>/conf/conf.php`.
 
 ```sh
 sudo -u www-data /usr/bin/php -d xdebug.mode=off \
@@ -50,7 +54,7 @@ Expect `MariaDBSnapshot`, 10.11.19, `performance_schema=not_required`. Missing/i
 **Never run A and C concurrently.** Finish A's entire test window first, including its one-time verify and evidence preservation. Only then, during a controlled maintenance period:
 
 1. Ensure no web/CLI business operation or pending confirmation is running.
-2. Owner manually changes the DB username/password in the shared `/home/marcel/dolibarr-i105-v24-mysql/htdocs/conf/conf.php` to the independently approved EnhancedMySQL account.
+2. Owner manually changes the DB username/password in the shared `<PRIVATE_MYSQL_V24_DOCROOT>/conf/conf.php` to the independently approved EnhancedMySQL account.
 3. Ensure new Apache/PHP connections actually use that configuration.
 4. Owner explicitly selects `EnhancedMySQL` via module Setup (never edit the `llx_const` row directly). Old confirmation sessions are stale.
 5. Run the preflight with the actual Enhanced username.
@@ -61,7 +65,7 @@ sudo -u www-data /usr/bin/php -d xdebug.mode=off \
   --db-user=REPLACE_WITH_ACTUAL_C_ENHANCED_DB_USERNAME
 ```
 
-Expect profile `EnhancedMySQL`, the different C account and `performance_schema=select_allowed` in the **same schema** `dolibarr_i105_v24`. This establishes SELECT permission only; it **does not** establish enabled event consumers, actually advancing event IDs, savepoint/release counters or end-event continuity. Qualify the real active observer separately before any invoice business action.
+Expect profile `EnhancedMySQL`, the different C account and `performance_schema=select_allowed` in the **same schema** `<PRIVATE_MYSQL_SCHEMA>`. This establishes SELECT permission only; it **does not** establish enabled event consumers, actually advancing event IDs, savepoint/release counters or end-event continuity. Qualify the real active observer separately before any invoice business action.
 
 If returning to A, repeat the manual inverse switch, ensure a fresh effective limited user/profile and execute A preflight again.
 
@@ -85,7 +89,7 @@ Expect actual Dolibarr 22.0.5 source, actual CoreGuarded profile in entity 1, In
 
 ## CF03-W01 hardened evidence and invoice operator prerequisites
 
-The W01 library requires an **existing canonical, non-symlink evidence root readable and writable by the effective PHP CLI user**. A/B/C retain the fixed `/var/lib/dolibarr-test-results` parent. D's `--baseline` and `--verify` require **both** `--evidence-root=/ACTUAL/SAFE/PATH` and `--evidence-dir=/ACTUAL/SAFE/PATH/cf03-d-unique-case-01` with identical values per call. **The root has no mandatory ownership or mode-0700 check; group/other read permissions are accepted.** The tool still creates the individual case directory at 0700 and its evidence files at 0600 and preserves strict one-shot integrity checks. For D, the root must remain outside the webroot/checkout and their ancestors; hosting operators must separately exclude HTTP alias/public backup exposure. The tool does not create or chmod/chown the parent or switch accounts. Evidence options remain forbidden for `--preflight` and `--check-only`. **Security tradeoff:** a parent writable by untrusted users may permit case-directory replacement despite private case permissions. Prefer restricting such write access administratively; this risk is no longer rejected by the root guard.
+The W01 library requires an **existing canonical, non-symlink evidence root readable and writable by the effective PHP CLI user, and NOT group/other writable**. A/B/C retain the fixed `/var/lib/dolibarr-test-results` parent. D's `--baseline` and `--verify` require **both** `--evidence-root=/ACTUAL/SAFE/PATH` and `--evidence-dir=/ACTUAL/SAFE/PATH/cf03-d-unique-case-01` with identical values per call. **The root has no mandatory ownership or mode-0700 check; group/other read permissions are accepted, but group/other write permissions are rejected.** The tool still creates the individual case directory at 0700 and its evidence files at 0600 and preserves strict one-shot integrity checks. For D, the root must remain outside the webroot/checkout and their ancestors; hosting operators must separately exclude HTTP alias/public backup exposure. The tool does not create or chmod/chown the parent or switch accounts. Evidence options remain forbidden for `--preflight` and `--check-only`. **Security requirement:** the tool rejects group/other-writable parents because untrusted users could replace private case entries. Hosting ACLs/mount permissions and public aliases require additional operator assessment.
 
 **Only after specific Owner authorization of a real business case**: check-only PASS → baseline once → one authenticated UI action → verify once. Verification enforces exactly the two original baseline files, 0600 file modes, checksum integrity, stable DB/profile/conf/module/Core/SQL schema context, and creates `verify.started` before readback. No replay or cleanup even after a partial write.
 
@@ -95,7 +99,7 @@ See [CF03-W01 implementation and assurance limits](cf03-w01-validation.md). The 
 
 ## Paket A gate — accessible evidence parent and private one-shot case
 
-Current contract for **A/B/C/D**: the already existing root must be canonical, non-symlink, and **effectively readable and writable** by the CLI user; no root owner/mode restriction is enforced. A/B/C keep the fixed `/var/lib/dolibarr-test-results`; D supplies an explicit root and retains the no-web-exposure restrictions. **The newly created case directory and every evidence file remain owner-restricted (0700 / 0600), with exclusive writes and single-use verify.** The Owner provisions and assesses the parent separately; the tool never modifies it.
+Current contract for **A/B/C/D**: the already existing root must be canonical, non-symlink, and **effectively readable and writable** by the CLI user; no root owner/mode-0700 restriction is enforced, but group/other write is forbidden. A/B/C keep the fixed `/var/lib/dolibarr-test-results`; D supplies an explicit root and retains the no-web-exposure restrictions. **The newly created case directory and every evidence file remain owner-restricted (0700 / 0600), with exclusive writes and single-use verify.** The Owner provisions and assesses the parent separately; the tool never modifies it.
 
 A valid, admitted case's `--verify` now creates `verify.started` **before database connection, profile inspection or source hash checks**. After that point, any STOP is terminal for the Case ID, including database or configuration failure; when possible `verdict.json` carries the STOP, but the exclusive marker remains authoritative. No retry, file deletion, directory replacement, rebooking or automatic cleanup. An invalid baseline is not admitted as a valid case.
 

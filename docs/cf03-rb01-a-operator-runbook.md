@@ -14,7 +14,7 @@
 - [ ] The clone's correct PHP Web/CLI runtime, restricted DB identity, CoreGuarded profile, source/deployment and session/syslog prerequisites are attested; external SMTP/notifications are blocked.
 - [ ] A uniquely identified **test-only** injection build has been implemented, synthetic-negative-tested and independently reviewed. It is **not installed on the regular A/C instance**.
 - [ ] The reviewed injection point is exactly **after successful parent `verifyStored()` / Core DML and before the first COMMIT attempt**, qualified as `MSMConsistencyError`. It may be armed for one exact member/marker/consumed confirmation only.
-- [ ] A canonical non-symlink W01 evidence root with **effective CLI read/write access** and a **separate** protected injection/control-evidence root exist, with no web exposure. The parent need not be owner-only; untrusted-writer/replacement risks must be independently ruled out. Individual W01 case directories/files remain 0700/0600.
+- [ ] A canonical non-symlink W01 evidence root with **effective CLI read/write access** and a **separate** protected injection/control-evidence root exist, with no web exposure. The parent need not be owner-only, but group/other write permissions now cause STOP; additional ACL and alias exposure must still be independently ruled out. Individual W01 case directories/files remain 0700/0600.
 - [ ] A written **prior case-specific Owner-GO** names actual cloned instance, reviewed harness SHA, member/ref/marker, possible business writes, one permitted UI action and recovery/STOP contact.
 - [ ] No other application operation, profile/account switch, PHP source deployment, data cleanup or hook/config change occurs between baseline and final readback.
 
@@ -26,7 +26,7 @@ A failed gate means **NO-GO**. Do not create a trigger, disable an application s
 2. Record the original A server UUID and the clone UUID through independent approved DBA access; prove that the clone's TCP endpoint and persistent volume cannot route to A/C. Note server family/version, Docker/Podman namespace, Dolibarr source and effective PHP-CLI/Web worker version.
 3. Configure the **clone** with CoreGuarded and restricted DB grants. Require `autocommit=1` and `completion_type=NO_CHAIN`. Turn **Member** Agenda OFF through Dolibarr administration before baseline; note independently configured invoice-Agenda flags. Do not change the A/C profile or credentials.
 4. Prepare one clean test-only source commit: original application code plus *only* reviewed injection subclass/controller wiring, with its own pinned SHA and source/deployed manifest. Reject a dirty/uncommitted controller patch; its SHA must be reviewable.
-5. **Important mapping caveat:** `tools/cf03-lab.php --environment=A` expects exact A filesystem path, DB name/account/port and module-source identity. In an isolated VM/container namespace those logical paths and port can be mapped to the isolated clone; verify physical separation independently. Otherwise STOP and implement/review a separate `A-RB` read-only witness, **never modify the standard A mapping in-place**.
+5. **Important mapping caveat:** `tools/cf03-lab.php --environment=A` expects private operator-supplied A filesystem path, DB name/account/port and module-source identity. In an isolated VM/container namespace those logical paths and port can be mapped to the isolated clone; verify physical separation independently. Otherwise STOP and implement/review a separate `A-RB` read-only witness, **never modify the standard A mapping in-place**.
 
 Record only sanitized inventory in GitHub. Original backup, user data, DB export, conf.php, session and raw traces stay private.
 
@@ -54,7 +54,7 @@ Separate injection trace path: a **different sibling/private directory**, not in
 Run these commands **only inside the isolated clone namespace** after source review, not on the ordinary A/C worktree. Replace the two real fixture placeholders:
 
 ~~~bash
-cd /home/marcel/dolibarr-member-subscription-massaction-cf03 || exit 1
+cd ${CF03_WORKTREE:?set_private_worktree_path} || exit 1
 
 RB01_REVIEWED_SHA=REPLACE_WITH_REVIEWED_TEST_ONLY_HEAD
 RB01_MEMBER_ID=0
@@ -87,7 +87,7 @@ rb01_a_witness() {
     --amount=120.00 --agenda=off
 }
 
-# Standard A witness: only if the isolated namespace matches all hard-coded A identities.
+# Standard A witness: only if the isolated namespace matches all operator-bound A identities.
 sudo -u www-data /usr/bin/php -d xdebug.mode=off \
   tools/cf03-lab.php --preflight --environment=A
 rb01_a_witness --check-only
