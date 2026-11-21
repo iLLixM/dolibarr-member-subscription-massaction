@@ -5,8 +5,8 @@
             "operation": "commit",
             "fixture": 4090,
             "identity": {
-                "db": "msmsh01lab",
-                "account": "msmsh01lab@%",
+                "db": "cf03_restricted_lab_fixture",
+                "account": "cf03_restricted_lab_fixture@%",
                 "version": "8.4.13",
                 "ac": "1"
             },
@@ -23,8 +23,8 @@
             "operation": "rollback",
             "fixture": 4091,
             "identity": {
-                "db": "msmsh01lab",
-                "account": "msmsh01lab@%",
+                "db": "cf03_restricted_lab_fixture",
+                "account": "cf03_restricted_lab_fixture@%",
                 "version": "8.4.13",
                 "ac": "1"
             },

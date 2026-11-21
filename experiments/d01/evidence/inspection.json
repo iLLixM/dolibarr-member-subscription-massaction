@@ -14,8 +14,8 @@
         "completion_type": "NO_CHAIN"
     },
     "grants": [
-        "GRANT USAGE ON *.* TO `msmsh01lab`@`%`",
-        "GRANT SELECT, INSERT, UPDATE, DELETE ON `msmsh01lab`.* TO `msmsh01lab`@`%`"
+        "GRANT USAGE ON *.* TO `cf03_restricted_lab_fixture`@`%`",
+        "GRANT SELECT, INSERT, UPDATE, DELETE ON `cf03_restricted_lab_fixture`.* TO `cf03_restricted_lab_fixture`@`%`"
     ],
     "P_S_errno": 1142,
     "engine": [
