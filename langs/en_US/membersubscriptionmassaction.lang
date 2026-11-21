@@ -163,3 +163,8 @@ MSMAttachment_not_selected=Attachment not selected.
 MSMAttachment_not_required=No invoice attachment required.
 MSMAttachment_not_processed=Attachment processing not attempted after STOP.
 MSMAttachment_unknown=Attachment outcome uncertain; no automatic resend.
+
+MSMCompletionStatus=Transaction completion
+MSMCompletion_nonterminal_acknowledged=Acknowledged nonterminal Core completion; effects require a separate durable checkpoint.
+MSMCompletion_terminal_acknowledged=Acknowledged terminal Core completion; no further booking, PDF or mail work.
+MSMCompletion_unknown=Transaction completion uncertain; STOP without further effects.

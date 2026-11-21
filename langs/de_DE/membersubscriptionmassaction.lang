@@ -163,3 +163,8 @@ MSMAttachment_not_selected=Anlage nicht ausgewählt.
 MSMAttachment_not_required=Keine Rechnungsanlage erforderlich.
 MSMAttachment_not_processed=Anlagenverarbeitung aufgrund eines STOP nicht begonnen.
 MSMAttachment_unknown=Anlagenstatus ungeklärt; kein automatischer Neuversand.
+
+MSMCompletionStatus=Transaktionsabschluss
+MSMCompletion_nonterminal_acknowledged=Bestätigter nichtterminaler Core-Abschluss; Folgeschritte nur nach eigenem Ergebnis-Checkpoint.
+MSMCompletion_terminal_acknowledged=Bestätigter terminaler Core-Abschluss; keine weiteren Buchungen, PDF- oder Mailaktionen.
+MSMCompletion_unknown=Transaktionsabschluss ungeklärt; STOP ohne Folgeschritte.

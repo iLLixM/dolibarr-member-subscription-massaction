@@ -43,6 +43,11 @@ function msmRenderBooking(array $state, $key, array $access = array())
 			$result = $state['results'][$id]; $counts[$result['status']]++;
 			$html .= msmText('MSMStatus_'.$result['status']).': '.msmText($result['message']);
 			if ($result['status'] === 'success') {
+				if (isset($result['completion'])) {
+					$completion = $result['completion'];
+					if (!in_array($completion, array('nonterminal_acknowledged','terminal_acknowledged'), true)) { $completion = 'unknown'; }
+					$html .= '<div>'.msmText('MSMCompletionStatus').': '.msmText('MSMCompletion_'.$completion).'</div>';
+				}
 				$sum += $result['amount'];
 				$html .= '<div><a href="'.dol_escape_htmltag(dol_buildpath('/adherents/subscription.php', 1).'?rowid='.$id).'">'.msmText('Subscription').' #'.((int) $result['id']).'</a></div>';
 				if (!empty($result['invoice'])) {
