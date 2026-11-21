@@ -297,10 +297,10 @@ final class Cf03LabContract
             && ($m['entity']??null)===1 && ($m['status']??null)===1
             && array_key_exists('datefin',$m) && $m['datefin']===null
             && ($m['type_id']??0)>0,'CF03FixtureMismatch');
-        // Dolibarr V22/V24 llx_adherent_type: statut=0 ACTIVE, 1 INACTIVE.
+        // Dolibarr V22/V24 llx_adherent_type: statut=1 ACTIVE, 0 INACTIVE.
         // The paid-fixture contract also requires entity 1 and subscription '1'.
         self::need(($s['type']['id']??null)===$m['type_id']
-            && ($s['type']['status']??null)===0
+            && ($s['type']['status']??null)===1
             && ($s['type']['entity']??null)===1
             && ($s['type']['subscription']??null)==='1'
             && isset($s['type']['amount'])
