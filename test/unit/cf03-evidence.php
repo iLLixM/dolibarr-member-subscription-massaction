@@ -45,6 +45,14 @@ evStop(static function()use($site,$doc,$source){
 evStop(static function()use($source,$doc){
     Cf03Evidence::privateRoot($source,'D',$doc,$source);
 },'CF03EvidenceInsideWebOrSource');
+// The webroot/checkout rule is a shared security boundary for A, B, C and D.
+foreach (array('A','B','C','D') as $profile) {
+    foreach (array($site,$doc,$source) as $exposed) {
+        evStop(static function()use($exposed,$profile,$doc,$source) {
+            Cf03Evidence::privateRoot($exposed,$profile,$doc,$source);
+        },'CF03EvidenceInsideWebOrSource');
+    }
+}
 $hostSibling=$site.'/cf03-private-evidence';
 evOk(mkdir($hostSibling,0700),'create a private sibling of htdocs');
 Cf03Evidence::privateRoot($hostSibling,'D',$doc,$source);
@@ -54,8 +62,21 @@ evOk(is_dir($dir) && (fileperms($dir)&0077)===0,'private one-shot directory');
 evStop(static function()use($dir,$private,$doc,$source){
     Cf03Evidence::directory($dir,true,'D',$private,$doc,$source);
 },'CF03EvidenceExistsNoRetry');
-Cf03Evidence::json($dir,'baseline.json',array('case'=>'CF03','nonce'=>'fixture'));
-Cf03Evidence::exclusive($dir,'baseline.sha256',hash_file('sha256',$dir.'/baseline.json')."\n");
+// A permissive process umask must not expose any evidence at creation time.
+$umaskBefore=umask(0000);
+try {
+    Cf03Evidence::json($dir,'baseline.json',array('case'=>'CF03','nonce'=>'fixture'));
+    evOk((fileperms($dir.'/baseline.json') & 0077)===0,
+        'private baseline under ambient umask 0000');
+    evOk(umask()===0000,'ambient umask restored after exclusive create');
+    Cf03Evidence::exclusive($dir,'baseline.sha256',
+        hash_file('sha256',$dir.'/baseline.json')."\n");
+    evOk((fileperms($dir.'/baseline.sha256') & 0077)===0,
+        'private digest under ambient umask 0000');
+    evOk(umask()===0000,'ambient umask restored after digest create');
+} finally {
+    umask($umaskBefore);
+}
 $before=Cf03Evidence::readyToVerify($dir);
 evOk($before['case']==='CF03','baseline integrity');
 evStop(static function()use($dir){
