@@ -10,6 +10,8 @@ final class MsmFileBookingCheckpoint
 	private $session;
 	private $confirmedOrigin;
 	private $attempted = array();
+	private $financeAttempted = array();
+	private $postEffects = array();
 	public function __construct($key)
 	{
 		if (!is_string($key) || !preg_match('/^[a-f0-9]{32}$/D', $key)) { throw new RuntimeException('MSMSessionFailure'); }
@@ -99,6 +101,26 @@ final class MsmFileBookingCheckpoint
 		// Once admitted, even an unsuccessful Core BEGIN may have an unknown
 		// acknowledgement. This in-process capability cannot be reused.
 		$this->attempted[$id] = true;
+	}
+	/** No SQL and no new permission grant: the originally consumed, in-process
+	 * capability is the only possible CoreGuarded Invoice continuation.
+	 */
+	public function requireFinanceContinuation($id, array $row, $user)
+	{
+		$this->requireBinding();
+		$origin = $this->confirmedOrigin;
+		if (!isset($this->attempted[$id]) || isset($this->financeAttempted[$id])
+			|| !is_array($origin) || empty($origin['options']['invoice'])
+			|| ($origin['profile']['profile'] ?? null) !== 'CoreGuarded'
+			|| (int) ($origin['owner'] ?? 0) !== (int) ($user->id ?? 0)
+			|| !isset($origin['rows'][$id]['invoice'])
+			|| !is_string($origin['rows'][$id]['fingerprint'] ?? null)
+			|| !hash_equals($origin['rows'][$id]['fingerprint'], (string) ($row['fingerprint'] ?? ''))
+			|| empty($row['invoice'])
+			|| !empty($row['autocreate']) !== !empty($origin['options']['autocreate'])) {
+			throw new RuntimeException('MSMCoreGuardedSessionUnsupported');
+		}
+		$this->financeAttempted[$id] = true; // Never another Invoice attempt.
 	}
 	public function __invoke(array $updated)
 	{

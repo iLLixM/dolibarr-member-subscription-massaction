@@ -48,7 +48,9 @@ class MsmTransactionProfile
 			} else { $reason = 'MSMProfileInvalid'; }
 		}
 		$enabled = in_array($profile, array('CoreGuarded', 'EnhancedMySQL', 'MariaDBSnapshot'), true);
-		$extended = $profile !== 'CoreGuarded' && $enabled;
+		// CF05-03: the configured CoreGuarded profile now admits the same server-
+		// confirmed business options. It does NOT gain P_S/event equivalence.
+		$extended = $enabled;
 		return array('family' => $family, 'profile' => $profile, 'revision' => self::revision($raw),
 			'features' => array('booking' => $enabled, 'invoice' => $extended, 'autocreate' => $extended, 'sendmail' => $extended), 'reason' => $reason);
 	}
