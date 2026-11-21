@@ -290,15 +290,26 @@ class Cf05BoundaryGuard implements MsmActiveTransactionGuard
 {
 	private $db;
 	public $blockedAfter = '';
+	public $blockedOnProbe = 0;
+	public $blockedAfterCall = '';
+	public $blockedAfterSql = '';
 	public $probes = 0;
+	public $probesAt = array();
 	public $isolationChecks = 0;
 	public function __construct($db) { $this->db = $db; }
 	public function isFor($db) { return $this->db === $db; }
 	public function active() {
 		$this->probes++;
-		if ($this->blockedAfter !== '' && in_array($this->blockedAfter, $this->db->calls, true)) {
-			return array('state'=>MsmDatabaseState::UNKNOWN,'fresh'=>false,'owned'=>false);
+		$this->probesAt[] = array('calls'=>$this->db->calls, 'queries'=>$this->db->queries);
+		$lost = ($this->blockedOnProbe > 0 && $this->probes === $this->blockedOnProbe)
+			|| ($this->blockedAfter !== '' && in_array($this->blockedAfter, $this->db->calls, true))
+			|| ($this->blockedAfterCall !== '' && in_array($this->blockedAfterCall, $this->db->calls, true));
+		if ($this->blockedAfterSql !== '') {
+			foreach ($this->db->queries as $sql) {
+				if (strpos($sql, $this->blockedAfterSql) === 0) { $lost = true; break; }
+			}
 		}
+		if ($lost) { return array('state'=>MsmDatabaseState::UNKNOWN,'fresh'=>false,'owned'=>false); }
 		return array('state'=>MsmDatabaseState::ACTIVE,'fresh'=>true,'owned'=>true);
 	}
 	public function requireSupportedIsolation(array $state) { $this->isolationChecks++; }
@@ -326,6 +337,117 @@ $diagnostic = array('stage'=>'preflight','subscription_id'=>9,'invoice_id'=>0,'c
 $created = $service->create($member,9,$row,new PreviewUser(),$diagnostic);
 verify($created['id'] === 42 && $spy->probes >= 10 && $spy->probes === $spy->isolationChecks,
 	'CF05 complete customer/invoice chain uses shared guard before and after Core calls');
+// F34-01: fail before EACH Core business operation, not just after it.
+// Find the last guard probe that observed exactly N previous Core writes in
+// the successful reference run; do not hard-code a PHP-version-specific count.
+$expectedCalls = array('customer-create','invoice-create','invoice-line','invoice-validate');
+foreach ($expectedCalls as $index => $call) {
+	$preProbe = 0;
+	foreach ($spy->probesAt as $position => $snapshot) {
+		if ($snapshot['calls'] === array_slice($expectedCalls, 0, $index)) { $preProbe = $position + 1; }
+	}
+	verify($preProbe > 0, 'F34-01 successful reference has pre-Core probe '.$call);
+	list($db,$booking,$row)=invoiceBookingFixture(true);
+	$preGuard = new Cf05BoundaryGuard($db); $preGuard->blockedOnProbe = $preProbe;
+	$service = new InvoiceServiceDouble($db, $booking->observer(), $preGuard);
+	$diagnostic = array('stage'=>'preflight','subscription_id'=>9,'invoice_id'=>0,'customer_id'=>0);
+	fails(static function()use($service,$booking,$row,&$diagnostic) {
+		$service->create($booking->object,9,$row,new PreviewUser(),$diagnostic);
+	}, 'MSMTransactionUnknown');
+	verify($db->calls === array_slice($expectedCalls, 0, $index),
+		'F34-01 guard loss BEFORE '.$call.' prohibits that write and later writes');
+	verify($preGuard->isolationChecks === $preGuard->probes-1,
+		'F34-01 failed pre-Core ownership probe is not isolation-admitted '.$call);
+}
+
+// F34-01: the real, non-overridden direct-service admission rejects a
+// mismatched guard profile even if metadata and guard share the SAME DoliDB.
+class Cf05ProfileConfigDb extends InvoiceDatabaseDouble
+{
+	public $profileName = 'EnhancedMySQL';
+	public function decrypt($s) { return $s; }
+	public function encrypt($s) { return "'".$s."'"; }
+	public function query($sql) {
+		if (strpos($sql, ' FROM test_const WHERE ') !== false) {
+			$this->queries[] = $sql;
+			$raw = json_encode(array('version'=>1, 'family'=>'mysql',
+				'profile'=>$this->profileName, 'nonce'=>str_repeat('a',32)));
+			return (object) array('rows'=>array((object)array('value'=>$raw)));
+		}
+		return parent::query($sql);
+	}
+}
+$profileDb = new Cf05ProfileConfigDb(); $profileDb->family = 'mysql';
+$profileMeta = new SyntheticDatabaseState($profileDb);
+$profileGuard = new MsmCoreGuardedTransaction($profileDb);
+$profileService = new MsmInvoiceService($profileDb, $profileMeta, $profileGuard);
+$admission = new ReflectionMethod(MsmInvoiceService::class, 'requireInvoiceAdmission');
+$admission->setAccessible(true);
+fails(static function()use($admission,$profileService){$admission->invoke($profileService);},
+	'MSMTransactionUnknown');
+verify(!$profileDb->calls && !$profileDb->events && $profileDb->transaction_opened === 0,
+	'F34-01 same-DoliDB Enhanced profile rejects CoreGuarded type before business APIs');
+$admitted = new MsmInvoiceService($profileDb, $profileMeta, $profileMeta);
+$admission->invoke($admitted);
+verify(true, 'F34-01 matching Enhanced profile and guard remain admitted');
+$profileDb->profileName = 'CoreGuarded';
+fails(static function()use($admission,$admitted){$admission->invoke($admitted);},
+	'MSMProfileFeatureUnavailable');
+fails(static function()use($admission,$profileService){$admission->invoke($profileService);},
+	'MSMProfileFeatureUnavailable');
+verify(!$profileDb->calls && !$profileDb->events,
+	'F34-01 CoreGuarded invoice remains feature-disabled for both guard types');
+
+// F34-02: after customer fetch, loss of the injected active guard must
+// prevent even the NEXT member-link readback. The synthetic Core double
+// makes the fetch boundary observable without any database/HTTP access.
+class Cf05ReadbackCustomer extends InvoiceCustomerDouble
+{
+	private $fixtureDb;
+	public function __construct($db) { parent::__construct($db); $this->fixtureDb = $db; }
+	public function fetch($id) { $value = parent::fetch($id); $this->fixtureDb->calls[] = 'customer-fetch'; return $value; }
+}
+class Cf05ReadbackInvoiceService extends InvoiceServiceDouble
+{
+	protected function customer() { return new Cf05ReadbackCustomer($this->db); }
+}
+list($db,$booking,$row)=invoiceBookingFixture(true);
+$readGuard = new Cf05BoundaryGuard($db); $readGuard->blockedAfterCall = 'customer-fetch';
+$readService = new Cf05ReadbackInvoiceService($db, $booking->observer(), $readGuard);
+$diagnostic = array('stage'=>'preflight','subscription_id'=>9,'invoice_id'=>0,'customer_id'=>0);
+fails(static function()use($readService,$booking,$row,&$diagnostic) {
+	$readService->create($booking->object,9,$row,new PreviewUser(),$diagnostic);
+}, 'MSMTransactionUnknown');
+verify($db->calls === array('customer-create','customer-fetch') && !$db->queries,
+	'F34-02 customer-fetch context loss stops before member-link SELECT and Facture::create');
+
+// Every persisted Invoice SELECT gets its own post-readback guard check.
+// If one SELECT loses ownership, no subsequent SELECT or Core API may run.
+$readbackSql = array(
+	'SELECT entity, fk_soc',
+	'SELECT COUNT(*) AS n, SUM(qty)',
+	'SELECT COUNT(*) AS n FROM test_element_element',
+	'SELECT client FROM'
+);
+foreach ($readbackSql as $index => $sqlPrefix) {
+	list($db,$booking,$row)=invoiceBookingFixture(true);
+	$readGuard = new Cf05BoundaryGuard($db); $readGuard->blockedAfterSql = $sqlPrefix;
+	$readService = new InvoiceServiceDouble($db, $booking->observer(), $readGuard);
+	$diagnostic = array('stage'=>'preflight','subscription_id'=>9,'invoice_id'=>0,'customer_id'=>0);
+	fails(static function()use($readService,$booking,$row,&$diagnostic) {
+		$readService->create($booking->object,9,$row,new PreviewUser(),$diagnostic);
+	}, 'MSMTransactionUnknown');
+	$readbackQueries = array_values(array_filter($db->queries, static function($query)use($readbackSql) {
+		foreach ($readbackSql as $prefix) { if (strpos($query,$prefix)===0) { return true; } }
+		return false;
+	}));
+	verify(count($readbackQueries) === $index + 1
+		&& strpos($readbackQueries[$index],$sqlPrefix) === 0,
+		'F34-02 guard loss after persisted readback stops next SELECT '.($index+1));
+	verify($db->calls === $expectedCalls,
+		'F34-02 lost readback prevents further Core operations '.($index+1));
+}
+
 // Early read-only table readiness is invoice-selective; final lock checks remain.
 foreach (array('ecm_files', 'product') as $unsupportedTable) {
 	list($db, $service, $row) = invoiceBookingFixture(); $db->family = 'mysql'; $db->nonTransactionalTable = $unsupportedTable;
