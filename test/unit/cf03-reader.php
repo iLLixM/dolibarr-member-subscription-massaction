@@ -37,6 +37,7 @@ final class Cf03FakeDb
     public $billCreate;
     public $billValidate;
     public $lineOn;
+    public $memberTypeStatus=1;
     public $fault='';
     public $resourceActor=4;
     public $sql=array();
@@ -99,7 +100,7 @@ final class Cf03FakeDb
                 'entity'=>1,'fk_adherent_type'=>2,'fk_soc'=>5,'statut'=>1,
                 'datefin'=>$this->after?'2080-12-31 00:00:00':null));
         } elseif (strpos($sql,'FROM llx_adherent_type WHERE')!==false) {
-            $rows=array(array('rowid'=>2,'statut'=>0,'entity'=>1,'subscription'=>'1',
+            $rows=array(array('rowid'=>2,'statut'=>$this->memberTypeStatus,'entity'=>1,'subscription'=>'1',
                 'amount'=>'120.00000000','duration'=>12));
         } elseif (strpos($sql,'FROM llx_const ')!==false) {
             $module=$this->memberOn || $this->billCreate || $this->billValidate || $this->lineOn;
@@ -282,6 +283,16 @@ foreach ($cases as $case) {
             $label.' incomplete invoice Resultset must fail closed');
     }
 }
+// The actual SQL reader accepts active member types (statut=1), and
+// must reject inactive types (statut=0) with the exact STOP reason.
+$inactiveExpected=cf03ReaderExpected(true);
+$inactiveDb=new Cf03FakeDb(false,true,false,false);
+$inactiveDb->memberTypeStatus=0;
+$inactiveSnapshot=cf03State($inactiveDb,cf03ReaderContext(),$inactiveExpected);
+readerStop(static function()use($inactiveSnapshot,$inactiveExpected) {
+    Cf03LabContract::baseline($inactiveSnapshot,$inactiveExpected,'B');
+},'CF03MemberTypeMismatch',
+    'inactive member-type statut=0 rejected by actual SQL reader');
 $expect=cf03ReaderExpected(false);
 $lineDb=new Cf03FakeDb(false,false,false,true,true);
 $line=cf03State($lineDb,cf03ReaderContext(),$expect);
