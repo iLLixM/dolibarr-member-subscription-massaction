@@ -7,7 +7,7 @@ function ap3Need($ok,$label) { if(!$ok) throw new LogicException($label); }
 function ap3LoadLibraries()
 {
  global $conf,$langs;
- $root=getenv('AP3_CORE')?:'/home/marcel/dolibarr-i105-v24-mysql';
+ $root=getenv('AP3_CORE')?:'/opt/private-fixture/mysql';
  foreach(json_decode(file_get_contents(__DIR__.'/core-pins.json'),true,512,JSON_THROW_ON_ERROR)as $file=>$sha)ap3Need(hash_file('sha256',$root.'/htdocs/'.$file)===$sha,'Unpinned Core source');
  if(!defined('DOL_DOCUMENT_ROOT')) define('DOL_DOCUMENT_ROOT',$root.'/htdocs');
  if(!defined('DOL_URL_ROOT')) define('DOL_URL_ROOT','');
@@ -54,13 +54,13 @@ class Ap3Core extends DoliDBMysqli
 function ap3Config($provided=null)
 {
  if($provided===null){$p=getenv('AP3_CONFIG')?:getenv('HOME').'/.config/dolibarr-sh01/app.json';ap3Need(is_file($p)&&(fileperms($p)&0077)===0,'Protected app config required');$provided=json_decode(file_get_contents($p),true,512,JSON_THROW_ON_ERROR);}
- ap3Need($provided['host']==='127.0.0.1'&&$provided['port']===3307&&$provided['database']==='msmsh01lab'&&$provided['user']==='msmsh01lab','Restricted lab only');return $provided;
+ ap3Need($provided['host']==='127.0.0.1'&&$provided['port']===3307&&$provided['database']==='cf03_restricted_lab_fixture'&&$provided['user']==='cf03_restricted_lab_fixture','Restricted lab only');return $provided;
 }
 function ap3Connect($config=null,$role='lab',$proxyPort=0)
 {
  $c=ap3Config($config);Ap3Trace::$role=$role;$d=new Ap3Core('mysqli',$c['host'],$c['user'],$c['password'],$c['database'],$proxyPort?:$c['port']);unset($c);
  ap3Need($d->ok,'Lab unavailable');$m=ap3Rows($d,'SELECT DATABASE() AS db,CURRENT_USER() AS account,VERSION() AS version,@@autocommit AS ac')[0];
- ap3Need($m['db']==='msmsh01lab'&&$m['account']==='msmsh01lab@%'&&$m['version']==='8.4.13'&&$m['ac']==='1','Lab identity mismatch');return $d;
+ ap3Need($m['db']==='cf03_restricted_lab_fixture'&&$m['account']==='cf03_restricted_lab_fixture@%'&&$m['version']==='8.4.13'&&$m['ac']==='1','Lab identity mismatch');return $d;
 }
 function ap3Rows($d,$sql) {$r=$d->query($sql);ap3Need($r instanceof mysqli_result,'Read failed');$a=$r->fetch_all(MYSQLI_ASSOC);$r->free();return $a;}
 function ap3Q($d,$sql) {ap3Need($d->query($sql)!==false,'Unexpected lab SQL failure');}

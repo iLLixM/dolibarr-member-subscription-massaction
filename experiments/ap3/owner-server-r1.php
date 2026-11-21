@@ -9,8 +9,8 @@ ini_set('display_errors','0');ini_set('log_errors','0');umask(0077);mysqli_repor
 function ownerNeed($ok,$text){if(!$ok)throw new LogicException($text);}
 function ownerReference()
 {
- require '/home/marcel/dolibarr-i105-v24-mysql/htdocs/conf/conf.php';
- ownerNeed($dolibarr_main_db_name==='dolibarr_i105_v24'&&$dolibarr_main_db_host==='127.0.0.1'&&(int)$dolibarr_main_db_port===3307&&$dolibarr_main_db_prefix==='llx_','Reference identity mismatch');
+ require '/opt/private-fixture/mysql/htdocs/conf/conf.php';
+ ownerNeed($dolibarr_main_db_name==='cf03_mysql_fixture'&&$dolibarr_main_db_host==='127.0.0.1'&&(int)$dolibarr_main_db_port===3307&&$dolibarr_main_db_prefix==='llx_','Reference identity mismatch');
  $r=new mysqli($dolibarr_main_db_host,$dolibarr_main_db_user,$dolibarr_main_db_pass,$dolibarr_main_db_name,(int)$dolibarr_main_db_port);$r->set_charset('utf8mb4');return $r;
 }
 function ownerSnapshot($d)
@@ -24,9 +24,9 @@ function ownerSnapshot($d)
 }
 $p=null;$memory=null;$ref=null;$runtime=null;
 try {
- foreach(json_decode(file_get_contents(__DIR__.'/core-pins.json'),true,512,JSON_THROW_ON_ERROR)as $file=>$sha)ownerNeed(hash_file('sha256','/home/marcel/dolibarr-i105-v24-mysql/htdocs/'.$file)===$sha,'Core pin mismatch');
+ foreach(json_decode(file_get_contents(__DIR__.'/core-pins.json'),true,512,JSON_THROW_ON_ERROR)as $file=>$sha)ownerNeed(hash_file('sha256','/opt/private-fixture/mysql/htdocs/'.$file)===$sha,'Core pin mismatch');
  $request=json_decode(fgets(STDIN),true,512,JSON_THROW_ON_ERROR);$lab=$request['lab']??array();
- ownerNeed(($lab['host']??'')==='127.0.0.1'&&($lab['port']??0)===3307&&($lab['database']??'')==='msmsh01lab'&&($lab['user']??'')==='msmsh01lab','Restricted lab only');
+ ownerNeed(($lab['host']??'')==='127.0.0.1'&&($lab['port']??0)===3307&&($lab['database']??'')==='cf03_restricted_lab_fixture'&&($lab['user']??'')==='cf03_restricted_lab_fixture','Restricted lab only');
  // Stop only a stranded server from the failed initial AP3 harness, same UID/exact script.
  $reconciled=0;foreach(glob('/proc/[0-9]*/cmdline')as $pf){$pid=(int)basename(dirname($pf));if(@fileowner(dirname($pf))!==33)continue;$args=explode(chr(0),(string)@file_get_contents($pf));if(!in_array(__DIR__.'/http-router.php',$args,true))continue;ownerNeed(in_array('-S',$args,true),'Unexpected old server');ownerNeed(posix_kill($pid,SIGTERM),'Could not stop old dedicated server');for($i=0;$i<50&&posix_kill($pid,0);$i++)usleep(100000);ownerNeed(!posix_kill($pid,0),'Old dedicated server still alive; no forced kill');$reconciled++;}
  $runtime=sys_get_temp_dir().'/dolibarr-ap3-www-'.bin2hex(random_bytes(10));ownerNeed(mkdir($runtime,0700),'Private runtime path');
@@ -35,7 +35,7 @@ try {
  $route='/ap3-private-'.bin2hex(random_bytes(24));
  // Private ephemeral shared memory, mode0600, same www-data UID only. No credential file.
  $payload=json_encode(array('lab'=>$lab,'route'=>$route,'runtime'=>$runtime));$key=random_int(100000,2000000000);$memory=shmop_open($key,'n',0600,strlen($payload));ownerNeed((bool)$memory,'Private memory unavailable');shmop_write($memory,$payload,0);unset($request,$lab,$payload);putenv('AP3_SHM_KEY='.$key);
- $command=array(PHP_BINARY,'-d','display_errors=0','-d','log_errors=0','-d','xdebug.mode=develop','-d','xdebug.show_exception_trace=0','-d','xdebug.show_error_trace=0','-d','session.save_handler=files','-d','session.save_path=/home/marcel/dolibarr-i105-v24-mysql-data/sessions','-d','disable_functions=mail,fsockopen,pfsockopen,stream_socket_client,socket_connect,curl_exec,curl_multi_exec','-S','127.0.0.1:'.$port,__DIR__.'/http-router-r1.php');
+ $command=array(PHP_BINARY,'-d','display_errors=0','-d','log_errors=0','-d','xdebug.mode=develop','-d','xdebug.show_exception_trace=0','-d','xdebug.show_error_trace=0','-d','session.save_handler=files','-d','session.save_path=/opt/private-fixture/mysql-data/sessions','-d','disable_functions=mail,fsockopen,pfsockopen,stream_socket_client,socket_connect,curl_exec,curl_multi_exec','-S','127.0.0.1:'.$port,__DIR__.'/http-router-r1.php');
  $p=proc_open($command,array(0=>array('file','/dev/null','r'),1=>array('file','/dev/null','a'),2=>array('file','/dev/null','a')),$pipes,$runtime);
  ownerNeed(is_resource($p),'PHP server spawn');
  echo json_encode(array('status'=>'READY','port'=>$port,'route'=>$route,'reference_before'=>$before,'runtime_path'=>$runtime,'prior_dedicated_servers_stopped'=>$reconciled,'profile'=>array('session_handler'=>'files','session_path'=>'existing I105 sessions','bind'=>'127.0.0.1','transports_disabled'=>true)))."\n";fflush(STDOUT);
