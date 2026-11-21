@@ -6,7 +6,7 @@
 
 - [PR #38](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/38) (draft, **not merged or production-admitted**) distinguishes the acknowledged Core completion, verified/stale/unknown PDF file, separately verified invoice attachment and actual mail transport/hook outcomes, without conflating a hooked send with delivery. The existing mail `send()` API remains compatible; `sendWithEvidence()` supplies independently reported attachment status.
 - Under the qualified test-only CoreGuarded path, uncertain PDF generation or SMTP/hook outcomes retain the already committed business result, mark downstream effects uncertain or not processed and **STOP subsequent member actions** without blind regeneration, resend, rollback or compensation.
-- Add offline tests of invalid/changed PDF and hook outcomes, post-commit UNKNOWN STOP, one-shot original file-session checkpoints and B/C regression boundaries. Trigger the existing **21-job full PHP/Core matrix** for this sensitive file family while keeping ordinary PR CI at nine jobs.
+- Add offline tests of invalid/changed PDF and hook outcomes, post-commit UNKNOWN STOP, one-shot original file-session checkpoints and B/C regression boundaries. Trigger the existing **21-job full PHP/Core matrix** plus targeted hosted PHP8.3/V22.0.5 offline PDF/mail checks for this sensitive file family while keeping unrelated ordinary PR CI at nine jobs.
 - **No actual CoreGuarded finance unlock**: `MsmTransactionProfile::coreGuardedFinanceQualified()` is still production `false`; F36-02 remains OPEN / CF05-06, real A–D and release gates remain OPEN.
 
 ### 2026-11-21 – Phase-3 CoreGuarded finance code merged, productive admission OFF (PR #36)
