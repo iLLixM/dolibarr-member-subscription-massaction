@@ -32,7 +32,7 @@ BANNED = [
 ]
 HOME_PATH = re.compile(re.escape("/" + "home/") + r"[A-Za-z0-9._-]+")
 MAC_HOME = re.compile(re.escape("/" + "Users/") + r"[A-Za-z0-9._-]+")
-WINDOWS_HOME = re.compile(r"[A-Za-z]:\\\\Users\\\\[A-Za-z0-9._-]+", re.IGNORECASE)
+WINDOWS_HOME = re.compile(r"[A-Za-z]:\\Users\\[A-Za-z0-9._-]+", re.IGNORECASE)
 issues = []
 scanned = 0
 for name in TRACKED:
