@@ -12,6 +12,7 @@ final class MsmFileBookingCheckpoint
 	private $attempted = array();
 	private $financeAttempted = array();
 	private $postEffects = array();
+	private $mailEvidenceClaimed = array();
 	public function __construct($key)
 	{
 		if (!is_string($key) || !preg_match('/^[a-f0-9]{32}$/D', $key)) { throw new RuntimeException('MSMSessionFailure'); }
@@ -165,6 +166,34 @@ final class MsmFileBookingCheckpoint
 			restore_error_handler();
 		}
 		$this->postEffects[$id][$kind] = true;
+	}
+	/** One-shot continuation for the actual mail adapter, not merely a
+	 * boolean asserted by its caller. requirePostCommitEffect('mail') must
+	 * already have re-read the persisted original confirmed result.
+	 * This proof never writes a DB row or opens another transaction.
+	 */
+	public function requireMailEvidence($id, $user, array $invoice = null)
+	{
+		$this->requireBinding();
+		$origin = $this->confirmedOrigin;
+		if (!is_int($id) || $id < 1 || !is_array($origin)
+			|| !isset($this->postEffects[$id]['mail'])
+			|| isset($this->mailEvidenceClaimed[$id])
+			|| !isset($this->attempted[$id])
+			|| !in_array($id, $origin['ids'] ?? array(), true)
+			|| (int) ($origin['owner'] ?? 0) !== (int) ($user->id ?? 0)
+			|| ($origin['profile']['profile'] ?? null) !== 'CoreGuarded'
+			|| empty($origin['profile']['features']['sendmail'])
+			|| empty($origin['options']['sendmail'])
+			|| !is_array($origin['rows'][$id] ?? null)
+			|| (bool) !empty($origin['options']['invoice']) !== ($invoice !== null)
+			|| ($invoice !== null && ((int) ($invoice['member_id'] ?? 0) !== $id
+				|| (int) ($invoice['entity'] ?? 0) !== (int) ($origin['entity'] ?? 0)
+				|| (int) ($invoice['id'] ?? 0) < 1
+				|| ($invoice['pdf']['status'] ?? null) !== 'verified'))) {
+			throw new RuntimeException('MSMCoreGuardedSessionUnsupported');
+		}
+		$this->mailEvidenceClaimed[$id] = true; // No second adapter attempt.
 	}
 	public function __invoke(array $updated)
 	{

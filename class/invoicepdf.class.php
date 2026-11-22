@@ -106,6 +106,9 @@ class MsmInvoicePdfService
 
 	public function generate(array $identity, $user)
 	{
+		// Once generateCore() was entered, even a negative return or failed
+		// metadata/signature check cannot prove the absence of filesystem effects.
+		$generationStarted = false;
 		try {
 			$user = $this->currentUser($user);
 			if (!MsmPreviewService::canCreateSubscriptionWithOptions($user, true, false)) { throw new RuntimeException('NotEnoughPermissions'); }
@@ -119,7 +122,11 @@ class MsmInvoicePdfService
 				: (!empty($mysoc->default_lang) ? $mysoc->default_lang : getDolGlobalString('MAIN_LANG_DEFAULT', 'en_US'));
 			$outputlangs->setDefaultLang($defaultlang);
 			$model = (string) $identity['pdf_model'];
-			if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_]*$/D', $model) || $this->generateCore($invoice, $model, $outputlangs) <= 0) {
+			if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_]*$/D', $model)) {
+				throw new RuntimeException('MSMPdfGenerationFailed');
+			}
+			$generationStarted = true; // Point of no proved filesystem non-effect.
+			if ($this->generateCore($invoice, $model, $outputlangs) <= 0) {
 				throw new RuntimeException('MSMPdfGenerationFailed');
 			}
 			$invoice = $this->load($identity, $user);
@@ -128,6 +135,9 @@ class MsmInvoicePdfService
 			return $result;
 		} catch (Throwable $e) {
 			$key = in_array($e->getMessage(), array('NotEnoughPermissions', 'MSMPdfStale', 'MSMPdfUnsafePath', 'MSMPdfInvalid', 'MSMPdfMetadataMismatch', 'MSMPdfIdentityMismatch', 'MSMPdfGenerationFailed'), true) ? $e->getMessage() : 'MSMPdfUnknown';
+			// A post-generation failure is never a deterministic "failed" file
+			// outcome, even if the diagnostic code is otherwise recognizable.
+			if ($generationStarted) { return array('status' => 'unknown', 'message' => 'MSMPdfUnknown'); }
 			return array('status' => $key === 'MSMPdfUnknown' ? 'unknown' : 'failed', 'message' => $key);
 		}
 	}
