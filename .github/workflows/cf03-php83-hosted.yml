@@ -6,6 +6,16 @@ on:
       - 'test/unit/cf03-*'
       - '.github/workflows/cf03-php83-hosted.yml'
       - 'class/booking.class.php'
+      - 'class/actions_membersubscriptionmassaction.class.php'
+      - 'lib/membersubscriptionmassaction.lib.php'
+      - 'admin/setup.php'
+      - 'class/period.class.php'
+      - 'lib/preview_renderer.lib.php'
+      # Forward-safe: any new class, library or admin PHP can affect financial
+      # admission, confirmation, CSRF, amounts or post-COMMIT effects.
+      - 'class/**'
+      - 'lib/**'
+      - 'admin/**'
       - 'subscription.php'
       - 'class/coreguardedrightsdb.class.php'
       - 'class/corecompatibility.class.php'

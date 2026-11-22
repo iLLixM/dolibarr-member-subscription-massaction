@@ -8,6 +8,11 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 $root = dirname(__DIR__, 2);
 $required = array(
 	'class/booking.class.php',
+	'class/actions_membersubscriptionmassaction.class.php',
+	'lib/membersubscriptionmassaction.lib.php',
+	'admin/setup.php',
+	'class/period.class.php',
+	'lib/preview_renderer.lib.php',
 	'subscription.php',
 	'class/coreguardedrightsdb.class.php',
 	'class/corecompatibility.class.php',
@@ -49,6 +54,12 @@ $required = array(
 	'.github/workflows/ci-full.yml',
 	'.github/workflows/cf03-php83-hosted.yml',
 );
+$requiredBroad = array('class/**', 'lib/**', 'admin/**');
+function msmCiContainsRequired(array $paths, array $required)
+{
+	foreach ($required as $path) { if (!isset($paths[$path])) { return false; } }
+	return true;
+}
 foreach (array('ci-full.yml', 'cf03-php83-hosted.yml') as $name) {
 	$file = $root.'/.github/workflows/'.$name;
 	$source = file_get_contents($file);
@@ -61,8 +72,16 @@ foreach (array('ci-full.yml', 'cf03-php83-hosted.yml') as $name) {
 			$paths[$match[1]] = true;
 		}
 	}
-	foreach ($required as $path) {
+	foreach (array_merge($required, $requiredBroad) as $path) {
 		if (!isset($paths[$path])) { throw new RuntimeException('F38-04 uncovered '.$path.' in '.$name); }
+	}
+	// Synthetic negative check: a formerly missing critical entry MUST fail
+	// the same helper that drives the actual workflow coverage verdict.
+	$mutated = $paths;
+	unset($mutated['class/actions_membersubscriptionmassaction.class.php']);
+	if (msmCiContainsRequired($mutated, $required)
+		|| !msmCiContainsRequired($paths, array_merge($required, $requiredBroad))) {
+		throw new RuntimeException('F38-04 negative coverage self-test failed');
 	}
 	if (!preg_match('/(?m)^  workflow_dispatch:\s*$/', $source)
 		|| !preg_match('/(?m)^        run:\s*\\|\s*\n(?:          [^\n]*\n)*?          php test\\/unit\\/ci-triggers\\.php(?:\\s|$)/', $source)) {
@@ -79,4 +98,4 @@ $probe = preg_replace('/(?m)^(          php test\\/unit\\/ci-triggers\\.php)\\s*
 if ($probe === $standard || preg_match('/(?m)^        run:\s*\\|\s*\n(?:          [^\n]*\n)*?          php test\\/unit\\/ci-triggers\\.php(?:\\s|$)/', $probe)) {
 	throw new RuntimeException('F38-04 comment-only static gate bypass');
 }
-echo 'F38-04 full+hosted security path coverage PASS ('.count($required).' exact paths, 3 CI workflows; executable steps).'.PHP_EOL;
+echo 'F38-04 full+hosted security path coverage PASS ('.count($required).' exact paths, 3 broad class/lib/admin fallback paths, executable steps and missing-entry negative)'.PHP_EOL;
