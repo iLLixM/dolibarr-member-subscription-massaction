@@ -1,5 +1,8 @@
 # Current development baseline, architecture and roadmap
 
+> **PR #38 F38-12/P2 focused corrective checkpoint (2026-11-22):** The independent F38-10/F38-11 review on `970c318b2aaad3eb0b06b43b4e804eb26360cf41` closed both original P2 findings but identified a newly reachable two-member Invoice failure: Core changes the raw `FACTURE_ADDON` alias during first `Facture::validate()` in the same PHP request while the previous per-member Confirmation fingerprint included that raw setting. F38-12 is a DEVELOPMENT-MERGE BLOCKER. The limited correction uses the *effective canonical model* in the read-only Invoice settings snapshot, not an actual Core global mutation; matching first/second member Preview fingerprints and rejecting genuine model changes are required regressions. **F38-10 and F38-11: INDEPENDENTLY CLOSED. F38-12: IMPLEMENTED / INDEPENDENT CLOSURE PENDING.** Owner Variant B, transaction/one-shot/UNKNOWN/STOP contracts and the separate Phase-5/release NO-GOs are unchanged.
+
+
 > **PR #38 F38-10/F38-11 correction checkpoint — 2026-11-22 (unreviewed):** The independent holistic review of exact `859ea280b3b726870cdb7727af72c04514c26e5f` issued `CHANGES REQUIRED BEFORE DEVELOPMENT MERGE` for F38-10/P2 (direct Invoice first-call actual row not bound to the confirmed snapshot) and F38-11/P2 (Core numbering defaults, historical aliases, and legacy search unsupported). Limited fixes and positive/negative synthetic regressions are implemented in the same draft PR; **independent delta closure and exact new-HEAD 9/21/Hosted CI are not asserted here**. Core parity + Massaction safety (Owner Variant B), F36-02 accepted Core residual, and separate real A–D/release gates remain unchanged.
 
 
