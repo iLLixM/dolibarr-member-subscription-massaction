@@ -79,7 +79,7 @@ file_put_contents($attachment['_path'], "%PDF-1.4\nchanged\n");
 fails(static function () use ($pdf, $identity, $verified, $user) { $pdf->attachment($identity, $verified, $user); }, 'MSMPdfChanged');
 pdfCleanup($root);
 
-foreach (array('negative' => 'failed', 'exception' => 'unknown', 'missing' => 'failed', 'invalid' => 'failed', 'symlink' => 'failed', 'metadata' => 'failed') as $mode => $status) {
+foreach (array('negative' => 'unknown', 'exception' => 'unknown', 'missing' => 'unknown', 'invalid' => 'unknown', 'symlink' => 'unknown', 'metadata' => 'unknown') as $mode => $status) {
 	list($root, $pdf, $identity) = pdfFixture(); $pdf->mode = $mode;
 	$result = $pdf->generate($identity, $user);
 	verify($result['status'] === $status, 'PDF outcome '.$mode);
@@ -91,7 +91,9 @@ verify($pdf->generate($identity, $user)['message'] === 'MSMPdfStale', 'preexisti
 list($root, $pdf, $identity) = pdfFixture(); $pdf->object->entity = 2;
 verify($pdf->generate($identity, $user)['message'] === 'NotEnoughPermissions', 'wrong invoice entity rejected'); pdfCleanup($root);
 list($root, $pdf, $identity) = pdfFixture(); $identity['pdf_model'] = '../unsafe';
-verify($pdf->generate($identity, $user)['message'] === 'MSMPdfGenerationFailed', 'unsafe model rejected'); pdfCleanup($root);
+verify($pdf->generate($identity, $user)['status'] === 'failed'
+	&& $pdf->generate($identity, $user)['message'] === 'MSMPdfGenerationFailed',
+	'unsafe model denied before starting generator with deterministic failure'); pdfCleanup($root);
 foreach (array(false, true) as $outside) {
 	pdfSymlinkDirectoryCase($outside, false);
 	pdfSymlinkDirectoryCase($outside, true);

@@ -127,21 +127,31 @@ class Cf05FinancePdfSpy
 			'sha256'=>str_repeat('a',64));
 	}
 }
-class Cf05FinanceMailSpy
+/** Test-only qualified subtype exercises production sendWithEvidence() including
+ * the real one-shot capability and profile decision. No SMTP/Core hook or PDF
+ * leaves the process: only sendInternal() is replaced with a synthetic return.
+ */
+class Cf05FinanceMailSpy extends MsmSubscriptionMail
 {
 	public $calls=0; public $status='transport'; public $throws=false;
-	public function sendWithEvidence($member,$row,$user,$selected,$invoice=null) {
-		$this->calls++;
-		if ($this->throws) { throw new RuntimeException('Synthetic uncertain SMTP after attempted effect'); }
-		$status=$selected?$this->status:'not_selected';
-		return array('mail'=>$status,
-			'attachment'=>$invoice===null?'not_required':
-				($status==='transport'?'verified_for_transport':
-					($status==='hook'?'verified_before_hook':($status==='unknown'?'unknown':'not_sent'))));
+	protected function evidenceProfile() {
+		global $conf;
+		return new Cf05QualifiedFinanceProfile($this->db,new SyntheticDatabaseState($this->db),(int)$conf->entity);
 	}
-	public function send($member,$row,$user,$selected,$invoice=null) {
+	protected function permitted($user) { return true; }
+	protected function invoicePermitted($user) { return true; }
+	protected function sendInternal($member,array $row,$user,$selected,$invoice,&$afterEffect) {
 		$this->calls++;
+		$afterEffect=true;
+		if ($this->throws) { throw new RuntimeException('Synthetic uncertain SMTP after attempted effect'); }
 		return $selected?$this->status:'not_selected';
+	}
+}
+class Cf05ProductionEvidenceMailSpy extends Cf05FinanceMailSpy
+{
+	protected function evidenceProfile() {
+		global $conf;
+		return new MsmTransactionProfile($this->db,new SyntheticDatabaseState($this->db),(int)$conf->entity);
 	}
 }
 $cf05Tmp=sys_get_temp_dir().'/cf05-finance-'.bin2hex(random_bytes(12));
@@ -227,7 +237,17 @@ try {
 		verify($denied['message']==='MSMProfileFeatureUnavailable' && $denied['stop']
 			&& !$db->events && !$db->calls && $db->transaction_opened===0 && $db->saved===null,
 			'F36-01 production Booking denies fully confirmed CoreGuarded finance without any write '.$case['name']);
-		$pdf=new Cf05FinancePdfSpy(); $mail=new Cf05FinanceMailSpy();
+		$pdf=new Cf05FinancePdfSpy(); $mail=new Cf05FinanceMailSpy($db);
+		$realAdmissionMail=new Cf05ProductionEvidenceMailSpy($db);
+		$forged = $realAdmissionMail->sendWithEvidence($flow->object,$row,$user,true,
+			array('id'=>42,'member_id'=>1,'entity'=>1,'pdf'=>array('status'=>'verified')),
+			$checkpoint,1);
+		verify($forged['mail']==='denied' && $realAdmissionMail->calls===0,
+			'F38-03 direct evidence service production CoreGuarded profile denies before hook or transport '.$case['name']);
+		$missingCapability=$mail->sendWithEvidence($flow->object,$row,$user,true,
+			array('id'=>42,'member_id'=>1,'entity'=>1,'pdf'=>array('status'=>'verified')));
+		verify($missingCapability['mail']==='denied' && $mail->calls===0,
+			'F38-03 qualified positive adapter cannot self-authorize without original checkpoint '.$case['name']);
 		if (isset($case['pdf_status'])) { $pdf->status=$case['pdf_status']; }
 		if (isset($case['mail_status'])) { $mail->status=$case['mail_status']; }
 		if (!empty($case['pdf_throw'])) { $pdf->throws=true; }
@@ -276,6 +296,13 @@ try {
 		verify(($_SESSION['msm_previews'][$key]['phase'] ?? null)==='done'
 			&& ($_SESSION['msm_previews'][$key]['results'][1]['status'] ?? null)===$case['expected'],
 			'CF05 durable terminal result no replay '.$case['name']);
+		$replayEvidence=$mail->sendWithEvidence($flow->object,$row,$user,true,
+			array('id'=>42,'member_id'=>1,'entity'=>1,'pdf'=>array('status'=>'verified')),
+			$checkpoint,1);
+		verify($replayEvidence['mail']==='denied'
+			&& $mail->calls===($case['expected']==='success' && !isset($case['pdf_status'])
+				&& empty($case['pdf_throw']) ? 1 : 0),
+			'F38-03 post-completion direct-service evidence replay always denied '.$case['name']);
 		if ($expectStop) {
 			verify(($_SESSION['msm_previews'][$key]['results'][2]['status'] ?? null)==='not_processed'
 				&& !empty($_SESSION['msm_previews'][$key]['batch_stop']),

@@ -87,25 +87,33 @@ checkMail($invoiceMail->pdfAdapter->calls === 4 && $invoiceMail->hookAdapter->ca
 // Phase 4: the real adapter reports verified attachment evidence separately
 // from transport/hook outcome; it never equates either with delivered mail.
 $invoiceMail->hookAdapter->code = 0;
-$detail = $invoiceMail->sendWithEvidence($member, $row, new stdClass(), true, $invoice);
-checkMail($detail['mail'] === 'transport' && $detail['attachment'] === 'verified_for_transport',
-	'Phase4 verified attachment is not a delivery receipt');
+$detail = $invoiceMail->send($member, $row, new stdClass(), true, $invoice);
+checkMail($detail === 'transport',
+	'F38-03 legacy invoice send retains its return code under existing B/C use');
 $invoiceMail->hookAdapter->code = 1;
-$detail = $invoiceMail->sendWithEvidence($member, $row, new stdClass(), true, $invoice);
-checkMail($detail['mail'] === 'hook' && $detail['attachment'] === 'verified_before_hook',
-	'Phase4 hook takeover has no verified attachment transport');
+$detail = $invoiceMail->send($member, $row, new stdClass(), true, $invoice);
+checkMail($detail === 'hook',
+	'F38-03 legacy hook handling unchanged while guarded evidence requires capability');
 $invoiceMail->hookAdapter->code = 0;
 $invoiceMail->pdfAdapter->fail = true;
-$detail = $invoiceMail->sendWithEvidence($member, $row, new stdClass(), true, $invoice);
-checkMail($detail['mail'] === 'attachment_missing' && $detail['attachment'] === 'missing',
-	'Phase4 changed attachment blocks mail and hook');
+$detail = $invoiceMail->send($member, $row, new stdClass(), true, $invoice);
+checkMail($detail === 'attachment_missing',
+	'F38-03 legacy verified PDF mismatch blocks hook as before');
 $invoiceMail->pdfAdapter->fail = false;
 $invoiceMail->hookAdapter->fail = true;
-$detail = $invoiceMail->sendWithEvidence($member, $row, new stdClass(), true, $invoice);
-checkMail($detail['mail'] === 'unknown' && $detail['attachment'] === 'unknown',
-	'Phase4 hook exception retains uncertain effect without delivery claim');
+$detail = $invoiceMail->send($member, $row, new stdClass(), true, $invoice);
+checkMail($detail === 'unknown',
+	'F38-02 legacy hook exception continues to return unknown');
 $invoiceMail->hookAdapter->fail = false;
+// F38-03: direct service without original file-session capability fails closed.
+$previousCalls = $invoiceMail->hookAdapter->calls;
+$detail = $invoiceMail->sendWithEvidence($member, $row, new stdClass(), true, $invoice);
+checkMail($detail['mail'] === 'denied' && $detail['attachment'] === 'not_sent'
+	&& $invoiceMail->hookAdapter->calls === $previousCalls,
+	'F38-03 no direct invoice evidence send without original checkpoint');
 $detail = $mail->sendWithEvidence($member, $row, new stdClass(), true);
-checkMail($detail['mail'] === 'transport' && $detail['attachment'] === 'not_required',
-	'Phase4 contribution-only mail never fabricates an invoice attachment');
+checkMail($detail['mail'] === 'denied' && $detail['attachment'] === 'not_required',
+	'F38-03 direct contribution-only evidence cannot bypass original capability');
+checkMail($mail->send($member, $row, new stdClass(), true) === 'transport',
+	'F38-03 legacy B/C send() unchanged while direct evidence is denied');
 echo $passed." mail adapter assertions passed (template/type/transport doubles; no SMTP).\n";
