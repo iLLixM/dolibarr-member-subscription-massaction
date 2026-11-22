@@ -2,6 +2,7 @@
 /* Copyright (C) 2026 iLLixM
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
+ob_start(); // F38-10 direct file-session fixture must run before output is flushed.
 require __DIR__.'/booking.php';
 require __DIR__.'/../../class/invoice.class.php';
 $beforeInvoice = $passed;
@@ -582,3 +583,4 @@ verify($state->rollbackContext()['owned']&&!$db->calls,'I107 Invoice policy reje
 $conf->global=$invoiceAgendaGlobals;$conf->modules=$invoiceAgendaModules;
 
 echo ($passed - $beforeInvoice)." invoice transaction assertions passed (synthetic Core API doubles; no database).\n";
+ob_end_flush();
