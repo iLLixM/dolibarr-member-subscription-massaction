@@ -157,7 +157,7 @@ foreach ($validInvoice as $status => $expectedAttachment) {
 foreach (array('transport','hook','failed','denied','unknown','missing','disabled','attachment_missing') as $status) {
 	foreach ($allAttachment as $candidate) {
 		checkMail(msmValidMailAttachmentEvidence(array('mail'=>$status,'attachment'=>$candidate),false)
-			=== ($candidate === 'not_required'),
+			=== ($candidate === 'not_required' && $status !== 'attachment_missing'),
 			'F38-05 contribution evidence pair '.$status.'/'.$candidate);
 	}
 }
