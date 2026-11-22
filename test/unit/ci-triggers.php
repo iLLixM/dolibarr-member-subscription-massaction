@@ -8,6 +8,19 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 $root = dirname(__DIR__, 2);
 $required = array(
 	'class/booking.class.php',
+	'subscription.php',
+	'class/coreguardedrightsdb.class.php',
+	'class/corecompatibility.class.php',
+	'class/invoiceprofile.class.php',
+	'lib/preview.lib.php',
+	'lib/batch.lib.php',
+	'test/unit/preview.php',
+	'test/unit/request.php',
+	'test/unit/controller-runtime.php',
+	'test/unit/f29-rights.php',
+	'test/unit/f29-book-flow.php',
+	'test/unit/userreload.php',
+	'test/unit/database.php',
 	'class/invoice.class.php',
 	'class/coreguardedtransaction.class.php',
 	'class/transactionprofile.class.php',
@@ -51,13 +64,19 @@ foreach (array('ci-full.yml', 'cf03-php83-hosted.yml') as $name) {
 	foreach ($required as $path) {
 		if (!isset($paths[$path])) { throw new RuntimeException('F38-04 uncovered '.$path.' in '.$name); }
 	}
-	if (strpos($source, 'workflow_dispatch:') === false
-		|| strpos($source, 'php test/unit/ci-triggers.php') === false) {
-		throw new RuntimeException('F38-04 missing manual trigger or static gate in '.$name);
+	if (!preg_match('/(?m)^  workflow_dispatch:\s*$/', $source)
+		|| !preg_match('/(?m)^        run:\s*\\|\s*\n(?:          [^\n]*\n)*?          php test\\/unit\\/ci-triggers\\.php(?:\\s|$)/', $source)) {
+		throw new RuntimeException('F38-04 missing executable manual/static gate in '.$name);
 	}
 }
 $standard = file_get_contents($root.'/.github/workflows/ci.yml');
-if (!is_string($standard) || strpos($standard, 'php test/unit/ci-triggers.php') === false) {
+if (!is_string($standard)
+	|| !preg_match('/(?m)^        run:\s*\\|\s*\n(?:          [^\n]*\n)*?          php test\\/unit\\/ci-triggers\\.php(?:\\s|$)/', $standard)) {
 	throw new RuntimeException('F38-04 reduced standard PR CI omits static trigger test');
 }
-echo 'F38-04 full+hosted security path coverage PASS ('.count($required).' exact paths, 3 CI workflows).'.PHP_EOL;
+// Comment-only occurrences must never pass as executable test gates.
+$probe = preg_replace('/(?m)^(          php test\\/unit\\/ci-triggers\\.php)\\s*$/', '          # php test/unit/ci-triggers.php', $standard);
+if ($probe === $standard || preg_match('/(?m)^        run:\s*\\|\s*\n(?:          [^\n]*\n)*?          php test\\/unit\\/ci-triggers\\.php(?:\\s|$)/', $probe)) {
+	throw new RuntimeException('F38-04 comment-only static gate bypass');
+}
+echo 'F38-04 full+hosted security path coverage PASS ('.count($required).' exact paths, 3 CI workflows; executable steps).'.PHP_EOL;
