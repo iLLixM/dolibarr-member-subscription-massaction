@@ -8,6 +8,11 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 $root = dirname(__DIR__, 2);
 $required = array(
 	'class/booking.class.php',
+	'docs/cf05-06-standard-core-source-qualification.md',
+	'docs/cf05-06-standard-core-qualification-plan.md',
+	'docs/adr/ADR-0001-core-first-transaction-profiles.md',
+	'docs/adr/ADR-0001-risk-register.md',
+	'docs/current-development-baseline.md',
 	'class/actions_membersubscriptionmassaction.class.php',
 	'lib/membersubscriptionmassaction.lib.php',
 	'admin/setup.php',
