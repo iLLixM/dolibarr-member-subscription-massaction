@@ -1,5 +1,15 @@
 # PR #38 – Core parity and Massaction regression acceptance (Owner 2026-11-22)
 
+## F38-10 and F38-11 targeted follow-up regressions (2026-11-22)
+
+| Finding | New executable evidence | Boundary |
+| --- | --- | --- |
+| **F38-10/P2** | `coreguarded-session.php` independently consumed capability for each changed FIRST Finance continuation (amount, start/end, description, invoice plan, injected `_profile`, additional field), unchanged original fingerprint, plus positive exact profile; `invoice.php` public direct service rejects original-capability amount/invoice tampering before Invoice Core API; `cf05-finance.php` changes row after confirmed subscription and rejects before invoice Core | Synthetic original File-Session and Core/DB doubles; no real DML/HTTP |
+| **F38-11/P2** | `invoiceprofile.php` calls production `resolve()/models()` with Core V22/V23/V24 effective numbering defaults and aliases, direct custom numbering/PDF, read-only `dol_document_root` legacy fallback, invalid/missing models | Pinned checkout and synthetic file fixtures; no actual invoice numbering generation |
+
+**Gate status:** Focused code and tests implemented in PR #38; external exact-HEAD follow-up closure PENDING. Recheck exact final source Standard 9/9, Full 21/21, Hosted 1/1. Preserve Owner Variant B, earlier Finding dispositions and separate real A–D/Release NO-GO.
+
+
 **Development-only evidence plan.** Read with [binding Owner decision](owner-core-parity-2026-11-22.md), [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22) and ADR-06/11/12. **No real A–D or release claim.**
 
 | Scenario / security property | Executable regression | Evidence type |
