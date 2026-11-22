@@ -263,18 +263,13 @@ try {
 		$state['phase']='processing'; $state['revision']=6;
 		$_SESSION['msm_previews'][$key]=$state;
 		verify(session_write_close(),'CF05 persist consumption '.$case['name']);
-		// F36-01: a real (non-test-qualified) CoreGuarded profile rejects this
-		// otherwise valid processing/confirmed session and fully privileged user.
-		// No member, Third Party, invoice, rollback or DB transaction may start.
+		// Owner 2026-11-22 explicitly reactivates finance in the actual
+		// production profile, without bypassing the original file-session.
 		$productionProfile=new MsmTransactionProfile($db,new SyntheticDatabaseState($db),1);
-		$closedBinding=$productionProfile->binding($productionProfile->current(),$user,0);
-		$closedExpected=$row; $closedExpected['_profile']=$closedBinding;
-		$closedFlow=new Cf05ProductionGateBooking($db);
-		$closedFlow->object=$flow->object; $closedFlow->reader=$flow->reader;
-		$denied=$closedFlow->book(1,$closedExpected,$options,$user,false,$checkpoint);
-		verify($denied['message']==='MSMProfileFeatureUnavailable' && $denied['stop']
-			&& !$db->events && !$db->calls && $db->transaction_opened===0 && $db->saved===null,
-			'F36-01 production Booking denies fully confirmed CoreGuarded finance without any write '.$case['name']);
+		$liveCurrent=$productionProfile->current();
+		verify($liveCurrent['features']['invoice'] && $liveCurrent['features']['autocreate']
+			&& $liveCurrent['features']['sendmail'],
+			'Owner production CoreGuarded profile now enables full finance '.$case['name']);
 		$pdf=new Cf05FinancePdfSpy(); $mail=new Cf05FinanceMailSpy($db);
 		if (!empty($case['pdf_invalid_written'])) {
 			$pdfRoot=$cf05Tmp.'/pdf-'.$case['name'];
@@ -286,7 +281,7 @@ try {
 			array('id'=>42,'member_id'=>1,'entity'=>1,'pdf'=>array('status'=>'verified')),
 			$checkpoint,1);
 		verify($forged['mail']==='denied' && $realAdmissionMail->calls===0,
-			'F38-03 direct evidence service production CoreGuarded profile denies before hook or transport '.$case['name']);
+			'F38-03 production CoreGuarded direct evidence denies without original post-COMMIT mail gate '.$case['name']);
 		$missingCapability=$mail->sendWithEvidence($flow->object,$row,$user,true,
 			array('id'=>42,'member_id'=>1,'entity'=>1,'pdf'=>array('status'=>'verified')));
 		verify($missingCapability['mail']==='denied' && $mail->calls===0,

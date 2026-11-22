@@ -392,11 +392,11 @@ $admission->invoke($admitted);
 verify(true, 'F34-01 matching Enhanced profile and guard remain admitted');
 $profileDb->profileName = 'CoreGuarded';
 fails(static function()use($admission,$admitted){$admission->invoke($admitted);},
-	'MSMProfileFeatureUnavailable');
-fails(static function()use($admission,$profileService){$admission->invoke($profileService);},
-	'MSMProfileFeatureUnavailable');
+	'MSMTransactionUnknown');
+$admission->invoke($profileService);
+verify(true,'Owner finance profile admits matching CoreGuarded guard without new P_S observer');
 verify(!$profileDb->calls && !$profileDb->events && $profileDb->transaction_opened===0,
-	'F36-01 direct Invoice admission rejects even correct CoreGuarded guard before any DML');
+	'Owner direct Invoice admission reuses matching CoreGuarded guard with zero DML');
 $guardProbe = new class($profileDb) extends MsmCoreGuardedTransaction {
 	public function active() { return array('state'=>MsmDatabaseState::ACTIVE,'fresh'=>true,'owned'=>true); }
 	public function requireSupportedIsolation(array $state) {}
@@ -406,9 +406,9 @@ $expectedPlan = array('invoice'=>array('customer_id'=>4,'entity'=>1,'create_cust
 fails(static function()use($noCapability,$expectedPlan){
 	$diagnostic=array('stage'=>'preflight'); $member=(object)array('id'=>1,'entity'=>1,'socid'=>4);
 	$noCapability->create($member,9,$expectedPlan,new PreviewUser(),$diagnostic);
-}, 'MSMProfileFeatureUnavailable');
+}, 'MSMTransactionUnknown');
 verify(!$profileDb->calls && !$profileDb->events && $profileDb->transaction_opened===0,
-	'F36-01 finance gate precedes owned-context and file-capability checks under CoreGuarded');
+	'Owner finance admission still requires active owned guard and consumed file capability before DML');
 
 // F34-02: after customer fetch, loss of the injected active guard must
 // prevent even the NEXT member-link readback. The synthetic Core double

@@ -77,16 +77,14 @@ foreach(array('', '{}', 'bad',profileRaw('mysql','invalid'),profileRaw('mariadb'
 list($pd,$ps)=profileStore('mysql',profileRaw('mysql','CoreGuarded'));$pd->psDenied=true;
 $c=$ps->current();$b=$ps->binding($c,$user,0);
 verify($ps->admit($b,$user,array('invoice'=>false))['features']['booking'], 'CF02 CoreGuarded contributes without P_S');
-verify($c['features']['booking'] && !$c['features']['invoice']
-	&& !$c['features']['autocreate'] && !$c['features']['sendmail'],
-	'F36-01 valid configured CoreGuarded retains contribution but all finance gates are default OFF');
+verify($c['features']['booking'] && $c['features']['invoice']
+	&& $c['features']['autocreate'] && $c['features']['sendmail'],
+	'Owner 2026-11-22 real CoreGuarded finance, conditional third party, PDF and mail options enabled');
 foreach (array('invoice','autocreate','sendmail') as $feature) {
-	fails(static function()use($ps,$b,$user,$feature){
-		$ps->admit($b,$user,array($feature=>true));
-	}, 'MSMProfileFeatureUnavailable');
+	verify(!empty($ps->admit($b,$user,array($feature=>true))['features'][$feature]),
+		'Owner full CoreGuarded feature admitted through actual production profile '.$feature);
 }
-$forged = $b; $forged['features'] = array('booking'=>true,'invoice'=>true,
-	'autocreate'=>true,'sendmail'=>true);
+$forged = $b; $forged['features']['sendmail'] = false;
 fails(static function()use($ps,$forged,$user){
 	$ps->admit($forged,$user,array('invoice'=>true,'autocreate'=>true,'sendmail'=>true));
 }, 'MSMProfileChanged');
@@ -95,19 +93,18 @@ $maliciousPreview['options']['invoice']=true;
 $maliciousPreview['options']['autocreate']=true;
 $maliciousPreview['options']['sendmail']=true;
 $reconciled=msmSyncPreviewProfile($maliciousPreview,$ps,$user);
-verify(!$reconciled['options']['invoice']&&!$reconciled['options']['autocreate']
-	&&!$reconciled['options']['sendmail'] && $reconciled['profile']['features']===$c['features'],
-	'F36-01 server-side Preview strips all CoreGuarded finance options even from stale/manipulated session');
+verify($reconciled['options']['invoice'] && $reconciled['options']['autocreate']
+	&& $reconciled['options']['sendmail'] && $reconciled['profile']['features']===$c['features'],
+	'Owner finance options remain confirmed in supported CoreGuarded preview');
 foreach (array('invoice','autocreate','sendmail') as $feature) {
 	$preview=profileState(); $preview['profile']=$b;
 	$post=array('action'=>'confirm','revision'=>'0','common'=>'','description'=>'Synthetic',
-		'start'=>array(1=>'2026-10-10'),'end'=>array(1=>'2027-10-09'),
-		$feature=>'1');
-	fails(static function()use($preview,$post){msmUpdatePreview($preview,$post);},
-		'MSMProfileFeatureUnavailable');
+		'start'=>array(1=>'2026-10-10'),'end'=>array(1=>'2027-10-09'),$feature=>'1');
+	$updated=msmUpdatePreview($preview,$post);
+	verify(!empty($updated['options'][$feature]), 'Owner CoreGuarded preview admits '.$feature);
 }
 verify(!$pd->writes&&!$pd->events && $pd->transaction_opened===0,
-	'F36-01 feature/Preview/manipulated binding denial performs no SQL DML or BEGIN');
+	'Owner finance preview/admission requires no SQL DML or BEGIN');
 verify(!array_filter($pd->queries,static function($q){return stripos($q,'performance_schema')!==false;}),'CF01 CoreGuarded blocked without P_S fallback');
 // An ordinary authorized admin may select CoreGuarded, but cannot use the
 // profile settings route to grant unqualified financial options.
@@ -117,9 +114,9 @@ $gateProfile->configure(array('token'=>'synthetic-csrf','action'=>'save','profil
 	'revision'=>$gateBefore['revision']),array('token'=>'synthetic-csrf'),$admin,'POST');
 $gateAfter=$gateProfile->current();
 verify($gateDb->writes===1 && $gateAfter['profile']==='CoreGuarded'
-	&& $gateAfter['features']['booking'] && !$gateAfter['features']['invoice']
-	&& !$gateAfter['features']['autocreate'] && !$gateAfter['features']['sendmail'],
-	'F36-01 normal admin profile configuration cannot lift the closed finance qualification gate');
+	&& $gateAfter['features']['booking'] && $gateAfter['features']['invoice']
+	&& $gateAfter['features']['autocreate'] && $gateAfter['features']['sendmail'],
+	'Owner policy now admits full finance through valid CoreGuarded config without admin bypass');
 // Admin authorization/CSRF/field/family checks execute before config mutation.
 list($pd,$ps)=profileStore();$revision=$ps->current()['revision'];$session=array('token'=>'synthetic-csrf');
 $post=array('token'=>'synthetic-csrf','action'=>'save','profile'=>'EnhancedMySQL','revision'=>$revision);
@@ -204,16 +201,16 @@ $blockedPlan['_profile']=$blockedProfile->binding($blockedProfile->current(),$us
 $blockedOptions=array('invoice'=>true,'autocreate'=>false,'sendmail'=>false,
 	'description'=>'Synthetic');
 $blockedResult=$blockedFlow->book(1,$blockedPlan,$blockedOptions,$user,false);
-verify($blockedResult['message']==='MSMProfileFeatureUnavailable'
+verify($blockedResult['message']==='MSMCoreGuardedSessionUnsupported'
 	&& $blockedResult['stop'] && !$blockedDb->events
 	&& $blockedDb->transaction_opened===0 && $blockedDb->saved===null,
-	'F36-01 production Booking rejects otherwise valid CoreGuarded invoice before BEGIN');
+	'Owner enabled production profile still refuses CoreGuarded booking without original file-session one-shot');
 foreach (array('autocreate','sendmail') as $feature) {
 	$forgedOptions=$blockedOptions; $forgedOptions[$feature]=true;
 	$blockedResult=$blockedFlow->book(1,$blockedPlan,$forgedOptions,$user,false);
-	verify($blockedResult['message']==='MSMProfileFeatureUnavailable'
+	verify($blockedResult['message']==='MSMCoreGuardedSessionUnsupported'
 		&& $blockedResult['stop'] && !$blockedDb->events,
-		'F36-01 production Booking rejects '.$feature.' even with invoice and full rights');
+		'Owner enabled '+$feature+' never bypasses original CoreGuarded session checkpoint');
 }
 // The fresh per-member SELECT is the admission snapshot. Admin may change later;
 // this admitted member finishes, but the next member cannot inherit the old profile.
