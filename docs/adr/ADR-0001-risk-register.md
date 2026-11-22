@@ -1,5 +1,7 @@
 # ADR-0001 — Transaction profile risk register
 
+> **Post-PR #38 corrective review checkpoint (2026-11-22):** The independent initial PR #38 review on `2ef26893ec9aca5dd78d9946a64e7f3ee8c41de8` found **F38-01..04/P2 + F38-05/P3** and issued `CHANGES REQUIRED BEFORE DEVELOPMENT MERGE`. Focused fail-closed PDF/Hooks/Direct-Evidence/CI-trigger/status-matrix changes are being implemented under the still-closed CoreGuarded finance gate; **independent finding closure PENDING**. See [Phase-4 corrective record](../cf05-phase4-postcommit-offline-evidence.md). **F36-02/P2 remains OPEN / CF05-06**; no real-test/production/release authorization or ADR revision is implied.
+
 ## PR #36 merged – current CF05 financial risk disposition (2026-11-21)
 
 [PR #36](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/36) was **SQUASH-MERGED** on 2026-11-21 as `d0b15785c60b74aa7ad59a1c687db94193d159c6`; independently reviewed source `33cb3da3b389f9df2870bc8c6223c86a959cb467` and merge have **identical Git tree `6cc4834b9fe5100aca99126885791b3aeff12fef`**. External verdict **`APPROVED FOR DEVELOPMENT MERGE`**, **F36-01/P1 CLOSED** and **F36-02/P2 OPEN / CF05-06 REQUIRED**, no new P0–P3 delta findings. [standard CI 9/9 PASS](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44956004981) and [hosted PHP8.3/V22.0.5 CI 1/1 PASS](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44956004947) refer to the **exact reviewed head**; their positives are **synthetic**, not new real full-finance test evidence.
