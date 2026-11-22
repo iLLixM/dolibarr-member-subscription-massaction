@@ -582,5 +582,180 @@ fails(static function()use($guard,$service){$guard->invoke($service->adapter);},
 verify($state->rollbackContext()['owned']&&!$db->calls,'I107 Invoice policy rejection preserves own rollback eligibility');$db->rollback();verify($state->completed('ROLLBACK',true)['state']==='IDLE','I107 Invoice policy own rollback confirmed');
 $conf->global=$invoiceAgendaGlobals;$conf->modules=$invoiceAgendaModules;
 
+// F38-12: real production Preview->fingerprint->Booking->Invoice flow for
+// TWO independently confirmed members in a single synthetic batch, with
+// Facture::validate() fixture reproducing Core's in-process alias rewrite.
+// This uses the actual Preview and Booking validation, not a fake comparator.
+class F3812InvoiceProfile extends MsmInvoiceProfile
+{
+	protected function paymentTerm() { return 1; }
+	protected function paymentTermLabel($id) { return 'Synthetic term'; }
+	protected function vat($product) { return 0; }
+}
+class F3812Preview extends PreviewFixtureService
+{
+	public function __construct($db,$member)
+	{
+		parent::__construct($db,$member);
+		$this->type=(object)array('duration'=>'1y','label'=>'Synthetic type',
+			'amount'=>'24.5','status'=>1,'subscription'=>1);
+	}
+	protected function invoiceProfile() { return new F3812InvoiceProfile($this->db); }
+}
+class F3812Database extends InvoiceDatabaseDouble
+{
+	public function query($sql)
+	{
+		if (strpos($sql,'SELECT rowid FROM test_subscription WHERE fk_adherent = ')===0
+			|| strpos($sql,'SELECT rowid, dateadh, datef FROM test_subscription WHERE fk_adherent = ')===0) {
+			$this->queries[]=$sql;
+			return (object)array('rows'=>array()); // no overlapping synthetic contributions
+		}
+		return parent::query($sql);
+	}
+}
+class F3812Member extends BookingMemberDouble
+{
+	public function fetch_thirdparty()
+	{
+		$this->thirdparty=(object)array('id'=>4,'entity'=>1,'client'=>1,
+			'name'=>'Synthetic customer','multicurrency_code'=>'EUR');
+		return 1;
+	}
+}
+class F3812NormalizingInvoice extends InvoiceObjectDouble
+{
+	public static $canonical='mod_facture_mercure';
+	public function validate($user)
+	{
+		$answer=parent::validate($user);
+		if ($answer>0) {
+			global $conf;
+			$conf->global->FACTURE_ADDON=self::$canonical;
+		}
+		return $answer;
+	}
+}
+class F3812InvoiceService extends InvoiceServiceDouble
+{
+	protected function invoice() { return new F3812NormalizingInvoice($this->db); }
+}
+class F3812Booking extends BookingServiceDouble
+{
+	public $adapter;
+	protected function preview($member) { return new F3812Preview($this->profileDb,$member); }
+	protected function invoicing() { return $this->adapter; }
+}
+$f3812OriginalGlobal=$conf->global;
+$f3812OriginalModules=$conf->modules;
+$f3812OriginalCurrency=$conf->currency;
+$f3812OriginalMysoc=$mysoc;
+try {
+	$conf->modules=array('member'=>1,'invoice'=>1,'societe'=>1);
+	$conf->currency='EUR';
+	$mysoc=(object)array('country_id'=>1);
+	foreach (array(null,'','terre','mercure') as $rawModel) {
+		$conf->global=new stdClass();
+		$conf->global->ADHERENT_VAT_FOR_SUBSCRIPTIONS='0';
+		if ($rawModel!==null) { $conf->global->FACTURE_ADDON=$rawModel; }
+		$canonical=$rawModel==='mercure'?'mod_facture_mercure'
+			:(version_compare(DOL_VERSION,'23.0.0','>=')?'mod_facture_mars':'mod_facture_terre');
+		F3812NormalizingInvoice::$canonical=$canonical;
+		$db=new F3812Database();
+		$db->family='mysql';
+		$db->customerId=4;
+		$booking=new F3812Booking($db);
+		$actor=new PreviewUser();
+		$booking->object=new F3812Member($db);
+		$booking->object->entity=1; $booking->object->typeid=1;
+		$booking->object->socid=4; $booking->object->email='synthetic@example.invalid';
+		$booking->object->morphy='phy'; $booking->object->firstname='Synthetic';
+		$booking->object->lastname='Member';
+		$booking->object->status=Adherent::STATUS_VALIDATED;
+		$booking->adapter=new F3812InvoiceService($db,$booking->observer(),$booking->observer());
+		$options=array('invoice'=>true,'autocreate'=>false,
+			'sendmail'=>false,'description'=>'Synthetic fee');
+		$requestedStart=stamp('2030-01-01');
+		$expectedRows=array();
+		foreach (array(1,2) as $id) {
+			$member=clone $booking->object;
+			$member->id=$id;
+			$row=(new F3812Preview($db,$member))->previewSubscriptionWithOptions(
+				$actor,$requestedStart,true,false,null,false,$options['description']);
+			verify(!$row['errors'] && !empty($row['fingerprint'])
+				&& $row['invoice']['number_model']===$canonical,
+				'F38-12 original confirmed invoice preview member '.$id.' '.var_export($rawModel,true));
+			$expectedRows[$id]=$row;
+		}
+		$preCoreRaw=getDolGlobalString('FACTURE_ADDON');
+		verify($preCoreRaw===($rawModel??''), 'F38-12 original Core setting not mutated by previews');
+		$batch=array('profile'=>array('profile'=>'EnhancedMySQL'),
+			'ids'=>array(1,2),'rows'=>$expectedRows,'options'=>$options,
+			'revision'=>5,'phase'=>'processing','results'=>array(),'overlap'=>array());
+		$pdf=new class {
+			public $calls=0;
+			public function generate($identity,$user) {
+				$this->calls++;
+				return array('status'=>'verified','message'=>'Synthetic PDF');
+			}
+		};
+		$save=static function(array $value) { return true; };
+		$mail=new MsmSubscriptionMail($db);
+		$done=msmProcessBooking($batch,$booking,$mail,$actor,$save,$pdf);
+		verify(($done['results'][1]['status']??null)==='success'
+			&& ($done['results'][2]['status']??null)==='success'
+			&& $pdf->calls===2
+			&& count(array_keys($db->events,'subscription',true))===2
+			&& count(array_keys($db->calls,'invoice-validate',true))===2,
+			'F38-12 two confirmed members survive Core normalized model in real Booking/Invoice adapter flow '
+			.var_export($rawModel,true));
+		verify(getDolGlobalString('FACTURE_ADDON')===$canonical,
+			'F38-12 Core validate adapter reproduced in-process normalization');
+		$after=new F3812Preview($db,(function()use($booking) {
+			$member=clone $booking->object; $member->id=2; return $member;
+		})());
+		$fresh=$after->previewSubscriptionWithOptions($actor,$requestedStart,true,false,
+			$expectedRows[2]['end'],false,$options['description']);
+		verify($fresh['fingerprint']===$expectedRows[2]['fingerprint'],
+			'F38-12 second-member full production preview fingerprint stable after Core normalization');
+	}
+	// Genuine effective model modification, after original confirmation, must
+	// STILL fail before the second business write.
+	$conf->global=new stdClass();
+	$conf->global->ADHERENT_VAT_FOR_SUBSCRIPTIONS='0';
+	$conf->global->FACTURE_ADDON='terre';
+	$otherNumber=version_compare(DOL_VERSION,'23.0.0','>=')?'mod_facture_mars':'mod_facture_terre';
+	$db=new F3812Database(); $db->family='mysql'; $db->customerId=4;
+	$booking=new F3812Booking($db); $actor=new PreviewUser();
+	$booking->object=new F3812Member($db);
+	$booking->object->entity=1; $booking->object->typeid=1;
+	$booking->object->socid=4; $booking->object->email='synthetic@example.invalid';
+	$booking->object->morphy='phy'; $booking->object->firstname='Synthetic';
+	$booking->object->lastname='Member'; $booking->object->status=Adherent::STATUS_VALIDATED;
+	$booking->adapter=new F3812InvoiceService($db,$booking->observer(),$booking->observer());
+	$opts=array('invoice'=>true,'autocreate'=>false,'sendmail'=>false,'description'=>'Synthetic fee');
+	$start=stamp('2030-01-01');
+	$member=clone $booking->object; $member->id=2;
+	$original=(new F3812Preview($db,$member))->previewSubscriptionWithOptions($actor,$start,true,false,null,false,$opts['description']);
+	verify(!$original['errors'] && $original['invoice']['number_model']===$otherNumber,
+		'F38-12 negative original confirmation supported');
+	$conf->global->FACTURE_ADDON='mod_facture_mercure';
+	$changed=(new F3812Preview($db,$member))->previewSubscriptionWithOptions($actor,$start,true,false,
+		$original['end'],false,$opts['description']);
+	verify(!$changed['errors'] && $changed['fingerprint']!==$original['fingerprint'],
+		'F38-12 different effective numbering model changes full fingerprint');
+	$result=$booking->book(2,$original,$opts,$actor,false);
+	verify(($result['status']??null)==='skipped'
+		&& ($result['message']??null)==='MSMChangedConfirmation'
+		&& !in_array('subscription',$db->events,true)
+		&& !$db->calls,
+		'F38-12 changed effective model rejects second member before all business APIs');
+} finally {
+	$conf->global=$f3812OriginalGlobal;
+	$conf->modules=$f3812OriginalModules;
+	$conf->currency=$f3812OriginalCurrency;
+	$mysoc=$f3812OriginalMysoc;
+}
+
 echo ($passed - $beforeInvoice)." invoice transaction assertions passed (synthetic Core API doubles; no database).\n";
 ob_end_flush();
