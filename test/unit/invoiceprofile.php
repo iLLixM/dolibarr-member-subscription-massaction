@@ -75,6 +75,8 @@ try {
 	foreach (array(
 		array(null, $default),
 		array('', $default),
+		array('0', $default),
+		array(0, $default),
 		array('terre', $default),
 		array('mercure', 'mod_facture_mercure'),
 		array($default, $default)
@@ -87,7 +89,7 @@ try {
 	}
 	// F38-12: the snapshot must represent effective numbering identity, not
 	// Core's mutable raw FACTURE_ADDON alias. No production settings mutation.
-	foreach (array(null, '', 'terre', 'mercure') as $raw) {
+	foreach (array(null, '', '0', 0, 'terre', 'mercure') as $raw) {
 		if ($raw === null) { unset($conf->global->FACTURE_ADDON); }
 		else { $conf->global->FACTURE_ADDON = $raw; }
 		$beforeRaw = getDolGlobalString('FACTURE_ADDON');
@@ -105,6 +107,13 @@ try {
 		verify($changedPlan['number_model'] !== $canonicalPlan['number_model']
 			&& $changedPlan['settings']['FACTURE_ADDON'] !== $canonicalPlan['settings']['FACTURE_ADDON'],
 			'F38-12 actual effective numbering model change invalidates plan '.var_export($raw,true));
+	}
+	// F38-13: only the PHP-falsy zero string is a Core default. Numeric-
+	// looking non-falsy model names still fail safe; do not broaden paths.
+	foreach (array('00', '0.0', '../mod_facture_custom', 'missing_synthetic_number_model') as $badNumber) {
+		$conf->global->FACTURE_ADDON = $badNumber;
+		fails(static function()use($profile,$member,$user) { $profile->resolve($member,$user,false,false); },
+			'MSMInvoiceProfileUnsupported');
 	}
 	$conf->global->FACTURE_ADDON = 'mod_facture_custom';
 	$financePlan = $profile->resolve($member,$user,false,false);
