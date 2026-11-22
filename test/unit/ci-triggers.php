@@ -50,6 +50,7 @@ $required = array(
 	'test/unit/invoicepdf.php',
 	'test/unit/postcommit.php',
 	'test/unit/ci-triggers.php',
+	'test/unit/cf05-core-qualification.php',
 	'.github/workflows/ci.yml',
 	'.github/workflows/ci-full.yml',
 	'.github/workflows/cf03-php83-hosted.yml',

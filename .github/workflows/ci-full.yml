@@ -170,11 +170,13 @@ jobs:
       - name: Synthetic contracts against Dolibarr ${{ matrix.core }} APIs
         env:
           DOLIBARR_TEST_ROOT: ${{ github.workspace }}/.test-core
+          DOLIBARR_TEST_VERSION: ${{ matrix.core }}
         run: |
           php test/unit/booking.php
           php test/unit/f29-book-flow.php
           php test/unit/maildelivery.php
           php test/unit/invoiceprofile.php
+          php test/unit/cf05-core-qualification.php
           php test/unit/invoice.php
           php test/unit/cf05-finance.php
           php test/unit/invoicepdf.php

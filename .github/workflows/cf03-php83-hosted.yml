@@ -101,12 +101,14 @@ jobs:
       - name: PHP 8.3/V22.0.5 business synthetic spot checks
         env:
           DOLIBARR_TEST_ROOT: ${{ github.workspace }}/.test-core
+          DOLIBARR_TEST_VERSION: '22.0.5'
         run: |
           php test/unit/coreguarded.php
           php test/unit/f29-rights.php
           php test/unit/booking.php
           php test/unit/f29-book-flow.php
           php test/unit/invoiceprofile.php
+          php test/unit/cf05-core-qualification.php
           php test/unit/invoice.php
           php test/unit/cf05-finance.php
           php test/unit/ci-triggers.php
