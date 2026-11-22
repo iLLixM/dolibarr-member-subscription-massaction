@@ -616,7 +616,7 @@ class F3812Database extends InvoiceDatabaseDouble
 }
 class F3812Member extends BookingMemberDouble
 {
-	public function fetch_thirdparty()
+	public function fetch_thirdparty($force_thirdparty_id = 0)
 	{
 		$this->thirdparty=(object)array('id'=>4,'entity'=>1,'client'=>1,
 			'name'=>'Synthetic customer','multicurrency_code'=>'EUR');
