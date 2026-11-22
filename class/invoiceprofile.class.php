@@ -145,6 +145,11 @@ class MsmInvoiceProfile
 		$this->models($number, $pdf);
 		$settings = array();
 		foreach (array('ADHERENT_BANK_USE', 'ADHERENT_VAT_FOR_SUBSCRIPTIONS', 'ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS', 'FACTURE_ADDON', 'FACTURE_ADDON_PDF_0', 'FACTURE_ADDON_PDF', 'FACTURE_ADDON_PDF_STANDARD', 'FACTURE_RIB_NUMBER', 'SOCIETE_CODECLIENT_ADDON', 'THIRDPARTY_DEFAULT_CREATE_CONTACT', 'THIRDPARTY_CUSTOMERCODE_EQUALS_MEMBERREF', 'SOCIETE_USEPREFIX', 'SOCIETE_DISABLE_PROSPECTSCUSTOMERS', 'MAIN_USE_ADVANCED_PERMS', 'MAIN_ROUNDOFTOTAL_NOT_TOTALOFROUND', 'MAIN_MAX_DECIMALS_TOT', 'MAIN_MAX_DECIMALS_UNIT', 'MAIN_MAX_DECIMALS_SHOWN', 'MAIN_DISABLE_ALL_MAILS') as $name) { $settings[$name] = getDolGlobalString($name); }
+		// F38-12: Core normalizes missing/legacy FACTURE_ADDON in-process during
+		// Facture::validate(). Fingerprints compare the effective numbering model,
+		// not that mutable raw alias. Keep all other confirmation settings intact.
+		// Read-only snapshot: never write to $conf->global here.
+		$settings['FACTURE_ADDON'] = $number;
 		return array('entity' => (int) $conf->entity, 'currency' => $conf->currency,
 			'date' => dol_print_date(dol_now(), '%Y-%m-%d'), 'product' => $productid, 'vat' => (float) $vat,
 			'quantity' => 1, 'type' => $product ? (int) $product->type : 1, 'price_base' => 'TTC', 'term' => $term, 'term_label' => $termLabel,
