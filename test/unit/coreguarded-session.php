@@ -84,7 +84,42 @@ try {
 	denySession(static function()use($financeCheckpoint,$recipient,$financeRow){
 		$financeCheckpoint->bindMailRecipient(7,$recipient,$financeRow);
 	},'F38-03 recipient identity seal cannot be overwritten');
-	$financeCheckpoint->requireFinanceContinuation(7,$financeRow,$user);
+	// F38-10: each negative is the FIRST finance invocation on an original,
+	// independently consumed capability. An unchanged fingerprint cannot mask
+	// altered actual fee, dates, description, invoice plan or profile carrier.
+	foreach (array('amount', 'start', 'end', 'description', 'invoice', '_profile', 'extra') as $field) {
+		$testKey=bin2hex(random_bytes(16));
+		verifySession(session_start(), 'F38-10 fresh confirmation '.$field);
+		$_SESSION['msm_previews'][$testKey]=array('owner'=>18,'entity'=>1,
+			'phase'=>'confirm','revision'=>10,'profile'=>$binding,'ids'=>array(7),
+			'options'=>$financeOpts,'rows'=>$financeRows,
+			'results'=>array(7=>array('status'=>'unknown','stop'=>false)));
+		$testCheckpoint=new MsmFileBookingCheckpoint($testKey);
+		verifySession(session_write_close(), 'F38-10 persist confirm '.$field);
+		verifySession(session_start(), 'F38-10 consume confirm '.$field);
+		$_SESSION['msm_previews'][$testKey]['phase']='processing';
+		$_SESSION['msm_previews'][$testKey]['revision']=11;
+		verifySession(session_write_close(), 'F38-10 persist consumed '.$field);
+		$testCheckpoint->requireProcessing(7,$binding,$user,$financeExpected,$financeOpts);
+		$changedRow=$financeRow;
+		switch ($field) {
+			case 'amount': $changedRow['amount']=999; break;
+			case 'start': $changedRow['start']=999; break;
+			case 'end': $changedRow['end']=999; break;
+			case 'description': $changedRow['description']='altered'; break;
+			case 'invoice': $changedRow['invoice']['customer_id']=99; break;
+			case '_profile': $changedRow['_profile']=$binding; $changedRow['_profile']['owner']=99; break;
+			case 'extra': $changedRow['extra']='injected'; break;
+		}
+		verifySession($changedRow['fingerprint']===$financeRow['fingerprint'],
+			'F38-10 original fingerprint retained '.$field);
+		denySession(static function()use($testCheckpoint,$changedRow,$user){
+			$testCheckpoint->requireFinanceContinuation(7,$changedRow,$user);
+		},'F38-10 first altered direct finance attempt denied '.$field);
+	}
+	// Matching optional profile carrier is permitted, but never authorizes replay.
+	$financeWithProfile=$financeRow; $financeWithProfile['_profile']=$binding;
+	$financeCheckpoint->requireFinanceContinuation(7,$financeWithProfile,$user);
 	verifySession(true, 'CF05 same original owner one-shot finance capability admitted');
 	denySession(static function()use($financeCheckpoint,$financeRow,$user){
 		$financeCheckpoint->requireFinanceContinuation(7,$financeRow,$user);
