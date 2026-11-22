@@ -210,8 +210,12 @@ verify($blockedResult['message']==='MSMCoreGuardedSessionUnsupported'
 	&& $blockedDb->transaction_opened===0 && $blockedDb->saved===null,
 	'Owner enabled production profile still refuses CoreGuarded booking without original file-session one-shot');
 foreach (array('autocreate','sendmail') as $feature) {
+	// A stopped CoreGuarded coordinator cannot be reused by definition;
+	// prove admission on a *fresh* coordinator for each enabled option.
+	$flowForFeature=new ProfileBookingFlow($blockedDb); $flowForFeature->autoBindProfile=false;
+	$flowForFeature->object=$blockedFlow->object; $flowForFeature->reader=$blockedFlow->reader;
 	$forgedOptions=$blockedOptions; $forgedOptions[$feature]=true;
-	$blockedResult=$blockedFlow->book(1,$blockedPlan,$forgedOptions,$user,false);
+	$blockedResult=$flowForFeature->book(1,$blockedPlan,$forgedOptions,$user,false);
 	verify($blockedResult['message']==='MSMCoreGuardedSessionUnsupported'
 		&& $blockedResult['stop'] && !$blockedDb->events,
 		'Owner enabled '.$feature.' never bypasses original CoreGuarded session checkpoint');
