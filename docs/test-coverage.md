@@ -1,5 +1,8 @@
 # Reading the existing requirement matrix
 
+> **F38-12/P2 (2026-11-22; external closure pending):** Invoice Profile stores the canonical effective `FACTURE_ADDON` model only in the confirmed invoice settings snapshot. `test/unit/invoiceprofile.php` validates alias/default normalization without Core global writes, plan equivalence and actual-model/other-finance-setting negatives. `test/unit/invoice.php` exercises real module Preview fingerprints and guarded Booking/Invoice path for TWO separate confirmed members, with synthetic Core `Facture::validate()` changing the raw global after member 1; also rejects truly changed effective model before any business API. Existing F38-10 direct first-call and F38-11 Core-model regressions are retained. No real database/SMTP/PDF integration or independently closed F38-12 is claimed before the follow-up review.
+
+
 > **PR #38 F38-10/F38-11 synthetic delta coverage (2026-11-22; external closure pending):** `test/unit/coreguarded-session.php`: independently consumed original capabilities and mutated FIRST finance invocations with unchanged fingerprint; `test/unit/invoice.php`: public Invoice service first-call denial before any Core invoice API; `test/unit/cf05-finance.php`: synthetic Booking-to-Invoice changed-row interception; `test/unit/invoiceprofile.php`: actual production model resolver under pinned Core versions, aliases, missing/empty settings, legacy installed document root, nonexistent/traversal negative. No live Business DML, actual Core numbering generation, HTTP/SMTP effects or independent final Finding closure is claimed.
 
 
