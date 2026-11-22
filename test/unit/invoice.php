@@ -409,6 +409,70 @@ fails(static function()use($noCapability,$expectedPlan){
 }, 'MSMCoreGuardedSessionUnsupported');
 verify(!$profileDb->calls && !$profileDb->events && $profileDb->transaction_opened===0,
 	'Owner finance admission still requires active owned guard and consumed file capability before DML');
+ // F38-10: actual public Invoice::create() must reject an altered FIRST
+ // direct-service call after the original controller capability was consumed.
+ // No synthetic Invoice factory is involved: denial precedes all Core APIs.
+ $sessionDir = sys_get_temp_dir().'/f38-10-invoice-'.bin2hex(random_bytes(8));
+ if (!mkdir($sessionDir, 0700)) { throw new RuntimeException('Cannot create F38-10 session'); }
+ $oldSessionPath = session_save_path();
+ $oldCookies = ini_get('session.use_cookies');
+ $oldLimiter = session_cache_limiter();
+ ini_set('session.use_cookies','0'); session_cache_limiter('');
+ session_save_path($sessionDir);
+ try {
+ 	foreach (array('amount','invoice') as $mutation) {
+ 		$sessionId='f38'.bin2hex(random_bytes(10));
+ 		session_id($sessionId);
+ 		verify(session_start(),'F38-10 invoice first-call session '.$mutation);
+ 		$actor = new PreviewUser();
+ 		$profile = new MsmTransactionProfile($profileDb,$profileMeta,1);
+ 		$binding = $profile->binding($profile->current(),$actor,0);
+ 		$originalRow = array('start'=>123,'end'=>456,'amount'=>24.5,
+ 			'description'=>'Original fee','fingerprint'=>'original-fingerprint',
+ 			'autocreate'=>false,'invoice'=>array('customer_id'=>4,
+ 				'entity'=>1,'create_customer'=>false));
+ 		$options = array('invoice'=>true,'autocreate'=>false,
+ 			'sendmail'=>false,'description'=>'Original fee');
+ 		$key=bin2hex(random_bytes(16));
+ 		$_SESSION=array('msm_previews'=>array($key=>array(
+ 			'owner'=>$actor->id,'entity'=>1,'phase'=>'confirm','revision'=>5,
+ 			'profile'=>$binding,'ids'=>array(1),'options'=>$options,
+ 			'rows'=>array(1=>$originalRow),
+ 			'results'=>array(1=>array('status'=>'unknown','stop'=>false)))));
+ 		$capability = new MsmFileBookingCheckpoint($key);
+ 		verify(session_write_close(),'F38-10 invoice persist confirmation '.$mutation);
+ 		verify(session_start(),'F38-10 invoice consume confirmation '.$mutation);
+ 		$_SESSION['msm_previews'][$key]['phase']='processing';
+ 		$_SESSION['msm_previews'][$key]['revision']=6;
+ 		verify(session_write_close(),'F38-10 invoice persist consumed state '.$mutation);
+ 		$expected = $originalRow; $expected['_profile']=$binding;
+ 		$capability->requireProcessing(1,$binding,$actor,$expected,$options);
+ 		$changedRow = $originalRow;
+ 		if ($mutation === 'amount') { $changedRow['amount']=999; }
+ 		else { $changedRow['invoice']['customer_id']=99; }
+ 		$direct = new MsmInvoiceService($profileDb,$profileMeta,$guardProbe,$capability);
+ 		$diagnostic = array();
+ 		$beforeCalls = count($profileDb->calls);
+ 		fails(static function()use($direct,$changedRow,$actor,&$diagnostic) {
+ 			$member=(object)array('id'=>1,'entity'=>1,'socid'=>4);
+ 			$direct->create($member,9,$changedRow,$actor,$diagnostic);
+ 		}, 'MSMCoreGuardedSessionUnsupported');
+ 		verify($diagnostic['stage']==='finance_precheck'
+ 			&& count($profileDb->calls)===$beforeCalls,
+ 			'F38-10 modified first direct Invoice call has zero Core business APIs '.$mutation);
+ 		verify(session_start(),'F38-10 reopen for cleanup '.$mutation);
+ 		session_destroy(); session_write_close();
+ 		@unlink($sessionDir.'/sess_'.$sessionId);
+ 	}
+ } finally {
+ 	if (session_status()===PHP_SESSION_ACTIVE) { session_abort(); }
+ 	foreach (glob($sessionDir.'/sess_*') ?: array() as $leftover) { @unlink($leftover); }
+ 	@rmdir($sessionDir);
+ 	session_save_path($oldSessionPath);
+ 	ini_set('session.use_cookies',(string)$oldCookies);
+ 	session_cache_limiter($oldLimiter);
+ }
+
 
 // F34-02: after customer fetch, loss of the injected active guard must
 // prevent even the NEXT member-link readback. The synthetic Core double
