@@ -406,7 +406,7 @@ $expectedPlan = array('invoice'=>array('customer_id'=>4,'entity'=>1,'create_cust
 fails(static function()use($noCapability,$expectedPlan){
 	$diagnostic=array('stage'=>'preflight'); $member=(object)array('id'=>1,'entity'=>1,'socid'=>4);
 	$noCapability->create($member,9,$expectedPlan,new PreviewUser(),$diagnostic);
-}, 'MSMTransactionUnknown');
+}, 'MSMCoreGuardedSessionUnsupported');
 verify(!$profileDb->calls && !$profileDb->events && $profileDb->transaction_opened===0,
 	'Owner finance admission still requires active owned guard and consumed file capability before DML');
 
