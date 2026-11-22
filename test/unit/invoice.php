@@ -616,6 +616,14 @@ class F3812Preview extends PreviewFixtureService
 			'amount'=>'24.5','status'=>1,'subscription'=>1);
 	}
 	protected function invoiceProfile() { return new F3812InvoiceProfile($this->db); }
+	// A known readable synthetic linked customer; actual Core third-party
+	// access checks are covered in the existing dedicated rights tests.
+	protected function subscriptionThirdPartyForBatch($user,$invoice,$autocreate)
+	{
+		$this->member->thirdparty=(object)array('id'=>4,'entity'=>1,'client'=>1,
+			'name'=>'Synthetic customer','multicurrency_code'=>'EUR');
+		return false;
+	}
 }
 class F3812Database extends InvoiceDatabaseDouble
 {
