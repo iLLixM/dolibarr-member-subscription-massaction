@@ -62,7 +62,10 @@ class MsmInvoiceProfile
 	protected function numberModel()
 	{
 		$number = getDolGlobalString('FACTURE_ADDON');
-		if ($number === '' || $number === 'terre') {
+		// F38-13: Core uses a falsy check, so string '0' (also integer 0
+		// after getDolGlobalString()) selects the version-specific default.
+		// Do not normalize other invalid names such as '00' or '0.0'.
+		if (!$number || $number === 'terre') {
 			return version_compare(DOL_VERSION, '23.0.0', '>=') ? 'mod_facture_mars' : 'mod_facture_terre';
 		}
 		if ($number === 'mercure') { return 'mod_facture_mercure'; }
