@@ -1,5 +1,16 @@
 # PR #38 – Core parity and Massaction regression acceptance (Owner 2026-11-22)
 
+## F38-13/P2 – Core-falsy zero numbering default and confirmed multi-member regression
+
+Independent F38-12 follow-up closed F38-12/P2 and identified F38-13/P2 (review HEAD `b8e23f321bd18f89ef55093663605f9dba807b3a`): Core's `!getDolGlobalString('FACTURE_ADDON')` treats the string `'0'` and stored integer `0` as falsy, selecting the V22 `mod_facture_terre` or V23/V24 `mod_facture_mars` default. The module formerly accepted only strict `''`, failing a legitimate Core fallback.
+
+**Minimal production fix:** the preexisting `numberModel()` default condition matches Core falsy semantics; original F38-12 canonical effective-model snapshot, read-only Preview and every remaining security gate are unchanged.
+
+**Required regression:** `test/unit/invoiceprofile.php` covers both `'0'` and `0` for modern model resolution, canonical snapshots before/after Core normalization, no Core global mutation, still rejects `'00'`, `'0.0'`, traversal and missing models, and preserves original true-model/finance-settings mutation cases. `test/unit/invoice.php` extends the TWO originally confirmed members' production Preview→Booking→Invoice synthetic core-normalization loop to both zero representations under pinned V22/V23/V24 versions. Existing F38-10/11/12 tests remain.
+
+**Evidence status:** synthetic/hosted CI on FINAL exact HEAD must be verified separately; new F38-13 independently **OPEN until focused read-only delta review**. Full real SQL/trigger/document/SMTP/CF03-NORMAL A–D, CF05-07, R0-04, R0-07 and release Owner GO are not covered or authorized.
+
+
 ## F38-12/P2 canonical number-model confirmation and two-member batch regression (2026-11-22)
 
 **Root cause:** `Facture::validate()` in supported V22/23/24 may update `$conf->global->FACTURE_ADDON` from missing/blank/`terre`/`mercure` to its canonical effective name during first-member validation. A later `MsmBookingService::book()` refreshed preview previously treated the unchanged *effective* numbering model as a changed confirmation because `invoice.settings.FACTURE_ADDON` held the raw pre-Core alias.
