@@ -172,7 +172,7 @@ final class MsmFileBookingCheckpoint
 	 * already have re-read the persisted original confirmed result.
 	 * This proof never writes a DB row or opens another transaction.
 	 */
-	public function requireMailEvidence($id, $user, array $invoice = null)
+	public function requireMailEvidence($id, $user, array $invoice = null, array $current = null)
 	{
 		$this->requireBinding();
 		$origin = $this->confirmedOrigin;
@@ -183,6 +183,11 @@ final class MsmFileBookingCheckpoint
 			|| !in_array($id, $origin['ids'] ?? array(), true)
 			|| (int) ($origin['owner'] ?? 0) !== (int) ($user->id ?? 0)
 			|| ($origin['profile']['profile'] ?? null) !== 'CoreGuarded'
+			|| !is_array($current) || ($current['profile'] ?? null) !== 'CoreGuarded'
+			|| ($current['family'] ?? null) !== ($origin['profile']['family'] ?? null)
+			|| ($current['revision'] ?? null) !== ($origin['profile']['revision'] ?? null)
+			|| ($current['features'] ?? null) !== ($origin['profile']['features'] ?? null)
+			|| !empty($current['reason'])
 			|| empty($origin['profile']['features']['sendmail'])
 			|| empty($origin['options']['sendmail'])
 			|| !is_array($origin['rows'][$id] ?? null)

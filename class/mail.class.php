@@ -93,7 +93,7 @@ class MsmSubscriptionMail
 				|| ($invoice !== null && empty($profile['features']['invoice']))) {
 				throw new RuntimeException('MSMProfileFeatureUnavailable');
 			}
-			$checkpoint->requireMailEvidence($id, $user, $invoice);
+			$checkpoint->requireMailEvidence($id, $user, $invoice, $profile);
 		} catch (Throwable $e) {
 			// Denied/uncertain admission must never reach a hook or SMTP.
 			return array('mail' => 'denied', 'attachment' => $invoice === null ? 'not_required' : 'not_sent');
