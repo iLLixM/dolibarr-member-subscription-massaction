@@ -34,8 +34,23 @@ class MsmInvoiceService
 	}
 	protected function invoice() { require_once DOL_DOCUMENT_ROOT.'/compta/facture/class/facture.class.php'; return new Facture($this->db); }
 	protected function customer() { require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php'; return new Societe($this->db); }
+	/** Qualified Core source/trigger gate: do not replace with a UI/admin flag.
+	 * This seam is overridden solely by isolated synthetic financial fixtures.
+	 */
+	protected function requireCoreFinanceQualification()
+	{
+		require_once __DIR__.'/corefinancequalification.class.php';
+		MsmCoreFinanceQualification::requireReady();
+	}
+	protected function requireCoreProvisionalPathSafe($invoice)
+	{
+		require_once __DIR__.'/corefinancequalification.class.php';
+		MsmCoreFinanceQualification::requireProvisionalPathSafe($invoice);
+	}
 	public function checkTables()
 	{
+		// The first Booking checkTables() runs BEFORE outer BEGIN.
+		if ($this->activeGuard instanceof MsmCoreGuardedTransaction) { $this->requireCoreFinanceQualification(); }
 		$this->databaseState->requireTransactionalTables(array('societe', 'societe_extrafields', 'socpeople', 'socpeople_extrafields', 'societe_commerciaux', 'facture', 'facture_extrafields', 'facturedet', 'facturedet_extrafields', 'element_element', 'ecm_files'));
 	}
 	public function lock($id)
@@ -93,6 +108,7 @@ class MsmInvoiceService
 		// No direct CoreGuarded invoice call without the original Controller's
 		// already-consumed, owner/entity/profile/row-bound one-shot capability.
 		if ($this->activeGuard instanceof MsmCoreGuardedTransaction) {
+			$this->requireCoreFinanceQualification();
 			if ($this->coreCheckpoint === null) { throw new RuntimeException('MSMCoreGuardedSessionUnsupported'); }
 			$this->coreCheckpoint->requireFinanceContinuation((int) $member->id, $row, $actor);
 		}
@@ -149,6 +165,12 @@ class MsmInvoiceService
 		$line = $invoice->addline($this->invoiceDescription($row['description']), 0, $plan['quantity'], $plan['vat'], 0, 0, $plan['product'], 0, $row['start'], '', 0, 0, 0, $plan['price_base'], $row['amount'], $plan['type']);
 		$this->owned(); if ($line <= 0) { throw new RuntimeException('MSMInvoiceFailed'); }
 		$diagnostic['stage'] = 'invoice_validate';
+		// F36-02: the stock Core validator may rename an existing provisional
+		// document directory before the OUTER transaction commits. Reject a
+		// reachable source directory without modifying it.
+		if ($this->activeGuard instanceof MsmCoreGuardedTransaction) {
+			$this->requireCoreProvisionalPathSafe($invoice);
+		}
 		$this->owned(); // Before nested Core Facture::validate().
 		$validated = $invoice->validate($actor); $this->owned();
 		if ($validated <= 0) { throw new RuntimeException('MSMInvoiceFailed'); }

@@ -82,6 +82,8 @@ class Cf05FinanceInvoice extends MsmInvoiceService
 		global $conf;
 		return new Cf05QualifiedFinanceProfile($this->db,$this->databaseState,(int)$conf->entity);
 	}
+	protected function requireCoreFinanceQualification() {} // Test-only fixture, never the deployed source gate.
+	protected function requireCoreProvisionalPathSafe($invoice) {} // Synthetic invoice creates no real PROV directory.
 	protected function invoice() { return new InvoiceObjectDouble($this->db); }
 	protected function customer() { return new InvoiceCustomerDouble($this->db); }
 }
