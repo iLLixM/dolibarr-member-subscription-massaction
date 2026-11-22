@@ -11,6 +11,8 @@ on:
       - 'docs/adr/ADR-0001-core-first-transaction-profiles.md'
       - 'docs/adr/ADR-0001-risk-register.md'
       - 'docs/current-development-baseline.md'
+      - 'docs/owner-core-parity-2026-11-22.md'
+      - 'docs/cf05-core-parity-regression.md'
       - 'class/actions_membersubscriptionmassaction.class.php'
       - 'lib/membersubscriptionmassaction.lib.php'
       - 'admin/setup.php'
