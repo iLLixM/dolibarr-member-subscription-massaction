@@ -1,5 +1,22 @@
 # PR #38 – Core parity and Massaction regression acceptance (Owner 2026-11-22)
 
+## F38-12/P2 canonical number-model confirmation and two-member batch regression (2026-11-22)
+
+**Root cause:** `Facture::validate()` in supported V22/23/24 may update `$conf->global->FACTURE_ADDON` from missing/blank/`terre`/`mercure` to its canonical effective name during first-member validation. A later `MsmBookingService::book()` refreshed preview previously treated the unchanged *effective* numbering model as a changed confirmation because `invoice.settings.FACTURE_ADDON` held the raw pre-Core alias.
+
+**Production change:** only `MsmInvoiceProfile::resolve()` includes canonical `$number` in the returned `settings['FACTURE_ADDON']`, using its existing read-only `numberModel()`; no writing to Core configuration or weakening of the complete fingerprint.
+
+| Required case | Regression | Evidence boundary |
+| --- | --- | --- |
+| Absent, blank, `terre`, `mercure` before first invoice validation | `invoiceprofile.php`: canonical original vs normalized full plan; `invoice.php`: two-member synthetic Booking/Invoice batch with normalizing invoice double, both members successful and two invoice validations | Pinned V22/V23/V24 source-backed Core model resolution; **no real DB/SMTP** |
+| Original confirmed member 2 following internal Core alias rewrite | `invoice.php`: full production Preview fingerprint equals refreshed member-2 fingerprint and Booking continues | Actual module Preview/Booking/Invoice call path with in-memory Core double |
+| Genuine change to effective numbering model | `invoice.php`: negative Booking case returns `MSMChangedConfirmation` before any subscription/invoice Core business calls | Synthetic; unmodified original session consent |
+| Other finance/configuration changes | `invoiceprofile.php` finance-setting negative, existing invoice, CoreGuarded Session, and postcommit tests | Core safety gates remain unchanged |
+| No application configuration write | `invoiceprofile.php` explicitly checks original `$conf->global->FACTURE_ADDON` after `resolve()` | Read-only preview |
+
+**Status:** F38-10/11 independently CLOSED; F38-12 implementation awaiting final exact-HEAD Standard 9/9, Full 21/21, Hosted 1/1 and independent F38-12 focused delta review. Does not supersede real A–D/case-by-case GO, CF05-07, exact ZIP, R0-04/R0-07 or deferred CF03-FAULT.
+
+
 ## F38-10 and F38-11 targeted follow-up regressions (2026-11-22)
 
 | Finding | New executable evidence | Boundary |
