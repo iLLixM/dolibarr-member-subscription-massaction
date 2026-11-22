@@ -165,7 +165,9 @@ final class MsmFileBookingCheckpoint
 			}
 			restore_error_handler();
 		}
-		$this->postEffects[$id][$kind] = true;
+		// Bind the post-effect authorization to the exact durable invoice
+		// descriptor, not merely the member number and a claimed status.
+		$this->postEffects[$id][$kind] = $kind === 'mail' ? array('invoice'=>$invoice) : true;
 	}
 	/** One-shot continuation for the actual mail adapter, not merely a
 	 * boolean asserted by its caller. requirePostCommitEffect('mail') must
@@ -178,6 +180,7 @@ final class MsmFileBookingCheckpoint
 		$origin = $this->confirmedOrigin;
 		if (!is_int($id) || $id < 1 || !is_array($origin)
 			|| !isset($this->postEffects[$id]['mail'])
+			|| ($this->postEffects[$id]['mail']['invoice'] ?? null) !== $invoice
 			|| isset($this->mailEvidenceClaimed[$id])
 			|| !isset($this->attempted[$id])
 			|| !in_array($id, $origin['ids'] ?? array(), true)
