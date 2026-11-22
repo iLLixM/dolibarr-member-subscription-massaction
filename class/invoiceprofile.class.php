@@ -55,6 +55,33 @@ class MsmInvoiceProfile
 		}
 		return $result;
 	}
+	/** Resolve the effective invoice numbering choice without invoking Core DML.
+	 * V22 defaults to terre; V23+ defaults to mars. Core also maps the
+	 * historical terre/mercure aliases before including the model.
+	 */
+	protected function numberModel()
+	{
+		$number = getDolGlobalString('FACTURE_ADDON');
+		if ($number === '' || $number === 'terre') {
+			return version_compare(DOL_VERSION, '23.0.0', '>=') ? 'mod_facture_mars' : 'mod_facture_terre';
+		}
+		if ($number === 'mercure') { return 'mod_facture_mercure'; }
+		return $number;
+	}
+	/** Legacy Core numbering models resolve through dol_document_root.
+	 * This is availability checking only, not PHP source qualification.
+	 */
+	protected function legacyNumberModelDirectories()
+	{
+		global $conf;
+		$result = array();
+		foreach ((array) ($conf->file->dol_document_root ?? array()) as $root) {
+			if (is_string($root) && $root !== '') {
+				$result[] = rtrim($root, '/').'/core/modules/facture/';
+			}
+		}
+		return $result;
+	}
 	protected function models($number, $pdf)
 	{
 		foreach (array($number, $pdf) as $name) {
@@ -68,6 +95,15 @@ class MsmInvoiceProfile
 			$root = rtrim($root, '/').'/';
 			$numberFound = $numberFound || (is_file($root.$number.'.php') && is_readable($root.$number.'.php'));
 			$pdfFound = $pdfFound || (is_file($root.'doc/pdf_'.$pdf.'.modules.php') && is_readable($root.'doc/pdf_'.$pdf.'.modules.php'));
+		}
+		if (!$numberFound) {
+			// Facture::getNextNumRef() uses this legacy fallback if no modern
+			// <model>.php was loaded, including installed document roots.
+			foreach ($this->legacyNumberModelDirectories() as $root) {
+				$root = rtrim($root, '/').'/';
+				$file = $root.$number.'/'.$number.'.modules.php';
+				if (is_file($file) && is_readable($file)) { $numberFound = true; break; }
+			}
 		}
 		if (!$numberFound || !$pdfFound) { throw new RuntimeException('MSMInvoiceProfileUnsupported'); }
 	}
@@ -102,7 +138,7 @@ class MsmInvoiceProfile
 		$term = !empty($customer->cond_reglement_id) ? (int) $customer->cond_reglement_id : $this->paymentTerm();
 		if ($term <= 0) { throw new RuntimeException('MSMInvoiceProfileUnsupported'); }
 		$termLabel = $this->paymentTermLabel($term);
-		$number = getDolGlobalString('FACTURE_ADDON', 'mod_facture_terre');
+		$number = $this->numberModel();
 		$pdf = getDolGlobalString('FACTURE_ADDON_PDF_0');
 		if ($pdf === '') { $pdf = getDolGlobalString('FACTURE_ADDON_PDF'); }
 		if ($pdf === '') { $pdf = MsmCoreCompatibility::defaultPdf(); }
