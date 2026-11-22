@@ -120,7 +120,7 @@ class MsmSubscriptionMail
 		$afterEffect = false;
 		return $this->sendInternal($member, $row, $user, $selected, $invoice, $afterEffect);
 	}
-	protected function sendInternal($member, array $row, $user, $selected, array $invoice, &$afterEffect)
+	protected function sendInternal($member, array $row, $user, $selected, $invoice, &$afterEffect)
 	{
 		global $hookmanager, $langs;
 		if (!$selected) { return 'not_selected'; }
