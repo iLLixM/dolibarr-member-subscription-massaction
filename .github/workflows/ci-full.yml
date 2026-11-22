@@ -15,6 +15,24 @@ on:
       - 'test/unit/postcommit.php'
       - 'test/unit/invoicepdf.php'
       - '.github/workflows/ci-full.yml'
+      - 'class/booking.class.php'
+      - 'class/invoice.class.php'
+      - 'class/coreguardedtransaction.class.php'
+      - 'class/transactionprofile.class.php'
+      - 'class/preview.class.php'
+      - 'class/databasestate.class.php'
+      - 'class/activetransactionguard.class.php'
+      - 'class/bookingmember.class.php'
+      - 'lib/profile.lib.php'
+      - 'test/unit/coreguarded-session.php'
+      - 'test/unit/terminal.php'
+      - 'test/unit/profile.php'
+      - 'test/unit/booking.php'
+      - 'test/unit/invoice.php'
+      - 'test/unit/invoiceprofile.php'
+      - 'test/unit/ci-triggers.php'
+      - '.github/workflows/ci.yml'
+      - '.github/workflows/cf03-php83-hosted.yml'
 permissions:
   contents: read
 jobs:
@@ -118,6 +136,7 @@ jobs:
           php test/unit/cf03-evidence.php
           php test/unit/cf03-source.php
           php test/unit/coreguarded-session.php
+          php test/unit/ci-triggers.php
           node test/unit/loading.js
       - uses: actions/checkout@v4
         with:
