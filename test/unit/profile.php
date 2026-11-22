@@ -98,8 +98,12 @@ verify($reconciled['options']['invoice'] && $reconciled['options']['autocreate']
 	'Owner finance options remain confirmed in supported CoreGuarded preview');
 foreach (array('invoice','autocreate','sendmail') as $feature) {
 	$preview=profileState(); $preview['profile']=$b;
+	$preview['rows'][1]=array('start'=>stamp('2026-10-10'),'end'=>stamp('2027-10-09'),'manualend'=>false);
 	$post=array('action'=>'confirm','revision'=>'0','common'=>'','description'=>'Synthetic',
 		'start'=>array(1=>'2026-10-10'),'end'=>array(1=>'2027-10-09'),$feature=>'1');
+	if ($feature==='autocreate') {
+		$post['invoice']='1'; $conf->modules['societe']=1;
+	}
 	$updated=msmUpdatePreview($preview,$post);
 	verify(!empty($updated['options'][$feature]), 'Owner CoreGuarded preview admits '.$feature);
 }
