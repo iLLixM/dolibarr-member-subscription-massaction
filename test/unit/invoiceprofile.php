@@ -85,6 +85,35 @@ try {
 		verify($resolved['number_model'] === $numberCase[1],
 			'F38-11 Core effective numbering '.DOL_VERSION.' '.var_export($numberCase[0],true));
 	}
+	// F38-12: the snapshot must represent effective numbering identity, not
+	// Core's mutable raw FACTURE_ADDON alias. No production settings mutation.
+	foreach (array(null, '', 'terre', 'mercure') as $raw) {
+		if ($raw === null) { unset($conf->global->FACTURE_ADDON); }
+		else { $conf->global->FACTURE_ADDON = $raw; }
+		$beforeRaw = getDolGlobalString('FACTURE_ADDON');
+		$canonicalPlan = $profile->resolve($member,$user,false,false);
+		verify($canonicalPlan['settings']['FACTURE_ADDON'] === $canonicalPlan['number_model'],
+			'F38-12 canonical effective snapshot '.DOL_VERSION.' '.var_export($raw,true));
+		verify(getDolGlobalString('FACTURE_ADDON') === $beforeRaw,
+			'F38-12 read-only preview leaves raw Core global untouched '.var_export($raw,true));
+		$conf->global->FACTURE_ADDON = $canonicalPlan['number_model'];
+		$normalizedPlan = $profile->resolve($member,$user,false,false);
+		verify($normalizedPlan === $canonicalPlan,
+			'F38-12 Core normalized and legacy alias invoice plans identical '.var_export($raw,true));
+		$conf->global->FACTURE_ADDON = 'mod_facture_custom';
+		$changedPlan = $profile->resolve($member,$user,false,false);
+		verify($changedPlan['number_model'] !== $canonicalPlan['number_model']
+			&& $changedPlan['settings']['FACTURE_ADDON'] !== $canonicalPlan['settings']['FACTURE_ADDON'],
+			'F38-12 actual effective numbering model change invalidates plan '.var_export($raw,true));
+	}
+	$conf->global->FACTURE_ADDON = 'mod_facture_custom';
+	$financePlan = $profile->resolve($member,$user,false,false);
+	$conf->global->ADHERENT_BANK_USE = 'bankviainvoice';
+	$financeChanged = $profile->resolve($member,$user,false,false);
+	verify($financeChanged !== $financePlan
+		&& $financeChanged['settings']['ADHERENT_BANK_USE'] !== $financePlan['settings']['ADHERENT_BANK_USE'],
+		'F38-12 other financial setting remains confirmation-bound');
+	unset($conf->global->ADHERENT_BANK_USE);
 	// Exercise the PRODUCTION legacy lookup through Core's document roots,
 	// not a test-only implementation of models().
 	$oldFileRoots = $conf->file ?? null;
