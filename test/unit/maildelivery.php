@@ -28,7 +28,15 @@ class Adherent
 	public function sendEmail(...$args) { $GLOBALS['last_mail'] = $args; $GLOBALS['mail_language'] = $GLOBALS['langs']->defaultlang; return $this->returnCode; }
 }
 class DeliveryHooks { public function executeHooks($name, $params, &$object, &$action) { return 0; } }
-class DeliveryAdapter extends MsmSubscriptionMail { protected function permitted($user) { return true; } protected function hooks() { return new DeliveryHooks(); } }
+class DeliveryAdapter extends MsmSubscriptionMail {
+	protected function permitted($user) { return true; }
+	protected function hooks() { return new DeliveryHooks(); }
+	public function inspectEffectPhase($member, $row, $user, $invoice = null) {
+		$started = false;
+		$status = $this->sendInternal($member, $row, $user, true, $invoice, $started);
+		return array($status, $started);
+	}
+}
 class InvoiceAttachmentDouble
 {
 	public $calls = 0; public $fail = false;
@@ -105,6 +113,16 @@ $detail = $invoiceMail->send($member, $row, new stdClass(), true, $invoice);
 checkMail($detail === 'unknown',
 	'F38-02 legacy hook exception continues to return unknown');
 $invoiceMail->hookAdapter->fail = false;
+$invoiceMail->hookAdapter->code = -1;
+$negativeHook = $invoiceMail->inspectEffectPhase($member, $row, new stdClass(), $invoice);
+checkMail($negativeHook === array('failed', true),
+	'F38-02 negative hook return is after entering potentially effectful hook');
+$invoiceMail->hookAdapter->code = 0;
+$member->returnCode = -1;
+$negativeSmtp = $invoiceMail->inspectEffectPhase($member, $row, new stdClass(), $invoice);
+checkMail($negativeSmtp === array('failed', true),
+	'F38-02 negative Core SMTP return is after effectful hook/transport boundary');
+$member->returnCode = 1;
 // F38-03: direct service without original file-session capability fails closed.
 $previousCalls = $invoiceMail->hookAdapter->calls;
 $detail = $invoiceMail->sendWithEvidence($member, $row, new stdClass(), true, $invoice);
@@ -116,4 +134,35 @@ checkMail($detail['mail'] === 'denied' && $detail['attachment'] === 'not_require
 	'F38-03 direct contribution-only evidence cannot bypass original capability');
 checkMail($mail->send($member, $row, new stdClass(), true) === 'transport',
 	'F38-03 legacy B/C send() unchanged while direct evidence is denied');
+// F38-05: finite mail/attachment result matrix is enforced before checkpointing.
+require_once __DIR__.'/../../lib/booking.lib.php';
+$validInvoice = array(
+	'transport'=>'verified_for_transport',
+	'hook'=>'verified_before_hook',
+	'attachment_missing'=>'missing',
+	'unknown'=>'unknown',
+	'failed'=>'not_sent',
+	'denied'=>'not_sent',
+	'missing'=>'not_sent',
+	'disabled'=>'not_sent',
+);
+$allAttachment=array('verified_for_transport','verified_before_hook','missing','not_sent','unknown','not_required');
+foreach ($validInvoice as $status => $expectedAttachment) {
+	foreach ($allAttachment as $candidate) {
+		$actual = msmValidMailAttachmentEvidence(array('mail'=>$status,'attachment'=>$candidate),true);
+		checkMail($actual === ($candidate === $expectedAttachment),
+			'F38-05 invoice evidence pair '.$status.'/'.$candidate);
+	}
+}
+foreach (array('transport','hook','failed','denied','unknown','missing','disabled','attachment_missing') as $status) {
+	foreach ($allAttachment as $candidate) {
+		checkMail(msmValidMailAttachmentEvidence(array('mail'=>$status,'attachment'=>$candidate),false)
+			=== ($candidate === 'not_required'),
+			'F38-05 contribution evidence pair '.$status.'/'.$candidate);
+	}
+}
+checkMail(!msmValidMailAttachmentEvidence(array('mail'=>'transport','attachment'=>'verified_before_hook'),true)
+	&& !msmValidMailAttachmentEvidence(array('mail'=>'failed','attachment'=>'verified_for_transport'),true)
+	&& !msmValidMailAttachmentEvidence(array('mail'=>'hook','attachment'=>'verified_for_transport'),true),
+	'F38-05 contradictory adapter evidence pairs never redeem successful effect');
 echo $passed." mail adapter assertions passed (template/type/transport doubles; no SMTP).\n";
