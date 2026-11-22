@@ -45,10 +45,12 @@ class MsmInvoiceProfile
 	protected function modelDirectories()
 	{
 		global $conf;
-		$dirs = array_merge(array('/'), (array) ($conf->modules_parts['models'] ?? array()));
-		$result = array();
-		foreach ($dirs as $relative) {
-			if (!is_string($relative) || $relative === '') { continue; }
+		// The installed Core directory does not need dol_buildpath() (which
+		// relies on fully bootstrapped $conf->file even in offline fixtures).
+		// Resolve optional module roots exactly through Dolibarr's resolver.
+		$result = array(DOL_DOCUMENT_ROOT.'/core/modules/facture/');
+		foreach ((array) ($conf->modules_parts['models'] ?? array()) as $relative) {
+			if (!is_string($relative) || $relative === '' || $relative === '/') { continue; }
 			$result[] = dol_buildpath($relative.'core/modules/facture/', 0);
 		}
 		return $result;
