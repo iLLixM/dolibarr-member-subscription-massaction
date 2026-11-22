@@ -70,6 +70,44 @@ try {
 	$customPlan = $profile->resolve($member, $user, false, false);
 	verify($customPlan['number_model']==='mod_facture_custom' && $customPlan['pdf_model']==='custom',
 		'Core-parity installed custom numbering and PDF models admitted by normal model lookup');
+	// F38-11: read-only effective Core numbering defaults and historical aliases.
+	$default = version_compare(DOL_VERSION, '23.0.0', '>=') ? 'mod_facture_mars' : 'mod_facture_terre';
+	foreach (array(
+		array(null, $default),
+		array('', $default),
+		array('terre', $default),
+		array('mercure', 'mod_facture_mercure'),
+		array($default, $default)
+	) as $numberCase) {
+		if ($numberCase[0] === null) { unset($conf->global->FACTURE_ADDON); }
+		else { $conf->global->FACTURE_ADDON = $numberCase[0]; }
+		$resolved = $profile->resolve($member, $user, false, false);
+		verify($resolved['number_model'] === $numberCase[1],
+			'F38-11 Core effective numbering '.DOL_VERSION.' '.var_export($numberCase[0],true));
+	}
+	// Exercise the PRODUCTION legacy lookup through Core's document roots,
+	// not a test-only implementation of models().
+	$oldFileRoots = $conf->file ?? null;
+	$legacyRoot = $extra.'/legacy-document-root';
+	$legacyModelDir = $legacyRoot.'/core/modules/facture/legacy';
+	if (!mkdir($legacyModelDir, 0700, true)) { throw new RuntimeException('Cannot create legacy model fixture'); }
+	file_put_contents($legacyModelDir.'/legacy.modules.php', '<?php // valid legacy Core numbering model');
+	try {
+		$conf->file = (object) array('dol_document_root'=>array($legacyRoot));
+		$conf->global->FACTURE_ADDON = 'legacy';
+		$legacyPlan = $profile->resolve($member, $user, false, false);
+		verify($legacyPlan['number_model'] === 'legacy', 'F38-11 legacy model from Core document root admitted');
+		foreach (array('../legacy','missing_synthetic_number_model') as $invalid) {
+			$conf->global->FACTURE_ADDON = $invalid;
+			fails(static function()use($profile,$member,$user) { $profile->resolve($member,$user,false,false); },
+				'MSMInvoiceProfileUnsupported');
+		}
+	} finally {
+		if ($oldFileRoots === null) { unset($conf->file); } else { $conf->file = $oldFileRoots; }
+		@unlink($legacyModelDir.'/legacy.modules.php'); @rmdir($legacyModelDir);
+		@rmdir($legacyRoot.'/core/modules/facture'); @rmdir($legacyRoot.'/core/modules');
+		@rmdir($legacyRoot.'/core'); @rmdir($legacyRoot);
+	}
 	$conf->global->FACTURE_ADDON_PDF_0 = '../custom';
 	fails(static function()use($profile,$member,$user) { $profile->resolve($member,$user,false,false); }, 'MSMInvoiceProfileUnsupported');
 } finally {
