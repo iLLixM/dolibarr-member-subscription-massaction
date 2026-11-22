@@ -133,7 +133,16 @@ function msmProcessBooking(array $state, $service, $mailer, $user, callable $sav
 					msmSaveBookingCheckpoint($state, $save, true);
 					return $state;
 				}
-				if (!msmSaveBookingCheckpoint($state, $save, $coreGuarded)) { msmStopUnprocessed($state, $id); return $state; }
+				if (!msmSaveBookingCheckpoint($state, $save, $coreGuarded)) {
+					if ($coreGuarded) {
+						// PDF may exist, but its verified descriptor could not be
+						// durably checkpointed. Never imply verified persistence.
+						$state['results'][$id]['invoice']['pdf'] = array('status'=>'unknown','message'=>'MSMPdfUnknown');
+						$state['results'][$id]['mail'] = 'not_processed';
+						$state['results'][$id]['attachment_status'] = 'not_processed';
+					}
+					msmStopUnprocessed($state, $id); return $state;
+				}
 			}
 			$invoice = $state['results'][$id]['invoice'] ?? null;
 			if ($coreGuarded) {
@@ -173,7 +182,15 @@ function msmProcessBooking(array $state, $service, $mailer, $user, callable $sav
 				msmSaveBookingCheckpoint($state, $save, true);
 				return $state;
 			}
-			if (!msmSaveBookingCheckpoint($state, $save, $coreGuarded)) { msmStopUnprocessed($state, $id); return $state; }
+			if (!msmSaveBookingCheckpoint($state, $save, $coreGuarded)) {
+				if ($coreGuarded) {
+					// Transport may have occurred but its result could not be
+					// durably checkpointed; preserve DB and PDF status only.
+					$state['results'][$id]['mail'] = 'unknown';
+					$state['results'][$id]['attachment_status'] = $invoice !== null ? 'unknown' : 'not_required';
+				}
+				msmStopUnprocessed($state, $id); return $state;
+			}
 		}
 	}
 	$state['phase'] = 'done'; msmSaveBookingCheckpoint($state, $save, $coreGuarded);
@@ -188,7 +205,8 @@ function msmValidMailAttachmentEvidence(array $delivery, $withInvoice)
 	$mail = $delivery['mail'] ?? null;
 	$attachment = $delivery['attachment'] ?? null;
 	if (!$withInvoice) {
-		return $attachment === 'not_required';
+		return $attachment === 'not_required'
+			&& in_array($mail,array('transport','hook','failed','denied','missing','disabled','unknown'),true);
 	}
 	$allowed = array(
 		'transport' => 'verified_for_transport',
