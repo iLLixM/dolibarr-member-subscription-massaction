@@ -218,7 +218,9 @@ try {
 		array('name'=>'hook_negative_after_effect','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success','mail_status'=>'failed'),
 		array('name'=>'transport_negative_after_effect','autocreate'=>false,'mode'=>'','change'=>false,'expected'=>'success','mail_status'=>'failed'),
 		array('name'=>'pdf_checkpoint_lost','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success','pdf_checkpoint_lost'=>true),
-		array('name'=>'mail_checkpoint_lost','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success','mail_checkpoint_lost'=>true)
+		array('name'=>'mail_checkpoint_lost','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success','mail_checkpoint_lost'=>true),
+		array('name'=>'contribution_mail_throws','autocreate'=>false,'mode'=>'','change'=>false,
+			'expected'=>'success','no_invoice'=>true,'mail_throw'=>true)
 	) as $case) {
 		$db=new Cf05FinanceDb(); $db->family='mysql'; $db->profileRaw=json_encode(array(
 			'version'=>1,'family'=>'mysql','profile'=>'CoreGuarded','nonce'=>str_repeat('b',32)));
@@ -239,7 +241,7 @@ try {
 				'vat'=>0,'quantity'=>1,'price_base'=>'TTC','type'=>1));
 		$flow->reader->row=$row;
 		$user=new PreviewUser();
-		$options=array('invoice'=>true,'autocreate'=>$case['autocreate'],
+		$options=array('invoice'=>empty($case['no_invoice']),'autocreate'=>$case['autocreate'],
 			'sendmail'=>true,'description'=>'Synthetic fee');
 		$qualifiedProfile=new Cf05QualifiedFinanceProfile($db,new SyntheticDatabaseState($db),1);
 		$binding=$qualifiedProfile->binding($qualifiedProfile->current(),$user,0);
@@ -299,11 +301,12 @@ try {
 			'CF05 one original contribution and no replay '.$case['name']);
 		if ($case['expected']==='success') {
 			verify(!$r['stop'] && ($r['completion'] ?? '')==='nonterminal_acknowledged'
-				&& ($r['invoice']['id'] ?? null)===42 && ($r['invoice']['customer_created'] ?? null)===$case['autocreate'],
-				'CF05 one guarded financial flow with confirmed nonterminal completion '.$case['name']);
+				&& (!empty($case['no_invoice']) ? !isset($r['invoice']) :
+					(($r['invoice']['id'] ?? null)===42 && ($r['invoice']['customer_created'] ?? null)===$case['autocreate'])),
+				'CF05 guarded contribution/financial flow with confirmed nonterminal completion '.$case['name']);
 			if ($expectStop) {
 				verify($done['batch_stop'] && $done['results'][2]['status']==='not_processed'
-					&& $pdf->calls===1 && $db->transaction_opened===0
+					&& $pdf->calls===(!empty($case['no_invoice'])?0:1) && $db->transaction_opened===0
 					&& count(array_keys($db->events,'subscription',true))===1,
 					'CF05 Phase4 ambiguous postcommit effect stops next member without rollback '.$case['name']);
 				if (isset($case['pdf_status']) || !empty($case['pdf_throw']) || !empty($case['pdf_invalid_written'])
@@ -311,6 +314,10 @@ try {
 					verify($r['invoice']['pdf']['status']==='unknown' && $r['mail']==='not_processed'
 						&& $r['attachment_status']==='not_processed' && $mail->calls===0,
 						'CF05 Phase4 PDF uncertainty prevents SMTP and preserves file status');
+				} elseif (!empty($case['no_invoice'])) {
+					verify(!isset($r['invoice']) && $r['mail']==='unknown'
+						&& $r['attachment_status']==='not_required' && $mail->calls===1,
+						'F38-06 contribution-only exception preserves UNKNOWN/STOP but no fictional invoice attachment');
 				} else {
 					verify($r['invoice']['pdf']['status']==='verified' && $r['mail']==='unknown'
 						&& $r['attachment_status']==='unknown' && $mail->calls===1,
