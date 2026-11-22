@@ -1,5 +1,12 @@
 # Binding Owner decision — 2026-11-22: Dolibarr Core parity with Massaction-specific safety
 
+## F38-13/P2 – Core-falsy FACTURE_ADDON default parity (2026-11-22)
+
+Independent F38-12 delta review of PR #38 exact HEAD `b8e23f321bd18f89ef55093663605f9dba807b3a` determined **F38-12/P2 INDEPENDENTLY CLOSED**, preserved F38-10/11 CLOSED and newly found **F38-13/P2 OPEN**, an otherwise supported Core fallback rejected when `FACTURE_ADDON` is numeric zero or string `'0'`. Dolibarr V22–V24 `getDolGlobalString()` casts both to `'0'`; Core `Facture::getNextNumRef()` uses `if (!getDolGlobalString('FACTURE_ADDON'))` to choose V22 `mod_facture_terre` or V23/V24 `mod_facture_mars`. The module previously used `=== ''`, rejecting `'0'` as an invalid model.
+
+**Owner-authorized bounded corrective implementation:** use the same PHP-falsy test in existing `MsmInvoiceProfile::numberModel()`, retaining the existing `terre`/`mercure` aliases, model-name safety and F38-12 canonical read-only settings snapshot. Both `'0'` and integer `0` must produce the appropriate Core default without writing `$conf->global`; `'00'`, `'0.0'`, traversal and missing models stay denied. Positive two-member first Core-normalization cases and full exact-HEAD CI are required. **F38-13 status: FIX IMPLEMENTED / INDEPENDENT EXACT-HEAD DELTA CLOSURE PENDING.** No Owner-Variant-B change, no new source allowlist or transaction/one-shot changes. F36-02 remains OWNER-ACCEPTED CORE RESIDUAL RISK; real A–D/Release remain separate NO-GO gates.
+
+
 ## F38-12/P2 – batch numbering snapshot normalization (2026-11-22; independent closure pending)
 
 The independent F38-10/F38-11 delta review of `970c318b2aaad3eb0b06b43b4e804eb26360cf41` declared **F38-10/P2 CLOSED** (strict original direct-finance confirmation) and **F38-11/P2 CLOSED** (Core numbering default/alias/legacy model lookup) but discovered **F38-12/P2 OPEN, DEVELOPMENT-MERGE BLOCKER**. In V22/23/24, `Facture::validate()` may normalize a missing, blank or legacy `FACTURE_ADDON` inside the same PHP request after booking the first member. A later per-member preview previously included the mutated raw setting in `invoice.settings`, changing the confirmation fingerprint although the effective numbering model did not change.
