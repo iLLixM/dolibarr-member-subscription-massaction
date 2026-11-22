@@ -150,6 +150,11 @@ final class MsmFileBookingCheckpoint
 			|| ($origin['profile']['profile'] ?? null) !== 'CoreGuarded'
 			|| (int) ($origin['owner'] ?? 0) !== (int) ($user->id ?? 0)
 			|| !isset($origin['rows'][$id]['invoice'])
+			// F38-10: fingerprint equality alone does not bind the actual invoice
+			// parameters supplied to a direct service caller.
+			|| !is_array($origin['rows'][$id] ?? null)
+			|| (array_key_exists('_profile', $row) && $row['_profile'] !== $origin['profile'])
+			|| $this->mailConfirmedRowMismatch($row, $origin['rows'][$id])
 			|| !is_string($origin['rows'][$id]['fingerprint'] ?? null)
 			|| !hash_equals($origin['rows'][$id]['fingerprint'], (string) ($row['fingerprint'] ?? ''))
 			|| empty($row['invoice'])
