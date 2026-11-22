@@ -152,12 +152,11 @@ function msmProcessBooking(array $state, $service, $mailer, $user, callable $sav
 						// Only the production adapter exposes separately derived
 						// evidence. Fail closed instead of pretending a legacy spy
 						// is an authoritative real-file/transport verifier.
-						$delivery = $mailer->sendWithEvidence($member, $row, $user, true, $invoice);
+						$delivery = $mailer->sendWithEvidence($member, $row, $user, true, $invoice, $save, (int) $id);
 						if (!is_array($delivery)
 							|| !in_array($delivery['mail'] ?? '', array('transport', 'hook', 'failed', 'missing', 'disabled', 'denied', 'attachment_missing', 'unknown'), true)
 							|| !in_array($delivery['attachment'] ?? '', array('verified_for_transport', 'verified_before_hook', 'missing', 'not_sent', 'unknown', 'not_required'), true)
-							|| ($invoice !== null && ($delivery['mail'] ?? '') === 'transport' && $delivery['attachment'] !== 'verified_for_transport')
-							|| ($invoice !== null && ($delivery['mail'] ?? '') === 'hook' && $delivery['attachment'] !== 'verified_before_hook')) {
+							|| !msmValidMailAttachmentEvidence($delivery, $invoice !== null)) {
 							throw new RuntimeException('MSMMailUnknown');
 						}
 					} catch (Throwable $e) { $delivery = array('mail' => 'unknown', 'attachment' => 'unknown'); }
@@ -181,6 +180,28 @@ function msmProcessBooking(array $state, $service, $mailer, $user, callable $sav
 	return $state;
 }
 
+/** Finite combinations; never infer successful transport from a stray adapter
+ * status. The invoice-less mail path must not invent invoice attachments.
+ */
+function msmValidMailAttachmentEvidence(array $delivery, $withInvoice)
+{
+	$mail = $delivery['mail'] ?? null;
+	$attachment = $delivery['attachment'] ?? null;
+	if (!$withInvoice) {
+		return $attachment === 'not_required';
+	}
+	$allowed = array(
+		'transport' => 'verified_for_transport',
+		'hook' => 'verified_before_hook',
+		'attachment_missing' => 'missing',
+		'unknown' => 'unknown',
+		'failed' => 'not_sent',
+		'disabled' => 'not_sent',
+		'denied' => 'not_sent',
+		'missing' => 'not_sent',
+	);
+	return isset($allowed[$mail]) && $attachment === $allowed[$mail];
+}
 /** Mark only following selected slots, preserving the acknowledged current result. */
 function msmStopUnprocessed(array &$state, $current)
 {
