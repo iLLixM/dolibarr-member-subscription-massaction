@@ -731,7 +731,8 @@ try {
 			&& count(array_keys($db->events,'subscription',true))===2
 			&& count(array_keys($db->calls,'invoice-validate',true))===2,
 			'F38-12 two confirmed members survive Core normalized model in real Booking/Invoice adapter flow '
-			.var_export($rawModel,true));
+			.var_export($rawModel,true).' results='.json_encode($done['results'])
+			.' calls='.json_encode($db->calls).' events='.json_encode($db->events));
 		verify(getDolGlobalString('FACTURE_ADDON')===$canonical,
 			'F38-12 Core validate adapter reproduced in-process normalization');
 		$after=new F3812Preview($db,(function()use($booking) {
