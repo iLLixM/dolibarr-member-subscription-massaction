@@ -103,6 +103,29 @@ class Cf05FinanceBooking extends BookingServiceDouble
 			$guard->getValue($this),$checkpoint->getValue($this));
 	}
 }
+/** F38-10: mutate the finance row only after Booking confirmed and posted the
+ * subscription. Invoice admission must reject before any invoice Core API.
+ */
+class Cf05TamperedFinanceInvoice extends Cf05FinanceInvoice
+{
+	public function create($member,$subscription,array $row,$actor,array &$diagnostic)
+	{
+		$row['amount'] = $row['amount'] + 1;
+		return parent::create($member,$subscription,$row,$actor,$diagnostic);
+	}
+}
+class Cf05TamperedFinanceBooking extends Cf05FinanceBooking
+{
+	protected function invoicing()
+	{
+		$guard = new ReflectionProperty(MsmBookingService::class,'activeTransaction');
+		$guard->setAccessible(true);
+		$checkpoint = new ReflectionProperty(MsmBookingService::class,'coreCheckpoint');
+		$checkpoint->setAccessible(true);
+		return new Cf05TamperedFinanceInvoice($this->profileDb,$this->databaseState,
+			$guard->getValue($this),$checkpoint->getValue($this));
+	}
+}
 /** Unmodified, real production profile admission for a confirmed file-session.
  * It must deny finance before Core BEGIN even when the stored confirmation
  * is valid and the PreviewUser has the usual rights.
@@ -208,6 +231,7 @@ try {
 		array('name'=>'core_agenda_copy_parity','autocreate'=>false,'mode'=>'','change'=>false,
 			'expected'=>'success','agenda'=>true,'agenda_copy'=>'yes','logevents'=>'1'),
 		array('name'=>'precheck','autocreate'=>true,'mode'=>'','change'=>true,'expected'=>'failed'),
+		array('name'=>'finance_tampered_row','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'unknown','tampered_finance'=>true),
 		array('name'=>'customer_fail','autocreate'=>true,'mode'=>'customer','change'=>false,'expected'=>'unknown'),
 		array('name'=>'invoice_create_fail','autocreate'=>true,'mode'=>'create','change'=>false,'expected'=>'unknown'),
 		array('name'=>'invoice_validate_fail','autocreate'=>true,'mode'=>'validate','change'=>false,'expected'=>'unknown'),
@@ -233,7 +257,7 @@ try {
 			'version'=>1,'family'=>'mysql','profile'=>'CoreGuarded','nonce'=>str_repeat('b',32)));
 		$db->customerId=$case['autocreate']?0:4;
 		$db->mode=$case['mode'];
-		$flow=new Cf05FinanceBooking($db);
+		$flow=!empty($case['tampered_finance']) ? new Cf05TamperedFinanceBooking($db) : new Cf05FinanceBooking($db);
 		$flow->object=new BookingMemberDouble($db);
 		$flow->object->id=1; $flow->object->entity=1; $flow->object->typeid=1;
 		$flow->object->socid=$db->customerId; $flow->object->morphy='phy';
@@ -349,6 +373,10 @@ try {
 				&& !in_array('invoice-create',$db->calls,true) && $pdf->calls===0 && $mail->calls===0,
 				'CF05 typed pre-Core finance business refusal permits only owned rollback');
 		} else {
+			if (!empty($case['tampered_finance'])) {
+				verify(!$db->calls && ($r['diagnostic']['stage'] ?? null)==='finance_precheck',
+					'F38-10 finance row altered after Booking original subscription cannot enter Invoice Core');
+			}
 			verify($r['stop'] && ($r['rollback'] ?? null)==='unconfirmed'
 				&& !in_array('rollback',$db->events,true) && $pdf->calls===0 && $mail->calls===0,
 				'CF05 unqualified customer/invoice/error context UNKNOWN/STOP '.$case['name']);
