@@ -13,6 +13,7 @@ final class MsmFileBookingCheckpoint
 	private $financeAttempted = array();
 	private $postEffects = array();
 	private $mailEvidenceClaimed = array();
+	private $mailRecipients = array(); // Original fresh Booking recipient; never persisted or re-created.
 	public function __construct($key)
 	{
 		if (!is_string($key) || !preg_match('/^[a-f0-9]{32}$/D', $key)) { throw new RuntimeException('MSMSessionFailure'); }
@@ -103,6 +104,32 @@ final class MsmFileBookingCheckpoint
 		// acknowledgement. This in-process capability cannot be reused.
 		$this->attempted[$id] = true;
 	}
+	/** F38-03: attach the freshly fetched member identity at Booking's
+	 * verified-preview boundary, before any business DML. Never accept a
+	 * caller-supplied confirmation row as the trusted recipient itself.
+	 * An empty email may still be captured (the mail adapter returns missing).
+	 */
+	public function bindMailRecipient($id, $member, array $verifiedRow)
+	{
+		$this->requireBinding();
+		$origin = $this->confirmedOrigin;
+		if (!is_int($id) || $id < 1 || !isset($this->attempted[$id])
+			|| isset($this->mailRecipients[$id]) || !is_array($origin)
+			|| empty($origin['options']['sendmail'])
+			|| !in_array($id, $origin['ids'] ?? array(), true)
+			|| !is_object($member) || (int) ($member->id ?? 0) !== $id
+			|| (int) ($member->entity ?? 0) !== (int) ($origin['entity'] ?? 0)
+			|| !is_array($origin['rows'][$id] ?? null)
+			|| !is_string($verifiedRow['fingerprint'] ?? null)
+			|| !is_string($origin['rows'][$id]['fingerprint'] ?? null)
+			|| !hash_equals($origin['rows'][$id]['fingerprint'], $verifiedRow['fingerprint'])) {
+			throw new RuntimeException('MSMCoreGuardedSessionUnsupported');
+		}
+		$this->mailRecipients[$id] = array(
+			'email' => (string) ($member->email ?? ''),
+			'entity' => (int) $member->entity,
+			'typeid' => (int) ($member->typeid ?? 0));
+	}
 	/** No SQL and no new permission grant: the originally consumed, in-process
 	 * capability is the only possible CoreGuarded Invoice continuation.
 	 */
@@ -174,7 +201,8 @@ final class MsmFileBookingCheckpoint
 	 * already have re-read the persisted original confirmed result.
 	 * This proof never writes a DB row or opens another transaction.
 	 */
-	public function requireMailEvidence($id, $user, array $invoice = null, array $current = null)
+	public function requireMailEvidence($id, $user, array $invoice = null, array $current = null,
+		$member = null, array $row = array())
 	{
 		$this->requireBinding();
 		$origin = $this->confirmedOrigin;
@@ -194,6 +222,14 @@ final class MsmFileBookingCheckpoint
 			|| empty($origin['profile']['features']['sendmail'])
 			|| empty($origin['options']['sendmail'])
 			|| !is_array($origin['rows'][$id] ?? null)
+			// The effect is bound to the *actual* original email recipient
+			// and exact server-confirmed fee/period/description/fingerprint.
+			|| !is_array($this->mailRecipients[$id] ?? null)
+			|| !is_object($member) || (int) ($member->id ?? 0) !== $id
+			|| (int) ($member->entity ?? 0) !== $this->mailRecipients[$id]['entity']
+			|| (int) ($member->typeid ?? 0) !== $this->mailRecipients[$id]['typeid']
+			|| (string) ($member->email ?? '') !== $this->mailRecipients[$id]['email']
+			|| $row !== $origin['rows'][$id]
 			|| (bool) !empty($origin['options']['invoice']) !== ($invoice !== null)
 			|| ($invoice !== null && ((int) ($invoice['member_id'] ?? 0) !== $id
 				|| (int) ($invoice['entity'] ?? 0) !== (int) ($origin['entity'] ?? 0)

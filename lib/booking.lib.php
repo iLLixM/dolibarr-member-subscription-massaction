@@ -168,7 +168,11 @@ function msmProcessBooking(array $state, $service, $mailer, $user, callable $sav
 							|| !msmValidMailAttachmentEvidence($delivery, $invoice !== null)) {
 							throw new RuntimeException('MSMMailUnknown');
 						}
-					} catch (Throwable $e) { $delivery = array('mail' => 'unknown', 'attachment' => 'unknown'); }
+					} catch (Throwable $e) {
+						// F38-06: contribution-only mails have no invoice attachment.
+						$delivery = array('mail' => 'unknown',
+							'attachment' => $invoice !== null ? 'unknown' : 'not_required');
+					}
 					$state['results'][$id]['mail'] = $delivery['mail'];
 					$state['results'][$id]['attachment_status'] = $delivery['attachment'];
 				}

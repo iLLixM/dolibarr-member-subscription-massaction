@@ -239,6 +239,13 @@ class MsmBookingService
 				$result['status'] = 'skipped';
 				throw new RuntimeException('MSMChangedConfirmation');
 			}
+			// F38-03: seal the recipient of the freshly reloaded member and
+			// the revalidated preview before any Core business action.
+			// This original in-process capability later rejects altered
+			// recipient/entity/mail parameters before Hook/SMTP.
+			if ($coreGuarded && !empty($options['sendmail'])) {
+				$checkpoint->bindMailRecipient((int) $id, $member, $row);
+			}
 			$this->requireOwned();
 			$diagnostic['stage'] = 'subscription';
 			$subscription = $member->subscription($row['start'], $row['amount'], 0, '', $row['description'], '', '', '', $row['end'], $member->typeid);
