@@ -16,6 +16,8 @@ $required = array(
 	'class/actions_membersubscriptionmassaction.class.php',
 	'lib/membersubscriptionmassaction.lib.php',
 	'admin/setup.php',
+	'langs/de_DE/membersubscriptionmassaction.lang',
+	'langs/en_US/membersubscriptionmassaction.lang',
 	'class/period.class.php',
 	'lib/preview_renderer.lib.php',
 	'subscription.php',
