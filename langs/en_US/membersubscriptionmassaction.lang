@@ -168,3 +168,5 @@ MSMCompletionStatus=Transaction completion
 MSMCompletion_nonterminal_acknowledged=Acknowledged nonterminal Core completion; effects require a separate durable checkpoint.
 MSMCompletion_terminal_acknowledged=Acknowledged terminal Core completion; no further booking, PDF or mail work.
 MSMCompletion_unknown=Transaction completion uncertain; STOP without further effects.
+
+MSMCoreFinanceUnqualified=CoreGuarded finance is not qualified for this Dolibarr version, enabled trigger configuration or provisional invoice file path. Processing stopped; review the configuration.

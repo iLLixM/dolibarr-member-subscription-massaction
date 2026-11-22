@@ -168,3 +168,5 @@ MSMCompletionStatus=Transaktionsabschluss
 MSMCompletion_nonterminal_acknowledged=Bestätigter nichtterminaler Core-Abschluss; Folgeschritte nur nach eigenem Ergebnis-Checkpoint.
 MSMCompletion_terminal_acknowledged=Bestätigter terminaler Core-Abschluss; keine weiteren Buchungen, PDF- oder Mailaktionen.
 MSMCompletion_unknown=Transaktionsabschluss ungeklärt; STOP ohne Folgeschritte.
+
+MSMCoreFinanceUnqualified=CoreGuarded-Finanzfunktion ist für diese Dolibarr-Version, Trigger-Konfiguration oder den vorgefundenen Rechnungsdateipfad nicht sicher qualifiziert. Vorgang gestoppt; Konfiguration prüfen.
