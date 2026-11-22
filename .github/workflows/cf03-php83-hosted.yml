@@ -62,7 +62,7 @@ on:
       - 'lib/booking.lib.php'
       - 'lib/booking_renderer.lib.php'
       - 'test/unit/cf05-finance.php'
-      - 'test/unit/cf05-core-qualification.php'
+      - 'test/unit/cf05-core-parity.php'
       - 'test/unit/maildelivery.php'
       - 'test/unit/invoicepdf.php'
       - 'test/unit/postcommit.php'
@@ -116,7 +116,7 @@ jobs:
           php test/unit/booking.php
           php test/unit/f29-book-flow.php
           php test/unit/invoiceprofile.php
-          php test/unit/cf05-core-qualification.php
+          php test/unit/cf05-core-parity.php
           php test/unit/invoice.php
           php test/unit/cf05-finance.php
           php test/unit/ci-triggers.php

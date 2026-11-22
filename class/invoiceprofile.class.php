@@ -38,14 +38,36 @@ class MsmInvoiceProfile
 		global $mysoc;
 		return getDolGlobalString('ADHERENT_VAT_FOR_SUBSCRIPTIONS') === 'defaultforfoundationcountry' ? get_default_tva($mysoc, $mysoc, $product) : 0;
 	}
-	/** No arbitrary module paths from configuration are accepted. */
+	/** Use Dolibarr's normal model search roots, including installed modules.
+	 * Keep strict model-name shape so confirmed values cannot supply paths.
+	 * This checks configured model availability, NOT PHP source identity.
+	 */
+	protected function modelDirectories()
+	{
+		global $conf;
+		$dirs = array_merge(array('/'), (array) ($conf->modules_parts['models'] ?? array()));
+		$result = array();
+		foreach ($dirs as $relative) {
+			if (!is_string($relative) || $relative === '') { continue; }
+			$result[] = dol_buildpath($relative.'core/modules/facture/', 0);
+		}
+		return $result;
+	}
 	protected function models($number, $pdf)
 	{
 		foreach (array($number, $pdf) as $name) {
-			if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_]*$/D', $name)) { throw new RuntimeException('MSMInvoiceProfileUnsupported'); }
+			if (!is_string($name) || !preg_match('/^[a-zA-Z][a-zA-Z0-9_]*$/D', $name)) {
+				throw new RuntimeException('MSMInvoiceProfileUnsupported');
+			}
 		}
-		if (!is_readable(DOL_DOCUMENT_ROOT.'/core/modules/facture/'.$number.'.php')
-			|| !is_readable(DOL_DOCUMENT_ROOT.'/core/modules/facture/doc/pdf_'.$pdf.'.modules.php')) { throw new RuntimeException('MSMInvoiceProfileUnsupported'); }
+		$numberFound = false; $pdfFound = false;
+		foreach ($this->modelDirectories() as $root) {
+			if (!is_string($root) || $root === '') { continue; }
+			$root = rtrim($root, '/').'/';
+			$numberFound = $numberFound || (is_file($root.$number.'.php') && is_readable($root.$number.'.php'));
+			$pdfFound = $pdfFound || (is_file($root.'doc/pdf_'.$pdf.'.modules.php') && is_readable($root.'doc/pdf_'.$pdf.'.modules.php'));
+		}
+		if (!$numberFound || !$pdfFound) { throw new RuntimeException('MSMInvoiceProfileUnsupported'); }
 	}
 	public static function fields($object, array $names)
 	{

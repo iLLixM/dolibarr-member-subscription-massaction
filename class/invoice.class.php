@@ -34,23 +34,11 @@ class MsmInvoiceService
 	}
 	protected function invoice() { require_once DOL_DOCUMENT_ROOT.'/compta/facture/class/facture.class.php'; return new Facture($this->db); }
 	protected function customer() { require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php'; return new Societe($this->db); }
-	/** Qualified Core source/trigger gate: do not replace with a UI/admin flag.
-	 * This seam is overridden solely by isolated synthetic financial fixtures.
-	 */
-	protected function requireCoreFinanceQualification()
-	{
-		require_once __DIR__.'/corefinancequalification.class.php';
-		MsmCoreFinanceQualification::requireReady();
-	}
-	protected function requireCoreProvisionalPathSafe($invoice)
-	{
-		require_once __DIR__.'/corefinancequalification.class.php';
-		MsmCoreFinanceQualification::requireProvisionalPathSafe($invoice);
-	}
 	public function checkTables()
 	{
-		// The first Booking checkTables() runs BEFORE outer BEGIN.
-		if ($this->activeGuard instanceof MsmCoreGuardedTransaction) { $this->requireCoreFinanceQualification(); }
+		// Core-parity Owner decision (2026-11-22): do not source-pin Dolibarr
+		// invoice, trigger, numbering or extension code. Keep transaction-engine
+		// readiness and original Booking/Invoice guard ownership checks.
 		$this->databaseState->requireTransactionalTables(array('societe', 'societe_extrafields', 'socpeople', 'socpeople_extrafields', 'societe_commerciaux', 'facture', 'facture_extrafields', 'facturedet', 'facturedet_extrafields', 'element_element', 'ecm_files'));
 	}
 	public function lock($id)
@@ -110,9 +98,6 @@ class MsmInvoiceService
 		if ($this->activeGuard instanceof MsmCoreGuardedTransaction) {
 			if ($this->coreCheckpoint === null) { throw new RuntimeException('MSMCoreGuardedSessionUnsupported'); }
 			$this->coreCheckpoint->requireFinanceContinuation((int) $member->id, $row, $actor);
-			// Never source-qualify a forged direct call before verifying the
-			// original consumed capability; still BEFORE first financial Core API.
-			$this->requireCoreFinanceQualification();
 		}
 		if (!MsmPreviewService::canCreateSubscriptionWithOptions($actor, true, false)) {
 			throw new MsmQualifiedCoreFinanceBusinessError('NotEnoughPermissions');
@@ -167,12 +152,10 @@ class MsmInvoiceService
 		$line = $invoice->addline($this->invoiceDescription($row['description']), 0, $plan['quantity'], $plan['vat'], 0, 0, $plan['product'], 0, $row['start'], '', 0, 0, 0, $plan['price_base'], $row['amount'], $plan['type']);
 		$this->owned(); if ($line <= 0) { throw new RuntimeException('MSMInvoiceFailed'); }
 		$diagnostic['stage'] = 'invoice_validate';
-		// F36-02: the stock Core validator may rename an existing provisional
-		// document directory before the OUTER transaction commits. Reject a
-		// reachable source directory without modifying it.
-		if ($this->activeGuard instanceof MsmCoreGuardedTransaction) {
-			$this->requireCoreProvisionalPathSafe($invoice);
-		}
+		// F36-02: accept Core's conditional PROV document-directory rename as
+		// an explicit, documented Core-inherent non-DB-atomic residual risk.
+		// Do not add an independent file/source allowlist; never promise that
+		// SQL rollback compensates a prior Core filesystem side effect.
 		$this->owned(); // Before nested Core Facture::validate().
 		$validated = $invoice->validate($actor); $this->owned();
 		if ($validated <= 0) { throw new RuntimeException('MSMInvoiceFailed'); }

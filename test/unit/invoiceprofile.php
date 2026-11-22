@@ -8,10 +8,17 @@ $before = $passed;
 class InvoiceProfileFixture extends MsmInvoiceProfile
 {
 	public $term = 1; public $rate = 0; public $item; public $useCoreVat = false;
+	public $extraModelDir = null;
 	protected function paymentTerm() { return $this->term; }
 	protected function paymentTermLabel($id) { return 'Synthetic term'; }
 	protected function vat($product) { return $this->useCoreVat ? parent::vat($product) : $this->rate; }
 	protected function product($id, $user) { return $this->item; }
+	protected function modelDirectories()
+	{
+		$dirs = parent::modelDirectories();
+		if ($this->extraModelDir !== null) { $dirs[] = $this->extraModelDir; }
+		return $dirs;
+	}
 	protected function models($number, $pdf) { parent::models($number, $pdf); }
 }
 $conf->global = new stdClass(); $conf->entity = 1; $conf->currency = 'EUR';
@@ -50,6 +57,27 @@ $profile->rate = '20*';
 fails(static function () use ($profile, $member, $user) { $profile->resolve($member, $user, false, false); }, 'MSMInvoiceProfileUnsupported'); $profile->rate = 0;
 $conf->global->FACTURE_ADDON_PDF = '../crabe';
 fails(static function () use ($profile, $member, $user) { $profile->resolve($member, $user, false, false); }, 'MSMInvoiceProfileUnsupported'); unset($conf->global->FACTURE_ADDON_PDF);
+// Core model resolution also searches installed module model paths. This
+// fixture overrides ONLY the directory list, not the production models() logic.
+$extra = sys_get_temp_dir().'/msm-parity-models-'.bin2hex(random_bytes(6));
+if (!mkdir($extra.'/doc', 0700, true)) { throw new RuntimeException('Cannot create custom model fixture'); }
+try {
+	file_put_contents($extra.'/mod_facture_custom.php', '<?php // valid installed numbering model');
+	file_put_contents($extra.'/doc/pdf_custom.modules.php', '<?php // valid installed PDF model');
+	$profile->extraModelDir = $extra;
+	$conf->global->FACTURE_ADDON = 'mod_facture_custom';
+	$conf->global->FACTURE_ADDON_PDF_0 = 'custom';
+	$customPlan = $profile->resolve($member, $user, false, false);
+	verify($customPlan['number_model']==='mod_facture_custom' && $customPlan['pdf_model']==='custom',
+		'Core-parity installed custom numbering and PDF models admitted by normal model lookup');
+	$conf->global->FACTURE_ADDON_PDF_0 = '../custom';
+	fails(static function()use($profile,$member,$user) { $profile->resolve($member,$user,false,false); }, 'MSMInvoiceProfileUnsupported');
+} finally {
+	$profile->extraModelDir = null;
+	unset($conf->global->FACTURE_ADDON, $conf->global->FACTURE_ADDON_PDF_0);
+	@unlink($extra.'/mod_facture_custom.php'); @unlink($extra.'/doc/pdf_custom.modules.php');
+	@rmdir($extra.'/doc'); @rmdir($extra);
+}
 $conf->global->ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS = 1; $profile->item = (object) array('packaging' => 2, 'ref' => 'P-<1>', 'label' => 'Synthetic & service');
 fails(static function () use ($profile, $member, $user) { $profile->resolve($member, $user, false, false); }, 'MSMInvoiceProfileUnsupported'); unset($conf->global->ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS);
 foreach (array('processing', 'done') as $phase) {

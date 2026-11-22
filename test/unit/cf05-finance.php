@@ -25,13 +25,11 @@ class Cf05FinanceDb extends InvoiceDatabaseDouble
 		return parent::query($sql);
 	}
 }
-/** TEST-ONLY qualification: future CoreGuarded feature admission, not reachable
- * through the production profile factory, admin config, POST or ordinary UI.
+/** Fixture supplies the synthetic persisted admin row, but INHERITS the
+ * actual production CoreGuarded finance admission (now enabled by Owner).
+ * This test must no longer override the real feature gate.
  */
-class Cf05QualifiedFinanceProfile extends FixtureTransactionProfile
-{
-	protected function coreGuardedFinanceQualified() { return true; }
-}
+class Cf05QualifiedFinanceProfile extends FixtureTransactionProfile {}
 /** Faithful bounded synthetic guard: never calls P_S or invents event identity. */
 class Cf05FinanceGuard extends MsmCoreGuardedTransaction
 {
@@ -82,8 +80,6 @@ class Cf05FinanceInvoice extends MsmInvoiceService
 		global $conf;
 		return new Cf05QualifiedFinanceProfile($this->db,$this->databaseState,(int)$conf->entity);
 	}
-	protected function requireCoreFinanceQualification() {} // Test-only fixture, never the deployed source gate.
-	protected function requireCoreProvisionalPathSafe($invoice) {} // Synthetic invoice creates no real PROV directory.
 	protected function invoice() { return new InvoiceObjectDouble($this->db); }
 	protected function customer() { return new InvoiceCustomerDouble($this->db); }
 }
@@ -207,6 +203,10 @@ try {
 	foreach (array(
 		array('name'=>'existing','autocreate'=>false,'mode'=>'','change'=>false,'expected'=>'success'),
 		array('name'=>'new','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success'),
+		array('name'=>'contribution_mail_success','autocreate'=>false,'mode'=>'','change'=>false,
+			'expected'=>'success','no_invoice'=>true),
+		array('name'=>'core_agenda_copy_parity','autocreate'=>false,'mode'=>'','change'=>false,
+			'expected'=>'success','agenda'=>true,'agenda_copy'=>'yes','logevents'=>'1'),
 		array('name'=>'precheck','autocreate'=>true,'mode'=>'','change'=>true,'expected'=>'failed'),
 		array('name'=>'customer_fail','autocreate'=>true,'mode'=>'customer','change'=>false,'expected'=>'unknown'),
 		array('name'=>'invoice_create_fail','autocreate'=>true,'mode'=>'create','change'=>false,'expected'=>'unknown'),
@@ -224,6 +224,11 @@ try {
 		array('name'=>'contribution_mail_throws','autocreate'=>false,'mode'=>'','change'=>false,
 			'expected'=>'success','no_invoice'=>true,'mail_throw'=>true)
 	) as $case) {
+		// Enabling a standard Agenda/file-copy or Logevents configuration
+		// must no longer invoke the retired source/trigger allowlist.
+		$conf->modules['agenda']=!empty($case['agenda']) ? 1 : 0;
+		$conf->global->MAIN_COPY_FILE_IN_EVENT_AUTO=$case['agenda_copy'] ?? '';
+		$conf->global->MAIN_LOGEVENTS_BILL_VALIDATE=$case['logevents'] ?? '';
 		$db=new Cf05FinanceDb(); $db->family='mysql'; $db->profileRaw=json_encode(array(
 			'version'=>1,'family'=>'mysql','profile'=>'CoreGuarded','nonce'=>str_repeat('b',32)));
 		$db->customerId=$case['autocreate']?0:4;
@@ -326,10 +331,16 @@ try {
 						'CF05 Phase4 uncertain SMTP preserves verified PDF and unknown attachment separately');
 				}
 			} else {
-				verify($pdf->calls===1 && $mail->calls===1
-					&& ($r['invoice']['pdf']['status'] ?? '')==='verified'
-					&& $r['mail']==='transport' && $r['attachment_status']==='verified_for_transport',
-					'CF05 Phase4 completion, verified PDF, attachment and mail evidence separate '.$case['name']);
+				if (!empty($case['no_invoice'])) {
+					verify(!isset($r['invoice']) && $pdf->calls===0 && $mail->calls===1
+						&& $r['mail']==='transport' && $r['attachment_status']==='not_required',
+						'Owner Core-parity contribution-only mail transports without a fabricated PDF attachment');
+				} else {
+					verify($pdf->calls===1 && $mail->calls===1
+						&& ($r['invoice']['pdf']['status'] ?? '')==='verified'
+						&& $r['mail']==='transport' && $r['attachment_status']==='verified_for_transport',
+						'CF05 Phase4 completion, verified PDF, attachment and mail evidence separate '.$case['name']);
+				}
 			}
 			verify($db->transaction_opened===0 && !in_array('rollback',$db->events,true),
 				'CF05 no second transaction owner '.$case['name']);
