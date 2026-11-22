@@ -1,5 +1,7 @@
 # CF05-06 – V22/V24 standard-Core, transaction and filesystem qualification plan
 
+> **OWNER OVERRIDE 2026-11-22 — PR #38:** Full CoreGuarded invoice/Third-Party/PDF/mail *runtime profile admission is now enabled* for Phase-5 preparation by an explicit Owner decision. Historical references below requiring the finance gate to stay closed until CF05-06/07 have been superseded **for feature admission only**. **F36-02/CF05-06 is NOT CLOSED**: the V22/V24 `Facture::validate()` conditional pre-outer-COMMIT `PROV` rename and standard trigger/engine/FS effects remain unqualified, so real financial safety/rollback-atomicity cannot be asserted. The previous exemption making F36-02 nonblocking for a closed-gate development merge **cannot be carried forward to this open-gate change**. Independent source review and an explicit Owner operational risk decision are required before actual A/D finance writes/deployment. A/B/C preflight, new one-shot real cases and release gates remain separate.
+
 **Status: OPEN / NOT QUALIFIED / NOT A REAL-TEST OR FINANCE-ACTIVATION AUTHORIZATION (2026-11-21).** Binding references: [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22), [ADR-06/11 and D-01/D-02](adr/ADR-0001-core-first-transaction-profiles.md), the [risk register](adr/ADR-0001-risk-register.md) and the [Phase-3 implementation record](cf05-phase3-finance-admission.md). This is a source-led qualification work plan, not a new Owner architecture decision or proof of completed tests.
 
 ## Current exact-source development baseline

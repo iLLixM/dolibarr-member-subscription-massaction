@@ -1,5 +1,7 @@
 # CF05 Phase 4 – Post-commit PDF, attachment and mail evidence / offline qualification
 
+> **CURRENT OWNER POLICY — 2026-11-22, DRAFT PR #38:** The originally documented production-default-deny condition below was an accurate *historical development checkpoint*, not the current PR policy. The Owner now expressly activates CoreGuarded invoice/autocreate/selected-invoice PDF/sendmail via `MsmTransactionProfile` to prepare Phase 5 real A–D coverage. This is a **runtime admission policy change**, not completed F36-02/CF05-06 real Core/FS safety qualification. The previous F38-01/F38-02 protections, original active guard, independently persisted one-shot file session and UNKNOWN/STOP remain binding. **F38-03 recipient/entity/confirmed-row binding, F38-04 CI filters and F38-06 no-invoice attachment exception handling** are being corrected in the same PR, pending exact-HEAD independent delta review. No real DB/SMTP evidence or release GO is inferred.
+
 **Status: DRAFT DEVELOPMENT IN [PR #38](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/38), NOT PRODUCTION-ADMITTED OR INDEPENDENTLY APPROVED (2026-11-21).**
 
 ## Independent F38 review and corrective delta (2026-11-22)

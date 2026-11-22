@@ -1,5 +1,11 @@
 # Changelog
 
+### Owner-requested full CoreGuarded finance re-activation (2026-11-22, PR #38 DRAFT)
+
+- **Policy change (not independently approved):** The server-authoritative CoreGuarded finance gate returns `true` on the PR branch. `booking/invoice/autocreate/sendmail` feature flags and the dependent invoice PDF path are available under normal valid CoreGuarded configuration and unchanged rights/confirmation/guard/one-shot checkpoints. The earlier default-denied state remains a historically CLOSED F36-01 finding on its earlier exact source, **not evidence of this new unlock's safety**.
+- **Risk boundary:** **F36-02/P2 OPEN / CF05-06 REQUIRED** remains materially relevant because the V22/V24 Core invoice validator may rename `PROV` documents prior to the outer commit. This was previously deferred only because finance was closed; now a reviewer must re-evaluate the opened path and any mitigation/support restriction before actual real finance writes. No new real test, production deployment, rollback guarantee, ZIP/tag or release GO is claimed.
+- **Latest corrective scope:** F38-03 recipient/entity/confirmed-row one-shot binding; F38-04 complete full/hosted CI security-path filter test; F38-06 invoice-less mail exception-status consistency. All remain independent-review pending until exact-HEAD CI and delta review.
+
 ## Unreleased
 
 ### Phase-4 development in PR #38 – checkpointed PDF/attachment/mail evidence, offline regression
