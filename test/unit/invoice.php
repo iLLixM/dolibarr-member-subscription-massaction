@@ -677,7 +677,7 @@ try {
 	$conf->modules=array('member'=>1,'invoice'=>1,'societe'=>1);
 	$conf->currency='EUR';
 	$mysoc=(object)array('country_id'=>1);
-	foreach (array(null,'','terre','mercure') as $rawModel) {
+	foreach (array(null,'','0',0,'terre','mercure') as $rawModel) {
 		$conf->global=new stdClass();
 		$conf->global->ADHERENT_VAT_FOR_SUBSCRIPTIONS='0';
 		if ($rawModel!==null) { $conf->global->FACTURE_ADDON=$rawModel; }
@@ -711,7 +711,7 @@ try {
 			$expectedRows[$id]=$row;
 		}
 		$preCoreRaw=getDolGlobalString('FACTURE_ADDON');
-		verify($preCoreRaw===($rawModel??''), 'F38-12 original Core setting not mutated by previews');
+		verify($preCoreRaw===($rawModel===null?'':(string)$rawModel), 'F38-12 original Core setting not mutated by previews');
 		$batch=array('profile'=>FixtureTransactionProfile::context($db,$actor),
 			'ids'=>array(1,2),'rows'=>$expectedRows,'options'=>$options,
 			'revision'=>5,'phase'=>'processing','results'=>array(),'overlap'=>array());
