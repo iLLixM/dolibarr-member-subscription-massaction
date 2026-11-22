@@ -19,6 +19,14 @@ The Owner requires **full** CoreGuarded, EnhancedMySQL and MariaDBSnapshot contr
 
 **Safety limitation:** A pre-`validate()` check **alone** cannot prevent a trigger *inside* `BILL_VALIDATE` from creating a new provisional directory after the check; therefore this control is explicitly paired with the restrictive source/trigger qualification described next. No guarantee for arbitrary triggers, unknown modifications, filesystem races from external actors or extra Core event behaviors is claimed.
 
+## Historical evidence classification — Core parity supersedes source admission
+
+**Dated Owner policy (2026-11-22, superseding the old reviewed qualification objective):** This file records **read-only historical code findings** about `Facture::validate()`, including the conditional pre-outer-COMMIT `PROV` filesystem rename, and the former source-pinning implementation. It is **not an effective PR #38 production permission gate**. The now-deleted `MsmCoreFinanceQualification` and its 15-version Core/Agenda/Logevents SHA allowlists, bans on enabled third-party triggers and automatic Agenda file copies, and `PROV` prevalidation prohibition were **intentionally withdrawn** under [Core parity + Massaction safety](owner-core-parity-2026-11-22.md), adopted in [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22). These previous restrictions are no longer required for F38-07/08/09 dispositions.
+
+**Still factual:** A conditional Core `PROV` rename may occur before the module's outer COMMIT and SQL rollback does not reverse a filesystem move. This remains **F36-02, Owner-accepted Core residual risk**, NOT proof of joint SQL/filesystem atomicity, a tested production guarantee, or an already executed A–D integration witness. All assertions about former `requireReady()` or trigger acceptance below are **historical descriptions of deleted PR-branch code**. The current functional/negative synthetic coverage is [Core parity regression](cf05-core-parity-regression.md). New independent whole-PR review and case-specific Owner real-test GO remain mandatory.
+
+---
+
 ## Exact pinned Core source evidence
 
 Dolibarr `Facture::create()` inserts the invoice as `(PROV)`, then sets the stored reference to `(PROV<id>)`. The fresh module flow sets normal type 0, creates a single subscription-linked invoice and line, and calls `Facture::validate()`. The validator assigns `oldref` from that provisional reference, invokes the standard `BILL_VALIDATE` trigger, then conditionally performs a **non-SQL** source-directory rename and contained-file renames if `file_exists($dirsource)`. Only afterwards does its nested Core COMMIT occur. The module's outer Booking COMMIT occurs later. A later SQL rollback cannot reverse such a rename.
