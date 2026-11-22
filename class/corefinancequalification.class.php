@@ -32,6 +32,38 @@ class MsmCoreFinanceQualification
 			'24.0.3'=>'f019dff8a7389282cf549c0a4ad9c9a665865fcd'
 		);
 	}
+	/** Enabled standard triggers are version-bound too; a patched trigger
+	 * with a harmless name cannot silently change the source qualification.
+	 */
+	private static function triggerBlobs()
+	{
+		return array(
+			'22.0.0'=>'72fda3a5d19b960500aa7c4e6ccc93c9edfb5b53',
+			'22.0.1'=>'72fda3a5d19b960500aa7c4e6ccc93c9edfb5b53',
+			'22.0.2'=>'696b4e701b760404c96eede3f2244fe4d04f72ab',
+			'22.0.3'=>'696b4e701b760404c96eede3f2244fe4d04f72ab',
+			'22.0.4'=>'696b4e701b760404c96eede3f2244fe4d04f72ab',
+			'22.0.5'=>'696b4e701b760404c96eede3f2244fe4d04f72ab',
+			'23.0.0'=>'bf8024e5dae4128d29e80e7882db6375ae98d3f0',
+			'23.0.1'=>'bf8024e5dae4128d29e80e7882db6375ae98d3f0',
+			'23.0.2'=>'bf8024e5dae4128d29e80e7882db6375ae98d3f0',
+			'23.0.3'=>'bf8024e5dae4128d29e80e7882db6375ae98d3f0',
+			'23.0.4'=>'bf8024e5dae4128d29e80e7882db6375ae98d3f0',
+			'24.0.0'=>'f4a7e4116dfd44d61f0309b90fc7a0418daf5875',
+			'24.0.1'=>'f4a7e4116dfd44d61f0309b90fc7a0418daf5875',
+			'24.0.2'=>'03b3210613c0a2a4d33deb45e6b443aad8a173b7',
+			'24.0.3'=>'03b3210613c0a2a4d33deb45e6b443aad8a173b7'
+		);
+	}
+	public static function triggerAllowed($version, $name, $gitBlobSha)
+	{
+		$agenda = self::triggerBlobs();
+		$known = $name === 'interface_50_modAgenda_ActionsAuto.class.php'
+			? ($agenda[$version] ?? null)
+			: ($name === 'interface_20_all_Logevents.class.php'
+				? 'b948ef99484444c3944d9cce1465af87c8f006f7' : null);
+		return is_string($gitBlobSha) && is_string($known) && hash_equals($known, $gitBlobSha);
+	}
 	/** Git blob identity, not raw SHA1: matches the immutable pinned Core tree. */
 	public static function sourceAllowed($version, $gitBlobSha)
 	{
@@ -53,7 +85,7 @@ class MsmCoreFinanceQualification
 	 * Any additional active Core or external trigger is outside the supported
 	 * CoreGuarded finance configuration until separately source-reviewed.
 	 */
-	public static function requireTriggerPaths($coreDir, array $extraDirs)
+	public static function requireTriggerPaths($coreDir, array $extraDirs, $version)
 	{
 		global $conf;
 		$dirs = array($coreDir);
@@ -77,6 +109,11 @@ class MsmCoreFinanceQualification
 				$module = strtolower(preg_replace('/^mod/i', '', $matches[1]));
 				if ($module !== 'all' && (!function_exists('isModEnabled') || !isModEnabled($module))) { continue; }
 				if ($index !== 0 || !in_array($module, array('agenda','all'), true)) {
+					throw new RuntimeException('MSMCoreFinanceUnqualified');
+				}
+				$bytes = file_get_contents($dir.'/'.$file);
+				if (!is_string($bytes)
+					|| !self::triggerAllowed($version, $file, sha1('blob '.strlen($bytes)."\0".$bytes))) {
 					throw new RuntimeException('MSMCoreFinanceUnqualified');
 				}
 			}
@@ -104,7 +141,7 @@ class MsmCoreFinanceQualification
 		self::requireSource(DOL_VERSION, $source);
 		$extra = $conf->modules_parts['triggers'] ?? array();
 		if (!is_array($extra)) { throw new RuntimeException('MSMCoreFinanceUnqualified'); }
-		self::requireTriggerPaths(DOL_DOCUMENT_ROOT.'/core/triggers', $extra);
+		self::requireTriggerPaths(DOL_DOCUMENT_ROOT.'/core/triggers', $extra, DOL_VERSION);
 		if (!is_object($conf->facture ?? null) || !is_string($conf->facture->dir_output ?? null)
 			|| $conf->facture->dir_output === '') { throw new RuntimeException('MSMCoreFinanceUnqualified'); }
 	}
