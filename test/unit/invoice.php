@@ -712,7 +712,7 @@ try {
 		}
 		$preCoreRaw=getDolGlobalString('FACTURE_ADDON');
 		verify($preCoreRaw===($rawModel??''), 'F38-12 original Core setting not mutated by previews');
-		$batch=array('profile'=>array('profile'=>'EnhancedMySQL'),
+		$batch=array('profile'=>FixtureTransactionProfile::context($db,$actor),
 			'ids'=>array(1,2),'rows'=>$expectedRows,'options'=>$options,
 			'revision'=>5,'phase'=>'processing','results'=>array(),'overlap'=>array());
 		$pdf=new class {
