@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 // CF05 synthetic original Booking + Invoice + file-session + after-commit
-// orchestration. No Dolibarr database, HTTP, PDF generation or SMTP.
+// orchestration. Local invalid PDF temporary file, no Dolibarr DB, HTTP or SMTP.
 if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 ob_start();
 require __DIR__.'/invoice.php';
+require_once __DIR__.'/../../class/invoicepdf.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/modules/syslog/mod_syslog_file.php';
 $cf05Base = $passed;
 
@@ -131,6 +132,26 @@ class Cf05FinancePdfSpy
  * the real one-shot capability and profile decision. No SMTP/Core hook or PDF
  * leaves the process: only sendInternal() is replaced with a synthetic return.
  */
+class Cf05InvalidWrittenPdf extends MsmInvoicePdfService
+{
+	public $root; public $calls=0; private $stored;
+	public function __construct($db,$root) {
+		parent::__construct($db); $this->root=$root;
+		$this->stored=(object) array('ref'=>'INV-SYNTHETIC',
+			'last_main_doc'=>'','status'=>1,'entity'=>1);
+	}
+	protected function currentUser($user) { return $user; }
+	protected function entityRoot($entity) { return $this->root; }
+	protected function load(array $identity,$user) { return $this->stored; }
+	protected function generateCore($invoice,$model,$langs) {
+		$this->calls++;
+		$dir=$this->root.'/INV-SYNTHETIC';
+		if (!is_dir($dir)) { mkdir($dir,0700); }
+		file_put_contents($dir.'/INV-SYNTHETIC.pdf','INVALID AFTER GENERATOR START');
+		$invoice->last_main_doc='facture/INV-SYNTHETIC/INV-SYNTHETIC.pdf';
+		return 1;
+	}
+}
 class Cf05FinanceMailSpy extends MsmSubscriptionMail
 {
 	public $calls=0; public $status='transport'; public $throws=false;
@@ -181,7 +202,10 @@ try {
 		array('name'=>'pdf_unknown','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success','pdf_status'=>'unknown'),
 		array('name'=>'mail_unknown','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success','mail_status'=>'unknown'),
 		array('name'=>'pdf_throws','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success','pdf_throw'=>true),
-		array('name'=>'mail_throws','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success','mail_throw'=>true)
+		array('name'=>'mail_throws','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success','mail_throw'=>true),
+		array('name'=>'pdf_invalid_written','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success','pdf_invalid_written'=>true),
+		array('name'=>'hook_negative_after_effect','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success','mail_status'=>'failed'),
+		array('name'=>'transport_negative_after_effect','autocreate'=>false,'mode'=>'','change'=>false,'expected'=>'success','mail_status'=>'failed')
 	) as $case) {
 		$db=new Cf05FinanceDb(); $db->family='mysql'; $db->profileRaw=json_encode(array(
 			'version'=>1,'family'=>'mysql','profile'=>'CoreGuarded','nonce'=>str_repeat('b',32)));
@@ -211,7 +235,7 @@ try {
 		session_id($sessionid);
 		verify(session_start(),'CF05 local session start '.$case['name']);
 		$expectStop=isset($case['pdf_status'])||isset($case['mail_status'])
-			|| !empty($case['pdf_throw']) || !empty($case['mail_throw']);
+			|| !empty($case['pdf_throw']) || !empty($case['mail_throw']) || !empty($case['pdf_invalid_written']);
 		$ids=$expectStop?array(1,2):array(1);
 		$rows=$expectStop?array(1=>$row,2=>$row):array(1=>$row);
 		$state=array('phase'=>'confirm','revision'=>5,'owner'=>$user->id,'entity'=>1,
@@ -238,6 +262,11 @@ try {
 			&& !$db->events && !$db->calls && $db->transaction_opened===0 && $db->saved===null,
 			'F36-01 production Booking denies fully confirmed CoreGuarded finance without any write '.$case['name']);
 		$pdf=new Cf05FinancePdfSpy(); $mail=new Cf05FinanceMailSpy($db);
+		if (!empty($case['pdf_invalid_written'])) {
+			$pdfRoot=$cf05Tmp.'/pdf-'.$case['name'];
+			if (!mkdir($pdfRoot,0700)) { throw new RuntimeException('Cannot create test-only PDF root'); }
+			$pdf=new Cf05InvalidWrittenPdf($db,$pdfRoot);
+		}
 		$realAdmissionMail=new Cf05ProductionEvidenceMailSpy($db);
 		$forged = $realAdmissionMail->sendWithEvidence($flow->object,$row,$user,true,
 			array('id'=>42,'member_id'=>1,'entity'=>1,'pdf'=>array('status'=>'verified')),
@@ -266,7 +295,7 @@ try {
 					&& $pdf->calls===1 && $db->transaction_opened===0
 					&& count(array_keys($db->events,'subscription',true))===1,
 					'CF05 Phase4 ambiguous postcommit effect stops next member without rollback '.$case['name']);
-				if (isset($case['pdf_status']) || !empty($case['pdf_throw'])) {
+				if (isset($case['pdf_status']) || !empty($case['pdf_throw']) || !empty($case['pdf_invalid_written'])) {
 					verify($r['invoice']['pdf']['status']==='unknown' && $r['mail']==='not_processed'
 						&& $r['attachment_status']==='not_processed' && $mail->calls===0,
 						'CF05 Phase4 PDF uncertainty prevents SMTP and preserves file status');
@@ -310,6 +339,12 @@ try {
 		}
 		session_destroy(); session_write_close();
 		@unlink($cf05Tmp.'/sess_'.$sessionid);
+		if (!empty($case['pdf_invalid_written'])) {
+			$file=$pdfRoot.'/INV-SYNTHETIC/INV-SYNTHETIC.pdf';
+			verify(is_file($file) && file_get_contents($file)!=='',
+				'F38-01 untrusted PDF file existed when output became unknown');
+			@unlink($file); @rmdir($pdfRoot.'/INV-SYNTHETIC'); @rmdir($pdfRoot);
+		}
 	}
 } finally {
 	if (session_status()===PHP_SESSION_ACTIVE) { session_abort(); }
