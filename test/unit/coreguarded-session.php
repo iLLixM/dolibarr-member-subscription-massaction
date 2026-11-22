@@ -79,6 +79,11 @@ try {
 	verifySession(session_write_close(), 'CF05 persist finance consumption');
 	$financeExpected=$financeRow; $financeExpected['_profile']=$binding;
 	$financeCheckpoint->requireProcessing(7,$binding,$user,$financeExpected,$financeOpts);
+	$recipient=(object)array('id'=>7,'entity'=>1,'typeid'=>1,'email'=>'original@example.invalid');
+	$financeCheckpoint->bindMailRecipient(7,$recipient,$financeRow);
+	denySession(static function()use($financeCheckpoint,$recipient,$financeRow){
+		$financeCheckpoint->bindMailRecipient(7,$recipient,$financeRow);
+	},'F38-03 recipient identity seal cannot be overwritten');
 	$financeCheckpoint->requireFinanceContinuation(7,$financeRow,$user);
 	verifySession(true, 'CF05 same original owner one-shot finance capability admitted');
 	denySession(static function()use($financeCheckpoint,$financeRow,$user){
@@ -119,18 +124,41 @@ try {
 	// match the independently persisted one-shot mail admission.
 	$persistedInvoice=array('id'=>42,'member_id'=>7,'entity'=>1,
 		'pdf'=>array('status'=>'verified'));
+	$mailRow=$financeRow; $mailRow['_profile']=$binding;
 	$wrongInvoice=$persistedInvoice; $wrongInvoice['id']=99;
-	denySession(static function()use($financeCheckpoint,$user,$wrongInvoice,$currentFinanceProfile){
-		$financeCheckpoint->requireMailEvidence(7,$user,$wrongInvoice,$currentFinanceProfile);
+	denySession(static function()use($financeCheckpoint,$user,$wrongInvoice,$currentFinanceProfile,$recipient,$mailRow){
+		$financeCheckpoint->requireMailEvidence(7,$user,$wrongInvoice,$currentFinanceProfile,$recipient,$mailRow);
 	},'F38-03 altered invoice cannot borrow the already consumed mail admission');
 	$wrongProfile=$currentFinanceProfile; $wrongProfile['revision']='new-admin-nonce';
-	denySession(static function()use($financeCheckpoint,$user,$persistedInvoice,$wrongProfile){
-		$financeCheckpoint->requireMailEvidence(7,$user,$persistedInvoice,$wrongProfile);
+	denySession(static function()use($financeCheckpoint,$user,$persistedInvoice,$wrongProfile,$recipient,$mailRow){
+		$financeCheckpoint->requireMailEvidence(7,$user,$persistedInvoice,$wrongProfile,$recipient,$mailRow);
 	},'F38-03 refreshed or forged profile cannot use original checkpoint');
-	$financeCheckpoint->requireMailEvidence(7,$user,$persistedInvoice,$currentFinanceProfile);
-	verifySession(true,'F38-03 exact original qualified profile and invoice permits one evidence continuation');
-	denySession(static function()use($financeCheckpoint,$user,$persistedInvoice,$currentFinanceProfile){
-		$financeCheckpoint->requireMailEvidence(7,$user,$persistedInvoice,$currentFinanceProfile);
+	$wrongRecipient=clone $recipient; $wrongRecipient->email='attacker@example.invalid';
+	denySession(static function()use($financeCheckpoint,$user,$persistedInvoice,$currentFinanceProfile,$wrongRecipient,$mailRow){
+		$financeCheckpoint->requireMailEvidence(7,$user,$persistedInvoice,$currentFinanceProfile,$wrongRecipient,$mailRow);
+	},'F38-03 same member ID with substituted email denied before hook/SMTP');
+	$wrongRecipient=clone $recipient; $wrongRecipient->entity=2;
+	denySession(static function()use($financeCheckpoint,$user,$persistedInvoice,$currentFinanceProfile,$wrongRecipient,$mailRow){
+		$financeCheckpoint->requireMailEvidence(7,$user,$persistedInvoice,$currentFinanceProfile,$wrongRecipient,$mailRow);
+	},'F38-03 same member ID and email but different entity denied before hook/SMTP');
+	$wrongRecipient=clone $recipient; $wrongRecipient->typeid=5;
+	denySession(static function()use($financeCheckpoint,$user,$persistedInvoice,$currentFinanceProfile,$wrongRecipient,$mailRow){
+		$financeCheckpoint->requireMailEvidence(7,$user,$persistedInvoice,$currentFinanceProfile,$wrongRecipient,$mailRow);
+	},'F38-03 changed membership type denied before hook/SMTP');
+	foreach (array('description'=>'forged','amount'=>42,'start'=>987,'end'=>654,'fingerprint'=>'forged') as $field=>$value) {
+		$wrongRow=$mailRow; $wrongRow[$field]=$value;
+		denySession(static function()use($financeCheckpoint,$user,$persistedInvoice,$currentFinanceProfile,$recipient,$wrongRow){
+			$financeCheckpoint->requireMailEvidence(7,$user,$persistedInvoice,$currentFinanceProfile,$recipient,$wrongRow);
+		},'F38-03 changed confirmed mail parameter '.$field.' denied');
+	}
+	$wrongRow=$mailRow; $wrongRow['_profile']['owner']=999;
+	denySession(static function()use($financeCheckpoint,$user,$persistedInvoice,$currentFinanceProfile,$recipient,$wrongRow){
+		$financeCheckpoint->requireMailEvidence(7,$user,$persistedInvoice,$currentFinanceProfile,$recipient,$wrongRow);
+	},'F38-03 altered profile carrier denied');
+	$financeCheckpoint->requireMailEvidence(7,$user,$persistedInvoice,$currentFinanceProfile,$recipient,$mailRow);
+	verifySession(true,'F38-03 exact original member, email, entity, row, profile and invoice permits one evidence continuation');
+	denySession(static function()use($financeCheckpoint,$user,$persistedInvoice,$currentFinanceProfile,$recipient,$mailRow){
+		$financeCheckpoint->requireMailEvidence(7,$user,$persistedInvoice,$currentFinanceProfile,$recipient,$mailRow);
 	},'F38-03 post-effect mail evidence replay denied');
 	verifySession(session_start(), 'CF05 change completion to terminal');
 	$_SESSION['msm_previews'][$financeKey]['results'][7]['completion']='terminal_acknowledged';
