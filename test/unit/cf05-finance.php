@@ -116,11 +116,21 @@ class Cf05ProductionGateBooking extends Cf05FinanceBooking
 		return new MsmTransactionProfile($this->profileDb,$this->databaseState,(int)$conf->entity);
 	}
 }
+/** Simulate a file-session persistence disruption after the external
+ * effect already ran. This is synthetic local file-session I/O only.
+ */
+function cf05LosePersistedCheckpoint($key)
+{
+	if (!session_start()) { throw new RuntimeException('Cannot open test-only file-session'); }
+	$_SESSION['msm_previews'][$key]['revision']=99;
+	if (!session_write_close()) { throw new RuntimeException('Cannot close test-only file-session'); }
+}
 class Cf05FinancePdfSpy
 {
-	public $calls=0; public $status='verified'; public $throws=false;
+	public $calls=0; public $status='verified'; public $throws=false; public $loseCheckpointKey=null;
 	public function generate($identity,$user) {
 		$this->calls++;
+		if ($this->loseCheckpointKey !== null) { cf05LosePersistedCheckpoint($this->loseCheckpointKey); }
 		if ($this->throws) { throw new RuntimeException('Synthetic PDF interruption after attempted effect'); }
 		return array('status'=>$this->status,
 			'message'=>$this->status==='verified'?'MSMPdfVerified':'MSMPdfUnknown',
@@ -154,7 +164,7 @@ class Cf05InvalidWrittenPdf extends MsmInvoicePdfService
 }
 class Cf05FinanceMailSpy extends MsmSubscriptionMail
 {
-	public $calls=0; public $status='transport'; public $throws=false;
+	public $calls=0; public $status='transport'; public $throws=false; public $loseCheckpointKey=null;
 	protected function evidenceProfile() {
 		global $conf;
 		return new Cf05QualifiedFinanceProfile($this->db,new SyntheticDatabaseState($this->db),(int)$conf->entity);
@@ -164,6 +174,7 @@ class Cf05FinanceMailSpy extends MsmSubscriptionMail
 	protected function sendInternal($member,array $row,$user,$selected,$invoice,&$afterEffect) {
 		$this->calls++;
 		$afterEffect=true;
+		if ($this->loseCheckpointKey !== null) { cf05LosePersistedCheckpoint($this->loseCheckpointKey); }
 		if ($this->throws) { throw new RuntimeException('Synthetic uncertain SMTP after attempted effect'); }
 		return $selected?$this->status:'not_selected';
 	}
@@ -205,7 +216,9 @@ try {
 		array('name'=>'mail_throws','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success','mail_throw'=>true),
 		array('name'=>'pdf_invalid_written','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success','pdf_invalid_written'=>true),
 		array('name'=>'hook_negative_after_effect','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success','mail_status'=>'failed'),
-		array('name'=>'transport_negative_after_effect','autocreate'=>false,'mode'=>'','change'=>false,'expected'=>'success','mail_status'=>'failed')
+		array('name'=>'transport_negative_after_effect','autocreate'=>false,'mode'=>'','change'=>false,'expected'=>'success','mail_status'=>'failed'),
+		array('name'=>'pdf_checkpoint_lost','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success','pdf_checkpoint_lost'=>true),
+		array('name'=>'mail_checkpoint_lost','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success','mail_checkpoint_lost'=>true)
 	) as $case) {
 		$db=new Cf05FinanceDb(); $db->family='mysql'; $db->profileRaw=json_encode(array(
 			'version'=>1,'family'=>'mysql','profile'=>'CoreGuarded','nonce'=>str_repeat('b',32)));
@@ -235,7 +248,8 @@ try {
 		session_id($sessionid);
 		verify(session_start(),'CF05 local session start '.$case['name']);
 		$expectStop=isset($case['pdf_status'])||isset($case['mail_status'])
-			|| !empty($case['pdf_throw']) || !empty($case['mail_throw']) || !empty($case['pdf_invalid_written']);
+			|| !empty($case['pdf_throw']) || !empty($case['mail_throw']) || !empty($case['pdf_invalid_written'])
+			|| !empty($case['pdf_checkpoint_lost']) || !empty($case['mail_checkpoint_lost']);
 		$ids=$expectStop?array(1,2):array(1);
 		$rows=$expectStop?array(1=>$row,2=>$row):array(1=>$row);
 		$state=array('phase'=>'confirm','revision'=>5,'owner'=>$user->id,'entity'=>1,
@@ -281,6 +295,8 @@ try {
 		if (isset($case['mail_status'])) { $mail->status=$case['mail_status']; }
 		if (!empty($case['pdf_throw'])) { $pdf->throws=true; }
 		if (!empty($case['mail_throw'])) { $mail->throws=true; }
+		if (!empty($case['pdf_checkpoint_lost'])) { $pdf->loseCheckpointKey=$key; }
+		if (!empty($case['mail_checkpoint_lost'])) { $mail->loseCheckpointKey=$key; }
 		$done=msmProcessBooking($state,$flow,$mail,$user,$checkpoint,$pdf);
 		$r=$done['results'][1];
 		verify($r['status']===$case['expected'],'CF05 expected booking status '.$case['name']);
@@ -295,7 +311,8 @@ try {
 					&& $pdf->calls===1 && $db->transaction_opened===0
 					&& count(array_keys($db->events,'subscription',true))===1,
 					'CF05 Phase4 ambiguous postcommit effect stops next member without rollback '.$case['name']);
-				if (isset($case['pdf_status']) || !empty($case['pdf_throw']) || !empty($case['pdf_invalid_written'])) {
+				if (isset($case['pdf_status']) || !empty($case['pdf_throw']) || !empty($case['pdf_invalid_written'])
+					|| !empty($case['pdf_checkpoint_lost'])) {
 					verify($r['invoice']['pdf']['status']==='unknown' && $r['mail']==='not_processed'
 						&& $r['attachment_status']==='not_processed' && $mail->calls===0,
 						'CF05 Phase4 PDF uncertainty prevents SMTP and preserves file status');
@@ -322,9 +339,27 @@ try {
 				'CF05 unqualified customer/invoice/error context UNKNOWN/STOP '.$case['name']);
 		}
 		verify(session_start(),'CF05 read committed result '.$case['name']);
-		verify(($_SESSION['msm_previews'][$key]['phase'] ?? null)==='done'
-			&& ($_SESSION['msm_previews'][$key]['results'][1]['status'] ?? null)===$case['expected'],
-			'CF05 durable terminal result no replay '.$case['name']);
+		$lostCheckpoint = !empty($case['pdf_checkpoint_lost']) || !empty($case['mail_checkpoint_lost']);
+		if ($lostCheckpoint) {
+			// A failed write cannot durably persist a new STOP flag. What
+			// prevents replay is the originally consumed processing session.
+			verify(($done['checkpoint_failed'] ?? null)===true
+				&& ($done['phase'] ?? '')==='processing'
+				&& ($_SESSION['msm_previews'][$key]['phase'] ?? '')==='processing'
+				&& ($_SESSION['msm_previews'][$key]['revision'] ?? 0)===99,
+				'F38 checkpoint write failure preserves consumed original session without claiming durable STOP '.$case['name']);
+			$freshReplay = new MsmFileBookingCheckpoint($key);
+			verify(session_write_close(),'F38 close consumed checkpoint before replay denial');
+			$expectRow=$row; $expectRow['_profile']=$binding;
+			fails(static function()use($freshReplay,$binding,$user,$expectRow,$options){
+				$freshReplay->requireProcessing(1,$binding,$user,$expectRow,$options);
+			},'MSMCoreGuardedSessionUnsupported');
+			verify(session_start(),'F38 restore consumed session for cleanup');
+		} else {
+			verify(($_SESSION['msm_previews'][$key]['phase'] ?? null)==='done'
+				&& ($_SESSION['msm_previews'][$key]['results'][1]['status'] ?? null)===$case['expected'],
+				'CF05 durable terminal result no replay '.$case['name']);
+		}
 		$replayEvidence=$mail->sendWithEvidence($flow->object,$row,$user,true,
 			array('id'=>42,'member_id'=>1,'entity'=>1,'pdf'=>array('status'=>'verified')),
 			$checkpoint,1);
@@ -332,7 +367,7 @@ try {
 			&& $mail->calls===($case['expected']==='success' && !isset($case['pdf_status'])
 				&& empty($case['pdf_throw']) && empty($case['pdf_invalid_written']) ? 1 : 0),
 			'F38-03 post-completion direct-service evidence replay always denied '.$case['name']);
-		if ($expectStop) {
+		if ($expectStop && !$lostCheckpoint) {
 			verify(($_SESSION['msm_previews'][$key]['results'][2]['status'] ?? null)==='not_processed'
 				&& !empty($_SESSION['msm_previews'][$key]['batch_stop']),
 				'CF05 Phase4 postcommit ambiguity persisted before any next member');
