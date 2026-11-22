@@ -330,7 +330,7 @@ try {
 			$checkpoint,1);
 		verify($replayEvidence['mail']==='denied'
 			&& $mail->calls===($case['expected']==='success' && !isset($case['pdf_status'])
-				&& empty($case['pdf_throw']) ? 1 : 0),
+				&& empty($case['pdf_throw']) && empty($case['pdf_invalid_written']) ? 1 : 0),
 			'F38-03 post-completion direct-service evidence replay always denied '.$case['name']);
 		if ($expectStop) {
 			verify(($_SESSION['msm_previews'][$key]['results'][2]['status'] ?? null)==='not_processed'
