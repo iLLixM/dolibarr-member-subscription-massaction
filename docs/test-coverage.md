@@ -1,5 +1,8 @@
 # Reading the existing requirement matrix
 
+> **F38-13/P2 – Core-falsy invoice numbering regression (2026-11-22):** `test/unit/invoiceprofile.php` now admits both string `'0'` and stored integer `0` via actual read-only `MsmInvoiceProfile::resolve()`, compares full canonical snapshots before/after Core normalization, and preserves real effective-model and other settings negatives plus malformed-name/traversal denial. `test/unit/invoice.php` extends originally confirmed TWO-member production Preview/fingerprint→Booking/Invoice synthetic normalizing-Core sequence to both zero representations, requiring two successes and two invoice validations. Tests are Core-source based with synthetic DB/Invoice doubles; no real numbering, SQL, triggers, PDF, filesystem or SMTP. F38-12 independently CLOSED, F38-13 external exact-HEAD closure pending.
+
+
 > **F38-12/P2 (2026-11-22; external closure pending):** Invoice Profile stores the canonical effective `FACTURE_ADDON` model only in the confirmed invoice settings snapshot. `test/unit/invoiceprofile.php` validates alias/default normalization without Core global writes, plan equivalence and actual-model/other-finance-setting negatives. `test/unit/invoice.php` exercises real module Preview fingerprints and guarded Booking/Invoice path for TWO separate confirmed members, with synthetic Core `Facture::validate()` changing the raw global after member 1; also rejects truly changed effective model before any business API. Existing F38-10 direct first-call and F38-11 Core-model regressions are retained. No real database/SMTP/PDF integration or independently closed F38-12 is claimed before the follow-up review.
 
 
