@@ -130,6 +130,14 @@ final class MsmFileBookingCheckpoint
 			'entity' => (int) $member->entity,
 			'typeid' => (int) ($member->typeid ?? 0));
 	}
+	/** Compare exact persisted confirmation while excluding the internal
+	 * profile carrier injected by the Booking orchestrator only.
+	 */
+	private function mailConfirmedRowMismatch(array $row, array $confirmed)
+	{
+		unset($row['_profile']);
+		return $row !== $confirmed;
+	}
 	/** No SQL and no new permission grant: the originally consumed, in-process
 	 * capability is the only possible CoreGuarded Invoice continuation.
 	 */
@@ -229,7 +237,8 @@ final class MsmFileBookingCheckpoint
 			|| (int) ($member->entity ?? 0) !== $this->mailRecipients[$id]['entity']
 			|| (int) ($member->typeid ?? 0) !== $this->mailRecipients[$id]['typeid']
 			|| (string) ($member->email ?? '') !== $this->mailRecipients[$id]['email']
-			|| $row !== $origin['rows'][$id]
+			|| !isset($row['_profile']) || $row['_profile'] !== $origin['profile']
+			|| $this->mailConfirmedRowMismatch($row, $origin['rows'][$id])
 			|| (bool) !empty($origin['options']['invoice']) !== ($invoice !== null)
 			|| ($invoice !== null && ((int) ($invoice['member_id'] ?? 0) !== $id
 				|| (int) ($invoice['entity'] ?? 0) !== (int) ($origin['entity'] ?? 0)
