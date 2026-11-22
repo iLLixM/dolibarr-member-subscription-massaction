@@ -1,5 +1,10 @@
 # Binding Owner decision — 2026-11-22: Dolibarr Core parity with Massaction-specific safety
 
+## F38-10/F38-11 focused correction – 2026-11-22 (implementation; external closure pending)
+
+Independent holistic PR #38 review on `859ea280b3b726870cdb7727af72c04514c26e5f` reported two new P2 module-specific findings; verdict `CHANGES REQUIRED BEFORE DEVELOPMENT MERGE`. **F38-10**: the first directly invoked CoreGuarded Invoice service must match the original entire confirmed row, not only its fingerprint. **F38-11**: invoice numbering profile availability must match supported Core defaults/aliases and legacy `model/model.modules.php` lookup. The focused PR #38 correction adds strict original-row comparison (only the exact optional `_profile` carrier is excluded after validation), Core-version-aware read-only numbering normalization and legacy document-root lookup, plus synthetic first-call and V22/V23/V24 model regressions. **Both statuses: FIX IMPLEMENTED / INDEPENDENT EXACT-HEAD DELTA REVIEW PENDING; NOT CLOSED.** No Owner security-policy change, PHP source allowlist, new Core transaction qualification, real A–D writing, development-merge or release authorization follows. Final source CI results must be separately verified on the exact final correction HEAD.
+
+
 **Scope:** Issue #22 / ADR-06, ADR-11, ADR-12, D-01/D-02 / PR #38. **Status: Owner-approved architecture; PR #38 implementation not independently reviewed or merged; real A–D and release gates OPEN.** This document **supersedes conflicting earlier date-bound default-deny and source-pinning text**, preserving it for audit.
 
 ## Normative product/architecture contract
