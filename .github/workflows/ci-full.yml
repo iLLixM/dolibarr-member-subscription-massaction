@@ -11,6 +11,7 @@ on:
       - 'lib/booking.lib.php'
       - 'lib/booking_renderer.lib.php'
       - 'test/unit/cf05-finance.php'
+      - 'test/unit/cf05-core-qualification.php'
       - 'test/unit/maildelivery.php'
       - 'test/unit/postcommit.php'
       - 'test/unit/invoicepdf.php'

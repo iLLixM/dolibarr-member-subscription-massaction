@@ -108,9 +108,11 @@ class MsmInvoiceService
 		// No direct CoreGuarded invoice call without the original Controller's
 		// already-consumed, owner/entity/profile/row-bound one-shot capability.
 		if ($this->activeGuard instanceof MsmCoreGuardedTransaction) {
-			$this->requireCoreFinanceQualification();
 			if ($this->coreCheckpoint === null) { throw new RuntimeException('MSMCoreGuardedSessionUnsupported'); }
 			$this->coreCheckpoint->requireFinanceContinuation((int) $member->id, $row, $actor);
+			// Never source-qualify a forged direct call before verifying the
+			// original consumed capability; still BEFORE first financial Core API.
+			$this->requireCoreFinanceQualification();
 		}
 		if (!MsmPreviewService::canCreateSubscriptionWithOptions($actor, true, false)) {
 			throw new MsmQualifiedCoreFinanceBusinessError('NotEnoughPermissions');
