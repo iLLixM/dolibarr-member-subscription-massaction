@@ -592,11 +592,26 @@ class F3812InvoiceProfile extends MsmInvoiceProfile
 	protected function paymentTermLabel($id) { return 'Synthetic term'; }
 	protected function vat($product) { return 0; }
 }
+class F3812PreviewMember extends PreviewMember
+{
+	public function fetch_thirdparty()
+	{
+		$this->thirdparty=(object)array('id'=>4,'entity'=>1,'client'=>1,
+			'name'=>'Synthetic customer','multicurrency_code'=>'EUR');
+		return 1;
+	}
+}
 class F3812Preview extends PreviewFixtureService
 {
 	public function __construct($db,$member)
 	{
-		parent::__construct($db,$member);
+		// Preview fixture models only the read-only Core member fields,
+		// while Booking still uses its original Adherent/transaction double.
+		$readMember=new F3812PreviewMember();
+		foreach (array('id','typeid','entity','socid','email','morphy','company') as $field) {
+			$readMember->$field=$member->$field;
+		}
+		parent::__construct($db,$readMember);
 		$this->type=(object)array('duration'=>'1y','label'=>'Synthetic type',
 			'amount'=>'24.5','status'=>1,'subscription'=>1);
 	}
