@@ -214,7 +214,7 @@ foreach (array('autocreate','sendmail') as $feature) {
 	$blockedResult=$blockedFlow->book(1,$blockedPlan,$forgedOptions,$user,false);
 	verify($blockedResult['message']==='MSMCoreGuardedSessionUnsupported'
 		&& $blockedResult['stop'] && !$blockedDb->events,
-		'Owner enabled '+$feature+' never bypasses original CoreGuarded session checkpoint');
+		'Owner enabled '.$feature.' never bypasses original CoreGuarded session checkpoint');
 }
 // The fresh per-member SELECT is the admission snapshot. Admin may change later;
 // this admitted member finishes, but the next member cannot inherit the old profile.
