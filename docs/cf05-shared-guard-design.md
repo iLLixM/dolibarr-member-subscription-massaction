@@ -1,5 +1,13 @@
 # CF05-01/02 – Shared active transaction guard (implementation record)
 
+## Current shared-guard integration after PR #38 (2026-11-24)
+
+This document retains PR #34's original guard-design provenance. The **same injected active Booking/Invoice Guard** is now exercised by merged Phase 4 Finance, not held behind the historically described CoreGuarded finance default-deny. Owner Variant B allows standard Core API/trigger/model execution; preserves same DoliDB identity, original consumed file-session, full confirmed finance row, ownership, completion and STOP. PR #38 merged as `0998fbaf58155cca04d31ab99c6bb47420e53c72` (reviewed `b15b93580f995fb05a696a125c2a5fd995dd4bb3`, tree identical). The new F38-14 `manualend` handoff was independently closed technically. **This does not qualify live Env B or D finance or release.** See [current baseline](current-development-baseline.md) and [dolienv](dolienv-environments.md).
+
+---
+
+> Historical record follows. Current status is defined above.
+
 > **Post-PR #36 status:** CF05-01/02 below is the historical PR #34 implementation contract; [PR #36](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/36) subsequently merged the Phase-3 finance, typed-error and postcommit code (`d0b15785c60b74aa7ad59a1c687db94193d159c6`), with **CoreGuarded production finance still OFF** and **F36-02/P2 OPEN**. See [Phase-3 record](cf05-phase3-finance-admission.md) and [CF05-06 next qualification](cf05-06-standard-core-qualification-plan.md).
 
 **Effective development baseline:** Issue #22 (Owner, 2026-11-21). **Status: CF05-01/02 IMPLEMENTED, independently reviewed and SQUASH-MERGED** in [PR #34](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/34) (`main` merge `dc7a172bfd476467d7980cbf16a2657cfc1e729c`, reviewed PR HEAD `11d7dd3cf4bdcf831aa87782b7466d2378fc733f`). Independent final verdict `APPROVED FOR DEVELOPMENT MERGE`, **F34-01/P2 and F34-02/P3 CLOSED**, no new findings; [exact-head CI](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44948777072) **9/9 PASS**. **No** finance enablement, CF05-03..07 completion, live test permission or release approval.

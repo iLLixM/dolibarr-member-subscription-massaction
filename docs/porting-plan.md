@@ -1,5 +1,13 @@
 # Functional porting baseline
 
+## Current porting outcome – after PR #38 (2026-11-24)
+
+The original Phase 1/3B porting analysis and 71-ID requirement matrix are **historical source-bound evidence**. The member contribution + optional Finance/Third Party/invoice/PDF/mail implementation for all three transaction profiles was **completed and squash-merged in PR #38** as `0998fbaf58155cca04d31ab99c6bb47420e53c72`; reviewed tree identical to `b15b93580f995fb05a696a125c2a5fd995dd4bb3`. Older descriptions of these features as future work are not current delivery status. [Current baseline](current-development-baseline.md) and [Owner Variant B](owner-core-parity-2026-11-22.md) govern. Real A–D integration, module mail and release v0.1.0 remain **NO-GO**. Never re-run the historical Env B UNKNOWN operation.
+
+---
+
+> Historical record follows. Current status is defined above.
+
 > **Current scope supersession (2026-11-21):** This is an archived Phase 1/3B porting report. Its statements that booking or invoice/PDF/email are *future* or *permanently deferred* are historical. [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22) requires the complete contribution/optional invoice/Third Party/PDF/mail massaction for v0.1.0 across all three profiles; CF05 is the outstanding implementation gate. There is **no** persistent module journal, exactly-once recovery or automatic retries in this scope. The original 71 requirement IDs are preserved in [requirements.csv](requirements.csv); use the [current baseline](current-development-baseline.md) for active statuses, not this historical stage snapshot.
 
 Phase 1 revision 2 is the accepted architecture: an independent wizard entered through
