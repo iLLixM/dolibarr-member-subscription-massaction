@@ -61,10 +61,13 @@ the local capture had no new message. **STOP after acknowledged finance**.
 The independent physical PDF signature/hash matched the durable result.
 The session records `nonterminal_acknowledged`, `mail=unknown` and
 `attachment=unknown`. The Core log contained transport errors during the
-operation. A separate capture handshake passed without sending a message.
-The exact mail failure needed further diagnosis. No booking or mail was
-repeated. The protected role checks and business-table comparisons
-confirmed A/C were unaffected by the B window.
+operation. The later protected B PHP-FPM probe confirmed the loopback
+configuration, SMTP greeting and envelope acceptance through recipient,
+then reset and quit before DATA. This establishes current connectivity
+for that probe. The cause of the historical module send remains open.
+No booking or mail was repeated. The protected role checks and
+business-table comparisons confirmed A/C were unaffected by the B
+window.
 
 After the Owner selected independent continuation without mail, one new
 existing-customer case each in A and C passed on the same source. Both
