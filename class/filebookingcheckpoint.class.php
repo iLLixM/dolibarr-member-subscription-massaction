@@ -31,9 +31,10 @@ final class MsmFileBookingCheckpoint
 	public static function requireSession()
 	{
 		$path = session_save_path();
+		// PHP reopens the bound session file without listing the directory.
 		if (session_module_name() !== 'files' || session_id() === '' || strpos($path, ';') !== false
 			|| strpos($path, '://') !== false || $path === '' || $path[0] !== '/' || !is_dir($path)
-			|| !is_readable($path) || !is_writable($path) || realpath($path) === false) { throw new RuntimeException('MSMCoreGuardedSessionUnsupported'); }
+			|| !is_writable($path) || realpath($path) === false) { throw new RuntimeException('MSMCoreGuardedSessionUnsupported'); }
 		return realpath($path);
 	}
 	/** Inspect actual objects/settings before work; never call an unknown exporter. */
