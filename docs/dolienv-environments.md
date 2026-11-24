@@ -23,7 +23,7 @@ results; it introduces no transaction policy, product change or release approval
 | **A** | Local, Dolibarr 24.0.3 | MariaDB 10.11.19 (`10.11.19-MariaDB-0+deb12u1`) | **`MariaDBSnapshot`** | PHP-FPM / CLI 8.2.35 |
 | **B** | Local, Dolibarr 24.0.3 | Oracle MySQL Community Server 8.4.13 | **`CoreGuarded`** | PHP-FPM / CLI 8.2.35 |
 | **C** | Local, Dolibarr 24.0.3 | Oracle MySQL Community Server 8.4.13 | **`EnhancedMySQL`** | PHP-FPM / CLI 8.2.35 |
-| **D** | Restricted shared hosting, Dolibarr 22.0.5 | Oracle MySQL Community Server 8.4.13 | **`CoreGuarded`** | Hosting CLI PHP / mysqlnd 8.3.37; actual Web/FPM contract not yet qualified |
+| **D** | Restricted shared hosting, Dolibarr 22.0.5 | Oracle MySQL Community Server 8.4.13 | **`CoreGuarded`** | PHP 8.4.28 (Web, `cgi-fcgi`), PHP/mysqlnd 8.3.37 (CLI) |
 
 The MariaDB-branded command-line client used on D does **not** make its server
 MariaDB. D's server family/version was confirmed by hosting-local SQL. There are
@@ -38,10 +38,32 @@ application SELECT grant on the transaction-event Performance Schema table; C ha
 the targeted grant/instrumentation required by EnhancedMySQL. A keeps its bounded
 MariaDB snapshot contract. These observation strengths are not equivalent.
 
-D is an independent hosted installation with its own module checkout and data.
-Changing the local worktree does not deploy D. Provider `open_basedir` restrictions
-apply to the Web environment; D CLI reported no configured `open_basedir` or main
-ini file. Those CLI observations do not disprove the Web restrictions.
+## Hosted D checkout and PR #45 validation (2026-11-24)
+
+D is a fresh, independent shared-hosting installation with a dedicated
+database schema and an active module from a direct Git checkout. The CLI
+reader confirmed the configured database identity, MySQL 8.4.13 and the
+saved `CoreGuarded` profile. A Chromium preflight authenticated all four
+test roles. Two authorized roles saw the bulk action and two restricted
+roles did not.
+
+The PR #44 baseline refused the first contribution-only confirmation before
+transaction entry. On D, Web PHP could resolve and write to the provider's
+standard file-session directory, but the directory was not readable for
+listing. [PR #45](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/45)
+removes that directory listing requirement. The durable session checkpoint,
+replay refusal and STOP rules remain in force.
+
+| Hosted D evidence | Result on module commit `0adc259d4739b44f9b1fb3a49574d7e1c318132c` |
+| --- | --- |
+| Owner browser booking | **PASS.** One contribution without invoice or mail. Independent hosting-local SQL readback confirmed exactly one contribution in the selected period, the expected amount and type, and the stored membership end. |
+| Focused browser and replay follow-up | **PASS.** A fresh period for the synthetic member started with zero matching or overlapping contributions. One confirmation recorded an acknowledged commit and the saved result remained visible after reloading. The browser resubmitted the identical consumed request once and the module rejected it. Independent SQL readbacks after booking and after replay found the same one matching contribution and identical member-state SHA-256. |
+
+The tested server used its standard session configuration. These results
+cover contribution booking, result persistence and replay refusal for the
+recorded cases. Broader Hosted D integration, finance, PDF, mail and the
+exact release ZIP still require separate qualification. **R0-04 remains
+BLOCKED.** Historical D results below describe the earlier hosted reference.
 
 ---
 
