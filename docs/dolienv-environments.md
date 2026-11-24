@@ -18,6 +18,70 @@ Current Owner-requested environment convention, **2026-11-24**. This document is
 public and pseudonymized. It describes deployment/test topology and observed
 results; it introduces no transaction policy, product change or release approval.
 
+
+## Phase 5 qualification checkpoint, 24 November 2026
+
+The Owner's Phase 5 package (OD5-01 through OD5-08) authorizes the bounded
+scenarios in the individual operator cases. Each case still has a source,
+environment, role, fresh fixture, expected effects and STOP criteria.
+
+Baseline `ba5c9a3121754fcbd4259bb8906ad1dd17f1ce00` (PRs #38 and #39
+merged) was deployed to the shared local checkout. Twenty-one fixed
+loaded-Core and independent reader checks passed across A/B/C. Profiles,
+DB identity, schema-specific readers, selected InnoDB engines and local
+file-session/logger preflight were confirmed. The newest backups for all
+three local environments passed SHA-256 and private-permission checks.
+These are integrity checks, without a restore exercise.
+
+`PHASE5-B01` passed on that exact source. It used an authenticated ordinary
+finance role and a new member linked to a synthetic existing customer.
+The manually specified end date, one acknowledged contribution, one
+validated EUR 120 invoice with its line and contribution link, standard
+Agenda effects and one physical PDF were verified. The independent
+reader checked 24 tables, the file witness matched the PDF signature,
+hash and Dolibarr metadata, and no mail capture was added. A/C
+business-table snapshots were unchanged during that window.
+
+The protected runner initially stopped before creating fixtures because
+its B runtime account could not read the shared module worktree index.
+It passed after the Owner accepted a narrow index read ACL and an
+independent check confirmed unchanged SQL baselines. This establishes
+the protected launcher path for B01. Each additional case must verify
+its own target-user access and source binding. Concurrent B/C windows
+are outside the campaign.
+
+`PHASE5-B02` used another new member with an automatically calculated end
+date and requested customer creation, invoice, PDF and capture-only mail.
+The browser reported an acknowledged commit and verified PDF. Independent
+SELECTs confirmed the new customer link, contribution, validated invoice,
+invoice line, subscription relation, document record and three standard
+Agenda event/resource pairs. Only the allocated member changed among
+existing business rows. The selected mail had no confirmed transport and
+the local capture had no new message. **STOP after acknowledged finance**.
+The independent physical PDF signature/hash matched the durable result.
+The session records `nonterminal_acknowledged`, `mail=unknown` and
+`attachment=unknown`. The Core log contained transport errors during the
+operation. A separate capture handshake passed without sending a message.
+The exact mail failure needed further diagnosis. No booking or mail was
+repeated. The protected role checks and business-table comparisons
+confirmed A/C were unaffected by the B window.
+
+After the Owner selected independent continuation without mail, one new
+existing-customer case each in A and C passed on the same source. Both
+had an independently reconciled contribution, valid invoice and line,
+links, expected Agenda effects and a matching physical PDF. Each also
+rejected an invalid CSRF token and the previously consumed confirmation
+with unchanged business tables. Their ordinary four-role browser checks
+passed.
+
+The original `DOLIENV-ACC-01` remains `UNKNOWN/STOP`. A new independent
+read still found no persisted diagnostic subscription #3. B01 and B02
+used separate fixtures and confirmations. Their evidence provides no
+rollback acknowledgment for the original attempt. Complete A/B/C
+integration, module mail with a verified attachment, and hosted D
+qualification remain open. The Owner selected a separately provisioned D
+test copy. The historical D CLI witness remains reference evidence only.
+
 ## Current matrix
 
 | Environment | Location / Core | Database server | Transaction profile | PHP evidence |

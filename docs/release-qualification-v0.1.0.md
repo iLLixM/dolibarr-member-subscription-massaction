@@ -21,6 +21,34 @@
 | R0-07 / independent release assessment and Owner GO | **OPEN / release NO-GO** |
 | CF03-FAULT destructive tests | **DEFERRED / NOT EXECUTED** |
 
+
+## Phase 5 candidate preparation, 24 November 2026
+
+The first exact-source B finance check (`PHASE5-B01`) passed on development
+baseline `ba5c9a3121754fcbd4259bb8906ad1dd17f1ce00`. See the
+[dolienv checkpoint](dolienv-environments.md#phase-5-qualification-checkpoint-24-november-2026)
+for the case scope and the preserved original UNKNOWN result.
+
+[Draft PR #40](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/40)
+prepares the final-format package from that baseline. Its candidate source
+`b19fbe7a80a97a45e8fa5d8aa96cecf5bcf4fa0d` is an unmerged packaging commit.
+Two builds produced a byte-identical ZIP and manifest. The archive uses
+committed, allowlisted runtime blobs, an operator README and a per-file SHA-256
+manifest.
+
+- ZIP SHA-256: `8dce6219baff656edbca48f0fe3d969eaf9f2aa801eacbc11426c0097253a37e`
+- Manifest SHA-256: `ea034824d1043d28786ba3a0d5660984ab4b351fa6dd8a4656b3e119aebb2796`
+- Candidate CI: [Standard 9/9](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/45394471444),
+  [Full 21/21](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/45394471299),
+  [Hosted 1/1](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/45394471350).
+  These runs are synthetic.
+
+The local artifact passed the structural and reproducibility rehearsal.
+Final R0-03 acceptance, the R0-04 exact-ZIP install and functional check on
+an isolated Hosted D copy, CF05-07, R0-07 and the separate Owner Release
+GO remain open. Real B01 was run on the development baseline above.
+CF03-FAULT remains deferred. No candidate was tagged or released.
+
 ---
 
 > **Archived date-bound content below:** previous sources/labels/admission claims reflect their original times; the post-PR38 section above governs current status.

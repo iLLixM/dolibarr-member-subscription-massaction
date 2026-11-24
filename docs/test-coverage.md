@@ -1,5 +1,19 @@
 # Reading the existing requirement matrix
 
+## Phase 5A/B real results, 24 November 2026
+
+| Scope | Result | Evidence limit |
+| --- | --- | --- |
+| A/B/C fixed local preflight on `ba5c9a3` | 21 checks PASS | Loaded Core and separate SELECT readers. Selected InnoDB tables, file session/logger, profiles and source binding. Backup hash and private-mode checks exclude restore. |
+| `PHASE5-B01` | PASS | Fresh authenticated existing-customer invoice, manual end, acknowledged CoreGuarded completion, 24-table readback and physical PDF. Mail deselected. |
+| `PHASE5-B02` | Finance PASS, mail STOP | Automatic end, new linked customer, acknowledged commit, validated invoice and matching physical PDF. Independent SELECT confirms business effects. Durable mail/attachment outcomes remain UNKNOWN and no local capture was observed. |
+| `PHASE5-A02` and `PHASE5-C02` | PASS | Fresh existing-customer finance/PDF without mail, 24-table reconciliation per case, isolated source/roles, rejected invalid CSRF and consumed POST without repeated DML. |
+| Other CF03-NORMAL A/B/C and D | NOT EXECUTED in this checkpoint | The remaining batch/Agenda variants, positive attachment transport, hosted package and independent release gates remain open. |
+
+See [case provenance](dolienv-environments.md#phase-5-qualification-checkpoint-24-november-2026).
+The original B UNKNOWN case and archived CF03 identities retain their earlier dispositions.
+
+
 ## Updated evidence legend after PR #38 merge
 
 **Authoritative post-PR #38 state (2026-11-24):** [PR #38](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/38) was independently reviewed and **squash-merged** into `main` as `0998fbaf58155cca04d31ab99c6bb47420e53c72`; reviewed HEAD `b15b93580f995fb05a696a125c2a5fd995dd4bb3` has **identical Git tree** `a6e7256fb1572361c4dd4d850124ca7a6afff566`. The independent verdict was **APPROVED FOR DEVELOPMENT MERGE WITH DOCUMENTED LIMITATIONS**, with exact-source Standard 9/9 + Full 21/21 + Hosted 1/1 (**31/31**) synthetic CI PASS. Phase 4 development is merged; **Phase 5 real A–D integration, CF05-07, package, hosted and Owner release acceptance are NOT complete**. All older dated DRAFT/finance-default-deny/core-source-allowlist statements below are historical and not current requirements.
