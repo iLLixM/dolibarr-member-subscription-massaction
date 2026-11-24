@@ -4,6 +4,9 @@
 
 This file describes the historical Phase-3 PR #36 **default-deny** source and its independent F36-01 finding; those statements remain true **only of that earlier source**. Later Owner Variant B authorized and PR #38 **merged** full finance admission on `CoreGuarded` alongside `EnhancedMySQL` and `MariaDBSnapshot`, via squash `0998fbaf58155cca04d31ab99c6bb47420e53c72`. Do not reinstate historical Core source-hash/trigger/PROV qualification or conclude that current Finance is disabled. Massaction guard, original one-shot, confirmed full row and UNKNOWN/STOP remain. F36-02 is Owner-accepted **Core residual filesystem risk**, not technically closed. Phase 5 A–D and release remain separate NO-GO. See [current policy](owner-core-parity-2026-11-22.md).
 
+
+**Post-PR #45:** development squash `b026f1504db27308fc7326e2e88ec2e53b2f48d9`, reviewed tree identical; #44 consolidation completed and #41–#43 closed without merge as superseded. [Current baseline](current-development-baseline.md) governs source identity, F45-01/02 open test precision, F45-03 documentation follow-up and remaining gates.
+
 ---
 
 > Historical record follows. Current status is defined above.

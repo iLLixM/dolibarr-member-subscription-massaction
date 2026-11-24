@@ -1,5 +1,8 @@
 # Phase 4 implementation validation
 
+> **Historical record — current navigation after PR #45 (2026-11-24):** the dated statements, earlier PR status, old A/B/C mappings and original test identities below are retained as historical evidence, not present authorization or roadmap. PR #38 full finance implementation is merged; Owner Variant B supersedes former source/trigger allowlists, blanket PROV veto and default-deny. PR #44 consolidation and PR #45 session compatibility fix are merged. Local A/B/C bounded results, B mail and focused D contribution/session/replay are accepted within their recorded scope. Full A–D integration and release remain open / NO-GO. F36-02 remains Owner-accepted Core residual risk. See [current baseline](current-development-baseline.md), [binding Owner decision](owner-core-parity-2026-11-22.md) and [current environments](dolienv-environments.md). No old command or fixture is authorized by this record.
+
+
 > **Current environment convention — 2026-11-24:** dolienv **A = MariaDBSnapshot**,
 > **B = CoreGuarded**, **C = EnhancedMySQL**, **D = hosted CoreGuarded**.
 > [Current topology, bounded acceptance and privacy rules](dolienv-environments.md) control

@@ -15,5 +15,7 @@ Use synthetic fixtures and test mail sinks; never commit credentials, real membe
 records, database dumps, documents, sessions or local configuration.
 
 Preserve source attribution and GPL-3.0-or-later licensing. Document borrowed code
-with its source commit. Resolve the temporary module ID before a public release.
+with its source commit. The Owner elected to retain unreserved module ID 584620 for bounded v0.1.0 (see [Issue #20](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/20)); verify final metadata and collision checks, not a permanent reservation.
 Do not treat upstream community inclusion as guaranteed.
+
+Use [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22), [Owner Variant B](docs/owner-core-parity-2026-11-22.md) and [current baseline](docs/current-development-baseline.md) for current architecture, provenance and release gates. Preserve historical requirements/evidence. New real tests require explicit authorization and protected per-case preflight. Development merge is separate from release acceptance.
