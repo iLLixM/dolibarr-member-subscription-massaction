@@ -1,5 +1,7 @@
 # CF-03 — Qualification plan and binding A-D environment matrix
 
+**2026-11-25 local Phase 5 delta:** See the [current A/B/C results and exact source](evidence/cf03/phase5-local-completion-2026-11-25.md). A/C mail and PDF attachments passed 3/3 each. Local CF03-NORMAL passed within the accepted A/B/C matrix. Local CF03-SECURITY-BASELINE remains PARTIAL pending real cross-entity evidence. Earlier dated results below retain their original evidence scope. Hosted D exact-package qualification and release approval remain open.
+
 ## Current CF03-NORMAL plan after PR #38 and dolienv reprovisioning
 
 **Phase 4 development provenance (2026-11-24):** [PR #38](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/38) was independently reviewed and **squash-merged** into `main` as `0998fbaf58155cca04d31ab99c6bb47420e53c72`; reviewed HEAD `b15b93580f995fb05a696a125c2a5fd995dd4bb3` has **identical Git tree** `a6e7256fb1572361c4dd4d850124ca7a6afff566`. The independent verdict was **APPROVED FOR DEVELOPMENT MERGE WITH DOCUMENTED LIMITATIONS**, with exact-source Standard 9/9 + Full 21/21 + Hosted 1/1 (**31/31**) synthetic CI PASS. Phase 4 development is merged; **Phase 5 real A–D integration, CF05-07, package, hosted and Owner release acceptance are NOT complete**. All older dated DRAFT/finance-default-deny/core-source-allowlist statements below are historical and not current requirements.
