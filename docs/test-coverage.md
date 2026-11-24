@@ -1,5 +1,14 @@
 # Reading the existing requirement matrix
 
+> **Current environment convention — 2026-11-24:** dolienv **A = MariaDBSnapshot**,
+> **B = CoreGuarded**, **C = EnhancedMySQL**, **D = hosted CoreGuarded**.
+> [Current topology, bounded acceptance and privacy rules](dolienv-environments.md) control
+> environment naming/readiness. Earlier CF03 labels, shared A/C bindings and dated
+> evidence below retain their historical meaning; do not relabel/replay old tools.
+> Current B finance acceptance is **BLOCKED (UNKNOWN/STOP)**; D has read-only
+> browser/hosting-CLI evidence, not business-write qualification.
+
+
 > **F38-13/P2 – Core-falsy invoice numbering regression (2026-11-22):** `test/unit/invoiceprofile.php` now admits both string `'0'` and stored integer `0` via actual read-only `MsmInvoiceProfile::resolve()`, compares full canonical snapshots before/after Core normalization, and preserves real effective-model and other settings negatives plus malformed-name/traversal denial. `test/unit/invoice.php` extends originally confirmed TWO-member production Preview/fingerprint→Booking/Invoice synthetic normalizing-Core sequence to both zero representations, requiring two successes and two invoice validations. Tests are Core-source based with synthetic DB/Invoice doubles; no real numbering, SQL, triggers, PDF, filesystem or SMTP. F38-12 independently CLOSED, F38-13 external exact-HEAD closure pending.
 
 

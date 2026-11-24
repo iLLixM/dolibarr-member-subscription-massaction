@@ -1,5 +1,14 @@
 # Phase 4 implementation validation
 
+> **Current environment convention — 2026-11-24:** dolienv **A = MariaDBSnapshot**,
+> **B = CoreGuarded**, **C = EnhancedMySQL**, **D = hosted CoreGuarded**.
+> [Current topology, bounded acceptance and privacy rules](dolienv-environments.md) control
+> environment naming/readiness. Earlier CF03 labels, shared A/C bindings and dated
+> evidence below retain their historical meaning; do not relabel/replay old tools.
+> Current B finance acceptance is **BLOCKED (UNKNOWN/STOP)**; D has read-only
+> browser/hosting-CLI evidence, not business-write qualification.
+
+
 > **Current Phase-3 provenance after PR #36 (2026-11-21):** [PR #36](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/36) independent review head `33cb3da3b389f9df2870bc8c6223c86a959cb467` is tree-identical to squash merge `d0b15785c60b74aa7ad59a1c687db94193d159c6`, with **F36-01/P1 CLOSED**, **F36-02/P2 OPEN / CF05-06 REQUIRED**, [9/9 standard CI](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44956004981) and [1/1 hosted CI](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44956004947) **synthetic PASS**. Product CoreGuarded invoice/autocreate/sendmail remains default-closed; historical Phase-4 tests below do **not** become new real CF03-NORMAL A–D or new finance/ZIP/release PASS. See [CF05-06 source and filesystem qualification plan](cf05-06-standard-core-qualification-plan.md).
 
 > **Post-PR34 update (2026-11-21):** [PR #34](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/34) integrated the **CF05-01/02 shared Booking→Invoice active guard**, independently closed F34-01/P2 and F34-02/P3 and was squash-merged as `dc7a172bfd476467d7980cbf16a2657cfc1e729c`. This is source-specific synthetic development evidence **only**. The historic Phase-4 tests below were executed on different pinned implementation/profile boundaries; they do not become real A–D CoreGuarded full finance acceptance. CF05-03..07, real CF03-NORMAL A–D, 21-profile release CI and D exact ZIP remain OPEN. [Current baseline](current-development-baseline.md) is authoritative for current admission.

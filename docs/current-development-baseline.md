@@ -1,5 +1,14 @@
 # Current development baseline, architecture and roadmap
 
+> **Current environment convention — 2026-11-24:** dolienv **A = MariaDBSnapshot**,
+> **B = CoreGuarded**, **C = EnhancedMySQL**, **D = hosted CoreGuarded**.
+> [Current topology, bounded acceptance and privacy rules](dolienv-environments.md) control
+> environment naming/readiness. Earlier CF03 labels, shared A/C bindings and dated
+> evidence below retain their historical meaning; do not relabel/replay old tools.
+> Current B finance acceptance is **BLOCKED (UNKNOWN/STOP)**; D has read-only
+> browser/hosting-CLI evidence, not business-write qualification.
+
+
 > **PR #38 F38-13 final bounded correction (2026-11-22):** Independent review closed F38-12/P2 on `b8e23f321bd18f89ef55093663605f9dba807b3a` and identified F38-13/P2: Core allows PHP-falsy `FACTURE_ADDON='0'` and stored integer `0` as version-specific default, while former module strict-empty normalization denied both. `MsmInvoiceProfile::numberModel()` now follows Core PHP-falsy behavior only for the effective model; unchanged F38-12 read-only canonical fingerprint, guards, complete finance confirmation, One-Shot, UNKNOWN/STOP and postcommit evidence. Tests extend original invoice profile and two-member batch with positive zero cases and negative other invalid model values. **F38-12 INDEPENDENTLY CLOSED; F38-13 IMPLEMENTED / INDEPENDENT CLOSURE PENDING**, exact-HEAD CI evidence must be verified separately. PR DRAFT, Development-Merge and real A–D/release GO remain open.
 
 
@@ -46,7 +55,22 @@
 
 A one-member outer transaction does not make a whole batch atomic. An already committed member is not rolled back because a later member fails.
 
-## Profile and evidence matrix
+## Current dolienv deployment and acceptance (2026-11-24)
+
+Use the [canonical A–D matrix](dolienv-environments.md): A local MariaDBSnapshot,
+B local CoreGuarded, C local EnhancedMySQL, D hosted CoreGuarded. A/C bounded
+contribution/invoice/PDF/R16 cases passed; B contribution passed but finance is
+UNKNOWN/STOP at `finance_precheck`; D's hosting-local reader is accepted with
+CLI/Web limitations and no business tests in this setup campaign. Local B/C
+schemas are now separate, with shared server/source caveats. Local SMTP capture
+is infrastructure evidence only. These results do not close CF05-07/release gates.
+
+## Historical profile and evidence matrix (before dolienv reprovisioning)
+
+The following original labels/topology belong to the earlier CF03 reference
+installation. Preserve them for the old commands/evidence; they are **not** the
+current dolienv deployment matrix.
+
 
 | Reference environment | Profile | Qualified evidence strength and restrictions |
 | --- | --- | --- |

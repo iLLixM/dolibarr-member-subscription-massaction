@@ -1,5 +1,14 @@
 # PR #38 – Core parity and Massaction regression acceptance (Owner 2026-11-22)
 
+> **Current environment convention — 2026-11-24:** dolienv **A = MariaDBSnapshot**,
+> **B = CoreGuarded**, **C = EnhancedMySQL**, **D = hosted CoreGuarded**.
+> [Current topology, bounded acceptance and privacy rules](dolienv-environments.md) control
+> environment naming/readiness. Earlier CF03 labels, shared A/C bindings and dated
+> evidence below retain their historical meaning; do not relabel/replay old tools.
+> Current B finance acceptance is **BLOCKED (UNKNOWN/STOP)**; D has read-only
+> browser/hosting-CLI evidence, not business-write qualification.
+
+
 ## F38-13/P2 – Core-falsy zero numbering default and confirmed multi-member regression
 
 Independent F38-12 follow-up closed F38-12/P2 and identified F38-13/P2 (review HEAD `b8e23f321bd18f89ef55093663605f9dba807b3a`): Core's `!getDolGlobalString('FACTURE_ADDON')` treats the string `'0'` and stored integer `0` as falsy, selecting the V22 `mod_facture_terre` or V23/V24 `mod_facture_mars` default. The module formerly accepted only strict `''`, failing a legitimate Core fallback.

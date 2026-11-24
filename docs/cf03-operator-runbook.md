@@ -1,5 +1,14 @@
 # CF-03 – Operator runbook for stages 0/1 (A–D)
 
+> **Current environment convention — 2026-11-24:** dolienv **A = MariaDBSnapshot**,
+> **B = CoreGuarded**, **C = EnhancedMySQL**, **D = hosted CoreGuarded**.
+> [Current topology, bounded acceptance and privacy rules](dolienv-environments.md) control
+> environment naming/readiness. Earlier CF03 labels, shared A/C bindings and dated
+> evidence below retain their historical meaning; do not relabel/replay old tools.
+> Current B finance acceptance is **BLOCKED (UNKNOWN/STOP)**; D has read-only
+> browser/hosting-CLI evidence, not business-write qualification.
+
+
 > **Latest operator STOP after PR #36 merge (2026-11-21):** [PR #36](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/36) merged as `d0b15785c60b74aa7ad59a1c687db94193d159c6` after `APPROVED FOR DEVELOPMENT MERGE` on `33cb3da3b389f9df2870bc8c6223c86a959cb467`. CoreGuarded invoice/autocreate/sendmail is **production-default-denied** despite implementation. **F36-02/P2 OPEN / CF05-06 REQUIRED**: V22/V24 `Facture::validate()` conditional `PROV` directory rename before outer DB commit must be qualified before any finance unlock. This runbook authorizes **no new real invoice/auto-customer/PDF/mail or ZIP finance test**, no replay, and no circumvention via admin, CLI or test fixtures. Existing F32-MR-01 private launcher/read-only preflight and serial A/C requirements remain. Begin with [source-only CF05-06 plan](cf05-06-standard-core-qualification-plan.md), not historical commands.
 
 > **Current operator restriction after PR #32 merge (2026-11-21):** F32-MR-01/P2 was **Owner-accepted as an operational limitation, NOT fixed**. The A/B/C examples below export private `CF03_*` in a calling shell but use `sudo -u www-data`; ordinary `sudoers env_reset` can strip them and cause fail-closed `CF03MissingEnvironmentParameter`. **Do not run new real A/B/C witness cases using those examples** until a separately protected launcher sets **only approved required environment variables in the actual target PHP-CLI user context** and passes an Owner-observed **read-only preflight**. Never commit the launcher/private values, put DB passwords into arguments or enable blanket environment forwarding. Source/head must be pinned and A/C operated serially. No launcher smoke PASS is currently recorded.

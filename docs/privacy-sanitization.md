@@ -1,5 +1,14 @@
 # Repository privacy and historical evidence handling (2026-11-21)
 
+> **Current environment convention — 2026-11-24:** dolienv **A = MariaDBSnapshot**,
+> **B = CoreGuarded**, **C = EnhancedMySQL**, **D = hosted CoreGuarded**.
+> [Current topology, bounded acceptance and privacy rules](dolienv-environments.md) control
+> environment naming/readiness. Earlier CF03 labels, shared A/C bindings and dated
+> evidence below retain their historical meaning; do not relabel/replay old tools.
+> Current B finance acceptance is **BLOCKED (UNKNOWN/STOP)**; D has read-only
+> browser/hosting-CLI evidence, not business-write qualification.
+
+
 > **PR #32 final status (2026-11-21):** Current-tree pseudonymization/evidence tooling was **squash-merged** as `425980c43a51a9f27073133212f18825ac6da248`, reviewed source `cbc97843fb017135739a39ea12ef26c7fa66dfdb`. No permanent private-term blacklist is kept in source/CI. F32-MR-01/P2 target-user private environment launcher and F32-MR-02/P3 historic root-prose deviation were **expressly Owner-accepted, not technically fixed**. The latter's **actual runtime** boundary is canonical evidence parent with no group/other write, case 0700/file 0600, operator root for A/B/C and full A–D webroot/source exclusion. Current-tree anonymization **does not purge old Git commits or PR/Issue discussions**. Historic original artifact hashes do not certify the redacted bytes. See [current baseline](current-development-baseline.md).
 
 ## Current working tree

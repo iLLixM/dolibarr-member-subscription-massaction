@@ -20,6 +20,18 @@
 
 ## Unreleased
 
+### 2026-11-24 – dolienv documentation and bounded setup acceptance
+
+- Establish current A=MariaDBSnapshot, B=CoreGuarded, C=EnhancedMySQL,
+  D=hosted CoreGuarded naming, separate local B/C schemas and hosting-local
+  read-only tooling. Preserve old CF03 letter/topology/evidence provenance.
+- Record limited real A/C invoice/PDF/R16 acceptance, B finance UNKNOWN/STOP,
+  local-only capture versus untested module mail, and D CLI/Web evidence limits.
+- Document private timestamped A/B/C backup integrity checks (no restore),
+  hosting protection rechecks and pseudonymization requirements. No product,
+  security-policy, release or general compatibility change.
+
+
 ### Phase-4 development in PR #38 – checkpointed PDF/attachment/mail evidence, offline regression
 
 - [PR #38](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/38) (draft, **not merged or production-admitted**) distinguishes the acknowledged Core completion, verified/stale/unknown PDF file, separately verified invoice attachment and actual mail transport/hook outcomes, without conflating a hooked send with delivery. The existing mail `send()` API remains compatible; `sendWithEvidence()` supplies independently reported attachment status.

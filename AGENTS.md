@@ -14,6 +14,20 @@
   applicable validation documents.
 - Do not create a parallel architecture, requirement matrix, test strategy, or evidence history.
 
+## Current environment naming (Owner update 2026-11-24)
+
+- Follow [dolienv environments](docs/dolienv-environments.md): A MariaDBSnapshot,
+  B CoreGuarded, C EnhancedMySQL, D hosted CoreGuarded. Older CF03 A/B labels and
+  A/C shared-schema instructions remain historical; never merely swap letters in
+  legacy tools/manifests. New B/C schemas are separate, but their server and local
+  module source are shared; no parallel qualification is implied.
+- A/C bounded finance/PDF cases passed. B finance remains UNKNOWN/STOP at
+  finance_precheck; D has read-only browser/hosting-CLI evidence only in the new
+  setup campaign. Preserve no-retry and all existing profile safety contracts.
+- Publish no real hosting origin, private route/path, DB/account/login identity,
+  secret/session material, dumps, documents or private inventory. A/B/C local
+  reader/backup-all does not automatically include D. No release approval follows.
+
 ## Architecture and compatibility
 
 - Core-first strategy: Owner decisions ADR-01–ADR-12 in Issue #22 (2026-11-18)
