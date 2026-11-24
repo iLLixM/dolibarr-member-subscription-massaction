@@ -22,7 +22,7 @@ class modMemberSubscriptionMassaction extends DolibarrModules
 		$this->module_position = '90';
 		$this->name = 'MemberSubscriptionMassaction';
 		$this->description = 'MSMDescription';
-		$this->version = '0.1.0-dev';
+		$this->version = '0.1.0';
 		$this->const_name = 'MAIN_MODULE_MEMBERSUBSCRIPTIONMASSACTION';
 		$this->picto = 'members';
 		$this->editor_name = 'iLLixM';
