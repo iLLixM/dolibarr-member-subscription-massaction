@@ -6,7 +6,9 @@
 
 **Current dolienv (2026-11-24):** A=MariaDBSnapshot (Dolibarr 24.0.3/MariaDB 10.11.19/PHP 8.2.35); B=CoreGuarded (Dolibarr 24.0.3/MySQL 8.4.13/PHP 8.2.35); C=EnhancedMySQL (same Dolibarr/MySQL/PHP versions, separate schema/webroot from B); D=Hosted CoreGuarded (Dolibarr 22.0.5/MySQL 8.4.13/CLI PHP 8.3.37). A/B/C have separate schemas and installations; **B/C share a MySQL server and local module source, not a schema**. Historic CF03 letters and historical A/C shared-schema tools are not valid current routes.
 
-**Evidence gates:** A/C have limited positive real contribution/invoice/PDF/R16/replay on prior source. The old Env B `DOLIENV-ACC-01` finance case returned `UNKNOWN/STOP` with **unconfirmed rollback**; F38-14 `manualend` defect is independently CLOSED in code, but **B real finance RETEST REQUIRED** on a *new*, separately authorized fixture. D has read-only browser/CLI evidence only. No prior operation may be automatically replayed or compensated. Phase 5 CF03-NORMAL A–D, F32-MR-01 private launcher/preflight, CF05-07 risk review, module SMTP/attachments, R0-03 exact ZIP, R0-04 Hosted D, R0-07 and explicit Owner Release GO remain **OPEN/NO-GO**. CF03-FAULT destructive tests are DEFERRED.
+**Current Phase 5:** Owner-accepted Codex outcomes on deployed `ba5c9a3121754fcbd4259bb8906ad1dd17f1ce00`: local A/B/C protected readiness 21 checks PASS; B01/B02 and A02/C02 bounded finance/PDF PASS; additional non-mail matrix 8/8 PASS; local B module mail/verified PDF attachments 3/3 PASS (two fresh bulk runs, local capture only). Historical B02 mail/attachment and DOLIENV-ACC-01 remain UNKNOWN/STOP, latter rollback unconfirmed. See [Phase 5 qualification register](docs/evidence/cf03/phase5-local-qualification-2026-11-24.md). These accepted summaries suffice under modified OD-P5-02; no external reproduction of raw artifacts is asserted.
+
+**Operational/release boundary:** Local readiness accepted for the tested scope; new cases require protected preflight, current source/profile binding, fresh fixtures, Owner authorization, controlled backups and independent readbacks. Full CF03-NORMAL A–D, A/C mail, remaining live/configuration coverage, isolated Hosted D, CF05-07/CF03-RISK, final R0-03, R0-04, R0-07 and separate Owner Release GO remain OPEN / NO-GO. CF03-FAULT destructive tests remain deferred. Never replay historical UNKNOWN operations.
 
 **Read first:** [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22), [current development baseline](docs/current-development-baseline.md), [Owner architecture](docs/owner-core-parity-2026-11-22.md), [dolienv topology](docs/dolienv-environments.md), [Phase 4 design](docs/phase4-invoice-architecture.md), [release gates](docs/release-qualification-v0.1.0.md). Dated older content below may describe earlier statuses; this current header and linked baseline take precedence.
 ## Intended v0.1.0 functionality
@@ -25,7 +27,7 @@ No standalone third-party creation, automatic payment/bank entry, new module per
 
 | Profile | Evidence | Development capability and limit |
 | --- | --- | --- |
-| `CoreGuarded` | MySQL bounded connection/depth/ACK, SET→Core-BEGIN; no P_S event proof | Full finance enabled; B/D real finance not fully accepted |
+| `CoreGuarded` | MySQL bounded connection/depth/ACK, SET→Core-BEGIN; no P_S event proof | Full finance enabled; local B bounded finance/mail PASS, D pending |
 | `EnhancedMySQL` | MySQL Performance Schema event, ownership and isolation | Full feature implementation, complete final-source integration pending |
 | `MariaDBSnapshot` | MariaDB snapshot, `@@in_transaction`, connection/depth | Full feature implementation, complete final-source integration pending |
 
@@ -41,7 +43,7 @@ F38-01–06 CLOSED; F38-07–09 SUPERSEDED; F38-10–14 INDEPENDENTLY CLOSED. Th
 
 ## Supported platforms and qualification
 
-The documented release compatibility target is **Dolibarr V22, V23 and V24 (Owner-confirmed)**. Retain that target as a product statement, while distinguishing synthetic/source checks from *actual real integration evidence*: **V23 has synthetic coverage, not a completed real V23 integration campaign**. V22.0.5 and V24.0.3 have separately pinned historical evidence, but the complete new CF05 workflow still requires fresh A–D integration. Capability admission at Dolibarr >=21 alone does not assert real support for every version.
+The documented release compatibility target is **Dolibarr V22, V23 and V24 (Owner-confirmed)**. Retain that target as a product statement, while distinguishing synthetic/source checks from *actual real integration evidence*: **V23 has synthetic coverage, not a completed real V23 integration campaign**. V22.0.5 and V24.0.3 have separately pinned historical evidence, but the local Phase 5 cases are accepted on V24; complete A–D qualification remains open. Capability admission at Dolibarr >=21 alone does not assert real support for every version.
 
 - **PHP:** module syntax minimum 7.4, subject to Dolibarr/Core requirements; CI includes PHP 7.4/8.2 and a targeted PHP 8.3/V22 witness lane.
 - **Database:** Oracle MySQL >=8.4 (CoreGuarded; Enhanced requires separate P_S qualification), or MariaDB >=10.11 (MariaDBSnapshot), direct `mysqli`/InnoDB under the qualified contracts. PostgreSQL is not supported.
@@ -51,13 +53,13 @@ The documented release compatibility target is **Dolibarr V22, V23 and V24 (Owne
 
 The repository root is the Dolibarr module root. For an Owner-approved isolated installation, link to `htdocs/custom/membersubscriptionmassaction`, enable Dolibarr Members and this module, select a compatible transaction profile and configure the appropriate rights. The Members bulk-subscription action offers Preview → Confirmation → Results. **Enabling, profile changes and confirmed bookings are writes** and require approval.
 
-Historical `CF03_*` operator commands are not ready for new dolienv use: F32-MR-01 protected target-user launcher and read-only preflight must be demonstrated first, with individual Owner GO and fresh one-shot fixtures. B/C share server/source: no uncontrolled parallel qualification. No private identities, paths, DB names or credentials in Git.
+Historical `CF03_*` operator commands are not ready for new dolienv use: F32-MR-01 protected target-user launcher and read-only preflight must be verified per new case, with individual Owner GO and fresh one-shot fixtures. B/C share server/source: no uncontrolled parallel qualification. No private identities, paths, DB names or credentials in Git.
 
 
 ## Tests, evidence and remaining gates
 
 - Source-verified PR #38 CI (9/21/1 = **31/31 SUCCESS**) is synthetic/offline evidence; not live financial or mail qualification. Use `php test/unit/run.php` and targeted runners under [test strategy](docs/test-strategy.md) / [coverage](docs/test-coverage.md).
-- Next: Phase 5 guarded CF03-NORMAL A–D on final code (priority: **new** B finance case, no old incident replay), module mail/PDF/verified attachments, CF05-07 financial and F36-02 operating-risk acceptance.
+- Next: remaining A/C mail and live/configuration cases, isolated Hosted D, exact package and CF05-07 operating-risk acceptance. No historical UNKNOWN replay.
 - Release **NO-GO**: source-exact sanitized v0.1.0 ZIP/manifest/SHA256 (R0-03), Hosted D exact package (R0-04), independent R0-07 and distinct Owner Release GO. Destructive CF03-FAULT deferred. [Current gate plan](docs/release-qualification-v0.1.0.md).
 
 
