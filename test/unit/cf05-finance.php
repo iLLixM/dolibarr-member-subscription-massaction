@@ -271,6 +271,9 @@ try {
 				'bank'=>0,'currency'=>'EUR','pdf_model'=>'crabe','product'=>0,
 				'vat'=>0,'quantity'=>1,'price_base'=>'TTC','type'=>1));
 		$flow->reader->row=$row;
+		// msmEvaluatePreview() appends this UI flag after calculating the
+		// fingerprint. The in-transaction preview service returns no such key.
+		$row['manualend']=$case['name']==='existing';
 		$user=new PreviewUser();
 		$options=array('invoice'=>empty($case['no_invoice']),'autocreate'=>$case['autocreate'],
 			'sendmail'=>true,'description'=>'Synthetic fee');

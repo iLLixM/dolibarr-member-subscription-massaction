@@ -98,8 +98,30 @@ attachment or SMTP-provider qualification.**
 **unconfirmed**. The independent readback found no persisted business delta from
 that attempt; **absence of a persisted delta does not supply a missing rollback
 ACK or rewrite UNKNOWN as FAILED/safe**. No retry, compensation, profile change
-or product fix was performed. No technical root cause or independent F38 finding
-closure is claimed. Its relationship to earlier reports is not established.
+or product fix was performed during the acceptance campaign. Its relationship to
+earlier reports is not established.
+
+**2026-11-24 source analysis and offline correction (F38-14 candidate).**
+The controller appends the boolean `manualend` to the confirmed row after the
+preview fingerprint is computed. The fresh preview under the member lock has
+matching business data and fingerprint but lacks this presentation field.
+`MsmInvoiceService::create()` rechecks profile admission and the active guard,
+then hands the fresh row to `requireFinanceContinuation()`. The exact row
+comparison denies the otherwise valid continuation with
+`RuntimeException(0), MSMCoreGuardedSessionUnsupported`. The synthetic
+file-session/Booking/Invoice test observed that exception before any Invoice
+Core call. The historical browser result stores the generic UNKNOWN code,
+so the original exception was inferred from the source and reproduction.
+
+Booking now carries that single field from the verified confirmation when
+handing the fresh row to CoreGuarded Invoice. Finance parameters still come
+from the fresh row, and the existing exact row, same-guard and consumed
+capability checks still run. The exception does not qualify for a controlled
+rollback, which explains the reproduced `UNKNOWN/STOP` classification.
+The original live result stays `UNKNOWN/STOP`. A fresh independent SELECT still
+found no row for diagnostic Subscription #3 and no invoice. Real testing of
+the correction, independent delta review and renewed Owner approval remain
+open. Development merge is blocked.
 
 This does not cancel the separately passed A/C cases, and does not establish a D
 finance failure or success. A–D complete finance/mail/attachment qualification,

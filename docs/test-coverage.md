@@ -9,6 +9,18 @@
 > browser/hosting-CLI evidence, not business-write qualification.
 
 
+> **DOLIENV-ACC-01 / F38-14 candidate (2026-11-24):**
+> `test/unit/cf05-finance.php` models the controller's persisted `manualend`
+> flag in the original confirmation and a fresh service row without the flag.
+> On the original code, the valid existing-customer case fails at
+> `finance_precheck`. The corrected handoff passes for both UI flag values.
+> The same runner still rejects a changed finance amount with the original
+> fingerprint and checks UNKNOWN/STOP after loss of context or an uncertain
+> Core outcome. The file-session, guard, direct-Invoice and F38-10–F38-13
+> regression contracts remain covered by their existing runners. This is
+> offline evidence with local file sessions and synthetic Core/DB adapters.
+> The corrected flow has no new live A/B/C/D finance evidence.
+
 > **F38-13/P2 – Core-falsy invoice numbering regression (2026-11-22):** `test/unit/invoiceprofile.php` now admits both string `'0'` and stored integer `0` via actual read-only `MsmInvoiceProfile::resolve()`, compares full canonical snapshots before/after Core normalization, and preserves real effective-model and other settings negatives plus malformed-name/traversal denial. `test/unit/invoice.php` extends originally confirmed TWO-member production Preview/fingerprint→Booking/Invoice synthetic normalizing-Core sequence to both zero representations, requiring two successes and two invoice validations. Tests are Core-source based with synthetic DB/Invoice doubles; no real numbering, SQL, triggers, PDF, filesystem or SMTP. F38-12 independently CLOSED, F38-13 external exact-HEAD closure pending.
 
 

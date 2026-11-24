@@ -252,7 +252,14 @@ class MsmBookingService
 			$diagnostic['subscription_id'] = max(0, (int) $subscription);
 			$this->requireOwned();
 			if ($subscription <= 0) { throw new RuntimeException('MSMBookingFailed'); }
-			if (!empty($options['invoice'])) { $invoice = $this->invoicing()->create($member, $subscription, $row, $user, $diagnostic); }
+			if (!empty($options['invoice'])) {
+				// The controller adds this UI flag after fingerprinting. Carry it
+				// from the verified confirmation for the exact finance row check.
+				if ($coreGuarded && array_key_exists('manualend', $expected)) {
+					$row += array('manualend' => $expected['manualend']);
+				}
+				$invoice = $this->invoicing()->create($member, $subscription, $row, $user, $diagnostic);
+			}
 			$this->verifyStored($id, $subscription, $member, $row);
 			$this->requireOwned();
 			$diagnostic['stage'] = 'commit';

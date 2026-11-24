@@ -9,6 +9,16 @@
 > browser/hosting-CLI evidence, not business-write qualification.
 
 
+> **PR #38 DOLIENV-ACC-01 / F38-14 candidate — 2026-11-24:** The real local
+> CoreGuarded invoice attempt on the previously reviewed implementation
+> `46f78d8f8f2c6f70424754d82171697e74ac4448` ended in `UNKNOWN/STOP`.
+> A deterministic offline reproduction isolated the mismatch between the confirmed
+> row and Booking's recalculated row and verifies a minimal correction.
+> **Development merge is blocked pending renewed independent review and Owner
+> approval.** B finance acceptance remains blocked pending a separately
+> authorized fresh real test. See [the incident and evidence limits](dolienv-environments.md#open-local-b-finance-observation).
+
+
 > **PR #38 F38-13 final bounded correction (2026-11-22):** Independent review closed F38-12/P2 on `b8e23f321bd18f89ef55093663605f9dba807b3a` and identified F38-13/P2: Core allows PHP-falsy `FACTURE_ADDON='0'` and stored integer `0` as version-specific default, while former module strict-empty normalization denied both. `MsmInvoiceProfile::numberModel()` now follows Core PHP-falsy behavior only for the effective model; unchanged F38-12 read-only canonical fingerprint, guards, complete finance confirmation, One-Shot, UNKNOWN/STOP and postcommit evidence. Tests extend original invoice profile and two-member batch with positive zero cases and negative other invalid model values. **F38-12 INDEPENDENTLY CLOSED; F38-13 IMPLEMENTED / INDEPENDENT CLOSURE PENDING**, exact-HEAD CI evidence must be verified separately. PR DRAFT, Development-Merge and real A–D/release GO remain open.
 
 
