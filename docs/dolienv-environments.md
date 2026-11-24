@@ -1,5 +1,19 @@
 # dolienv environments and bounded acceptance
 
+## Post-PR #38 source and acceptance handoff
+
+**Authoritative post-PR #38 state (2026-11-24):** [PR #38](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/38) was independently reviewed and **squash-merged** into `main` as `0998fbaf58155cca04d31ab99c6bb47420e53c72`; reviewed HEAD `b15b93580f995fb05a696a125c2a5fd995dd4bb3` has **identical Git tree** `a6e7256fb1572361c4dd4d850124ca7a6afff566`. The independent verdict was **APPROVED FOR DEVELOPMENT MERGE WITH DOCUMENTED LIMITATIONS**, with exact-source Standard 9/9 + Full 21/21 + Hosted 1/1 (**31/31**) synthetic CI PASS. Phase 4 development is merged; **Phase 5 real A–D integration, CF05-07, package, hosted and Owner release acceptance are NOT complete**. All older dated DRAFT/finance-default-deny/core-source-allowlist statements below are historical and not current requirements.
+
+**Independent disposition:** F38-01–06 `CLOSED`; F38-07–09 `SUPERSEDED BY OWNER VARIANT B` (not technically closed); F38-10–13 `INDEPENDENTLY CLOSED`; F38-14/P2 `INDEPENDENTLY CLOSED` (server-confirmed `manualend` restored only after fresh fingerprint revalidation); F36-01 historically closed. **Separate real incident:** `DOLIENV-ACC-01` in B remains `UNKNOWN/STOP`, diagnostic subscription #3 and rollback unconfirmed; lack of a persisted record does not prove rollback ACK. No replay/compensation. The corrected code has **not been retested in real B finance**.
+
+**Source identities:** A/B/C previous real acceptance used module `46f78d8f8f2c6f70424754d82171697e74ac4448`; last independent reviewed fix `b15b93580f995fb05a696a125c2a5fd995dd4bb3` was merged tree-identically as `0998fbaf58155cca04d31ab99c6bb47420e53c72`. **No real live finance acceptance is yet recorded for the merged tree.** Current B rollback remains unconfirmed despite independent SQL absence; this document retains immutable old-run identity.
+
+**Operational/release boundary:** `F32-MR-01` protected private target-user launcher and read-only preflight, independently reconciled **new** one-shot A–D CF03-NORMAL cases (priority B finance, never replay old UNKNOWN), per-case Owner write GO, controlled snapshots/backups and restore readiness, actual module mail/verified attachments, `CF05-07` risk acceptance, `R0-03` exact v0.1.0 ZIP/SHA256, `R0-04` hosted D package/Web-FPM/business qualification, `R0-07` independent final acceptance and separate Owner Release GO remain **OPEN / NO-GO**. SMTP-capture probes are infrastructure-only, backup integrity is not restore, and CF03-FAULT destructive cases remain DEFERRED/NOT EXECUTED. No real writes authorized by this documentation.
+
+---
+
+> **Archived date-bound content below:** previous sources/labels/admission claims reflect their original times; the post-PR38 section above governs current status.
+
 Current Owner-requested environment convention, **2026-11-24**. This document is
 public and pseudonymized. It describes deployment/test topology and observed
 results; it introduces no transaction policy, product change or release approval.

@@ -1,5 +1,23 @@
 # CF-03 – Operator runbook for stages 0/1 (A–D)
 
+## Current operator safety STOP – post-PR #38 (2026-11-24)
+
+**Authoritative post-PR #38 state (2026-11-24):** [PR #38](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/38) was independently reviewed and **squash-merged** into `main` as `0998fbaf58155cca04d31ab99c6bb47420e53c72`; reviewed HEAD `b15b93580f995fb05a696a125c2a5fd995dd4bb3` has **identical Git tree** `a6e7256fb1572361c4dd4d850124ca7a6afff566`. The independent verdict was **APPROVED FOR DEVELOPMENT MERGE WITH DOCUMENTED LIMITATIONS**, with exact-source Standard 9/9 + Full 21/21 + Hosted 1/1 (**31/31**) synthetic CI PASS. Phase 4 development is merged; **Phase 5 real A–D integration, CF05-07, package, hosted and Owner release acceptance are NOT complete**. All older dated DRAFT/finance-default-deny/core-source-allowlist statements below are historical and not current requirements.
+
+**Current dolienv topology:** A = local Dolibarr 24.0.3/PHP 8.2.35/MariaDB 10.11.19 `MariaDBSnapshot`; B = local Dolibarr 24.0.3/PHP 8.2.35/MySQL 8.4.13 `CoreGuarded`; C = same Dolibarr/PHP/MySQL versions `EnhancedMySQL`; D = hosted Dolibarr 22.0.5/MySQL 8.4.13/CLI PHP 8.3.37 `CoreGuarded`. A/B/C have separate schemas, webroots, accounts, sessions, document roots; B/C share MySQL server and local module source only. Legacy CF03 A/B labels and older shared A/C commands cannot be relabeled/reused. A/C limited invoice/PDF/R16/replay positive evidence was on prior HEAD `46f78d8...`; D has read-only hosted evidence; no exact-current-source full real finance qualification. [Canonical matrix](dolienv-environments.md).
+
+**All historical commands below are archival templates and are NOT executable authorization**; old A=CoreGuarded/B=MariaDB mapping and A/C shared-schema assertions were superseded by new dolienv. Private paths, DB users, credentials, installed checkouts and actual target-user environment variable transfer must be resolved **outside Git**. Validate canonical env-to-source/DB/schema/profile binding with a read-only preflight using a protected least-privilege launcher (F32-MR-01). No global `sudo -E` forwarding or public test artifacts. Schedule B/C source/DB access deliberately.
+
+**Independent disposition:** F38-01–06 `CLOSED`; F38-07–09 `SUPERSEDED BY OWNER VARIANT B` (not technically closed); F38-10–13 `INDEPENDENTLY CLOSED`; F38-14/P2 `INDEPENDENTLY CLOSED` (server-confirmed `manualend` restored only after fresh fingerprint revalidation); F36-01 historically closed. **Separate real incident:** `DOLIENV-ACC-01` in B remains `UNKNOWN/STOP`, diagnostic subscription #3 and rollback unconfirmed; lack of a persisted record does not prove rollback ACK. No replay/compensation. The corrected code has **not been retested in real B finance**.
+
+**Incident rule:** original B `DOLIENV-ACC-01` is UNKNOWN/STOP (subscription #3, rollback unconfirmed); independent readback no persistent delta does not prove rollback ACK. Do **not** rerun/compensate or claim final success. Any new B finance fixture must be explicitly authorized and separately reconciled. No new A–D real writes/SMTP/deployments under this documentation PR.
+
+**Operational/release boundary:** `F32-MR-01` protected private target-user launcher and read-only preflight, independently reconciled **new** one-shot A–D CF03-NORMAL cases (priority B finance, never replay old UNKNOWN), per-case Owner write GO, controlled snapshots/backups and restore readiness, actual module mail/verified attachments, `CF05-07` risk acceptance, `R0-03` exact v0.1.0 ZIP/SHA256, `R0-04` hosted D package/Web-FPM/business qualification, `R0-07` independent final acceptance and separate Owner Release GO remain **OPEN / NO-GO**. SMTP-capture probes are infrastructure-only, backup integrity is not restore, and CF03-FAULT destructive cases remain DEFERRED/NOT EXECUTED. No real writes authorized by this documentation.
+
+---
+
+> **Archived date-bound content below:** previous sources/labels/admission claims reflect their original times; the post-PR38 section above governs current status.
+
 > **Current environment convention — 2026-11-24:** dolienv **A = MariaDBSnapshot**,
 > **B = CoreGuarded**, **C = EnhancedMySQL**, **D = hosted CoreGuarded**.
 > [Current topology, bounded acceptance and privacy rules](dolienv-environments.md) control
