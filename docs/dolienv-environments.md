@@ -20,6 +20,14 @@ results; it introduces no transaction policy, product change or release approval
 
 ## Current matrix
 
+## Phase 5 local non-mail follow-up, 24 November 2026
+
+On exact deployed source `ba5c9a3121754fcbd4259bb8906ad1dd17f1ce00`, eight local
+A/B/C non-mail cases passed. The verified B02 Core SMTP host-validation failure
+and exact template restoration are documented with the controls and test matrix.
+B02 mail/attachment and the original `DOLIENV-ACC-01` retain their UNKNOWN/STOP
+dispositions. See [the dated follow-up](phase5-b02-nonmail-followup.md).
+
 | Environment | Location / Core | Database server | Transaction profile | PHP evidence |
 | --- | --- | --- | --- | --- |
 | **A** | Local, Dolibarr 24.0.3 | MariaDB 10.11.19 (`10.11.19-MariaDB-0+deb12u1`) | **`MariaDBSnapshot`** | PHP-FPM / CLI 8.2.35 |

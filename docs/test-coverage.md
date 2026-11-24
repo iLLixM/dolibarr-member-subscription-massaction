@@ -1,5 +1,14 @@
 # Reading the existing requirement matrix
 
+## Phase 5 follow-up on the deployed main baseline
+
+The [dated local follow-up](phase5-b02-nonmail-followup.md) records eight real
+non-mail cases in A/B/C: automatic customers and invoice/PDF in A and C,
+contribution Agenda-event ON/OFF, R16 and two-member batches in all three
+profiles. Safe live negative cases cover CSRF, stale confirmation and replay.
+Expiration and wrong entity remain offline coverage. The original A-on
+STOP, B02 mail unknown and separate DOLIENV-ACC-01 unknown remain recorded.
+
 ## Updated evidence legend after PR #38 merge
 
 **Authoritative post-PR #38 state (2026-11-24):** [PR #38](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/38) was independently reviewed and **squash-merged** into `main` as `0998fbaf58155cca04d31ab99c6bb47420e53c72`; reviewed HEAD `b15b93580f995fb05a696a125c2a5fd995dd4bb3` has **identical Git tree** `a6e7256fb1572361c4dd4d850124ca7a6afff566`. The independent verdict was **APPROVED FOR DEVELOPMENT MERGE WITH DOCUMENTED LIMITATIONS**, with exact-source Standard 9/9 + Full 21/21 + Hosted 1/1 (**31/31**) synthetic CI PASS. Phase 4 development is merged; **Phase 5 real A–D integration, CF05-07, package, hosted and Owner release acceptance are NOT complete**. All older dated DRAFT/finance-default-deny/core-source-allowlist statements below are historical and not current requirements.
