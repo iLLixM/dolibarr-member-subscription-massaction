@@ -81,12 +81,20 @@ function msmProcessBooking(array $state, $service, $mailer, $user, callable $sav
 		$stop = !empty($result['stop']) || ($coreGuarded && (($result['completion'] ?? '') !== 'nonterminal_acknowledged'
 			|| !in_array($result['status'], array('success', 'failed', 'skipped'), true)
 			|| ($result['status'] !== 'success' && ($result['rollback'] ?? '') !== 'confirmed'))); // Decide before checkpoints or any post-completion effect.
-		if ($coreGuarded) { $result['stop'] = $stop; }
+		if ($coreGuarded) {
+			$result['stop'] = $stop;
+			// Completion, file, attachment and transport are distinct evidence.
+			// A committed contribution must not become a failed DB operation
+			// because a later external effect was unverified.
+			$result['attachment_status'] = !empty($state['options']['invoice']) && !empty($state['options']['sendmail'])
+				? 'not_processed' : 'not_required';
+		}
 		$member = $result['_member'] ?? null; unset($result['_member']);
 		if ($stop && $coreGuarded) {
 			$state['results'][$id] = $result;
 			if ($result['status'] === 'success') {
 				$state['results'][$id]['mail'] = 'not_processed';
+				$state['results'][$id]['attachment_status'] = 'not_processed';
 				if (!empty($result['invoice'])) { $state['results'][$id]['invoice']['pdf'] = array('status' => 'not_processed', 'message' => 'MSMPdfNotProcessed'); }
 			}
 			msmStopUnprocessed($state, $id); $state['phase'] = 'done';
@@ -104,36 +112,118 @@ function msmProcessBooking(array $state, $service, $mailer, $user, callable $sav
 					try { $save->requirePostCommitEffect((int) $id, 'pdf'); }
 					catch (Throwable $e) { $state['checkpoint_failed'] = true; msmStopUnprocessed($state, $id); return $state; }
 				}
-				$state['results'][$id]['invoice']['pdf'] = $pdf !== null
-					? $pdf->generate($state['results'][$id]['invoice'], $user)
-					: array('status' => 'failed', 'message' => 'MSMPdfGenerationFailed');
-				if (!msmSaveBookingCheckpoint($state, $save, $coreGuarded)) { msmStopUnprocessed($state, $id); return $state; }
+				try {
+					$state['results'][$id]['invoice']['pdf'] = $pdf !== null
+						? $pdf->generate($state['results'][$id]['invoice'], $user)
+						: array('status' => 'failed', 'message' => 'MSMPdfGenerationFailed');
+					if (!is_array($state['results'][$id]['invoice']['pdf'])
+						|| !in_array($state['results'][$id]['invoice']['pdf']['status'] ?? '', array('verified', 'failed', 'unknown'), true)) {
+						throw new RuntimeException('MSMPdfUnknown');
+					}
+				} catch (Throwable $e) {
+					if (!$coreGuarded) { throw $e; }
+					$state['results'][$id]['invoice']['pdf'] = array('status' => 'unknown', 'message' => 'MSMPdfUnknown');
+				}
+				if (($state['results'][$id]['invoice']['pdf']['status'] ?? null) === 'unknown' && $coreGuarded) {
+					// A partially written document may have escaped an exception.
+					// STOP other members, never regenerate or dispatch SMTP.
+					$state['results'][$id]['mail'] = 'not_processed';
+					$state['results'][$id]['attachment_status'] = 'not_processed';
+					msmStopUnprocessed($state, $id); $state['phase'] = 'done';
+					msmSaveBookingCheckpoint($state, $save, true);
+					return $state;
+				}
+				if (!msmSaveBookingCheckpoint($state, $save, $coreGuarded)) {
+					if ($coreGuarded) {
+						// PDF may exist, but its verified descriptor could not be
+						// durably checkpointed. Never imply verified persistence.
+						$state['results'][$id]['invoice']['pdf'] = array('status'=>'unknown','message'=>'MSMPdfUnknown');
+						$state['results'][$id]['mail'] = 'not_processed';
+						$state['results'][$id]['attachment_status'] = 'not_processed';
+					}
+					msmStopUnprocessed($state, $id); return $state;
+				}
 			}
 			$invoice = $state['results'][$id]['invoice'] ?? null;
 			if ($coreGuarded) {
 				if (empty($state['options']['sendmail'])) {
 					$state['results'][$id]['mail'] = 'not_selected';
 				} elseif ($invoice !== null && ($invoice['pdf']['status'] ?? null) !== 'verified') {
-					// Never dispatch any hook/SMTP when the invoice PDF cannot
-					// be independently verified as the confirmed attachment.
+					// A failed PDF is not a transport failure or a successful attachment.
 					$state['results'][$id]['mail'] = 'attachment_missing';
+					$state['results'][$id]['attachment_status'] = 'missing';
 				} else {
-					// 'unknown' was durably persisted before PDF/SMTP work.
+					// 'unknown' was durably persisted before hooks/SMTP.
 					if (!msmSaveBookingCheckpoint($state, $save, true)) { msmStopUnprocessed($state, $id); return $state; }
 					try { $save->requirePostCommitEffect((int) $id, 'mail'); }
 					catch (Throwable $e) { $state['checkpoint_failed'] = true; msmStopUnprocessed($state, $id); return $state; }
-					$state['results'][$id]['mail'] = $mailer->send($member, $row, $user, true, $invoice);
+					try {
+						// Only the production adapter exposes separately derived
+						// evidence. Fail closed instead of pretending a legacy spy
+						// is an authoritative real-file/transport verifier.
+						$delivery = $mailer->sendWithEvidence($member, $row, $user, true, $invoice, $save, (int) $id);
+						if (!is_array($delivery)
+							|| !in_array($delivery['mail'] ?? '', array('transport', 'hook', 'failed', 'missing', 'disabled', 'denied', 'attachment_missing', 'unknown'), true)
+							|| !in_array($delivery['attachment'] ?? '', array('verified_for_transport', 'verified_before_hook', 'missing', 'not_sent', 'unknown', 'not_required'), true)
+							|| !msmValidMailAttachmentEvidence($delivery, $invoice !== null)) {
+							throw new RuntimeException('MSMMailUnknown');
+						}
+					} catch (Throwable $e) {
+						// F38-06: contribution-only mails have no invoice attachment.
+						$delivery = array('mail' => 'unknown',
+							'attachment' => $invoice !== null ? 'unknown' : 'not_required');
+					}
+					$state['results'][$id]['mail'] = $delivery['mail'];
+					$state['results'][$id]['attachment_status'] = $delivery['attachment'];
 				}
 			} else {
 				$state['results'][$id]['mail'] = $mailer->send($member, $row, $user, $state['options']['sendmail'], $invoice);
 			}
-			if (!msmSaveBookingCheckpoint($state, $save, $coreGuarded)) { msmStopUnprocessed($state, $id); return $state; }
+			if ($coreGuarded && $state['results'][$id]['mail'] === 'unknown') {
+				// The external effect may have happened. Persist ambiguity and
+				// stop the remaining batch; never attempt an automatic resend.
+				msmStopUnprocessed($state, $id); $state['phase'] = 'done';
+				msmSaveBookingCheckpoint($state, $save, true);
+				return $state;
+			}
+			if (!msmSaveBookingCheckpoint($state, $save, $coreGuarded)) {
+				if ($coreGuarded) {
+					// Transport may have occurred but its result could not be
+					// durably checkpointed; preserve DB and PDF status only.
+					$state['results'][$id]['mail'] = 'unknown';
+					$state['results'][$id]['attachment_status'] = $invoice !== null ? 'unknown' : 'not_required';
+				}
+				msmStopUnprocessed($state, $id); return $state;
+			}
 		}
 	}
 	$state['phase'] = 'done'; msmSaveBookingCheckpoint($state, $save, $coreGuarded);
 	return $state;
 }
 
+/** Finite combinations; never infer successful transport from a stray adapter
+ * status. The invoice-less mail path must not invent invoice attachments.
+ */
+function msmValidMailAttachmentEvidence(array $delivery, $withInvoice)
+{
+	$mail = $delivery['mail'] ?? null;
+	$attachment = $delivery['attachment'] ?? null;
+	if (!$withInvoice) {
+		return $attachment === 'not_required'
+			&& in_array($mail,array('transport','hook','failed','denied','missing','disabled','unknown'),true);
+	}
+	$allowed = array(
+		'transport' => 'verified_for_transport',
+		'hook' => 'verified_before_hook',
+		'attachment_missing' => 'missing',
+		'unknown' => 'unknown',
+		'failed' => 'not_sent',
+		'disabled' => 'not_sent',
+		'denied' => 'not_sent',
+		'missing' => 'not_sent',
+	);
+	return isset($allowed[$mail]) && $attachment === $allowed[$mail];
+}
 /** Mark only following selected slots, preserving the acknowledged current result. */
 function msmStopUnprocessed(array &$state, $current)
 {

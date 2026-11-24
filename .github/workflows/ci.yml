@@ -71,6 +71,7 @@ jobs:
           php test/unit/cf03-evidence.php
           php test/unit/cf03-source.php
           php test/unit/coreguarded-session.php
+          php test/unit/ci-triggers.php
           node test/unit/loading.js
       - uses: actions/checkout@v4
         with:
@@ -81,11 +82,13 @@ jobs:
       - name: Synthetic contracts against Dolibarr ${{ matrix.core }} APIs
         env:
           DOLIBARR_TEST_ROOT: ${{ github.workspace }}/.test-core
+          DOLIBARR_TEST_VERSION: ${{ matrix.core }}
         run: |
           php test/unit/booking.php
           php test/unit/f29-book-flow.php
           php test/unit/maildelivery.php
           php test/unit/invoiceprofile.php
+          php test/unit/cf05-core-parity.php
           php test/unit/invoice.php
           php test/unit/cf05-finance.php
           php test/unit/invoicepdf.php

@@ -36,6 +36,9 @@ class MsmInvoiceService
 	protected function customer() { require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php'; return new Societe($this->db); }
 	public function checkTables()
 	{
+		// Core-parity Owner decision (2026-11-22): do not source-pin Dolibarr
+		// invoice, trigger, numbering or extension code. Keep transaction-engine
+		// readiness and original Booking/Invoice guard ownership checks.
 		$this->databaseState->requireTransactionalTables(array('societe', 'societe_extrafields', 'socpeople', 'socpeople_extrafields', 'societe_commerciaux', 'facture', 'facture_extrafields', 'facturedet', 'facturedet_extrafields', 'element_element', 'ecm_files'));
 	}
 	public function lock($id)
@@ -149,6 +152,10 @@ class MsmInvoiceService
 		$line = $invoice->addline($this->invoiceDescription($row['description']), 0, $plan['quantity'], $plan['vat'], 0, 0, $plan['product'], 0, $row['start'], '', 0, 0, 0, $plan['price_base'], $row['amount'], $plan['type']);
 		$this->owned(); if ($line <= 0) { throw new RuntimeException('MSMInvoiceFailed'); }
 		$diagnostic['stage'] = 'invoice_validate';
+		// F36-02: accept Core's conditional PROV document-directory rename as
+		// an explicit, documented Core-inherent non-DB-atomic residual risk.
+		// Do not add an independent file/source allowlist; never promise that
+		// SQL rollback compensates a prior Core filesystem side effect.
 		$this->owned(); // Before nested Core Facture::validate().
 		$validated = $invoice->validate($actor); $this->owned();
 		if ($validated <= 0) { throw new RuntimeException('MSMInvoiceFailed'); }

@@ -28,7 +28,15 @@ class Adherent
 	public function sendEmail(...$args) { $GLOBALS['last_mail'] = $args; $GLOBALS['mail_language'] = $GLOBALS['langs']->defaultlang; return $this->returnCode; }
 }
 class DeliveryHooks { public function executeHooks($name, $params, &$object, &$action) { return 0; } }
-class DeliveryAdapter extends MsmSubscriptionMail { protected function permitted($user) { return true; } protected function hooks() { return new DeliveryHooks(); } }
+class DeliveryAdapter extends MsmSubscriptionMail {
+	protected function permitted($user) { return true; }
+	protected function hooks() { return new DeliveryHooks(); }
+	public function inspectEffectPhase($member, $row, $user, $invoice = null) {
+		$started = false;
+		$status = $this->sendInternal($member, $row, $user, true, $invoice, $started);
+		return array($status, $started);
+	}
+}
 class InvoiceAttachmentDouble
 {
 	public $calls = 0; public $fail = false;
@@ -41,8 +49,12 @@ class InvoiceAttachmentDouble
 }
 class InvoiceDeliveryHooks
 {
-	public $code = 0; public $calls = 0;
-	public function executeHooks($name, $params, &$object, &$action) { $this->calls++; return $this->code; }
+	public $code = 0; public $calls = 0; public $fail = false;
+	public function executeHooks($name, $params, &$object, &$action) {
+		$this->calls++;
+		if ($this->fail) { throw new RuntimeException('Synthetic hook uncertainty'); }
+		return $this->code;
+	}
 }
 class InvoiceDeliveryAdapter extends DeliveryAdapter
 {
@@ -80,4 +92,77 @@ $invoiceMail->pdfAdapter->fail = false;
 $invoiceMail->hookAdapter->code = 1;
 checkMail($invoiceMail->send($member, $row, new stdClass(), true, $invoice) === 'hook', 'positive hook remains distinct from standard invoice transport');
 checkMail($invoiceMail->pdfAdapter->calls === 4 && $invoiceMail->hookAdapter->calls === 2, 'verified PDF required before hook takeover without second transport resolution');
+// Phase 4: the real adapter reports verified attachment evidence separately
+// from transport/hook outcome; it never equates either with delivered mail.
+$invoiceMail->hookAdapter->code = 0;
+$detail = $invoiceMail->send($member, $row, new stdClass(), true, $invoice);
+checkMail($detail === 'transport',
+	'F38-03 legacy invoice send retains its return code under existing B/C use');
+$invoiceMail->hookAdapter->code = 1;
+$detail = $invoiceMail->send($member, $row, new stdClass(), true, $invoice);
+checkMail($detail === 'hook',
+	'F38-03 legacy hook handling unchanged while guarded evidence requires capability');
+$invoiceMail->hookAdapter->code = 0;
+$invoiceMail->pdfAdapter->fail = true;
+$detail = $invoiceMail->send($member, $row, new stdClass(), true, $invoice);
+checkMail($detail === 'attachment_missing',
+	'F38-03 legacy verified PDF mismatch blocks hook as before');
+$invoiceMail->pdfAdapter->fail = false;
+$invoiceMail->hookAdapter->fail = true;
+$detail = $invoiceMail->send($member, $row, new stdClass(), true, $invoice);
+checkMail($detail === 'unknown',
+	'F38-02 legacy hook exception continues to return unknown');
+$invoiceMail->hookAdapter->fail = false;
+$invoiceMail->hookAdapter->code = -1;
+$negativeHook = $invoiceMail->inspectEffectPhase($member, $row, new stdClass(), $invoice);
+checkMail($negativeHook === array('failed', true),
+	'F38-02 negative hook return is after entering potentially effectful hook');
+$invoiceMail->hookAdapter->code = 0;
+$member->returnCode = -1;
+$negativeSmtp = $invoiceMail->inspectEffectPhase($member, $row, new stdClass(), $invoice);
+checkMail($negativeSmtp === array('failed', true),
+	'F38-02 negative Core SMTP return is after effectful hook/transport boundary');
+$member->returnCode = 1;
+// F38-03: direct service without original file-session capability fails closed.
+$previousCalls = $invoiceMail->hookAdapter->calls;
+$detail = $invoiceMail->sendWithEvidence($member, $row, new stdClass(), true, $invoice);
+checkMail($detail['mail'] === 'denied' && $detail['attachment'] === 'not_sent'
+	&& $invoiceMail->hookAdapter->calls === $previousCalls,
+	'F38-03 no direct invoice evidence send without original checkpoint');
+$detail = $mail->sendWithEvidence($member, $row, new stdClass(), true);
+checkMail($detail['mail'] === 'denied' && $detail['attachment'] === 'not_required',
+	'F38-03 direct contribution-only evidence cannot bypass original capability');
+checkMail($mail->send($member, $row, new stdClass(), true) === 'transport',
+	'F38-03 legacy B/C send() unchanged while direct evidence is denied');
+// F38-05: finite mail/attachment result matrix is enforced before checkpointing.
+require_once __DIR__.'/../../lib/booking.lib.php';
+$validInvoice = array(
+	'transport'=>'verified_for_transport',
+	'hook'=>'verified_before_hook',
+	'attachment_missing'=>'missing',
+	'unknown'=>'unknown',
+	'failed'=>'not_sent',
+	'denied'=>'not_sent',
+	'missing'=>'not_sent',
+	'disabled'=>'not_sent',
+);
+$allAttachment=array('verified_for_transport','verified_before_hook','missing','not_sent','unknown','not_required');
+foreach ($validInvoice as $status => $expectedAttachment) {
+	foreach ($allAttachment as $candidate) {
+		$actual = msmValidMailAttachmentEvidence(array('mail'=>$status,'attachment'=>$candidate),true);
+		checkMail($actual === ($candidate === $expectedAttachment),
+			'F38-05 invoice evidence pair '.$status.'/'.$candidate);
+	}
+}
+foreach (array('transport','hook','failed','denied','unknown','missing','disabled','attachment_missing') as $status) {
+	foreach ($allAttachment as $candidate) {
+		checkMail(msmValidMailAttachmentEvidence(array('mail'=>$status,'attachment'=>$candidate),false)
+			=== ($candidate === 'not_required' && $status !== 'attachment_missing'),
+			'F38-05 contribution evidence pair '.$status.'/'.$candidate);
+	}
+}
+checkMail(!msmValidMailAttachmentEvidence(array('mail'=>'transport','attachment'=>'verified_before_hook'),true)
+	&& !msmValidMailAttachmentEvidence(array('mail'=>'failed','attachment'=>'verified_for_transport'),true)
+	&& !msmValidMailAttachmentEvidence(array('mail'=>'hook','attachment'=>'verified_for_transport'),true),
+	'F38-05 contradictory adapter evidence pairs never redeem successful effect');
 echo $passed." mail adapter assertions passed (template/type/transport doubles; no SMTP).\n";

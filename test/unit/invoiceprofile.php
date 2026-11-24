@@ -8,10 +8,17 @@ $before = $passed;
 class InvoiceProfileFixture extends MsmInvoiceProfile
 {
 	public $term = 1; public $rate = 0; public $item; public $useCoreVat = false;
+	public $extraModelDir = null;
 	protected function paymentTerm() { return $this->term; }
 	protected function paymentTermLabel($id) { return 'Synthetic term'; }
 	protected function vat($product) { return $this->useCoreVat ? parent::vat($product) : $this->rate; }
 	protected function product($id, $user) { return $this->item; }
+	protected function modelDirectories()
+	{
+		$dirs = parent::modelDirectories();
+		if ($this->extraModelDir !== null) { $dirs[] = $this->extraModelDir; }
+		return $dirs;
+	}
 	protected function models($number, $pdf) { parent::models($number, $pdf); }
 }
 $conf->global = new stdClass(); $conf->entity = 1; $conf->currency = 'EUR';
@@ -50,6 +57,103 @@ $profile->rate = '20*';
 fails(static function () use ($profile, $member, $user) { $profile->resolve($member, $user, false, false); }, 'MSMInvoiceProfileUnsupported'); $profile->rate = 0;
 $conf->global->FACTURE_ADDON_PDF = '../crabe';
 fails(static function () use ($profile, $member, $user) { $profile->resolve($member, $user, false, false); }, 'MSMInvoiceProfileUnsupported'); unset($conf->global->FACTURE_ADDON_PDF);
+// Core model resolution also searches installed module model paths. This
+// fixture overrides ONLY the directory list, not the production models() logic.
+$extra = sys_get_temp_dir().'/msm-parity-models-'.bin2hex(random_bytes(6));
+if (!mkdir($extra.'/doc', 0700, true)) { throw new RuntimeException('Cannot create custom model fixture'); }
+try {
+	file_put_contents($extra.'/mod_facture_custom.php', '<?php // valid installed numbering model');
+	file_put_contents($extra.'/doc/pdf_custom.modules.php', '<?php // valid installed PDF model');
+	$profile->extraModelDir = $extra;
+	$conf->global->FACTURE_ADDON = 'mod_facture_custom';
+	$conf->global->FACTURE_ADDON_PDF_0 = 'custom';
+	$customPlan = $profile->resolve($member, $user, false, false);
+	verify($customPlan['number_model']==='mod_facture_custom' && $customPlan['pdf_model']==='custom',
+		'Core-parity installed custom numbering and PDF models admitted by normal model lookup');
+	// F38-11: read-only effective Core numbering defaults and historical aliases.
+	$default = version_compare(DOL_VERSION, '23.0.0', '>=') ? 'mod_facture_mars' : 'mod_facture_terre';
+	foreach (array(
+		array(null, $default),
+		array('', $default),
+		array('0', $default),
+		array(0, $default),
+		array('terre', $default),
+		array('mercure', 'mod_facture_mercure'),
+		array($default, $default)
+	) as $numberCase) {
+		if ($numberCase[0] === null) { unset($conf->global->FACTURE_ADDON); }
+		else { $conf->global->FACTURE_ADDON = $numberCase[0]; }
+		$resolved = $profile->resolve($member, $user, false, false);
+		verify($resolved['number_model'] === $numberCase[1],
+			'F38-11 Core effective numbering '.DOL_VERSION.' '.var_export($numberCase[0],true));
+	}
+	// F38-12: the snapshot must represent effective numbering identity, not
+	// Core's mutable raw FACTURE_ADDON alias. No production settings mutation.
+	foreach (array(null, '', '0', 0, 'terre', 'mercure') as $raw) {
+		if ($raw === null) { unset($conf->global->FACTURE_ADDON); }
+		else { $conf->global->FACTURE_ADDON = $raw; }
+		$beforeRaw = getDolGlobalString('FACTURE_ADDON');
+		$canonicalPlan = $profile->resolve($member,$user,false,false);
+		verify($canonicalPlan['settings']['FACTURE_ADDON'] === $canonicalPlan['number_model'],
+			'F38-12 canonical effective snapshot '.DOL_VERSION.' '.var_export($raw,true));
+		verify(getDolGlobalString('FACTURE_ADDON') === $beforeRaw,
+			'F38-12 read-only preview leaves raw Core global untouched '.var_export($raw,true));
+		$conf->global->FACTURE_ADDON = $canonicalPlan['number_model'];
+		$normalizedPlan = $profile->resolve($member,$user,false,false);
+		verify($normalizedPlan === $canonicalPlan,
+			'F38-12 Core normalized and legacy alias invoice plans identical '.var_export($raw,true));
+		$conf->global->FACTURE_ADDON = 'mod_facture_custom';
+		$changedPlan = $profile->resolve($member,$user,false,false);
+		verify($changedPlan['number_model'] !== $canonicalPlan['number_model']
+			&& $changedPlan['settings']['FACTURE_ADDON'] !== $canonicalPlan['settings']['FACTURE_ADDON'],
+			'F38-12 actual effective numbering model change invalidates plan '.var_export($raw,true));
+	}
+	// F38-13: only the PHP-falsy zero string is a Core default. Numeric-
+	// looking non-falsy model names still fail safe; do not broaden paths.
+	foreach (array('00', '0.0', '../mod_facture_custom', 'missing_synthetic_number_model') as $badNumber) {
+		$conf->global->FACTURE_ADDON = $badNumber;
+		fails(static function()use($profile,$member,$user) { $profile->resolve($member,$user,false,false); },
+			'MSMInvoiceProfileUnsupported');
+	}
+	$conf->global->FACTURE_ADDON = 'mod_facture_custom';
+	$financePlan = $profile->resolve($member,$user,false,false);
+	$conf->global->ADHERENT_BANK_USE = 'bankviainvoice';
+	$financeChanged = $profile->resolve($member,$user,false,false);
+	verify($financeChanged !== $financePlan
+		&& $financeChanged['settings']['ADHERENT_BANK_USE'] !== $financePlan['settings']['ADHERENT_BANK_USE'],
+		'F38-12 other financial setting remains confirmation-bound');
+	unset($conf->global->ADHERENT_BANK_USE);
+	// Exercise the PRODUCTION legacy lookup through Core's document roots,
+	// not a test-only implementation of models().
+	$oldFileRoots = $conf->file ?? null;
+	$legacyRoot = $extra.'/legacy-document-root';
+	$legacyModelDir = $legacyRoot.'/core/modules/facture/legacy';
+	if (!mkdir($legacyModelDir, 0700, true)) { throw new RuntimeException('Cannot create legacy model fixture'); }
+	file_put_contents($legacyModelDir.'/legacy.modules.php', '<?php // valid legacy Core numbering model');
+	try {
+		$conf->file = (object) array('dol_document_root'=>array($legacyRoot));
+		$conf->global->FACTURE_ADDON = 'legacy';
+		$legacyPlan = $profile->resolve($member, $user, false, false);
+		verify($legacyPlan['number_model'] === 'legacy', 'F38-11 legacy model from Core document root admitted');
+		foreach (array('../legacy','missing_synthetic_number_model') as $invalid) {
+			$conf->global->FACTURE_ADDON = $invalid;
+			fails(static function()use($profile,$member,$user) { $profile->resolve($member,$user,false,false); },
+				'MSMInvoiceProfileUnsupported');
+		}
+	} finally {
+		if ($oldFileRoots === null) { unset($conf->file); } else { $conf->file = $oldFileRoots; }
+		@unlink($legacyModelDir.'/legacy.modules.php'); @rmdir($legacyModelDir);
+		@rmdir($legacyRoot.'/core/modules/facture'); @rmdir($legacyRoot.'/core/modules');
+		@rmdir($legacyRoot.'/core'); @rmdir($legacyRoot);
+	}
+	$conf->global->FACTURE_ADDON_PDF_0 = '../custom';
+	fails(static function()use($profile,$member,$user) { $profile->resolve($member,$user,false,false); }, 'MSMInvoiceProfileUnsupported');
+} finally {
+	$profile->extraModelDir = null;
+	unset($conf->global->FACTURE_ADDON, $conf->global->FACTURE_ADDON_PDF_0);
+	@unlink($extra.'/mod_facture_custom.php'); @unlink($extra.'/doc/pdf_custom.modules.php');
+	@rmdir($extra.'/doc'); @rmdir($extra);
+}
 $conf->global->ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS = 1; $profile->item = (object) array('packaging' => 2, 'ref' => 'P-<1>', 'label' => 'Synthetic & service');
 fails(static function () use ($profile, $member, $user) { $profile->resolve($member, $user, false, false); }, 'MSMInvoiceProfileUnsupported'); unset($conf->global->ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS);
 foreach (array('processing', 'done') as $phase) {

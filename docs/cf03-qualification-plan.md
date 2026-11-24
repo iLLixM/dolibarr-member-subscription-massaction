@@ -1,5 +1,14 @@
 # CF-03 — Qualification plan and binding A-D environment matrix
 
+> **Current environment convention — 2026-11-24:** dolienv **A = MariaDBSnapshot**,
+> **B = CoreGuarded**, **C = EnhancedMySQL**, **D = hosted CoreGuarded**.
+> [Current topology, bounded acceptance and privacy rules](dolienv-environments.md) control
+> environment naming/readiness. Earlier CF03 labels, shared A/C bindings and dated
+> evidence below retain their historical meaning; do not relabel/replay old tools.
+> Current B finance acceptance is **BLOCKED (UNKNOWN/STOP)**; D has read-only
+> browser/hosting-CLI evidence, not business-write qualification.
+
+
 ## Current CF03 admission after PR #36 squash merge (2026-11-21)
 
 [PR #36](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/36) was **squash-merged** into `main` as `d0b15785c60b74aa7ad59a1c687db94193d159c6` (independently reviewed `33cb3da3b389f9df2870bc8c6223c86a959cb467`, identical Git tree), **F36-01/P1 CLOSED**, **F36-02/P2 OPEN / CF05-06 REQUIRED**. Full CoreGuarded finance/Third-Party/typed-error/PDF/mail business code is present, but actual production `invoice/autocreate/sendmail` feature admission is still **default-denied**. This is synthetic development evidence, **not** a new real CF03-NORMAL A/B/C/D acceptance or a finance-use GO. Before any real A/B/C witness, F32-MR-01's target-user private launcher/read-only preflight must pass; A/C must be operated serially and all new writes need their own Owner GO. D needs separately approved exact ZIP/integration. [CF05-06](cf05-06-standard-core-qualification-plan.md) must resolve `Facture::validate()` conditional provisional-directory rename and V22/V24 Core/trigger/FS/engine call-graph risks first. No reuse of consumed POS/RB fixtures. Destructive real CF03-FAULT remains deferred **OPEN/NOT EXECUTED**.

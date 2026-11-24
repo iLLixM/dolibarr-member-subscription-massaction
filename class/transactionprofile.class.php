@@ -33,13 +33,17 @@ class MsmTransactionProfile
 		if ($family === 'mariadb') { return array('MariaDBSnapshot'); }
 		throw new RuntimeException('MSMDatabaseUnsupported');
 	}
-	/** F36-01 / ADR-06: development code is NOT an Owner qualification GO.
-	 * There is intentionally no admin constant, HTTP parameter or DB setting
-	 * that can enable CoreGuarded finance in the released production profile.
-	 * A separate reviewed, Owner-authorized admission change is required.
-	 * Only a clearly named synthetic fixture subclass may override this seam.
+	/** Owner 2026-11-22: explicit production-admission policy revision.
+	 * Phase 5 CF03-NORMAL requires full real CoreGuarded functionality.
+	 * This enables invoice, conditional auto-Third-Party and mail/PDF through
+	 * the existing unchanged rights, confirmation, same-guard, one-shot
+	 * post-COMMIT checkpoint and UNKNOWN/STOP gates; it is NOT a qualification
+	 * of F36-02/Core filesystem effects, nor a release or real-write GO.
+	 * F36-01 remains a historically CLOSED defect on the prior, closed-gate
+	 * source: that historical disposition is not a test of this new policy.
+	 * No admin/HTTP/POST/configuration bypass is introduced.
 	 */
-	protected function coreGuardedFinanceQualified() { return false; }
+	protected function coreGuardedFinanceQualified() { return true; }
 	/** Missing MySQL history is ambiguous, including fresh activation/reactivation. */
 	public function current()
 	{
@@ -55,10 +59,9 @@ class MsmTransactionProfile
 			} else { $reason = 'MSMProfileInvalid'; }
 		}
 		$enabled = in_array($profile, array('CoreGuarded', 'EnhancedMySQL', 'MariaDBSnapshot'), true);
-		// F36-01: preserve the implemented CoreGuarded finance path while its
-		// actual server-side admission remains CLOSED until CF05-06/07, real
-		// qualification and separate Owner approval. Never infer eligibility
-		// merely from an otherwise valid CoreGuarded profile selection.
+		// Owner 2026-11-22: CoreGuarded finance now explicitly admitted.
+		// All downstream runtime admission, guards, rights and checkpoint
+		// requirements still apply; F36-02 remains OPEN and unqualified.
 		$extended = $enabled && ($profile !== 'CoreGuarded' || $this->coreGuardedFinanceQualified());
 		return array('family' => $family, 'profile' => $profile, 'revision' => self::revision($raw),
 			'features' => array('booking' => $enabled, 'invoice' => $extended, 'autocreate' => $extended, 'sendmail' => $extended), 'reason' => $reason);

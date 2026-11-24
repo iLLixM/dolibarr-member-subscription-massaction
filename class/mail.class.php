@@ -64,7 +64,63 @@ class MsmSubscriptionMail
 		$result = $member->sendEmail($message, $subject, $paths, $mimes, $names, '', '', 0, $ishtml, '', "X-Dolibarr-Info: member subscription module\r\n");
 		return $result > 0 ? 'transport' : 'failed';
 	}
+	/** Only the original consumed transaction's one-shot checkpoint may
+	 * authorize a direct, standalone CoreGuarded evidence service call.
+	 * This factory is overridable by named isolated synthetic fixtures only.
+	 */
+	protected function evidenceProfile()
+	{
+		global $conf;
+		require_once __DIR__.'/transactionprofile.class.php';
+		return new MsmTransactionProfile($this->db, new MsmDatabaseState($this->db), (int) $conf->entity);
+	}
+	/** Legacy B/C send() deliberately does NOT acquire a new admission gate.
+	 * Direct evidence callers must provide the original post-COMMIT capability,
+	 * whose durable readback has already succeeded for this specific effect.
+	 */
+	public function sendWithEvidence($member, array $row, $user, $selected, array $invoice = null, $checkpoint = null, $id = null)
+	{
+		if (!$selected) { return array('mail' => 'not_selected', 'attachment' => $invoice === null ? 'not_required' : 'not_selected'); }
+		try {
+			if (!($checkpoint instanceof MsmFileBookingCheckpoint)
+				|| !is_int($id) || $id < 1 || (int) ($member->id ?? 0) !== $id
+				|| !is_object($user) || (int) ($user->id ?? 0) < 1) {
+				throw new RuntimeException('MSMCoreGuardedSessionUnsupported');
+			}
+			$profile = $this->evidenceProfile()->current();
+			if (($profile['profile'] ?? null) !== 'CoreGuarded'
+				|| empty($profile['features']['sendmail'])
+				|| ($invoice !== null && empty($profile['features']['invoice']))) {
+				throw new RuntimeException('MSMProfileFeatureUnavailable');
+			}
+			$checkpoint->requireMailEvidence($id, $user, $invoice, $profile, $member, $row);
+		} catch (Throwable $e) {
+			// Denied/uncertain admission must never reach a hook or SMTP.
+			return array('mail' => 'denied', 'attachment' => $invoice === null ? 'not_required' : 'not_sent');
+		}
+		// Preserve legacy send() return values while treating negative results
+		// after entering any hook or SMTP call as potentially effected.
+		$afterEffect = false;
+		$status = $this->sendInternal($member, $row, $user, $selected, $invoice, $afterEffect);
+		if ($afterEffect && !in_array($status, array('transport', 'hook'), true)) {
+			$status = 'unknown';
+		}
+		$attachment = 'not_required';
+		if ($invoice !== null) {
+			$attachment = 'not_sent';
+			if ($status === 'transport') { $attachment = 'verified_for_transport'; }
+			elseif ($status === 'hook') { $attachment = 'verified_before_hook'; }
+			elseif ($status === 'attachment_missing') { $attachment = 'missing'; }
+			elseif ($status === 'unknown') { $attachment = 'unknown'; }
+		}
+		return array('mail' => $status, 'attachment' => $attachment);
+	}
 	public function send($member, array $row, $user, $selected, array $invoice = null)
+	{
+		$afterEffect = false;
+		return $this->sendInternal($member, $row, $user, $selected, $invoice, $afterEffect);
+	}
+	protected function sendInternal($member, array $row, $user, $selected, $invoice, &$afterEffect)
 	{
 		global $hookmanager, $langs;
 		if (!$selected) { return 'not_selected'; }
@@ -84,6 +140,7 @@ class MsmSubscriptionMail
 			$object = clone $member; $action = 'subscription';
 			$hookmanager = $this->hooks();
 			$parameters = array('datesubscription' => $row['start'], 'amount' => $row['amount'], 'accountid' => 0, 'ccountid' => 0, 'operation' => '', 'label' => $row['description'], 'num_chq' => '', 'emetteur_nom' => '', 'emetteur_banque' => '', 'datesubend' => $row['end'], 'invoice' => $invoice);
+			$afterEffect = true; // A hook can do external work before returning < 0.
 			$result = $hookmanager->executeHooks('sendMail', $parameters, $object, $action);
 			if ($result < 0) { return 'failed'; }
 			if ($result > 0) { return 'hook'; }

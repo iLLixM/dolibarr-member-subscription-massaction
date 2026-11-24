@@ -43,6 +43,11 @@ function msmRenderBooking(array $state, $key, array $access = array())
 			$result = $state['results'][$id]; $counts[$result['status']]++;
 			$html .= msmText('MSMStatus_'.$result['status']).': '.msmText($result['message']);
 			if ($result['status'] === 'success') {
+				if (isset($result['completion'])) {
+					$completion = $result['completion'];
+					if (!in_array($completion, array('nonterminal_acknowledged','terminal_acknowledged'), true)) { $completion = 'unknown'; }
+					$html .= '<div>'.msmText('MSMCompletionStatus').': '.msmText('MSMCompletion_'.$completion).'</div>';
+				}
 				$sum += $result['amount'];
 				$html .= '<div><a href="'.dol_escape_htmltag(dol_buildpath('/adherents/subscription.php', 1).'?rowid='.$id).'">'.msmText('Subscription').' #'.((int) $result['id']).'</a></div>';
 				if (!empty($result['invoice'])) {
@@ -60,6 +65,11 @@ function msmRenderBooking(array $state, $key, array $access = array())
 					if (!is_array($pdf)) { $pdf = array('status' => 'unknown', 'message' => 'MSMPdfInterrupted'); }
 					$html .= '<div>'.msmText('MSMPdfStatus').': '.msmText($pdf['message']).'</div>';
 					if ($pdf['status'] === 'verified') { $counts['pdf']++; } else { $counts['pdfwarning']++; }
+				}
+				if (isset($result['attachment_status'])) {
+					$attachment = $result['attachment_status'];
+					if (!in_array($attachment, array('verified_for_transport', 'verified_before_hook', 'missing', 'not_sent', 'not_selected', 'not_required', 'not_processed', 'unknown'), true)) { $attachment = 'unknown'; }
+					$html .= '<div>'.msmText('MSMAttachmentStatus').': '.msmText('MSMAttachment_'.$attachment).'</div>';
 				}
 				$html .= '<div>'.msmText('MSMMail_'.$result['mail']).'</div>';
 				if (in_array($result['mail'], array('transport', 'hook'), true)) { $counts[$result['mail']]++; }

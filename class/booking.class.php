@@ -239,13 +239,27 @@ class MsmBookingService
 				$result['status'] = 'skipped';
 				throw new RuntimeException('MSMChangedConfirmation');
 			}
+			// F38-03: seal the recipient of the freshly reloaded member and
+			// the revalidated preview before any Core business action.
+			// This original in-process capability later rejects altered
+			// recipient/entity/mail parameters before Hook/SMTP.
+			if ($coreGuarded && !empty($options['sendmail'])) {
+				$checkpoint->bindMailRecipient((int) $id, $member, $row);
+			}
 			$this->requireOwned();
 			$diagnostic['stage'] = 'subscription';
 			$subscription = $member->subscription($row['start'], $row['amount'], 0, '', $row['description'], '', '', '', $row['end'], $member->typeid);
 			$diagnostic['subscription_id'] = max(0, (int) $subscription);
 			$this->requireOwned();
 			if ($subscription <= 0) { throw new RuntimeException('MSMBookingFailed'); }
-			if (!empty($options['invoice'])) { $invoice = $this->invoicing()->create($member, $subscription, $row, $user, $diagnostic); }
+			if (!empty($options['invoice'])) {
+				// The controller adds this UI flag after fingerprinting. Carry it
+				// from the verified confirmation for the exact finance row check.
+				if ($coreGuarded && array_key_exists('manualend', $expected)) {
+					$row += array('manualend' => $expected['manualend']);
+				}
+				$invoice = $this->invoicing()->create($member, $subscription, $row, $user, $diagnostic);
+			}
 			$this->verifyStored($id, $subscription, $member, $row);
 			$this->requireOwned();
 			$diagnostic['stage'] = 'commit';

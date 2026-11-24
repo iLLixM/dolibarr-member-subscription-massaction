@@ -18,7 +18,11 @@ if (!mkdir($root, 0700)) { throw new RuntimeException('Unable to create test dir
 $prior = session_save_path(); $oldCookies = ini_get('session.use_cookies');
 ini_set('session.use_cookies', '0'); session_save_path($root);
 $key = str_repeat('c', 32); $user = (object) array('id' => 18);
-$binding = array('profile'=>'CoreGuarded','entity'=>1,'owner'=>18,'revision'=>'known','confirmation_revision'=>4);
+$features=array('booking'=>true,'invoice'=>true,'autocreate'=>true,'sendmail'=>true);
+$binding = array('family'=>'mysql','profile'=>'CoreGuarded','entity'=>1,'owner'=>18,
+	'revision'=>'known','confirmation_revision'=>4,'features'=>$features);
+$currentFinanceProfile=array('family'=>'mysql','profile'=>'CoreGuarded',
+	'revision'=>'known','features'=>$features,'reason'=>'');
 $rows = array(7 => array('start'=>123,'end'=>456,'amount'=>12.5,'description'=>'Synthetic contribution','fingerprint'=>'signed','errors'=>array(),'overlaps'=>array()));
 $opts = array('invoice'=>false,'autocreate'=>false,'sendmail'=>false,'description'=>'Synthetic contribution');
 $sessionid = 'cf02'.bin2hex(random_bytes(12));
@@ -75,7 +79,47 @@ try {
 	verifySession(session_write_close(), 'CF05 persist finance consumption');
 	$financeExpected=$financeRow; $financeExpected['_profile']=$binding;
 	$financeCheckpoint->requireProcessing(7,$binding,$user,$financeExpected,$financeOpts);
-	$financeCheckpoint->requireFinanceContinuation(7,$financeRow,$user);
+	$recipient=(object)array('id'=>7,'entity'=>1,'typeid'=>1,'email'=>'original@example.invalid');
+	$financeCheckpoint->bindMailRecipient(7,$recipient,$financeRow);
+	denySession(static function()use($financeCheckpoint,$recipient,$financeRow){
+		$financeCheckpoint->bindMailRecipient(7,$recipient,$financeRow);
+	},'F38-03 recipient identity seal cannot be overwritten');
+	// F38-10: each negative is the FIRST finance invocation on an original,
+	// independently consumed capability. An unchanged fingerprint cannot mask
+	// altered actual fee, dates, description, invoice plan or profile carrier.
+	foreach (array('amount', 'start', 'end', 'description', 'invoice', '_profile', 'extra') as $field) {
+		$testKey=bin2hex(random_bytes(16));
+		verifySession(session_start(), 'F38-10 fresh confirmation '.$field);
+		$_SESSION['msm_previews'][$testKey]=array('owner'=>18,'entity'=>1,
+			'phase'=>'confirm','revision'=>10,'profile'=>$binding,'ids'=>array(7),
+			'options'=>$financeOpts,'rows'=>$financeRows,
+			'results'=>array(7=>array('status'=>'unknown','stop'=>false)));
+		$testCheckpoint=new MsmFileBookingCheckpoint($testKey);
+		verifySession(session_write_close(), 'F38-10 persist confirm '.$field);
+		verifySession(session_start(), 'F38-10 consume confirm '.$field);
+		$_SESSION['msm_previews'][$testKey]['phase']='processing';
+		$_SESSION['msm_previews'][$testKey]['revision']=11;
+		verifySession(session_write_close(), 'F38-10 persist consumed '.$field);
+		$testCheckpoint->requireProcessing(7,$binding,$user,$financeExpected,$financeOpts);
+		$changedRow=$financeRow;
+		switch ($field) {
+			case 'amount': $changedRow['amount']=999; break;
+			case 'start': $changedRow['start']=999; break;
+			case 'end': $changedRow['end']=999; break;
+			case 'description': $changedRow['description']='altered'; break;
+			case 'invoice': $changedRow['invoice']['customer_id']=99; break;
+			case '_profile': $changedRow['_profile']=$binding; $changedRow['_profile']['owner']=99; break;
+			case 'extra': $changedRow['extra']='injected'; break;
+		}
+		verifySession($changedRow['fingerprint']===$financeRow['fingerprint'],
+			'F38-10 original fingerprint retained '.$field);
+		denySession(static function()use($testCheckpoint,$changedRow,$user){
+			$testCheckpoint->requireFinanceContinuation(7,$changedRow,$user);
+		},'F38-10 first altered direct finance attempt denied '.$field);
+	}
+	// Matching optional profile carrier is permitted, but never authorizes replay.
+	$financeWithProfile=$financeRow; $financeWithProfile['_profile']=$binding;
+	$financeCheckpoint->requireFinanceContinuation(7,$financeWithProfile,$user);
 	verifySession(true, 'CF05 same original owner one-shot finance capability admitted');
 	denySession(static function()use($financeCheckpoint,$financeRow,$user){
 		$financeCheckpoint->requireFinanceContinuation(7,$financeRow,$user);
@@ -94,7 +138,8 @@ try {
 	verifySession(session_start(), 'CF05 record accepted nonterminal invoice');
 	$_SESSION['msm_previews'][$financeKey]['results'][7]=array(
 		'status'=>'success','completion'=>'nonterminal_acknowledged','stop'=>false,
-		'invoice'=>array('id'=>42,'pdf'=>array('status'=>'unknown')),'mail'=>'unknown');
+		'invoice'=>array('id'=>42,'member_id'=>7,'entity'=>1,
+			'pdf'=>array('status'=>'unknown')),'mail'=>'unknown');
 	verifySession(session_write_close(), 'CF05 persist accepted nonterminal checkpoint');
 	$financeCheckpoint->requirePostCommitEffect(7,'pdf');
 	denySession(static function()use($financeCheckpoint){
@@ -110,6 +155,46 @@ try {
 	denySession(static function()use($financeCheckpoint){
 		$financeCheckpoint->requirePostCommitEffect(7,'mail');
 	},'CF05 mail resend blocked');
+	// F38-03: original identity/descriptor and exact profile revision must
+	// match the independently persisted one-shot mail admission.
+	$persistedInvoice=array('id'=>42,'member_id'=>7,'entity'=>1,
+		'pdf'=>array('status'=>'verified'));
+	$mailRow=$financeRow; $mailRow['_profile']=$binding;
+	$wrongInvoice=$persistedInvoice; $wrongInvoice['id']=99;
+	denySession(static function()use($financeCheckpoint,$user,$wrongInvoice,$currentFinanceProfile,$recipient,$mailRow){
+		$financeCheckpoint->requireMailEvidence(7,$user,$wrongInvoice,$currentFinanceProfile,$recipient,$mailRow);
+	},'F38-03 altered invoice cannot borrow the already consumed mail admission');
+	$wrongProfile=$currentFinanceProfile; $wrongProfile['revision']='new-admin-nonce';
+	denySession(static function()use($financeCheckpoint,$user,$persistedInvoice,$wrongProfile,$recipient,$mailRow){
+		$financeCheckpoint->requireMailEvidence(7,$user,$persistedInvoice,$wrongProfile,$recipient,$mailRow);
+	},'F38-03 refreshed or forged profile cannot use original checkpoint');
+	$wrongRecipient=clone $recipient; $wrongRecipient->email='attacker@example.invalid';
+	denySession(static function()use($financeCheckpoint,$user,$persistedInvoice,$currentFinanceProfile,$wrongRecipient,$mailRow){
+		$financeCheckpoint->requireMailEvidence(7,$user,$persistedInvoice,$currentFinanceProfile,$wrongRecipient,$mailRow);
+	},'F38-03 same member ID with substituted email denied before hook/SMTP');
+	$wrongRecipient=clone $recipient; $wrongRecipient->entity=2;
+	denySession(static function()use($financeCheckpoint,$user,$persistedInvoice,$currentFinanceProfile,$wrongRecipient,$mailRow){
+		$financeCheckpoint->requireMailEvidence(7,$user,$persistedInvoice,$currentFinanceProfile,$wrongRecipient,$mailRow);
+	},'F38-03 same member ID and email but different entity denied before hook/SMTP');
+	$wrongRecipient=clone $recipient; $wrongRecipient->typeid=5;
+	denySession(static function()use($financeCheckpoint,$user,$persistedInvoice,$currentFinanceProfile,$wrongRecipient,$mailRow){
+		$financeCheckpoint->requireMailEvidence(7,$user,$persistedInvoice,$currentFinanceProfile,$wrongRecipient,$mailRow);
+	},'F38-03 changed membership type denied before hook/SMTP');
+	foreach (array('description'=>'forged','amount'=>42,'start'=>987,'end'=>654,'fingerprint'=>'forged') as $field=>$value) {
+		$wrongRow=$mailRow; $wrongRow[$field]=$value;
+		denySession(static function()use($financeCheckpoint,$user,$persistedInvoice,$currentFinanceProfile,$recipient,$wrongRow){
+			$financeCheckpoint->requireMailEvidence(7,$user,$persistedInvoice,$currentFinanceProfile,$recipient,$wrongRow);
+		},'F38-03 changed confirmed mail parameter '.$field.' denied');
+	}
+	$wrongRow=$mailRow; $wrongRow['_profile']['owner']=999;
+	denySession(static function()use($financeCheckpoint,$user,$persistedInvoice,$currentFinanceProfile,$recipient,$wrongRow){
+		$financeCheckpoint->requireMailEvidence(7,$user,$persistedInvoice,$currentFinanceProfile,$recipient,$wrongRow);
+	},'F38-03 altered profile carrier denied');
+	$financeCheckpoint->requireMailEvidence(7,$user,$persistedInvoice,$currentFinanceProfile,$recipient,$mailRow);
+	verifySession(true,'F38-03 exact original member, email, entity, row, profile and invoice permits one evidence continuation');
+	denySession(static function()use($financeCheckpoint,$user,$persistedInvoice,$currentFinanceProfile,$recipient,$mailRow){
+		$financeCheckpoint->requireMailEvidence(7,$user,$persistedInvoice,$currentFinanceProfile,$recipient,$mailRow);
+	},'F38-03 post-effect mail evidence replay denied');
 	verifySession(session_start(), 'CF05 change completion to terminal');
 	$_SESSION['msm_previews'][$financeKey]['results'][7]['completion']='terminal_acknowledged';
 	verifySession(session_write_close(), 'CF05 terminal result persisted');

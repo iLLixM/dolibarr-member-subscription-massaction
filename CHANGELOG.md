@@ -1,6 +1,43 @@
 # Changelog
 
+> **CURRENT BINDING OWNER DECISION — 2026-11-22 / PR #38, CORE PARITY + MASSACTION SAFETY (DRAFT, NOT YET INDEPENDENTLY REVIEWED).** The Owner expressly **supersedes the earlier CF05-06 exact-Core/trigger-blob allowlist and PROV-directory prohibition**. The module trusts Dolibarr's normal `Adherent::subscription()`, `Societe::create_from_member()`, `Facture::create()/addline()/validate()`, numbering/PDF models, enabled triggers/Agenda/Logevents and extension behavior as the Core single-member workflow does. **Full `CoreGuarded` invoice, conditional auto Third Party, post-COMMIT PDF and optional verified-attachment email stay enabled**, along with `EnhancedMySQL` and `MariaDBSnapshot`. Removed as normative admission checks: 15-version invoice source hashes, standard trigger hashes, prohibition of custom enabled triggers, Agenda file-copy/Logevents settings and `PROV` existence check. Do not rebuild those allowlists under F38-08/09. Core model lookup supports installed model roots without unsafe model-name paths.
+>
+> **STILL BINDING:** Massaction's per-member rights/entity, server-confirmed preview/fingerprint and user/profile revision, controlled original DoliDB Guard, effective transactional-table/engine checks, consumed one-shot session, confirmed nonterminal completion, durable post-COMMIT PDF/mail checkpoints, verified attachment/recipient identity, and `UNKNOWN/STOP` on uncertain completion or external effects with **no automatic booking/PDF/mail replay or foreign rollback**. No guarantee that Dolibarr Core SQL and filesystem are jointly atomic or that arbitrary custom extensions are benign. **F36-02/P2 = OWNER-ACCEPTED CORE RESIDUAL RISK** (conditional pre-outer-COMMIT `PROV` rename); it is not proven impossible or technically fixed. **F38-07/08/09 = SUPERSEDED BY OWNER ARCHITECTURE DECISION**, not historically falsified or independently technically CLOSED. F38-01..06 remain CLOSED per prior reviews and regressions. F36-01 remains historically CLOSED on the old default-deny branch, while its later Owner activation is binding.
+>
+> **EVIDENCE AND RELEASE:** Newly added `test/unit/cf05-core-parity.php`, positive/negative existing/new customer and contribution/mail orchestration, standard/custom model regression and 9-/21-/Hosted synthetic CI are development evidence, **not real A–D**. Real CF03-NORMAL A–D needs separately Owner-authorized cases, F32-MR-01 private launcher/read-only preflight, A/C serialized use, DB/invoice/PDF/file/SMTP evidence, CF05-07/Owner risk review, later exact-ZIP/hosted D and separate release GO. Purposefully destructive CF03-FAULT is DEFERRED. Earlier statements below that require Core source/trigger pinning or productive CoreGuarded default deny are preserved **only as dated history**, not current policy. [Current decision and finding map](docs/owner-core-parity-2026-11-22.md).
+
+
+### 2026-11-22 – F38-04 / F36-02 / F38-07 bounded correction, PR #38 DRAFT
+
+**PR #38 CF05-06 corrective checkpoint — 2026-11-22 (DRAFT / NOT INDEPENDENTLY CLOSED):** The new server-owned `MsmCoreFinanceQualification` implements a bounded supported-configuration gate for the Owner-authorized CoreGuarded invoice/Third-Party/PDF/mail workflow. **15 exact pinned V22.0.0–V24.0.3 Core invoice source blobs** and version-matched standard Agenda/Logevents trigger blobs are checked against installed content before a CoreGuarded invoice's first outer BEGIN. Unknown/patched Core, enabled third-party or unqualified core triggers, Agenda automatic file copying or enabled unqualified invoice Logevents are rejected; an existing provisional `PROV` invoice file/directory is refused immediately before Core `Facture::validate()`. The original rights/confirmation/same guard/one-shot/postcommit/no-retry contracts remain in force. **The finance feature gate remains ON for supported qualified Core configurations; this is not a blanket re-lock.** **F38-04/P2:** five remaining Massaction/CSRF/Admin/Period/Preview UI security entry points added to Full+Hosted CI with broad class/lib/admin fallback and a missing-path negative check. **F36-02/P2 and F38-07/P2:** BOUNDED MITIGATION IMPLEMENTED / INDEPENDENT SOURCE REVIEW PENDING, **NOT CLOSED** and no real A–D DB/FS/SMTP qualification; custom trigger side effects and external filesystem races are not certified. See [the source-qualification report](docs/cf05-06-standard-core-source-qualification.md). **No Owner operational GO or release GO.**
+
+
+### Owner-requested full CoreGuarded finance re-activation (2026-11-22, PR #38 DRAFT)
+
+- **Policy change (not independently approved):** The server-authoritative CoreGuarded finance gate returns `true` on the PR branch. `booking/invoice/autocreate/sendmail` feature flags and the dependent invoice PDF path are available under normal valid CoreGuarded configuration and unchanged rights/confirmation/guard/one-shot checkpoints. The earlier default-denied state remains a historically CLOSED F36-01 finding on its earlier exact source, **not evidence of this new unlock's safety**.
+- **Risk boundary:** **F36-02/P2 OPEN / CF05-06 REQUIRED** remains materially relevant because the V22/V24 Core invoice validator may rename `PROV` documents prior to the outer commit. This was previously deferred only because finance was closed; now a reviewer must re-evaluate the opened path and any mitigation/support restriction before actual real finance writes. No new real test, production deployment, rollback guarantee, ZIP/tag or release GO is claimed.
+- **Latest corrective scope:** F38-03 recipient/entity/confirmed-row one-shot binding; F38-04 complete full/hosted CI security-path filter test; F38-06 invoice-less mail exception-status consistency. All remain independent-review pending until exact-HEAD CI and delta review.
+
 ## Unreleased
+
+### 2026-11-24 – dolienv documentation and bounded setup acceptance
+
+- Establish current A=MariaDBSnapshot, B=CoreGuarded, C=EnhancedMySQL,
+  D=hosted CoreGuarded naming, separate local B/C schemas and hosting-local
+  read-only tooling. Preserve old CF03 letter/topology/evidence provenance.
+- Record limited real A/C invoice/PDF/R16 acceptance, B finance UNKNOWN/STOP,
+  local-only capture versus untested module mail, and D CLI/Web evidence limits.
+- Document private timestamped A/B/C backup integrity checks (no restore),
+  hosting protection rechecks and pseudonymization requirements. No product,
+  security-policy, release or general compatibility change.
+
+
+### Phase-4 development in PR #38 – checkpointed PDF/attachment/mail evidence, offline regression
+
+- [PR #38](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/38) (draft, **not merged or production-admitted**) distinguishes the acknowledged Core completion, verified/stale/unknown PDF file, separately verified invoice attachment and actual mail transport/hook outcomes, without conflating a hooked send with delivery. The existing mail `send()` API remains compatible; `sendWithEvidence()` supplies independently reported attachment status.
+- Under the qualified test-only CoreGuarded path, uncertain PDF generation or SMTP/hook outcomes retain the already committed business result, mark downstream effects uncertain or not processed and **STOP subsequent member actions** without blind regeneration, resend, rollback or compensation.
+- Add offline tests of invalid/changed PDF and hook outcomes, post-commit UNKNOWN STOP, one-shot original file-session checkpoints and B/C regression boundaries. Trigger the existing **21-job full PHP/Core matrix** plus targeted hosted PHP8.3/V22.0.5 offline PDF/mail checks for this sensitive file family while keeping unrelated ordinary PR CI at nine jobs.
+- **No actual CoreGuarded finance unlock**: `MsmTransactionProfile::coreGuardedFinanceQualified()` is still production `false`; F36-02 remains OPEN / CF05-06, real A–D and release gates remain OPEN.
 
 ### 2026-11-21 – Phase-3 CoreGuarded finance code merged, productive admission OFF (PR #36)
 

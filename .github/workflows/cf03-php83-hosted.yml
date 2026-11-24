@@ -5,6 +5,69 @@ on:
       - 'tools/cf03-*'
       - 'test/unit/cf03-*'
       - '.github/workflows/cf03-php83-hosted.yml'
+      - 'class/booking.class.php'
+      - 'docs/cf05-06-standard-core-source-qualification.md'
+      - 'docs/cf05-06-standard-core-qualification-plan.md'
+      - 'docs/adr/ADR-0001-core-first-transaction-profiles.md'
+      - 'docs/adr/ADR-0001-risk-register.md'
+      - 'docs/current-development-baseline.md'
+      - 'docs/owner-core-parity-2026-11-22.md'
+      - 'docs/cf05-core-parity-regression.md'
+      - 'class/actions_membersubscriptionmassaction.class.php'
+      - 'lib/membersubscriptionmassaction.lib.php'
+      - 'admin/setup.php'
+      - 'langs/de_DE/membersubscriptionmassaction.lang'
+      - 'langs/en_US/membersubscriptionmassaction.lang'
+      - 'class/period.class.php'
+      - 'lib/preview_renderer.lib.php'
+      # Forward-safe: any new class, library or admin PHP can affect financial
+      # admission, confirmation, CSRF, amounts or post-COMMIT effects.
+      - 'class/**'
+      - 'lib/**'
+      - 'admin/**'
+      - 'subscription.php'
+      - 'class/coreguardedrightsdb.class.php'
+      - 'class/corecompatibility.class.php'
+      - 'class/invoiceprofile.class.php'
+      - 'lib/preview.lib.php'
+      - 'lib/batch.lib.php'
+      - 'test/unit/preview.php'
+      - 'test/unit/request.php'
+      - 'test/unit/controller-runtime.php'
+      - 'test/unit/f29-rights.php'
+      - 'test/unit/f29-book-flow.php'
+      - 'test/unit/userreload.php'
+      - 'test/unit/database.php'
+      - 'class/invoice.class.php'
+      - 'class/coreguardedtransaction.class.php'
+      - 'class/transactionprofile.class.php'
+      - 'class/preview.class.php'
+      - 'class/databasestate.class.php'
+      - 'class/activetransactionguard.class.php'
+      - 'class/bookingmember.class.php'
+      - 'lib/profile.lib.php'
+      - 'test/unit/coreguarded-session.php'
+      - 'test/unit/terminal.php'
+      - 'test/unit/profile.php'
+      - 'test/unit/booking.php'
+      - 'test/unit/invoice.php'
+      - 'test/unit/invoiceprofile.php'
+      - 'test/unit/ci-triggers.php'
+      - '.github/workflows/ci.yml'
+      - '.github/workflows/ci-full.yml'
+      - '.github/workflows/cf03-php83-hosted.yml'
+      # Preserve the original hosted CF03 lane and exercise Phase-4
+      # post-commit/PDF/mail boundaries on security-relevant PRs.
+      - 'class/mail.class.php'
+      - 'class/invoicepdf.class.php'
+      - 'class/filebookingcheckpoint.class.php'
+      - 'lib/booking.lib.php'
+      - 'lib/booking_renderer.lib.php'
+      - 'test/unit/cf05-finance.php'
+      - 'test/unit/cf05-core-parity.php'
+      - 'test/unit/maildelivery.php'
+      - 'test/unit/invoicepdf.php'
+      - 'test/unit/postcommit.php'
   workflow_dispatch:
 permissions:
   contents: read
@@ -48,12 +111,18 @@ jobs:
       - name: PHP 8.3/V22.0.5 business synthetic spot checks
         env:
           DOLIBARR_TEST_ROOT: ${{ github.workspace }}/.test-core
+          DOLIBARR_TEST_VERSION: '22.0.5'
         run: |
           php test/unit/coreguarded.php
           php test/unit/f29-rights.php
           php test/unit/booking.php
           php test/unit/f29-book-flow.php
           php test/unit/invoiceprofile.php
+          php test/unit/cf05-core-parity.php
           php test/unit/invoice.php
           php test/unit/cf05-finance.php
+          php test/unit/ci-triggers.php
+          php test/unit/maildelivery.php
+          php test/unit/invoicepdf.php
+          php test/unit/postcommit.php
           php test/unit/request.php

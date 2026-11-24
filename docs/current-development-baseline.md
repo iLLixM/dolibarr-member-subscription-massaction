@@ -1,6 +1,50 @@
 # Current development baseline, architecture and roadmap
 
+> **Current environment convention — 2026-11-24:** dolienv **A = MariaDBSnapshot**,
+> **B = CoreGuarded**, **C = EnhancedMySQL**, **D = hosted CoreGuarded**.
+> [Current topology, bounded acceptance and privacy rules](dolienv-environments.md) control
+> environment naming/readiness. Earlier CF03 labels, shared A/C bindings and dated
+> evidence below retain their historical meaning; do not relabel/replay old tools.
+> Current B finance acceptance is **BLOCKED (UNKNOWN/STOP)**; D has read-only
+> browser/hosting-CLI evidence, not business-write qualification.
+
+
+> **PR #38 DOLIENV-ACC-01 / F38-14 candidate — 2026-11-24:** The real local
+> CoreGuarded invoice attempt on the previously reviewed implementation
+> `46f78d8f8f2c6f70424754d82171697e74ac4448` ended in `UNKNOWN/STOP`.
+> A deterministic offline reproduction isolated the mismatch between the confirmed
+> row and Booking's recalculated row and verifies a minimal correction.
+> **Development merge is blocked pending renewed independent review and Owner
+> approval.** B finance acceptance remains blocked pending a separately
+> authorized fresh real test. See [the incident and evidence limits](dolienv-environments.md#open-local-b-finance-observation).
+
+
+> **PR #38 F38-13 final bounded correction (2026-11-22):** Independent review closed F38-12/P2 on `b8e23f321bd18f89ef55093663605f9dba807b3a` and identified F38-13/P2: Core allows PHP-falsy `FACTURE_ADDON='0'` and stored integer `0` as version-specific default, while former module strict-empty normalization denied both. `MsmInvoiceProfile::numberModel()` now follows Core PHP-falsy behavior only for the effective model; unchanged F38-12 read-only canonical fingerprint, guards, complete finance confirmation, One-Shot, UNKNOWN/STOP and postcommit evidence. Tests extend original invoice profile and two-member batch with positive zero cases and negative other invalid model values. **F38-12 INDEPENDENTLY CLOSED; F38-13 IMPLEMENTED / INDEPENDENT CLOSURE PENDING**, exact-HEAD CI evidence must be verified separately. PR DRAFT, Development-Merge and real A–D/release GO remain open.
+
+
+> **PR #38 F38-12/P2 focused corrective checkpoint (2026-11-22):** The independent F38-10/F38-11 review on `970c318b2aaad3eb0b06b43b4e804eb26360cf41` closed both original P2 findings but identified a newly reachable two-member Invoice failure: Core changes the raw `FACTURE_ADDON` alias during first `Facture::validate()` in the same PHP request while the previous per-member Confirmation fingerprint included that raw setting. F38-12 is a DEVELOPMENT-MERGE BLOCKER. The limited correction uses the *effective canonical model* in the read-only Invoice settings snapshot, not an actual Core global mutation; matching first/second member Preview fingerprints and rejecting genuine model changes are required regressions. **F38-10 and F38-11: INDEPENDENTLY CLOSED. F38-12: IMPLEMENTED / INDEPENDENT CLOSURE PENDING.** Owner Variant B, transaction/one-shot/UNKNOWN/STOP contracts and the separate Phase-5/release NO-GOs are unchanged.
+
+
+> **PR #38 F38-10/F38-11 correction checkpoint — 2026-11-22 (unreviewed):** The independent holistic review of exact `859ea280b3b726870cdb7727af72c04514c26e5f` issued `CHANGES REQUIRED BEFORE DEVELOPMENT MERGE` for F38-10/P2 (direct Invoice first-call actual row not bound to the confirmed snapshot) and F38-11/P2 (Core numbering defaults, historical aliases, and legacy search unsupported). Limited fixes and positive/negative synthetic regressions are implemented in the same draft PR; **independent delta closure and exact new-HEAD 9/21/Hosted CI are not asserted here**. Core parity + Massaction safety (Owner Variant B), F36-02 accepted Core residual, and separate real A–D/release gates remain unchanged.
+
+
+> **CURRENT BINDING OWNER DECISION — 2026-11-22 / PR #38, CORE PARITY + MASSACTION SAFETY (DRAFT, NOT YET INDEPENDENTLY REVIEWED).** The Owner expressly **supersedes the earlier CF05-06 exact-Core/trigger-blob allowlist and PROV-directory prohibition**. The module trusts Dolibarr's normal `Adherent::subscription()`, `Societe::create_from_member()`, `Facture::create()/addline()/validate()`, numbering/PDF models, enabled triggers/Agenda/Logevents and extension behavior as the Core single-member workflow does. **Full `CoreGuarded` invoice, conditional auto Third Party, post-COMMIT PDF and optional verified-attachment email stay enabled**, along with `EnhancedMySQL` and `MariaDBSnapshot`. Removed as normative admission checks: 15-version invoice source hashes, standard trigger hashes, prohibition of custom enabled triggers, Agenda file-copy/Logevents settings and `PROV` existence check. Do not rebuild those allowlists under F38-08/09. Core model lookup supports installed model roots without unsafe model-name paths.
+>
+> **STILL BINDING:** Massaction's per-member rights/entity, server-confirmed preview/fingerprint and user/profile revision, controlled original DoliDB Guard, effective transactional-table/engine checks, consumed one-shot session, confirmed nonterminal completion, durable post-COMMIT PDF/mail checkpoints, verified attachment/recipient identity, and `UNKNOWN/STOP` on uncertain completion or external effects with **no automatic booking/PDF/mail replay or foreign rollback**. No guarantee that Dolibarr Core SQL and filesystem are jointly atomic or that arbitrary custom extensions are benign. **F36-02/P2 = OWNER-ACCEPTED CORE RESIDUAL RISK** (conditional pre-outer-COMMIT `PROV` rename); it is not proven impossible or technically fixed. **F38-07/08/09 = SUPERSEDED BY OWNER ARCHITECTURE DECISION**, not historically falsified or independently technically CLOSED. F38-01..06 remain CLOSED per prior reviews and regressions. F36-01 remains historically CLOSED on the old default-deny branch, while its later Owner activation is binding.
+>
+> **EVIDENCE AND RELEASE:** Newly added `test/unit/cf05-core-parity.php`, positive/negative existing/new customer and contribution/mail orchestration, standard/custom model regression and 9-/21-/Hosted synthetic CI are development evidence, **not real A–D**. Real CF03-NORMAL A–D needs separately Owner-authorized cases, F32-MR-01 private launcher/read-only preflight, A/C serialized use, DB/invoice/PDF/file/SMTP evidence, CF05-07/Owner risk review, later exact-ZIP/hosted D and separate release GO. Purposefully destructive CF03-FAULT is DEFERRED. Earlier statements below that require Core source/trigger pinning or productive CoreGuarded default deny are preserved **only as dated history**, not current policy. [Current decision and finding map](owner-core-parity-2026-11-22.md).
+
+
+**PR #38 CF05-06 corrective checkpoint — 2026-11-22 (DRAFT / NOT INDEPENDENTLY CLOSED):** The new server-owned `MsmCoreFinanceQualification` implements a bounded supported-configuration gate for the Owner-authorized CoreGuarded invoice/Third-Party/PDF/mail workflow. **15 exact pinned V22.0.0–V24.0.3 Core invoice source blobs** and version-matched standard Agenda/Logevents trigger blobs are checked against installed content before a CoreGuarded invoice's first outer BEGIN. Unknown/patched Core, enabled third-party or unqualified core triggers, Agenda automatic file copying or enabled unqualified invoice Logevents are rejected; an existing provisional `PROV` invoice file/directory is refused immediately before Core `Facture::validate()`. The original rights/confirmation/same guard/one-shot/postcommit/no-retry contracts remain in force. **The finance feature gate remains ON for supported qualified Core configurations; this is not a blanket re-lock.** **F38-04/P2:** five remaining Massaction/CSRF/Admin/Period/Preview UI security entry points added to Full+Hosted CI with broad class/lib/admin fallback and a missing-path negative check. **F36-02/P2 and F38-07/P2:** BOUNDED MITIGATION IMPLEMENTED / INDEPENDENT SOURCE REVIEW PENDING, **NOT CLOSED** and no real A–D DB/FS/SMTP qualification; custom trigger side effects and external filesystem races are not certified. See [the source-qualification report](cf05-06-standard-core-source-qualification.md). **No Owner operational GO or release GO.**
+
+
+> **CURRENT OWNER POLICY OVERRIDE — 2026-11-22, PR #38 DRAFT:** Full functional profile admission for **CoreGuarded is now enabled** by explicit Owner decision in the PR branch, including invoice, conditional new Third Party, post-COMMIT invoice PDF and optional mail/verified attachment. The earlier default-denied status and CF05-06-before-admission sequence described later in this document are **historical, superseded as to the feature switch**. This does **not** mean CF05-06/07, F36-02, real A–D or Owner release/operational risk review are passed: the potentially pre-outer-COMMIT `PROV` directory rename remains an **open material safety risk now reachable by admitted finance code**. Independently review the open gate and Owner acceptance before deploying or running actual CoreGuarded finance writes. No rollback/retry/journal exception introduced.
+
 **Effective: 2026-11-21, after squash merges of PR #32, PR #33, PR #34, PR #35 and PR #36.** This document is a navigational consolidation of the **binding Owner strategy in [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22)** and the release decisions in [Issue #20](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/20). If a dated historical document disagrees, the newer Owner decision in Issue #22 controls *prospectively*. This is documentation, **not a change of architecture authority, feature flags or runtime code**.
+
+## Phase-4 draft: postcommit PDF/attachment/mail evidence, without finance activation
+
+[PR #38](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/38) implements additional independent post-COMMIT **evidence channels** over the already merged Phase-3 finance code. For a suitably acknowledged nonterminal Core completion and durably re-read one-shot checkpoint only, the flow records (1) business/COMMIT completion, (2) PDF file result (verified/failed/unknown), (3) attachment verification (verified for standard transport / verified *before* hook takeover / missing / not sent / unknown), and (4) mail transport/hook result (transport not delivery / hook not delivery / failed / unknown). PDF/mail uncertainties stop subsequent CoreGuarded member execution without undoing a prior commit. The full 21-profile offline matrix is now triggered on PR changes to these security boundaries, in addition to the nine-job standard CI. **This remains DRAFT development, not merged**. An initial independent review on the original HEAD returned `CHANGES REQUIRED` for F38-01..05; focused corrective implementation and a new exact-head follow-up are pending. None of CF05-06/07/isolated real-test/Owner acceptance gates are changed; production finance remains **default denied**. See [Phase-4 evidence design](cf05-phase4-postcommit-offline-evidence.md).
 
 ## What is implemented, what is intended
 
@@ -21,7 +65,22 @@
 
 A one-member outer transaction does not make a whole batch atomic. An already committed member is not rolled back because a later member fails.
 
-## Profile and evidence matrix
+## Current dolienv deployment and acceptance (2026-11-24)
+
+Use the [canonical A–D matrix](dolienv-environments.md): A local MariaDBSnapshot,
+B local CoreGuarded, C local EnhancedMySQL, D hosted CoreGuarded. A/C bounded
+contribution/invoice/PDF/R16 cases passed; B contribution passed but finance is
+UNKNOWN/STOP at `finance_precheck`; D's hosting-local reader is accepted with
+CLI/Web limitations and no business tests in this setup campaign. Local B/C
+schemas are now separate, with shared server/source caveats. Local SMTP capture
+is infrastructure evidence only. These results do not close CF05-07/release gates.
+
+## Historical profile and evidence matrix (before dolienv reprovisioning)
+
+The following original labels/topology belong to the earlier CF03 reference
+installation. Preserve them for the old commands/evidence; they are **not** the
+current dolienv deployment matrix.
+
 
 | Reference environment | Profile | Qualified evidence strength and restrictions |
 | --- | --- | --- |

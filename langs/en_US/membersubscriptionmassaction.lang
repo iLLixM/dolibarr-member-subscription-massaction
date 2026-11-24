@@ -153,3 +153,20 @@ MSMNotProcessedTotal=Not processed: %s
 MSMTerminalBatchStop=The batch stopped. Confirmed database results remain valid. Remaining members were not processed; there is no automatic retry.
 MSMCoreGuardedSessionUnsupported=Core-Guarded requires a supported local file-session checkpoint. Booking is refused.
 MSMCoreGuardedLoggerUnsupported=Core-Guarded requires the supported standard local file logger. Booking is refused.
+
+MSMAttachmentStatus=Attachment status
+MSMAttachment_verified_for_transport=PDF attachment verified immediately before standard transport; delivery unconfirmed.
+MSMAttachment_verified_before_hook=PDF attachment verified before hook; actual hook attachment/delivery unconfirmed.
+MSMAttachment_missing=Verified invoice PDF attachment unavailable; no mail dispatched.
+MSMAttachment_not_sent=No attachment transported; successful mail transport not confirmed.
+MSMAttachment_not_selected=Attachment not selected.
+MSMAttachment_not_required=No invoice attachment required.
+MSMAttachment_not_processed=Attachment processing not attempted after STOP.
+MSMAttachment_unknown=Attachment outcome uncertain; no automatic resend.
+
+MSMCompletionStatus=Transaction completion
+MSMCompletion_nonterminal_acknowledged=Acknowledged nonterminal Core completion; effects require a separate durable checkpoint.
+MSMCompletion_terminal_acknowledged=Acknowledged terminal Core completion; no further booking, PDF or mail work.
+MSMCompletion_unknown=Transaction completion uncertain; STOP without further effects.
+
+MSMCoreFinanceUnqualified=CoreGuarded finance is not qualified for this Dolibarr version, enabled trigger configuration or provisional invoice file path. Processing stopped; review the configuration.

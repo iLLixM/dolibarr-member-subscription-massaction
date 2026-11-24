@@ -38,14 +38,77 @@ class MsmInvoiceProfile
 		global $mysoc;
 		return getDolGlobalString('ADHERENT_VAT_FOR_SUBSCRIPTIONS') === 'defaultforfoundationcountry' ? get_default_tva($mysoc, $mysoc, $product) : 0;
 	}
-	/** No arbitrary module paths from configuration are accepted. */
+	/** Use Dolibarr's normal model search roots, including installed modules.
+	 * Keep strict model-name shape so confirmed values cannot supply paths.
+	 * This checks configured model availability, NOT PHP source identity.
+	 */
+	protected function modelDirectories()
+	{
+		global $conf;
+		// The installed Core directory does not need dol_buildpath() (which
+		// relies on fully bootstrapped $conf->file even in offline fixtures).
+		// Resolve optional module roots exactly through Dolibarr's resolver.
+		$result = array(DOL_DOCUMENT_ROOT.'/core/modules/facture/');
+		foreach ((array) ($conf->modules_parts['models'] ?? array()) as $relative) {
+			if (!is_string($relative) || $relative === '' || $relative === '/') { continue; }
+			$result[] = dol_buildpath($relative.'core/modules/facture/', 0);
+		}
+		return $result;
+	}
+	/** Resolve the effective invoice numbering choice without invoking Core DML.
+	 * V22 defaults to terre; V23+ defaults to mars. Core also maps the
+	 * historical terre/mercure aliases before including the model.
+	 */
+	protected function numberModel()
+	{
+		$number = getDolGlobalString('FACTURE_ADDON');
+		// F38-13: Core uses a falsy check, so string '0' (also integer 0
+		// after getDolGlobalString()) selects the version-specific default.
+		// Do not normalize other invalid names such as '00' or '0.0'.
+		if (!$number || $number === 'terre') {
+			return version_compare(DOL_VERSION, '23.0.0', '>=') ? 'mod_facture_mars' : 'mod_facture_terre';
+		}
+		if ($number === 'mercure') { return 'mod_facture_mercure'; }
+		return $number;
+	}
+	/** Legacy Core numbering models resolve through dol_document_root.
+	 * This is availability checking only, not PHP source qualification.
+	 */
+	protected function legacyNumberModelDirectories()
+	{
+		global $conf;
+		$result = array();
+		foreach ((array) ($conf->file->dol_document_root ?? array()) as $root) {
+			if (is_string($root) && $root !== '') {
+				$result[] = rtrim($root, '/').'/core/modules/facture/';
+			}
+		}
+		return $result;
+	}
 	protected function models($number, $pdf)
 	{
 		foreach (array($number, $pdf) as $name) {
-			if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_]*$/D', $name)) { throw new RuntimeException('MSMInvoiceProfileUnsupported'); }
+			if (!is_string($name) || !preg_match('/^[a-zA-Z][a-zA-Z0-9_]*$/D', $name)) {
+				throw new RuntimeException('MSMInvoiceProfileUnsupported');
+			}
 		}
-		if (!is_readable(DOL_DOCUMENT_ROOT.'/core/modules/facture/'.$number.'.php')
-			|| !is_readable(DOL_DOCUMENT_ROOT.'/core/modules/facture/doc/pdf_'.$pdf.'.modules.php')) { throw new RuntimeException('MSMInvoiceProfileUnsupported'); }
+		$numberFound = false; $pdfFound = false;
+		foreach ($this->modelDirectories() as $root) {
+			if (!is_string($root) || $root === '') { continue; }
+			$root = rtrim($root, '/').'/';
+			$numberFound = $numberFound || (is_file($root.$number.'.php') && is_readable($root.$number.'.php'));
+			$pdfFound = $pdfFound || (is_file($root.'doc/pdf_'.$pdf.'.modules.php') && is_readable($root.'doc/pdf_'.$pdf.'.modules.php'));
+		}
+		if (!$numberFound) {
+			// Facture::getNextNumRef() uses this legacy fallback if no modern
+			// <model>.php was loaded, including installed document roots.
+			foreach ($this->legacyNumberModelDirectories() as $root) {
+				$root = rtrim($root, '/').'/';
+				$file = $root.$number.'/'.$number.'.modules.php';
+				if (is_file($file) && is_readable($file)) { $numberFound = true; break; }
+			}
+		}
+		if (!$numberFound || !$pdfFound) { throw new RuntimeException('MSMInvoiceProfileUnsupported'); }
 	}
 	public static function fields($object, array $names)
 	{
@@ -78,13 +141,18 @@ class MsmInvoiceProfile
 		$term = !empty($customer->cond_reglement_id) ? (int) $customer->cond_reglement_id : $this->paymentTerm();
 		if ($term <= 0) { throw new RuntimeException('MSMInvoiceProfileUnsupported'); }
 		$termLabel = $this->paymentTermLabel($term);
-		$number = getDolGlobalString('FACTURE_ADDON', 'mod_facture_terre');
+		$number = $this->numberModel();
 		$pdf = getDolGlobalString('FACTURE_ADDON_PDF_0');
 		if ($pdf === '') { $pdf = getDolGlobalString('FACTURE_ADDON_PDF'); }
 		if ($pdf === '') { $pdf = MsmCoreCompatibility::defaultPdf(); }
 		$this->models($number, $pdf);
 		$settings = array();
 		foreach (array('ADHERENT_BANK_USE', 'ADHERENT_VAT_FOR_SUBSCRIPTIONS', 'ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS', 'FACTURE_ADDON', 'FACTURE_ADDON_PDF_0', 'FACTURE_ADDON_PDF', 'FACTURE_ADDON_PDF_STANDARD', 'FACTURE_RIB_NUMBER', 'SOCIETE_CODECLIENT_ADDON', 'THIRDPARTY_DEFAULT_CREATE_CONTACT', 'THIRDPARTY_CUSTOMERCODE_EQUALS_MEMBERREF', 'SOCIETE_USEPREFIX', 'SOCIETE_DISABLE_PROSPECTSCUSTOMERS', 'MAIN_USE_ADVANCED_PERMS', 'MAIN_ROUNDOFTOTAL_NOT_TOTALOFROUND', 'MAIN_MAX_DECIMALS_TOT', 'MAIN_MAX_DECIMALS_UNIT', 'MAIN_MAX_DECIMALS_SHOWN', 'MAIN_DISABLE_ALL_MAILS') as $name) { $settings[$name] = getDolGlobalString($name); }
+		// F38-12: Core normalizes missing/legacy FACTURE_ADDON in-process during
+		// Facture::validate(). Fingerprints compare the effective numbering model,
+		// not that mutable raw alias. Keep all other confirmation settings intact.
+		// Read-only snapshot: never write to $conf->global here.
+		$settings['FACTURE_ADDON'] = $number;
 		return array('entity' => (int) $conf->entity, 'currency' => $conf->currency,
 			'date' => dol_print_date(dol_now(), '%Y-%m-%d'), 'product' => $productid, 'vat' => (float) $vat,
 			'quantity' => 1, 'type' => $product ? (int) $product->type : 1, 'price_base' => 'TTC', 'term' => $term, 'term_label' => $termLabel,
