@@ -2,6 +2,14 @@
 
 ## Unreleased – development completion and next release gates
 
+### 2026-11-24 – PR #45 shared-hosting compatibility and PR #44 documentation consolidation
+
+- PR #45 squash-merged as `b026f1504db27308fc7326e2e88ec2e53b2f48d9`, tree-identical to reviewed `7e5f64d07ab3830ce355cd745782c4f0c2a955b0`; APPROVED FOR DEVELOPMENT MERGE WITH DOCUMENTED LIMITATIONS; 31/31 exact-head CI.
+- PR #45 removes only the unnecessary directory-listing/readability prerequisite in `MsmFileBookingCheckpoint::requireSession()`. The PHP `files` handler, nonempty session ID, plain absolute existing writable directory, canonical binding and actual reopen/read/write/close/readback remain required. A known session file may be accessible even when the directory cannot be listed (e.g. owner mode `0300`). Preserve the original consumed confirmation, one-shot/processing/result persistence, owned guard and finance/post-COMMIT checks. Do not widen provider permissions to make a test pass. The six concrete Core/model/PDF file readability checks remain a separate contract.
+- Local accepted real cases on `ba5c9a3121754fcbd4259bb8906ad1dd17f1ce00`: protected readiness 21 checks, initial finance/PDF PASS within scope, additional non-mail 8/8 PASS, local B mail/verified attachments 3/3 PASS (capture only). Hosted D independent checkout and dedicated schema, Dolibarr 22.0.5, Oracle MySQL 8.4.13, Web PHP 8.4.28 CGI/FastCGI / CLI 8.3.37: four roles, two separate contribution-only cases, persisted result reload, consumed replay refusal and separate SQL readback PASS within scope on `0adc259d4739b44f9b1fb3a49574d7e1c318132c`. D finance/PDF/mail, broader live cases and exact ZIP OPEN; A/C mail OPEN. Modified OD-P5-02 accepts authorized summaries within scope, not independent external reproduction.
+- PR #44 merged; #41–#43 closed without merge as superseded. Historical source identities unchanged.
+- F45-01/02 open test precision; F45-03 documentation remediation awaits review/merge. Draft #40 requires #45 correction; Phase 5 PARTIAL / release NO-GO. See [current baseline](docs/current-development-baseline.md).
+
 ### 2026-11-24 – Phase 5 bounded local qualification
 
 **Current Phase 5:** Owner-accepted Codex outcomes on deployed `ba5c9a3121754fcbd4259bb8906ad1dd17f1ce00`: local A/B/C protected readiness 21 checks PASS; B01/B02 and A02/C02 bounded finance/PDF PASS; additional non-mail matrix 8/8 PASS; local B module mail/verified PDF attachments 3/3 PASS (two fresh bulk runs, local capture only). Historical B02 mail/attachment and DOLIENV-ACC-01 remain UNKNOWN/STOP, latter rollback unconfirmed. See [Phase 5 qualification register](docs/evidence/cf03/phase5-local-qualification-2026-11-24.md). These accepted summaries suffice under modified OD-P5-02; no external reproduction of raw artifacts is asserted.
