@@ -8,13 +8,16 @@
 
 **Current dolienv topology:** A = local Dolibarr 24.0.3/PHP 8.2.35/MariaDB 10.11.19 `MariaDBSnapshot`; B = local Dolibarr 24.0.3/PHP 8.2.35/MySQL 8.4.13 `CoreGuarded`; C = same Dolibarr/PHP/MySQL versions `EnhancedMySQL`; D = hosted Dolibarr 22.0.5/MySQL 8.4.13/CLI PHP 8.3.37 `CoreGuarded`. A/B/C have separate schemas, webroots, accounts, sessions, document roots; B/C share MySQL server and local module source only. Legacy CF03 A/B labels and older shared A/C commands cannot be relabeled/reused. A/C limited invoice/PDF/R16/replay positive evidence was on prior HEAD `46f78d8...`; D has read-only hosted evidence; no exact-current-source full real finance qualification. [Canonical matrix](dolienv-environments.md).
 
-**Operational/release boundary:** `F32-MR-01` protected private target-user launcher and read-only preflight, independently reconciled **new** one-shot A–D CF03-NORMAL cases (priority B finance, never replay old UNKNOWN), per-case Owner write GO, controlled snapshots/backups and restore readiness, actual module mail/verified attachments, `CF05-07` risk acceptance, `R0-03` exact v0.1.0 ZIP/SHA256, `R0-04` hosted D package/Web-FPM/business qualification, `R0-07` independent final acceptance and separate Owner Release GO remain **OPEN / NO-GO**. SMTP-capture probes are infrastructure-only, backup integrity is not restore, and CF03-FAULT destructive cases remain DEFERRED/NOT EXECUTED. No real writes authorized by this documentation.
+**Operational/release boundary:** `F32-MR-01` protected private target-user launcher and read-only preflight, independently reconciled **new** one-shot A–D CF03-NORMAL cases (priority B finance, never replay old UNKNOWN), per-case Owner write GO, controlled snapshots/backups and restore readiness, broader module mail/attachment coverage beyond the tested local B cases, `CF05-07` risk acceptance, `R0-03` exact v0.1.0 ZIP/SHA256, `R0-04` hosted D package/Web-FPM/business qualification, `R0-07` independent final acceptance and separate Owner Release GO remain **OPEN / NO-GO**. Envelope-only SMTP probes cover capture connectivity. The later browser runs exercised actual module transport and attachments. Backup integrity is not restore, and CF03-FAULT destructive cases remain DEFERRED/NOT EXECUTED. No real writes authorized by this documentation.
+
+**Local B mail/attachment status (2026-11-24): PASS for three members in two real bulk confirmations (one member and two members).** The [local B mail and attachment qualification](evidence/cf03/phase5-local-b-mail-attachment-2026-11-24.md) records three local captures and three decoded MIME attachments matching the physical invoice PDFs. Wider profile, hosted and external delivery coverage remain outside this result. The historical B02 and `DOLIENV-ACC-01` outcomes remain `UNKNOWN/STOP`.
 
 | Gate | Current outcome |
 | --- | --- |
 | CF05 Phase 4 (PR #38) | **DEVELOPMENT COMPLETE / SQUASH-MERGED** |
 | F32-MR-01 / protected operator preflight | **OPEN**; previously Owner-accepted operational restriction is not a technical closure |
-| CF03-NORMAL A–D (including B finance retest and module mail) | **OPEN / per-case GO required** |
+| Local B module mail and PDF attachments | **PASS** for the three isolated capture outcomes on the recorded source. Independent acceptance is pending. |
+| Remaining CF03-NORMAL A–D | **OPEN / per-case GO required** |
 | CF05-07 and F36-02 financial risk review | **OPEN** |
 | R0-03 / source-identical ZIP + manifest + SHA256 | **OPEN** |
 | R0-04 / exact ZIP on Hosted D + real Web/FPM and business tests | **OPEN** |
