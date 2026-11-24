@@ -1,5 +1,19 @@
 # PR #38 – Core parity and Massaction regression acceptance (Owner 2026-11-22)
 
+## Final PR #38 regression disposition and exact-source evidence
+
+**Authoritative post-PR #38 state (2026-11-24):** [PR #38](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/38) was independently reviewed and **squash-merged** into `main` as `0998fbaf58155cca04d31ab99c6bb47420e53c72`; reviewed HEAD `b15b93580f995fb05a696a125c2a5fd995dd4bb3` has **identical Git tree** `a6e7256fb1572361c4dd4d850124ca7a6afff566`. The independent verdict was **APPROVED FOR DEVELOPMENT MERGE WITH DOCUMENTED LIMITATIONS**, with exact-source Standard 9/9 + Full 21/21 + Hosted 1/1 (**31/31**) synthetic CI PASS. Phase 4 development is merged; **Phase 5 real A–D integration, CF05-07, package, hosted and Owner release acceptance are NOT complete**. All older dated DRAFT/finance-default-deny/core-source-allowlist statements below are historical and not current requirements.
+
+**Independent disposition:** F38-01–06 `CLOSED`; F38-07–09 `SUPERSEDED BY OWNER VARIANT B` (not technically closed); F38-10–13 `INDEPENDENTLY CLOSED`; F38-14/P2 `INDEPENDENTLY CLOSED` (server-confirmed `manualend` restored only after fresh fingerprint revalidation); F36-01 historically closed. **Separate real incident:** `DOLIENV-ACC-01` in B remains `UNKNOWN/STOP`, diagnostic subscription #3 and rollback unconfirmed; lack of a persisted record does not prove rollback ACK. No replay/compensation. The corrected code has **not been retested in real B finance**.
+
+**Coverage contracts:** accepted Core normal numbering/model/Agenda/trigger execution, no source hashes; original confirmed full invoice row not fingerprint-only, canonical `FACTURE_ADDON` model across V22/V23/V24 and `'0'`/integer zero fallback, stable second-member fingerprint; F38-14 genuine controller `manualend` in confirmed row versus fresh Booking row, with both boolean values and rejection of changed real finance parameters. Original one-shot/file-session, same active guard, readback, rights/entity and STOP tests remain binding. These are **offline and synthetic** Core/DB doubles, not real A–D acceptance.
+
+**Operational/release boundary:** `F32-MR-01` protected private target-user launcher and read-only preflight, independently reconciled **new** one-shot A–D CF03-NORMAL cases (priority B finance, never replay old UNKNOWN), per-case Owner write GO, controlled snapshots/backups and restore readiness, actual module mail/verified attachments, `CF05-07` risk acceptance, `R0-03` exact v0.1.0 ZIP/SHA256, `R0-04` hosted D package/Web-FPM/business qualification, `R0-07` independent final acceptance and separate Owner Release GO remain **OPEN / NO-GO**. SMTP-capture probes are infrastructure-only, backup integrity is not restore, and CF03-FAULT destructive cases remain DEFERRED/NOT EXECUTED. No real writes authorized by this documentation.
+
+---
+
+> **Archived date-bound content below:** previous sources/labels/admission claims reflect their original times; the post-PR38 section above governs current status.
+
 > **Current environment convention — 2026-11-24:** dolienv **A = MariaDBSnapshot**,
 > **B = CoreGuarded**, **C = EnhancedMySQL**, **D = hosted CoreGuarded**.
 > [Current topology, bounded acceptance and privacy rules](dolienv-environments.md) control

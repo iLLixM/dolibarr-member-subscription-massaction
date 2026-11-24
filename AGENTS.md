@@ -1,5 +1,19 @@
 # Codex repository guidance
 
+## Current source of truth after PR #38 – 2026-11-24
+
+- **Phase 4 development is merged**: PR #38 squash commit `0998fbaf58155cca04d31ab99c6bb47420e53c72`, reviewed source `b15b93580f995fb05a696a125c2a5fd995dd4bb3`, identical tree. Green 9/21/Hosted=31/31 CI is **synthetic**, not real acceptance.
+- Current authority: [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22), [Owner Core parity](docs/owner-core-parity-2026-11-22.md), [current baseline](docs/current-development-baseline.md), [dolienv](docs/dolienv-environments.md) and [release gates](docs/release-qualification-v0.1.0.md). This section supersedes older dated future-work, default-deny or shared A/C-site assertions below; preserve those solely as historical evidence.
+- **Owner Variant B:** normal Dolibarr Core/numbering/PDF/trigger/Agenda/extensions at parity, plus original confirmed full-row/fingerprint, consumed file-session one-shot, user/entity/rights/profile revision, same active owned Guard, engine/readbacks, ACK, UNKNOWN/STOP and no retries/foreign rollback. Full CoreGuarded Finance is **implemented and enabled**. Do **not** reintroduce source PHP SHA allowlists, blanket `PROV` prohibition or default-deny. F36-02 filesystem exposure remains Owner-accepted residual Core risk.
+- Findings F38-01–06 CLOSED, F38-07–09 SUPERSEDED, F38-10–14 INDEPENDENTLY CLOSED. `DOLIENV-ACC-01` old B finance attempt is `UNKNOWN/STOP`, rollback unconfirmed. Do not retry or compensate it; new B retest requires separate Owner GO, private target-user preflight, fresh fixtures and independent post-state.
+- Current dolienv: **A=MariaDBSnapshot, B=CoreGuarded, C=EnhancedMySQL, D=Hosted CoreGuarded**. B/C have separate DB schemas/webroots, shared MySQL server/local module source. Old A/B reversal and A/C shared-schema scripts **must never be blindly relabeled**. Do not run uncoordinated B/C qualification.
+- F32-MR-01 protected launcher, full real A–D CF03-NORMAL, real module SMTP/attachment, CF05-07, exact ZIP R0-03, Hosted D R0-04, independent R0-07 and separate Owner release GO are **OPEN**. CF03-FAULT destructive tests DEFERRED. No new real business/FS/mail writes without a separate case-specific approval.
+- Publish no private hosts, users, schemas, DB accounts, passwords, session material, local paths, dumps or raw evidence. Preserve requirements.csv original 71 IDs and historical audit records.
+
+---
+
+> Historical record follows. Current status is defined above.
+
 ## Scope and sources of truth
 
 - This repository is a standalone Dolibarr module. Do not modify Dolibarr Core.

@@ -1,5 +1,13 @@
 # Repository privacy and historical evidence handling (2026-11-21)
 
+## Current privacy and historical-evidence guidance (post PR #38 – 2026-11-24)
+
+The current source was independently reviewed and squash-merged as `0998fbaf58155cca04d31ab99c6bb47420e53c72`. Use the [new dolienv mapping](dolienv-environments.md) A MariaDB, B CoreGuarded MySQL, C EnhancedMySQL MySQL, D hosted; earlier A/C shared-schema and reversed A/B commands below are historical only. Continue to pseudonymize public current-tree docs; never publish private hostnames, URLs, account/database/login identities, paths, dumps, secrets or raw operator evidence. F32-MR-01 private target-user launcher and read-only preflight remain open; the original B UNKNOWN/STOP case is not eligible for retry. Nothing in this documentation authorizes real writes, deployment or release.
+
+---
+
+> Historical record follows. Current status is defined above.
+
 > **Current environment convention — 2026-11-24:** dolienv **A = MariaDBSnapshot**,
 > **B = CoreGuarded**, **C = EnhancedMySQL**, **D = hosted CoreGuarded**.
 > [Current topology, bounded acceptance and privacy rules](dolienv-environments.md) control

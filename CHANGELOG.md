@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased – development completion and next release gates
+
+### 2026-11-24 – PR #38 Phase 4 completed (development only)
+
+- [PR #38](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/38) independently reviewed and **squash-merged** to `main` as `0998fbaf58155cca04d31ab99c6bb47420e53c72`, tree-identical to reviewed `b15b93580f995fb05a696a125c2a5fd995dd4bb3`. Exact-head CI: **9/9 Standard, 21/21 Full, 1/1 Hosted SUCCESS**. Verdict: APPROVED FOR DEVELOPMENT MERGE WITH DOCUMENTED LIMITATIONS.
+- Owner Variant B Core parity plus Massaction rights, original confirmed Preview/full-row, one-shot, same owned transaction guard and UNKNOWN/STOP. Contribution, optional invoice/conditional new Third Party, line/validate/link, post-COMMIT PDF and optional mail/verified attachment implemented across three profiles. No Core/trigger source-hash qualification, `PROV` veto or CoreGuarded finance default-deny.
+- F38-01–06 CLOSED; F38-07–09 SUPERSEDED BY OWNER DECISION; F38-10–14 INDEPENDENTLY CLOSED. F36-02 retains Owner-accepted Core filesystem risk.
+- Current dolienv A=MariaDBSnapshot, B=CoreGuarded, C=EnhancedMySQL, D=Hosted CoreGuarded. A/C bounded prior-source positives; old B finance UNKNOWN/STOP remains unconfirmed and corrected finance needs a **new** separately approved retest; D only read-only hosting evidence.
+- **v0.1.0 NOT RELEASED**. Phase 5 real A–D, private F32-MR-01 launcher, actual module SMTP/attachment, CF05-07/risk review, R0-03 package, R0-04 hosted D, R0-07 and release Owner GO OPEN/NO-GO; CF03-FAULT destructive work DEFERRED.
+
+---
+
+> Historical record follows. Current status is defined above.
+
 > **CURRENT BINDING OWNER DECISION — 2026-11-22 / PR #38, CORE PARITY + MASSACTION SAFETY (DRAFT, NOT YET INDEPENDENTLY REVIEWED).** The Owner expressly **supersedes the earlier CF05-06 exact-Core/trigger-blob allowlist and PROV-directory prohibition**. The module trusts Dolibarr's normal `Adherent::subscription()`, `Societe::create_from_member()`, `Facture::create()/addline()/validate()`, numbering/PDF models, enabled triggers/Agenda/Logevents and extension behavior as the Core single-member workflow does. **Full `CoreGuarded` invoice, conditional auto Third Party, post-COMMIT PDF and optional verified-attachment email stay enabled**, along with `EnhancedMySQL` and `MariaDBSnapshot`. Removed as normative admission checks: 15-version invoice source hashes, standard trigger hashes, prohibition of custom enabled triggers, Agenda file-copy/Logevents settings and `PROV` existence check. Do not rebuild those allowlists under F38-08/09. Core model lookup supports installed model roots without unsafe model-name paths.
 >
 > **STILL BINDING:** Massaction's per-member rights/entity, server-confirmed preview/fingerprint and user/profile revision, controlled original DoliDB Guard, effective transactional-table/engine checks, consumed one-shot session, confirmed nonterminal completion, durable post-COMMIT PDF/mail checkpoints, verified attachment/recipient identity, and `UNKNOWN/STOP` on uncertain completion or external effects with **no automatic booking/PDF/mail replay or foreign rollback**. No guarantee that Dolibarr Core SQL and filesystem are jointly atomic or that arbitrary custom extensions are benign. **F36-02/P2 = OWNER-ACCEPTED CORE RESIDUAL RISK** (conditional pre-outer-COMMIT `PROV` rename); it is not proven impossible or technically fixed. **F38-07/08/09 = SUPERSEDED BY OWNER ARCHITECTURE DECISION**, not historically falsified or independently technically CLOSED. F38-01..06 remain CLOSED per prior reviews and regressions. F36-01 remains historically CLOSED on the old default-deny branch, while its later Owner activation is binding.
