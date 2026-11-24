@@ -2,7 +2,13 @@
 
 ## Unreleased – development completion and next release gates
 
-### 2026-11-24 – PR #38 Phase 4 completed (development only)
+### 2026-11-24 – Phase 5 bounded local qualification
+
+**Current Phase 5:** Owner-accepted Codex outcomes on deployed `ba5c9a3121754fcbd4259bb8906ad1dd17f1ce00`: local A/B/C protected readiness 21 checks PASS; B01/B02 and A02/C02 bounded finance/PDF PASS; additional non-mail matrix 8/8 PASS; local B module mail/verified PDF attachments 3/3 PASS (two fresh bulk runs, local capture only). Historical B02 mail/attachment and DOLIENV-ACC-01 remain UNKNOWN/STOP, latter rollback unconfirmed. See [Phase 5 qualification register](docs/evidence/cf03/phase5-local-qualification-2026-11-24.md). These accepted summaries suffice under modified OD-P5-02; no external reproduction of raw artifacts is asserted.
+
+**Operational/release boundary:** Local readiness accepted for the tested scope; new cases require protected preflight, current source/profile binding, fresh fixtures, Owner authorization, controlled backups and independent readbacks. Full CF03-NORMAL A–D, A/C mail, remaining live/configuration coverage, isolated Hosted D, CF05-07/CF03-RISK, final R0-03, R0-04, R0-07 and separate Owner Release GO remain OPEN / NO-GO. CF03-FAULT destructive tests remain deferred. Never replay historical UNKNOWN operations.
+
+### 2026-11-24 – PR #38 Phase 4 completed (historical development checkpoint)
 
 - [PR #38](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/38) independently reviewed and **squash-merged** to `main` as `0998fbaf58155cca04d31ab99c6bb47420e53c72`, tree-identical to reviewed `b15b93580f995fb05a696a125c2a5fd995dd4bb3`. Exact-head CI: **9/9 Standard, 21/21 Full, 1/1 Hosted SUCCESS**. Verdict: APPROVED FOR DEVELOPMENT MERGE WITH DOCUMENTED LIMITATIONS.
 - Owner Variant B Core parity plus Massaction rights, original confirmed Preview/full-row, one-shot, same owned transaction guard and UNKNOWN/STOP. Contribution, optional invoice/conditional new Third Party, line/validate/link, post-COMMIT PDF and optional mail/verified attachment implemented across three profiles. No Core/trigger source-hash qualification, `PROV` veto or CoreGuarded finance default-deny.
