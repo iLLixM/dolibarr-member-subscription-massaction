@@ -16,7 +16,10 @@ function denySession(callable $fn, $name)
 $root = sys_get_temp_dir().'/cf02-session-'.bin2hex(random_bytes(12));
 if (!mkdir($root, 0700)) { throw new RuntimeException('Unable to create test directory'); }
 $prior = session_save_path(); $oldCookies = ini_get('session.use_cookies');
-ini_set('session.use_cookies', '0'); session_save_path($root);
+$oldGc = ini_get('session.gc_probability');
+ini_set('session.use_cookies', '0');
+ini_set('session.gc_probability', '0'); // Shared hosts can manage session cleanup separately.
+session_save_path($root);
 $key = str_repeat('c', 32); $user = (object) array('id' => 18);
 $features=array('booking'=>true,'invoice'=>true,'autocreate'=>true,'sendmail'=>true);
 $binding = array('family'=>'mysql','profile'=>'CoreGuarded','entity'=>1,'owner'=>18,
@@ -27,6 +30,9 @@ $rows = array(7 => array('start'=>123,'end'=>456,'amount'=>12.5,'description'=>'
 $opts = array('invoice'=>false,'autocreate'=>false,'sendmail'=>false,'description'=>'Synthetic contribution');
 $sessionid = 'cf02'.bin2hex(random_bytes(12));
 try {
+	// The owner can open known files but cannot list the session directory.
+	verifySession(chmod($root, 0300), 'configure non-listable session directory');
+	clearstatcache(true, $root);
 	session_id($sessionid); verifySession(session_start(), 'start isolated file session');
 	$_SESSION = array('msm_previews'=>array($key=>array('owner'=>18,'entity'=>1,'phase'=>'confirm','revision'=>5,
 		'profile'=>$binding,'ids'=>array(7),'options'=>$opts,'rows'=>$rows,
@@ -36,6 +42,7 @@ try {
 	verifySession(session_start(), 'reopen to consume');
 	$_SESSION['msm_previews'][$key]['phase'] = 'processing';
 	$_SESSION['msm_previews'][$key]['revision'] = 6;
+	$updated = $_SESSION['msm_previews'][$key];
 	verifySession(session_write_close(), 'persist controller consumption');
 	$confirmed = $rows[7]; $confirmed['_profile'] = $binding;
 	$checkpoint->requireProcessing(7, $binding, $user, $confirmed, $opts);
@@ -52,9 +59,11 @@ try {
 	denySession(static function()use($checkpoint,$binding,$user,$confirmed,$changed){$checkpoint->requireProcessing(7,$binding,$user,$confirmed,$changed);},'forged invoice option denied');
 	$wrong=(object)array('id'=>99);
 	denySession(static function()use($checkpoint,$binding,$wrong,$confirmed,$opts){$checkpoint->requireProcessing(7,$binding,$wrong,$confirmed,$opts);},'different user denied');
-	verifySession(session_start(), 'reopen for changed confirmation');
-	$_SESSION['msm_previews'][$key]['results'][7]['status']='success';
-	verifySession(session_write_close(), 'persist changed result');
+	$updated['results'][7]['status'] = 'success';
+	$checkpoint($updated);
+	verifySession(session_start(), 'reopen after saving result');
+	verifySession($_SESSION['msm_previews'][$key]['results'][7]['status'] === 'success', 'read back saved result');
+	verifySession(session_write_close(), 'close persisted result');
 	denySession(static function()use($checkpoint,$binding,$user,$confirmed,$opts){$checkpoint->requireProcessing(7,$binding,$user,$confirmed,$opts);},'completed member cannot be booked twice');
 	verifySession(session_start(), 'reopen for phase completion');
 	$_SESSION['msm_previews'][$key]['phase']='done';
@@ -208,5 +217,6 @@ try {
 	if (session_status() === PHP_SESSION_ACTIVE) { session_abort(); }
 	@unlink($root.'/sess_'.$sessionid); @rmdir($root);
 	session_save_path($prior); ini_set('session.use_cookies', (string) $oldCookies);
+	ini_set('session.gc_probability', (string) $oldGc);
 }
 echo 'CF-02 durable file-session admission: '.$passed.' assertions PASS (local file I/O; no DB/HTTP).'.PHP_EOL;
