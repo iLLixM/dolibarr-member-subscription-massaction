@@ -146,7 +146,7 @@ class MailDouble extends MsmSubscriptionMail
 	protected function permitted($user) { return MsmPreviewService::canCreateSubscriptionWithOptions($user); }
 	public $manager; public $delivered = 0; public $outcome = 'transport';
 	protected function hooks() { return $this->manager; }
-	protected function deliver($member, array $row, $user) { $this->delivered++; return $this->outcome; }
+	protected function deliver($member, array $row, $user, &$isolatedSmtpFailure = null) { $this->delivered++; return $this->outcome; }
 }
 $hookmanager = (object) array('old' => true); $oldHook = $hookmanager; $oldLangs = $langs;
 foreach (array('off', 'transport', 'negative', 'positive', 'exception', 'replace', 'redirect', 'missing', 'disabled', 'failed') as $case) {

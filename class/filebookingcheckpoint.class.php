@@ -254,7 +254,7 @@ final class MsmFileBookingCheckpoint
 		}
 		$this->mailEvidenceClaimed[$id] = true; // No second adapter attempt.
 	}
-	public function __invoke(array $updated)
+	public function __invoke(array $updated, $isolatedMailId = null)
 	{
 		$this->requireBinding();
 		// Session warnings are failures too; never retry a failed write/reopen.
@@ -263,8 +263,37 @@ final class MsmFileBookingCheckpoint
 			if (!session_start()) { throw new RuntimeException('MSMSessionFailure'); }
 			$current = $_SESSION['msm_previews'][$this->key] ?? null;
 			if (!$current || $current['phase'] !== 'processing' || $current['revision'] !== $updated['revision']) { throw new RuntimeException('MSMSessionFailure'); }
+			if ($isolatedMailId !== null) {
+				$origin = $this->confirmedOrigin;
+				$result = $updated['results'][$isolatedMailId] ?? null;
+				$previous = $current['results'][$isolatedMailId] ?? array();
+				$attachment = empty($origin['options']['invoice']) ? 'not_required' : 'unknown';
+				if (!isset($this->mailEvidenceClaimed[$isolatedMailId]) || !is_array($origin)
+					|| $updated['phase'] !== 'processing' || $updated['revision'] !== $origin['revision'] + 1
+					|| ($previous['mail'] ?? null) !== 'unknown' || !is_array($result)
+					|| ($result['status'] ?? null) !== 'success'
+					|| ($result['completion'] ?? null) !== 'nonterminal_acknowledged'
+					|| !empty($result['stop']) || ($result['mail'] ?? null) !== 'unknown'
+					|| ($result['attachment_status'] ?? null) !== $attachment
+					|| array_replace($previous, array('attachment_status' => $attachment)) !== $result) {
+					throw new RuntimeException('MSMSessionFailure');
+				}
+				foreach (array('owner', 'entity', 'ids', 'rows', 'options', 'profile') as $key) {
+					if (($current[$key] ?? null) !== $origin[$key] || ($updated[$key] ?? null) !== $origin[$key]) {
+						throw new RuntimeException('MSMSessionFailure');
+					}
+				}
+			}
 			$_SESSION['msm_previews'][$this->key] = $updated;
 			if (!session_write_close()) { throw new RuntimeException('MSMSessionFailure'); }
+			if ($isolatedMailId !== null) {
+				// A successful write return alone cannot authorize the next member.
+				$this->requireBinding();
+				if (!session_start() || ($_SESSION['msm_previews'][$this->key] ?? null) !== $updated) {
+					throw new RuntimeException('MSMSessionFailure');
+				}
+				if (!session_abort()) { throw new RuntimeException('MSMSessionFailure'); }
+			}
 		} finally {
 			if (session_status() === PHP_SESSION_ACTIVE) { session_abort(); }
 			restore_error_handler();
