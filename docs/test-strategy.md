@@ -1,6 +1,6 @@
 # Required risk-based test strategy
 
-**2026-11-25 Hosted D delta:** [Verified finance, PDFs and live-security matrix](evidence/cf03/phase5-hosted-d-2026-11-25.md). Three contribution/invoice/PDF cases passed on merged PR #46. Hosted D development qualification remains PARTIAL. Isolated mail capture and cross-entity checks are blocked, and natural expiry is pending. The exact ZIP gate R0-04 remains separate. Earlier dated statements below retain their original scope.
+**2026-11-25 Hosted D completion:** [Bounded development qualification and live-security evidence](evidence/cf03/phase5-hosted-d-2026-11-25.md). Hosted D CF03-NORMAL passed on merged PR #46 within the approved cases, including verified contribution/invoice/PDF, three external test-mail receipts with matching PDF attachment hashes, and Agenda ON/OFF. Natural confirmation expiry passed. Live CF03-SECURITY-BASELINE remains PARTIAL because cross-entity testing requires a second authorized entity. ADR-08A and exact-release-ZIP R0-04 qualification remain separate. Earlier dated statements retain their original scope.
 
 ## Current Phase-5 validation and test boundaries – 2026-11-24
 

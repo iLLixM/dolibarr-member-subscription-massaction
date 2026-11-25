@@ -1,4 +1,4 @@
-# Phase 5 Hosted D — finance, document and security delta
+# Phase 5 Hosted D — development qualification
 
 ## Source and admission
 
@@ -22,7 +22,10 @@ role. Prior [PR #45 D contribution, session and consumed-replay evidence](../../
 retains the original source `0adc259d4739b44f9b1fb3a49574d7e1c318132c`.
 No historical operation was replayed.
 
-## Hosted D result matrix
+## Initial Hosted D checkpoint
+
+The following records the original finance/security checkpoint. Pending and
+blocked statuses are updated by the later evidence below.
 
 All newly executed cases below use the installed SHA above. Each finance
 confirmation selected one synthetic member and deselected mail.
@@ -47,13 +50,47 @@ designated member. The confirmed invoice issue dates agreed with the
 independent SQL dates. The case results do not imply any external mail
 delivery or new guarantees for unsupported completion behavior.
 
+## Hosted D completion addendum (2026-11-25)
+
+These follow-up cases retained the installed PR #46 source
+`c2dc2cfdadf2c4def6bcd2f2ec20473cea3683b3` and CoreGuarded profile.
+Previously created business objects were preserved. The Owner confirmed fresh
+database and Documents backups after their manual tests. The new positive cases
+used separate fresh synthetic fixtures and fixed independent before/after
+readbacks.
+
+| Case | Observed result |
+| --- | --- |
+| D-S05 | **PASS.** A valid confirmation was allowed to expire naturally for one hour and then reopened in the same authenticated session. Dolibarr returned its explicit unavailable/expired message over HTTP 200 and displayed no submit control. The harness sent zero booking POSTs; all 11 independently inspected business tables remained unchanged. |
+| D-SMTP2 single | **PASS, 1/1.** One contribution with acknowledged nonterminal completion, one validated invoice and verified PDF, one standard SMTP handoff and one Owner-confirmed external test mailbox receipt. |
+| D-SMTP2 double | **PASS, 2/2.** One bulk confirmation for two fresh members, with two acknowledged nonterminal contributions, validated invoices, verified PDFs, standard SMTP handoffs and Owner-confirmed external test mailbox receipts. |
+| D-AOFF | **PASS.** With only the automatic contribution Agenda event disabled, one contribution was confirmed without invoice or mail. Independent SQL across 11 tables verified zero new Agenda events or resource rows and the expected stored contribution. The original setting and unrelated settings were read back and confirmed after restoration. |
+
+In both SMTP2 cases, the loaded Core settings matched the new authenticated TLS
+SMTP route and fixed Owner-controlled recipient, with mail debugging disabled.
+The independent readback reconciled 14 tables per case and confirmed route
+stability. All three PDFs matched in size and SHA-256 between the hosting-local
+physical file and authenticated Web download. All three Owner-downloaded
+attachments matched the corresponding PDF SHA-256. This development evidence is
+Owner-confirmed external delivery and decoded attachment identity. Raw SMTP
+envelope/MIME capture and isolated no-relay qualification were outside these
+Hosted D cases. The original isolated-capture block remains part of the
+checkpoint history.
+
+The earlier SMTP observations on the previous route remain separate. The Owner
+later confirmed receipt, including a case that had reported mail/attachment
+UNKNOWN and STOP during the request. That application's historical verdict
+retains its original classification. No historical booking or mail was replayed.
+PR #49's separately scoped ADR-08A continuation was outside these Hosted D tests.
+Destructive faults and exact-release-ZIP qualification remain separate.
+
 ## Disposition and independent review
 
-Hosted D CF03-NORMAL is **PARTIAL** pending real mail and attachment
-qualification. The applicable live CF03-SECURITY-BASELINE is **PARTIAL**
-pending the expiry outcome and supported cross-entity evidence. Preserve the
-previous accepted scopes and all UNKNOWN/STOP results. Under modified
-OD-P5-02 these are compact, Owner-authorized summaries. F45-01/02 remain
-open test-hardening findings. CF03-RISK, CF05-07, R0-04 exact release ZIP
-and the final release gates are separate. [PR #40](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/40)
+Hosted D **CF03-NORMAL PASS within the approved development case matrix**.
+Live **CF03-SECURITY-BASELINE remains PARTIAL** because the cross-entity case
+requires an authorized second entity. Prior checkpoint and PR #45 evidence
+retain their tested source and scope. Under modified OD-P5-02 these are compact,
+Owner-authorized summaries. F45-01/02, Hosted D ADR-08A delta, CF03-RISK,
+CF05-07, R0-04 exact release ZIP and final release gates remain open.
+[PR #40](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/40)
 remains Draft. Release remains **NO-GO**.
