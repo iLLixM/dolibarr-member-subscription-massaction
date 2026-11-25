@@ -7,8 +7,26 @@ maildelivery and CF05 finance suites cover strict SMTP outcome attribution,
 four-member continuation, persisted UNKNOWN, one-shot effects and fail-closed
 contexts. Postcommit, file-session, invoice PDF and terminal tests retain their
 boundaries. The local PHP 8.2 / V24.0.3 full synthetic suite passed. Local real
-qualification is pending protected fixture and backup registration. Hosted D
-delta not executed under this task.
+qualification **PASS in the following bounded scope**. Hosted D delta was
+outside this task and requires separate authorization.
+
+| Case | Profile | Browser and local SMTP result |
+| --- | --- | --- |
+| ADR08A-B | CoreGuarded | Four fresh members in one confirmation. The sink consumed the first message through the DATA terminator and closed without its final acknowledgement. The member retained acknowledged business SUCCESS and verified PDF, with mail and attachment UNKNOWN. All three subsequent members completed with confirmed transport acceptance. Four local captures total. |
+| ADR08A-A | MariaDBSnapshot | Two fresh members in one confirmation, two acknowledged bookings, validated invoices, PDFs and local transport acceptances. |
+| ADR08A-C | EnhancedMySQL | Two fresh members in one confirmation, two acknowledged bookings, validated invoices, PDFs and local transport acceptances. |
+
+A/B/C ran serially on the exact behavioral commit above, Dolibarr 24.0.3 and
+PHP 8.2.35. Protected preflight, fresh synthetic fixtures and SHA-256-verified
+database/Documents backups preceded the windows. Each case independently
+reconciled 12 business tables; stored, authenticated and MIME-decoded PDFs
+matched by size and SHA-256. Each original result survived reload, the identical
+consumed POST produced no duplicate state or SMTP capture, and the temporary
+mail settings were restored. The original shared local source checkout was
+restored after the campaign. The sink did not relay. B withheld the final reply
+by closing the connection after the full message; timed-out delivery to an
+external server and destructive DB faults were outside this evidence. The
+reviewer receives these compact results under modified OD-P5-02.
 
 ## Updated evidence legend after PR #38 merge
 

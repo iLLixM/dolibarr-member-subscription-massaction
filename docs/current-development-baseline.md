@@ -1,11 +1,11 @@
 # Current development baseline, architecture and roadmap
 
 **ADR-08A delta (2026-11-25).** D-MAIL-01 is implemented at
-`1ac1a8f2dfd7384829fa5b85235f1e4884d689db` pending independent review and
-the remaining qualification. F38-02 is historically closed and the blanket
+`1ac1a8f2dfd7384829fa5b85235f1e4884d689db` with successful bounded local B/A/C qualification,
+pending independent review and the remaining qualification. F38-02 is historically closed and the blanket
 isolated-SMTP STOP is partially superseded. Preserve #47/#48 on their recorded
-sources. The local ADR-08A witness is a separate campaign, followed by separately
-authorized Hosted D qualification and the release gates.
+sources. See the [local ADR-08A witness](test-coverage.md#adr-08a-focused-evidence).
+Hosted D qualification requires separate authorization. Release gates remain open.
 
 ## Current authoritative development, architecture and release status
 
