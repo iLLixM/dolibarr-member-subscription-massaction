@@ -1,5 +1,14 @@
 # Phase 4 — Optional invoice integration architecture
 
+## ADR-08A — Mail outcome and next-member admission
+
+After qualified nonterminal COMMIT, the regular Core SMTP outcome may permit
+continuation only when it is isolated to the current member and the original
+file-session checkpoint is saved and read back with the truthful result. A
+failed readback or context check stops the batch. Each subsequent member retains
+independent admission, booking and mail capabilities. The previous blanket
+F38-02 behavior remains the historical baseline; see [ADR-08A](adr/ADR-0001-core-first-transaction-profiles.md#adr-08a--isolated-post-commit-smtp-failure-2026-11-25).
+
 ## Current implemented architecture – post-PR #38
 
 **Authoritative post-PR #38 state (2026-11-24):** [PR #38](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/38) was independently reviewed and **squash-merged** into `main` as `0998fbaf58155cca04d31ab99c6bb47420e53c72`; reviewed HEAD `b15b93580f995fb05a696a125c2a5fd995dd4bb3` has **identical Git tree** `a6e7256fb1572361c4dd4d850124ca7a6afff566`. The independent verdict was **APPROVED FOR DEVELOPMENT MERGE WITH DOCUMENTED LIMITATIONS**, with exact-source Standard 9/9 + Full 21/21 + Hosted 1/1 (**31/31**) synthetic CI PASS. Phase 4 development is merged; **Phase 5 real A–D integration, CF05-07, package, hosted and Owner release acceptance are NOT complete**. All older dated DRAFT/finance-default-deny/core-source-allowlist statements below are historical and not current requirements.

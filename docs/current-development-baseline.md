@@ -1,5 +1,12 @@
 # Current development baseline, architecture and roadmap
 
+**ADR-08A delta (2026-11-25).** D-MAIL-01 is implemented at
+`1ac1a8f2dfd7384829fa5b85235f1e4884d689db` pending independent review and
+the remaining qualification. F38-02 is historically closed and the blanket
+isolated-SMTP STOP is partially superseded. Preserve #47/#48 on their recorded
+sources. The local ADR-08A witness is a separate campaign, followed by separately
+authorized Hosted D qualification and the release gates.
+
 ## Current authoritative development, architecture and release status
 
 **Phase 4 development provenance (2026-11-24):** [PR #38](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/38) was independently reviewed and **squash-merged** into `main` as `0998fbaf58155cca04d31ab99c6bb47420e53c72`; reviewed HEAD `b15b93580f995fb05a696a125c2a5fd995dd4bb3` has **identical Git tree** `a6e7256fb1572361c4dd4d850124ca7a6afff566`. The independent verdict was **APPROVED FOR DEVELOPMENT MERGE WITH DOCUMENTED LIMITATIONS**, with exact-source Standard 9/9 + Full 21/21 + Hosted 1/1 (**31/31**) synthetic CI PASS. Phase 4 development is merged; **Phase 5 real A–D integration, CF05-07, package, hosted and Owner release acceptance are NOT complete**. All older dated DRAFT/finance-default-deny/core-source-allowlist statements below are historical and not current requirements.

@@ -1,5 +1,15 @@
 # Reading the existing requirement matrix
 
+## ADR-08A focused evidence
+
+Implementation source `1ac1a8f2dfd7384829fa5b85235f1e4884d689db`. The
+maildelivery and CF05 finance suites cover strict SMTP outcome attribution,
+four-member continuation, persisted UNKNOWN, one-shot effects and fail-closed
+contexts. Postcommit, file-session, invoice PDF and terminal tests retain their
+boundaries. The local PHP 8.2 / V24.0.3 full synthetic suite passed. Local real
+qualification is pending protected fixture and backup registration. Hosted D
+delta not executed under this task.
+
 ## Updated evidence legend after PR #38 merge
 
 **Phase 4 development provenance (2026-11-24):** [PR #38](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/38) was independently reviewed and **squash-merged** into `main` as `0998fbaf58155cca04d31ab99c6bb47420e53c72`; reviewed HEAD `b15b93580f995fb05a696a125c2a5fd995dd4bb3` has **identical Git tree** `a6e7256fb1572361c4dd4d850124ca7a6afff566`. The independent verdict was **APPROVED FOR DEVELOPMENT MERGE WITH DOCUMENTED LIMITATIONS**, with exact-source Standard 9/9 + Full 21/21 + Hosted 1/1 (**31/31**) synthetic CI PASS. Phase 4 development is merged; **Phase 5 real A–D integration, CF05-07, package, hosted and Owner release acceptance are NOT complete**. All older dated DRAFT/finance-default-deny/core-source-allowlist statements below are historical and not current requirements.

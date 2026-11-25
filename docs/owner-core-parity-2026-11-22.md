@@ -1,5 +1,15 @@
 # Binding Owner decision — 2026-11-22: Dolibarr Core parity with Massaction-specific safety
 
+## Owner amendment ADR-08A (2026-11-25)
+
+[Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22)
+authorizes CoreGuarded continuation after isolated standard SMTP uncertainty and
+a durable readback on the original consumed session. F38-02 remains historically
+closed; mandatory isolated-mail termination is partially superseded. Confirmed
+business and verified PDF evidence remain valid and the affected mail outcome stays
+UNKNOWN. Existing admission, replay, integrity and all other STOP rules continue.
+Earlier outcomes retain their recorded source and disposition.
+
 ## Final implementation ratification and findings after PR #38
 
 **Authoritative post-PR #38 state (2026-11-24):** [PR #38](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/38) was independently reviewed and **squash-merged** into `main` as `0998fbaf58155cca04d31ab99c6bb47420e53c72`; reviewed HEAD `b15b93580f995fb05a696a125c2a5fd995dd4bb3` has **identical Git tree** `a6e7256fb1572361c4dd4d850124ca7a6afff566`. The independent verdict was **APPROVED FOR DEVELOPMENT MERGE WITH DOCUMENTED LIMITATIONS**, with exact-source Standard 9/9 + Full 21/21 + Hosted 1/1 (**31/31**) synthetic CI PASS. Phase 4 development is merged; **Phase 5 real A–D integration, CF05-07, package, hosted and Owner release acceptance are NOT complete**. All older dated DRAFT/finance-default-deny/core-source-allowlist statements below are historical and not current requirements.

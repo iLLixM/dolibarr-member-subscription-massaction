@@ -1,5 +1,16 @@
 # Required risk-based test strategy
 
+## ADR-08A regression and qualification
+
+Exercise the production orchestrator with a four-member batch, first and
+multiple isolated errors, invoice/contribution-only evidence, durable readback
+before the next member and one-shot booking/mail capabilities. Check
+contradictory evidence, unqualified hooks, lost checkpoints, DB/PDF uncertainty
+and terminal context still STOP. Local real proof uses a fixed no-relay sink
+and the Core SMTP route in B, with targeted unchanged successful A/C batches,
+fresh fixtures, backups, independent SQL/documents and replay/readback. Retain
+source-bound sanitized results. Hosted D delta needs separate authorization.
+
 ## Current Phase-5 validation and test boundaries – 2026-11-24
 
 **Phase 4 development provenance (2026-11-24):** [PR #38](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/38) was independently reviewed and **squash-merged** into `main` as `0998fbaf58155cca04d31ab99c6bb47420e53c72`; reviewed HEAD `b15b93580f995fb05a696a125c2a5fd995dd4bb3` has **identical Git tree** `a6e7256fb1572361c4dd4d850124ca7a6afff566`. The independent verdict was **APPROVED FOR DEVELOPMENT MERGE WITH DOCUMENTED LIMITATIONS**, with exact-source Standard 9/9 + Full 21/21 + Hosted 1/1 (**31/31**) synthetic CI PASS. Phase 4 development is merged; **Phase 5 real A–D integration, CF05-07, package, hosted and Owner release acceptance are NOT complete**. All older dated DRAFT/finance-default-deny/core-source-allowlist statements below are historical and not current requirements.

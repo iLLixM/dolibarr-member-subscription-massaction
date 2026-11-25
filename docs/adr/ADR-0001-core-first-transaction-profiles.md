@@ -1,5 +1,27 @@
 # ADR-0001 — Core-first transaction profiles
 
+## ADR-08A — Isolated post-COMMIT SMTP failure (2026-11-25)
+
+The [Owner amendment](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22)
+partially supersedes F38-02's mandatory STOP for an isolated regular Core SMTP
+failure. After an acknowledged nonterminal COMMIT, CoreGuarded may admit the
+next independent member once it durably writes and reopens the original consumed
+file session with the truthful mail outcome. Business success and verified PDF
+remain intact. Mail is UNKNOWN, with attachment UNKNOWN for invoice mail and
+NOT_REQUIRED for contribution-only mail. Recheck the same connection, fresh
+nonterminal guard and qualified runtime before continuing; every next member
+still enters through the original processing capability and normal admission.
+
+Classify only errors newly observed on the same Core SMTPs instance and
+propagated through CMailFile on the standard SMTP path. Preserve Core member
+substitutions, sender, tracking, addressing and attachments. An active
+subscription or mail extension, non-observable transport or OAuth context
+does not provide that classification; these configurations retain their
+regular dispatch and conservative uncertainty handling. Unknown adapter/hook
+effects, invalid evidence, checkpoint failures, uncertain PDF/DB completion and
+terminal context still STOP. No resend, retry, compensation, change to Core or
+new persistence journal. EnhancedMySQL and MariaDBSnapshot are unchanged.
+
 ## Current ADR-06/11/12 application after PR #38 – 2026-11-24
 
 **Authoritative post-PR #38 state (2026-11-24):** [PR #38](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/38) was independently reviewed and **squash-merged** into `main` as `0998fbaf58155cca04d31ab99c6bb47420e53c72`; reviewed HEAD `b15b93580f995fb05a696a125c2a5fd995dd4bb3` has **identical Git tree** `a6e7256fb1572361c4dd4d850124ca7a6afff566`. The independent verdict was **APPROVED FOR DEVELOPMENT MERGE WITH DOCUMENTED LIMITATIONS**, with exact-source Standard 9/9 + Full 21/21 + Hosted 1/1 (**31/31**) synthetic CI PASS. Phase 4 development is merged; **Phase 5 real A–D integration, CF05-07, package, hosted and Owner release acceptance are NOT complete**. All older dated DRAFT/finance-default-deny/core-source-allowlist statements below are historical and not current requirements.
