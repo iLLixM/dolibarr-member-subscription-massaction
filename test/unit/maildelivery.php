@@ -10,7 +10,7 @@ $passed = 0;
 function checkMail($ok, $label) { global $passed; if (!$ok) { throw new RuntimeException($label); } $passed++; }
 function getDolGlobalString($key) { return $GLOBALS['mail_configuration'][$key]
 	?? ($key === 'ADHERENT_EMAIL_TEMPLATE_SUBSCRIPTION' ? 'Synthetic template' : ''); }
-function isModEnabled($module) { return true; }
+function isModEnabled($module) { return !in_array($module, $GLOBALS['mail_disabled_modules'] ?? array(), true); }
 function getDolGlobalInt($key) { return 0; }
 function isValidEmail($s) { return strpos($s, '@') !== false; }
 function dol_escape_htmltag($s) { return htmlspecialchars($s, ENT_QUOTES); }
@@ -168,7 +168,11 @@ checkMail(!msmValidMailAttachmentEvidence(array('mail'=>'transport','attachment'
 	&& !msmValidMailAttachmentEvidence(array('mail'=>'hook','attachment'=>'verified_for_transport'),true),
 	'F38-05 contradictory adapter evidence pairs never redeem successful effect');
 // ADR-08A: transport identity and newly propagated Core errors, never error text alone.
-class HookManager { public $hooks = array(); }
+class HookManager
+{
+	public $hooks = array();
+	public function executeHooks($name, $params, &$object, &$action) { return 0; }
+}
 class SMTPs
 {
 	public $error = '';
@@ -192,18 +196,64 @@ class ObservedMailFixture
 class ObservedDeliveryAdapter extends MsmSubscriptionMail
 {
 	public function observe($mail, &$isolated) { return $this->sendObservedSmtp($mail, $isolated); }
+	protected function permitted($user) { return true; }
+	protected function hooks() { return $GLOBALS['mail_hook_fixture']; }
+	public function inspectStandardPath($member, array $row, $user)
+	{
+		$started = $isolated = false;
+		$status = $this->sendInternal($member, $row, $user, true, null, $started, $isolated);
+		return array($status, $started, $isolated);
+	}
 }
 $hookmanager = new HookManager();
 $mail_configuration = array('MAIN_MAIL_SENDMODE'=>'smtps');
 $observed = new ObservedDeliveryAdapter(new stdClass());
-foreach (array('isolated', 'success', 'replacement', 'mismatch', 'unqualified', 'stale', 'hook') as $scenario) {
+foreach (array('isolated', 'success', 'replacement', 'mismatch', 'unqualified', 'stale', 'stale_mail', 'hook') as $scenario) {
 	$transport = new ObservedMailFixture($scenario);
 	if ($scenario === 'stale') { $transport->smtps->error = 'already present'; }
+	if ($scenario === 'stale_mail') { $transport->error = 'pre-existing CMailFile error'; }
 	$conf->modules_parts['hooks'] = $scenario === 'hook' ? array('synthetic'=>'mail') : array();
 	$isolated = false;
 	$result = $observed->observe($transport, $isolated);
 	checkMail($transport->calls === 1 && $isolated === ($scenario === 'isolated')
 		&& $result === ($scenario === 'success' ? 'transport' : 'failed'),
 		'ADR-08A strict Core outcome boundary '.$scenario);
+}
+// F49-03: real context selection in the module and the ordinary delivery
+// branch for unqualified configurations. All transport responses are doubles.
+$defaultSmtp = array('MAIN_MAIL_SENDMODE'=>'smtps');
+$contextCases = array(
+	'global XOAUTH2' => array($defaultSmtp + array('MAIN_MAIL_SMTPS_AUTH_TYPE'=>'XOAUTH2'), array(), false),
+	'standard XOAUTH2' => array($defaultSmtp + array('MAIN_MAIL_SENDMODE_STANDARD'=>'smtps','MAIN_MAIL_SMTPS_AUTH_TYPE_STANDARD'=>'XOAUTH2'), array(), false),
+	'default override inherits global XOAUTH2' => array($defaultSmtp + array('MAIN_MAIL_SENDMODE_STANDARD'=>'default','MAIN_MAIL_SMTPS_AUTH_TYPE'=>'XOAUTH2'), array(), false),
+	'standard transport overrides SMTP' => array($defaultSmtp + array('MAIN_MAIL_SENDMODE_STANDARD'=>'mail'), array(), false),
+	'standard SMTP overrides global auth choice' => array($defaultSmtp + array('MAIN_MAIL_SENDMODE_STANDARD'=>'smtps','MAIN_MAIL_SMTPS_AUTH_TYPE'=>'XOAUTH2','MAIN_MAIL_SMTPS_AUTH_TYPE_STANDARD'=>'LOGIN'), array(), true),
+	'standard default inherits SMTP' => array($defaultSmtp + array('MAIN_MAIL_SENDMODE_STANDARD'=>'default'), array(), true),
+	'explicit standard SMTP overrides other global mode' => array(array('MAIN_MAIL_SENDMODE'=>'mail','MAIN_MAIL_SENDMODE_STANDARD'=>'smtps'), array(), true),
+	'enabled all context' => array($defaultSmtp, array('synthetic'=>array('all')), false),
+	'enabled subscription context' => array($defaultSmtp, array('synthetic'=>'thirdparty:subscription'), false),
+	'enabled mail context' => array($defaultSmtp, array('synthetic'=>array('mail')), false),
+	'unrelated enabled hook' => array($defaultSmtp, array('synthetic'=>array('thirdparty')), true),
+	'disabled module' => array($defaultSmtp, array('disabled'=>'subscription:mail'), true),
+	'loaded hook' => array($defaultSmtp, array(), false),
+	'replacement hook manager' => array($defaultSmtp, array(), false),
+);
+$mail_disabled_modules = array('disabled');
+foreach ($contextCases as $label => list($mail_configuration, $registrations, $qualifies)) {
+	$conf->modules_parts['hooks'] = $registrations;
+	$mail_hook_fixture = $label === 'replacement hook manager' ? new DeliveryHooks() : new HookManager();
+	if ($label === 'loaded hook') { $mail_hook_fixture->hooks = array('subscription'=>array(new stdClass())); }
+	$hookmanager = $mail_hook_fixture;
+	$transport = new ObservedMailFixture('isolated');
+	$isolated = false;
+	checkMail($observed->observe($transport, $isolated) === 'failed' && $transport->calls === 1
+		&& $isolated === $qualifies, 'F49-03 bounded SMTP evidence '.$label);
+	if (!$qualifies) {
+		$legacy = new Adherent();
+		$legacy->returnCode = -1;
+		unset($GLOBALS['last_mail']);
+		checkMail($observed->inspectStandardPath($legacy, $row, new stdClass()) === array('failed', true, false)
+			&& isset($GLOBALS['last_mail']), 'F49-03 ordinary Core fallback remains unqualified '.$label);
+	}
 }
 echo $passed." mail adapter assertions passed (template/type/transport doubles; no SMTP).\n";

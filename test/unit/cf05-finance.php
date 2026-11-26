@@ -6,6 +6,7 @@
 // orchestration. Local invalid PDF temporary file, no Dolibarr DB, HTTP or SMTP.
 if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 ob_start();
+require __DIR__.'/coreguarded.php'; // Reuse the native-boundary DB fixture; invoice tests reset the assertion counter.
 require __DIR__.'/invoice.php';
 require_once __DIR__.'/../../class/invoicepdf.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/modules/syslog/mod_syslog_file.php';
@@ -186,7 +187,7 @@ class Cf05InvalidWrittenPdf extends MsmInvoicePdfService
 class Cf05FinanceMailSpy extends MsmSubscriptionMail
 {
 	public $calls=0; public $status='transport'; public $throws=false; public $loseCheckpointKey=null;
-	public $transportFailures=array(); public $members=array();
+	public $transportFailures=array(); public $members=array(); public $opaqueFailure=false;
 	protected function evidenceProfile() {
 		global $conf;
 		return new Cf05QualifiedFinanceProfile($this->db,new SyntheticDatabaseState($this->db),(int)$conf->entity);
@@ -203,6 +204,7 @@ class Cf05FinanceMailSpy extends MsmSubscriptionMail
 			return 'failed';
 		}
 		if ($this->throws) { throw new RuntimeException('Synthetic uncertain SMTP after attempted effect'); }
+		if ($this->opaqueFailure) { return 'failed'; }
 		return $selected?$this->status:'not_selected';
 	}
 }
@@ -267,8 +269,55 @@ $conf->global->SYSLOG_FILE=$cf05Tmp.'/qualified.log';
 $conf->modules=array('member'=>1,'invoice'=>1,'societe'=>1,'syslog'=>1);
 $conf->loghandlers=array(new mod_syslog_file());
 try {
+	session_id('msmcontext'.bin2hex(random_bytes(8)));
+	// Call the production service and production guard logic directly, with
+	// only the native handle and SQL responses supplied by the existing fixture.
+	foreach (array('valid', 'chain', 'release', 'lost_ack', 'depth', 'replacement',
+		'thread', 'read_failure', 'changed_autocommit', 'changed_completion', 'runtime') as $case) {
+		$db = new CgFixtureDB();
+		$db->mode = $case === 'chain' ? 'CHAIN' : ($case === 'release' ? 'RELEASE' : 'NO_CHAIN');
+		$guard = new CgFixtureAdapter($db);
+		$service = new class($db, $guard) extends MsmBookingService {
+			private $fixtureGuard;
+			public function __construct($db, $guard) { parent::__construct($db); $this->fixtureGuard = $guard; }
+			protected function coreTransaction() { return $this->fixtureGuard; }
+		};
+		verify($guard->beforeBegin()['state'] === MsmDatabaseState::IDLE && $guard->begin(), 'F49-03 synthetic Core entry '.$case);
+		$guard->beforeCompletion();
+		$ack = $db->commit();
+		$completed = $guard->completed('COMMIT', $case === 'lost_ack' ? false : $ack);
+		verify($completed['state'] === ($case === 'lost_ack' ? MsmDatabaseState::UNKNOWN : MsmDatabaseState::IDLE),
+			'F49-03 fixture completion '.$case);
+		$originalLoggers = $conf->loghandlers;
+		switch ($case) {
+			case 'depth': $db->transaction_opened = 1; break;
+			case 'replacement': $db->handle = clone $db->handle; break;
+			case 'thread': $db->handle->id = '1452'; break;
+			case 'read_failure': $db->readFail = true; break;
+			case 'changed_autocommit': $db->autocommit = '0'; break;
+			case 'changed_completion': $db->mode = 'CHAIN'; break;
+			case 'runtime': $conf->loghandlers = array(); break;
+		}
+		$offset = count($db->commands);
+		try {
+			if ($case === 'valid') { $service->requireIsolatedMailContinuation(); }
+			else {
+				$reason = array('read_failure'=>'MSMDatabaseObservationUnavailable',
+					'changed_autocommit'=>'MSMTransactionUnsupported', 'runtime'=>'MSMCoreGuardedLoggerUnsupported');
+				fails(static function () use ($service) { $service->requireIsolatedMailContinuation(); },
+					$reason[$case] ?? 'MSMTransactionUnknown');
+			}
+		} finally {
+			$conf->loghandlers = $originalLoggers;
+		}
+		$observes = in_array($case, array('valid','read_failure','changed_autocommit','changed_completion'), true);
+		verify(array_slice($db->commands, $offset) === ($observes
+			? array('SELECT CONNECTION_ID() AS cid, @@SESSION.autocommit AS ac, @@SESSION.completion_type AS completion') : array()),
+			'F49-03 context check must perform no write, transaction action or unexpected SQL '.$case);
+	}
+
 	foreach (array('one_with_invoice', 'multiple_contribution_only', 'context_failure', 'checkpoint_failure',
-		'unqualified', 'contradictory') as $scenario) {
+		'unqualified', 'opaque_transport_error', 'contradictory') as $scenario) {
 		$key = str_repeat('b', 32);
 		$db = new Cf05FinanceDb();
 		$profile = new Cf05QualifiedFinanceProfile($db, new SyntheticDatabaseState($db), 1);
@@ -299,6 +348,7 @@ try {
 		$mail->transportFailures = $uncertain;
 		if ($scenario === 'checkpoint_failure') { $mail->loseCheckpointKey = $key; }
 		if ($scenario === 'unqualified') { $mail->transportFailures = array(); $mail->throws = true; }
+		if ($scenario === 'opaque_transport_error') { $mail->transportFailures = array(); $mail->opaqueFailure = true; }
 		if ($scenario === 'contradictory') {
 			$mail = new class($db) extends Cf05FinanceMailSpy {
 				public function sendWithEvidence($member, array $row, $user, $selected, array $invoice = null, $checkpoint = null, $id = null)

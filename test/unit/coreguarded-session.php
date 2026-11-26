@@ -6,10 +6,12 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 require_once __DIR__.'/../../class/filebookingcheckpoint.class.php';
 $passed = 0;
 function verifySession($ok, $name) { global $passed; if (!$ok) { throw new RuntimeException('FAILED '.$name); } $passed++; }
-function denySession(callable $fn, $name)
+function denySession(callable $fn, $name, $reason = null)
 {
 	try { $fn(); } catch (RuntimeException $e) {
-		verifySession(in_array($e->getMessage(), array('MSMCoreGuardedSessionUnsupported', 'MSMSessionFailure'), true), $name); return;
+		verifySession($reason === null
+			? in_array($e->getMessage(), array('MSMCoreGuardedSessionUnsupported', 'MSMSessionFailure'), true)
+			: $e->getMessage() === $reason, $name); return;
 	}
 	throw new RuntimeException('Expected denial '.$name);
 }
@@ -33,6 +35,11 @@ try {
 	// The owner can open known files but cannot list the session directory.
 	verifySession(chmod($root, 0300), 'configure non-listable session directory');
 	clearstatcache(true, $root);
+	$effectiveUid = function_exists('posix_geteuid') ? posix_geteuid() : fileowner($root);
+	verifySession(is_int($effectiveUid) && $effectiveUid > 0, 'F45-01 unprivileged session owner required');
+	$listing = @opendir($root);
+	if (is_resource($listing)) { closedir($listing); }
+	verifySession($listing === false, 'F45-01 actual directory listing denied');
 	session_id($sessionid); verifySession(session_start(), 'start isolated file session');
 	$_SESSION = array('msm_previews'=>array($key=>array('owner'=>18,'entity'=>1,'phase'=>'confirm','revision'=>5,
 		'profile'=>$binding,'ids'=>array(7),'options'=>$opts,'rows'=>$rows,
@@ -51,19 +58,45 @@ try {
 	$replayed = new MsmFileBookingCheckpoint($key);
 	denySession(static function()use($replayed,$binding,$user,$confirmed,$opts){$replayed->requireProcessing(7,$binding,$user,$confirmed,$opts);},'new checkpoint after consumption denied');
 	denySession(static function() use ($checkpoint,$binding,$user,$confirmed,$opts) { $checkpoint->requireProcessing(8,$binding,$user,$confirmed,$opts); }, 'unknown member denied');
-	$wrong=$confirmed; $wrong['amount']=999;
-	denySession(static function()use($checkpoint,$binding,$user,$wrong,$opts){$checkpoint->requireProcessing(7,$binding,$user,$wrong,$opts);},'wrong expected amount denied');
-	$wrong=$binding;$wrong['owner']=99;
-	denySession(static function()use($checkpoint,$wrong,$user,$confirmed,$opts){$checkpoint->requireProcessing(7,$wrong,$user,$confirmed,$opts);},'forged profile binding denied');
-	$changed=$opts;$changed['invoice']=true;
-	denySession(static function()use($checkpoint,$binding,$user,$confirmed,$changed){$checkpoint->requireProcessing(7,$binding,$user,$confirmed,$changed);},'forged invoice option denied');
-	$wrong=(object)array('id'=>99);
-	denySession(static function()use($checkpoint,$binding,$wrong,$confirmed,$opts){$checkpoint->requireProcessing(7,$binding,$wrong,$confirmed,$opts);},'different user denied');
+	// F45-02: each mismatch reaches requireProcessing as its first invocation
+	// on a new original confirmation. A valid call on the same checkpoint
+	// after refusal proves the mismatch was not rejected as capability replay.
+	$original = $updated;
+	$original['phase'] = 'confirm';
+	$original['revision']--;
+	foreach (array('amount', 'options', 'profile', 'user') as $field) {
+		$testKey = bin2hex(random_bytes(16));
+		verifySession(session_start(), 'F45-02 open fresh confirmation '.$field);
+		$_SESSION['msm_previews'][$testKey] = $original;
+		$testCheckpoint = new MsmFileBookingCheckpoint($testKey);
+		$_SESSION['msm_previews'][$testKey] = $updated;
+		verifySession(session_write_close(), 'F45-02 persist consumed original '.$field);
+		$before = file_get_contents($root.'/sess_'.$sessionid);
+		$actual = array($binding, $user, $confirmed, $opts);
+		switch ($field) {
+			case 'amount': $actual[2]['amount'] = 999; break;
+			case 'options': $actual[3]['sendmail'] = true; break;
+			case 'profile': $actual[0]['revision'] = 'different'; break;
+			case 'user': $actual[1] = (object) array('id'=>99); break;
+		}
+		$businessCalls = 0;
+		denySession(static function () use ($testCheckpoint, $actual, &$businessCalls) {
+			$testCheckpoint->requireProcessing(7, ...$actual);
+			$businessCalls++;
+		}, 'F45-02 first mismatched '.$field.' denied', 'MSMCoreGuardedSessionUnsupported');
+		verifySession($businessCalls === 0 && session_status() === PHP_SESSION_NONE
+			&& file_get_contents($root.'/sess_'.$sessionid) === $before, 'F45-02 no admitted effect or state mutation '.$field);
+		$testCheckpoint->requireProcessing(7, $binding, $user, $confirmed, $opts);
+		verifySession(session_status() === PHP_SESSION_NONE, 'F45-02 original capability still admits exact input '.$field);
+	}
 	$updated['results'][7]['status'] = 'success';
 	$checkpoint($updated);
 	verifySession(session_start(), 'reopen after saving result');
 	verifySession($_SESSION['msm_previews'][$key]['results'][7]['status'] === 'success', 'read back saved result');
 	verifySession(session_write_close(), 'close persisted result');
+	verifySession(is_file($root.'/sess_'.$sessionid) && file_get_contents($root.'/sess_'.$sessionid) !== false,
+		'F45-01 known session file readable after persisted roundtrip');
+	verifySession(@opendir($root) === false, 'F45-01 listing still denied after readback');
 	denySession(static function()use($checkpoint,$binding,$user,$confirmed,$opts){$checkpoint->requireProcessing(7,$binding,$user,$confirmed,$opts);},'completed member cannot be booked twice');
 	verifySession(session_start(), 'reopen for phase completion');
 	$_SESSION['msm_previews'][$key]['phase']='done';
@@ -204,6 +237,24 @@ try {
 	denySession(static function()use($financeCheckpoint,$user,$persistedInvoice,$currentFinanceProfile,$recipient,$mailRow){
 		$financeCheckpoint->requireMailEvidence(7,$user,$persistedInvoice,$currentFinanceProfile,$recipient,$mailRow);
 	},'F38-03 post-effect mail evidence replay denied');
+	// F49-03: the files handler really writes successfully, then reopening
+	// deserializes the marker as a different object. The production strict
+	// readback comparison must reject this deliberately malformed test state.
+	verifySession(session_start(), 'F49-03 load original consumed checkpoint');
+	$persisted = $_SESSION['msm_previews'][$financeKey];
+	verifySession(session_abort(), 'F49-03 close before isolated result write');
+	$persisted['results'][7]['attachment_status'] = 'unknown';
+	$persisted['test_readback_marker'] = (object) array('value'=>'written');
+	denySession(static function () use ($financeCheckpoint, $persisted) {
+		$financeCheckpoint($persisted, 7);
+	}, 'F49-03 exact post-write readback required', 'MSMSessionFailure');
+	verifySession(session_status() === PHP_SESSION_NONE && session_start(), 'F49-03 reopen after rejected readback');
+	$reopened = $_SESSION['msm_previews'][$financeKey];
+	verifySession(($reopened['test_readback_marker']->value ?? null) === 'written'
+		&& ($reopened['results'][7]['attachment_status'] ?? null) === 'unknown'
+		&& $reopened !== $persisted, 'F49-03 new bytes were persisted before readback rejected evidence');
+	unset($_SESSION['msm_previews'][$financeKey]['test_readback_marker']);
+	verifySession(session_write_close(), 'F49-03 clear fixture marker');
 	verifySession(session_start(), 'CF05 change completion to terminal');
 	$_SESSION['msm_previews'][$financeKey]['results'][7]['completion']='terminal_acknowledged';
 	verifySession(session_write_close(), 'CF05 terminal result persisted');

@@ -155,6 +155,93 @@ try {
 		}
 	}
 
+	// F50-02/03: selected effects may run for the acknowledged predecessor
+	// only. Fault the terminal write specifically, with the earlier state on disk.
+	foreach (array('MariaDBSnapshot', 'EnhancedMySQL') as $profile) {
+		foreach (array('unknown', 'success', 'save_failure') as $case) {
+			$ids = array(1, 2, 3);
+			$confirmation = array('phase'=>'confirm', 'revision'=>1, 'ids'=>$ids,
+				'profile'=>array('profile'=>$profile), 'rows'=>array_fill_keys($ids, $renderState['rows'][1]),
+				'options'=>array('invoice'=>true, 'sendmail'=>true));
+			$post = array('action'=>'book','revision'=>'1');
+			$consumed = msmConsumeConfirmation($confirmation, $post);
+			session_id('msmterminallegacy'.bin2hex(random_bytes(8)));
+			verify(session_start(), 'F50 open isolated session '.$profile.'/'.$case);
+			$_SESSION = array('msm_previews'=>array($key=>$consumed));
+			$fileSave = new MsmFileBookingCheckpoint($key);
+			verify(session_write_close(), 'F50 persist consumed confirmation');
+			$events = new ArrayObject();
+			$service = new class($events, $case) {
+				private $events;
+				private $case;
+				public function __construct($events, $case) { $this->events = $events; $this->case = $case; }
+				public function book($id, $row, $options, $user, $overlap)
+				{
+					if (!in_array($id, array(1, 2), true) || !$options['invoice'] || !$options['sendmail']) {
+						throw new LogicException('F50 unexpected booking or disabled effects');
+					}
+					$this->events[] = 'book '.$id;
+					$result = array('status'=>'success','id'=>$id,'amount'=>12,'message'=>'MSMBooked','stop'=>$id === 2,
+						'_member'=>(object) array('id'=>$id),'mail'=>'not_selected','invoice'=>array('id'=>$id));
+					if ($id === 2 && $this->case !== 'success') {
+						return array('status'=>'unknown','id'=>0,'amount'=>0,'message'=>'MSMTransactionUnknown','stop'=>true,'mail'=>'unknown');
+					}
+					return $result;
+				}
+			};
+			$effects = new class($events) {
+				private $events;
+				public function __construct($events) { $this->events = $events; }
+				public function generate($invoice, $user)
+				{
+					if ($invoice['id'] !== 1) { throw new LogicException('F50 prohibited PDF at or after STOP'); }
+					$this->events[] = 'pdf 1';
+					return array('status'=>'verified','message'=>'MSMPdfVerified');
+				}
+				public function send($member, $row, $user, $selected, $invoice)
+				{
+					if ($member->id !== 1 || !$selected || ($invoice['pdf']['status'] ?? null) !== 'verified') {
+						throw new LogicException('F50 prohibited mail at or after STOP');
+					}
+					$this->events[] = 'mail 1';
+					return 'transport';
+				}
+			};
+			$previous = $terminal = null;
+			$terminalSave = static function ($updated) use ($fileSave, $case, $events, &$previous, &$terminal) {
+				if (!empty($updated['batch_stop'])) {
+					if ($terminal !== null || $updated['phase'] !== 'done') { throw new LogicException('F50 invalid terminal save'); }
+					$terminal = $updated;
+					$events[] = 'terminal save';
+					if ($case === 'save_failure') { return false; }
+				} else {
+					$previous = $updated;
+				}
+				$fileSave($updated);
+				return true;
+			};
+			$book = static function () use ($consumed, $service, $effects, $terminalSave) {
+				return msmProcessBooking($consumed, $service, $effects, new PreviewUser(), $terminalSave, $effects);
+			};
+			if ($case === 'save_failure') { fails($book, 'MSMSessionFailure'); }
+			else { verify($book() === $terminal, 'F50 completed result matches saved terminal state'); }
+			verify($events->getArrayCopy() === array('book 1','pdf 1','mail 1','book 2','terminal save'),
+				'F50 no work at or after STOP '.$profile.'/'.$case);
+			verify($terminal['batch_stop'] && $terminal['results'][1] === $previous['results'][1]
+				&& $terminal['results'][2]['status'] === ($case === 'success' ? 'success' : 'unknown')
+				&& $terminal['results'][3]['status'] === 'not_processed', 'F50 intended terminal result '.$profile.'/'.$case);
+			verify(session_start(), 'F50 reopen persisted session');
+			$stored = $_SESSION['msm_previews'][$key];
+			verify(session_abort(), 'F50 close readback');
+			verify($stored === ($case === 'save_failure' ? $previous : $terminal)
+				&& $stored['results'][1]['status'] === 'success'
+				&& $stored['results'][1]['mail'] === 'transport'
+				&& $stored['results'][1]['invoice']['pdf']['status'] === 'verified',
+				'F50 preserve previous durable effects and distinguish failed terminal save '.$profile.'/'.$case);
+			fails(static function () use ($stored, $post) { msmConsumeConfirmation($stored, $post); }, 'MSMInvalidForm');
+		}
+	}
+
 	// No arbitrary save callback may follow a Core-Guarded completion.
 	$customCalls = 0;
 	fails(static function () use ($state,$spy,$effect,&$customCalls) { msmProcessBooking($state,$spy,$effect,new PreviewUser(),static function()use(&$customCalls){$customCalls++;}); }, 'MSMCoreGuardedSessionUnsupported');

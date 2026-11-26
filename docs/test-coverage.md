@@ -35,9 +35,9 @@ reviewer receives these compact results under modified OD-P5-02.
 
 ### Hosted D delta and remaining test hardening (2026-11-26)
 
-**2026-11-26 ADR-08A status:** ADR-08A technical implementation ACCEPTED on `8bc36c4d4aab423e644276999066339ec1a5fd3c` (independent review 2026-11-26); local controlled B and positive A/C evidence on `1ac1a8f2dfd7384829fa5b85235f1e4884d689db`; Hosted D delta PASS WITH DOCUMENTED LIMITATIONS on the reported integrated checkout `8bc36c4d4aab423e644276999066339ec1a5fd3c` (positive SMTP/replay and separate Owner-run natural-error observation). Formal development qualification CLOSED WITH DOCUMENTED LIMITATIONS; F49-01/P2 and F49-02/P3 independently closed before the verified #49 squash. F49-03/P3 OPEN, NON-BLOCKING TEST HARDENING. No additional real tests required for this bounded acceptance. See [Hosted D delta evidence](evidence/cf03/adr-08a-hosted-d-2026-11-26.md). The [current development baseline](current-development-baseline.md) governs current qualification and supersedes earlier dated checkpoints.
+**2026-11-26 ADR-08A status:** ADR-08A technical implementation ACCEPTED on `8bc36c4d4aab423e644276999066339ec1a5fd3c` (independent review 2026-11-26); local controlled B and positive A/C evidence on `1ac1a8f2dfd7384829fa5b85235f1e4884d689db`; Hosted D delta PASS WITH DOCUMENTED LIMITATIONS on the reported integrated checkout `8bc36c4d4aab423e644276999066339ec1a5fd3c` (positive SMTP/replay and separate Owner-run natural-error observation). Formal development qualification CLOSED WITH DOCUMENTED LIMITATIONS; F49-01/P2 and F49-02/P3 independently closed before the verified #49 squash. F49-03/P3 FIX IMPLEMENTED – INDEPENDENT REVIEW PENDING. No additional real tests required for this bounded acceptance. See [Hosted D delta evidence](evidence/cf03/adr-08a-hosted-d-2026-11-26.md). The [current development baseline](current-development-baseline.md) governs current qualification and supersedes earlier dated checkpoints.
 
-F49-03/P3 OPEN – NON-BLOCKING TEST HARDENING: later test-only follow-up for direct negative `requireIsolatedMailContinuation()` tests (not just orchestration spy), XOAUTH2, pre-existing CMailFile error, SMTP context configuration and hook registration variants, and failed readback after successful session write. No test implementation in this documentation correction.
+F49-03/P3 FIX IMPLEMENTED – INDEPENDENT REVIEW PENDING. See the [individual test traceability](test-coverage.md#v010-pre-release-test-hardening).
 
 ## Updated evidence legend after PR #38 merge
 
@@ -581,3 +581,22 @@ the changed STOP branch on real bookings require fault induction outside this
 non-destructive case catalog. First, intermediate and final STOP and
 checkpoint-failure evidence remain synthetic. Hosted D is outside the CPC-02
 live scope; Hosted CI is synthetic.
+
+## v0.1.0 pre-release test hardening
+
+All five dispositions are **FIX IMPLEMENTED – INDEPENDENT REVIEW PENDING**.
+
+| Finding | Test and verified result | Evidence boundary |
+| --- | --- | --- |
+| F45-01/P3 | [coreguarded-session.php](../test/unit/coreguarded-session.php) actually denied `opendir()` on mode `0300`; the production file-session checkpoint wrote, closed, reopened and read back the known session file while the directory remained non-listable. PASS on PHP 8.2.35 under effective UID 1000. | Local unprivileged filesystem and PHP session runtime. Privileged execution cannot pass this proof. No provider configuration changed. |
+| F45-02/P3 | [coreguarded-session.php](../test/unit/coreguarded-session.php) rejected first-invocation amount, option, profile revision and user mismatches. Each case used a new original confirmation and untouched one-shot checkpoint; bytes and downstream effect count stayed unchanged. The same checkpoint accepted an exact-input control after refusal. PASS. | Synthetic confirmation through the actual file-session boundary; no business DML. Separate replay assertions remain. |
+| F49-03/P3 | [cf05-finance.php](../test/unit/cf05-finance.php) called the production continuation method and transaction guard with native/DB doubles. Qualified context passed; terminal, uncertain, changed and unobservable contexts refused. Opaque transport failure remained UNKNOWN/STOP. [maildelivery.php](../test/unit/maildelivery.php) checked XOAUTH2, a pre-existing CMailFile error, context precedence and hook registrations while retaining qualified SMTP evidence. [coreguarded-session.php](../test/unit/coreguarded-session.php) persisted a synthetic marker through the native files handler, then rejected the deliberately non-identical reopened state. A subsequent read proved the new bytes had been written. PASS. | Synthetic transport/DB and isolated real file I/O. The readback test supplies a serialization mismatch, not a live storage fault. Existing orchestrator E15 tests cover the refusal-to-continue path. |
+| F50-02/P3 | [terminal.php](../test/unit/terminal.php), executed by `postcommit.php`, rejected a false terminal-save acknowledgement in MariaDBSnapshot and EnhancedMySQL after the earlier success/PDF/mail were durably saved in a test session. Reopening returned the earlier snapshot without a persisted terminal result; replay was rejected and the effect trace ended at the failed save. PASS. | Synthetic profile/service/save responses with actual PHP file-session snapshots. No real DB or session storage outage. |
+| F50-03/P3 | [terminal.php](../test/unit/terminal.php) explicitly selected invoice and mail for both A/C profiles. Effect spies allowed the predecessor's PDF and mail only and rejected any attempt for the STOP member or follower, including a confirmed business success triggering STOP. PASS. | Synthetic selected effects and terminal outcomes. No PDF rendered or SMTP sent. |
+
+Targeted local results: `coreguarded-session.php` 122 assertions;
+`maildelivery.php` 154; `cf05-finance.php` 449 and `terminal.php` 219
+against each pinned Core 22.0.5, 23.0.4 and 24.0.3.
+The previously accepted A/B/C mixed runs remain on
+`042c917bd5d8844c33758f8c26170fd7eb7ecb87`. There is no new live
+qualification, Hosted D operation or release-package evidence in this follow-up.
