@@ -189,7 +189,7 @@ verify($saved[1]['results'][2]['status'] === 'success' && $saved[1]['results'][2
 fails(static function () use ($done, $post) { msmConsumeConfirmation($done, $post); }, 'MSMInvalidForm');
 $failed['status'] = 'unknown'; $failed['stop'] = true; $service->outcomes = array($failed, $ok); $service->calls = 0; $mail->calls = 0;
 $done = msmProcessBooking($state, $service, $mail, $user, static function ($s) {});
-verify($service->calls === 1 && $mail->calls === 0 && $done['results'][2]['status'] === 'skipped', 'unknown commit stops batch and mail');
+verify($service->calls === 1 && $mail->calls === 0 && $done['results'][2]['status'] === 'not_processed' && $done['batch_stop'], 'C04-04/CPC-02 unknown commit stops batch and mail');
 // Failure to persist a post-commit checkpoint prevents any mail or later booking.
 $service->outcomes = array($ok, $ok); $service->calls = 0; $mail->calls = 0;
 try {

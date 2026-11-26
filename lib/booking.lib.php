@@ -67,11 +67,10 @@ function msmProcessBooking(array $state, $service, $mailer, $user, callable $sav
 		if (!($save instanceof MsmFileBookingCheckpoint)) { throw new RuntimeException('MSMCoreGuardedSessionUnsupported'); }
 		$save->requireBinding();
 	}
-	$stop = false;
 	foreach ($state['ids'] as $id) {
 		$row = $state['rows'][$id];
-		if ($stop || $row['errors'] || ($row['overlaps'] && empty($state['overlap'][$id]))) {
-			$state['results'][$id] = array('status' => 'skipped', 'message' => $stop ? 'MSMBatchStopped' : 'MSMNotConfirmed', 'id' => 0, 'amount' => 0, 'mail' => 'not_selected', 'stop' => false);
+		if ($row['errors'] || ($row['overlaps'] && empty($state['overlap'][$id]))) {
+			$state['results'][$id] = array('status' => 'skipped', 'message' => 'MSMNotConfirmed', 'id' => 0, 'amount' => 0, 'mail' => 'not_selected', 'stop' => false);
 			$save($state); continue;
 		}
 		$row['_profile'] = $state['profile'] ?? null;
@@ -90,21 +89,21 @@ function msmProcessBooking(array $state, $service, $mailer, $user, callable $sav
 				? 'not_processed' : 'not_required';
 		}
 		$member = $result['_member'] ?? null; unset($result['_member']);
-		if ($stop && $coreGuarded) {
+		if ($stop) {
 			$state['results'][$id] = $result;
-			if ($result['status'] === 'success') {
+			if ($coreGuarded && $result['status'] === 'success') {
 				$state['results'][$id]['mail'] = 'not_processed';
 				$state['results'][$id]['attachment_status'] = 'not_processed';
 				if (!empty($result['invoice'])) { $state['results'][$id]['invoice']['pdf'] = array('status' => 'not_processed', 'message' => 'MSMPdfNotProcessed'); }
 			}
 			msmStopUnprocessed($state, $id); $state['phase'] = 'done';
-			msmSaveBookingCheckpoint($state, $save, true);
+			msmSaveBookingCheckpoint($state, $save, $coreGuarded);
 			return $state; // Only the fixed DB-independent checkpoint may follow terminal completion.
 		}
-		if (!$stop && $result['status'] === 'success' && $state['options']['sendmail']) { $result['mail'] = 'unknown'; }
+		if ($result['status'] === 'success' && $state['options']['sendmail']) { $result['mail'] = 'unknown'; }
 		$state['results'][$id] = $result;
 		if (!msmSaveBookingCheckpoint($state, $save, $coreGuarded)) { msmStopUnprocessed($state, $id); return $state; } // No automatic rebook/resend.
-		if (!$stop && $result['status'] === 'success') {
+		if ($result['status'] === 'success') {
 			if (!empty($state['options']['invoice'])) {
 				$state['results'][$id]['invoice']['pdf'] = array('status' => 'unknown', 'message' => 'MSMPdfInterrupted');
 				if (!msmSaveBookingCheckpoint($state, $save, $coreGuarded)) { msmStopUnprocessed($state, $id); return $state; }
