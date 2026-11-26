@@ -8,7 +8,9 @@ define('DOL_DOCUMENT_ROOT', __DIR__.'/../fixtures');
 require __DIR__.'/../../class/mail.class.php';
 $passed = 0;
 function checkMail($ok, $label) { global $passed; if (!$ok) { throw new RuntimeException($label); } $passed++; }
-function getDolGlobalString($key) { return $key === 'ADHERENT_EMAIL_TEMPLATE_SUBSCRIPTION' ? 'Synthetic template' : ''; }
+function getDolGlobalString($key) { return $GLOBALS['mail_configuration'][$key]
+	?? ($key === 'ADHERENT_EMAIL_TEMPLATE_SUBSCRIPTION' ? 'Synthetic template' : ''); }
+function isModEnabled($module) { return true; }
 function getDolGlobalInt($key) { return 0; }
 function isValidEmail($s) { return strpos($s, '@') !== false; }
 function dol_escape_htmltag($s) { return htmlspecialchars($s, ENT_QUOTES); }
@@ -165,4 +167,43 @@ checkMail(!msmValidMailAttachmentEvidence(array('mail'=>'transport','attachment'
 	&& !msmValidMailAttachmentEvidence(array('mail'=>'failed','attachment'=>'verified_for_transport'),true)
 	&& !msmValidMailAttachmentEvidence(array('mail'=>'hook','attachment'=>'verified_for_transport'),true),
 	'F38-05 contradictory adapter evidence pairs never redeem successful effect');
+// ADR-08A: transport identity and newly propagated Core errors, never error text alone.
+class HookManager { public $hooks = array(); }
+class SMTPs
+{
+	public $error = '';
+	public function getErrors() { return $this->error; }
+}
+class ObservedMailFixture
+{
+	public $smtps; public $sendmode = 'smtps'; public $error = '';
+	public $calls = 0; public $scenario;
+	public function __construct($scenario) { $this->smtps = new SMTPs(); $this->scenario = $scenario; }
+	public function sendfile()
+	{
+		$this->calls++;
+		if ($this->scenario === 'success') { return true; }
+		if ($this->scenario === 'replacement') { $this->smtps = new SMTPs(); }
+		if ($this->scenario !== 'unqualified') { $this->smtps->error = 'synthetic new SMTP error'; }
+		$this->error = $this->scenario === 'mismatch' ? 'synthetic non-SMTP error' : $this->smtps->error;
+		return false;
+	}
+}
+class ObservedDeliveryAdapter extends MsmSubscriptionMail
+{
+	public function observe($mail, &$isolated) { return $this->sendObservedSmtp($mail, $isolated); }
+}
+$hookmanager = new HookManager();
+$mail_configuration = array('MAIN_MAIL_SENDMODE'=>'smtps');
+$observed = new ObservedDeliveryAdapter(new stdClass());
+foreach (array('isolated', 'success', 'replacement', 'mismatch', 'unqualified', 'stale', 'hook') as $scenario) {
+	$transport = new ObservedMailFixture($scenario);
+	if ($scenario === 'stale') { $transport->smtps->error = 'already present'; }
+	$conf->modules_parts['hooks'] = $scenario === 'hook' ? array('synthetic'=>'mail') : array();
+	$isolated = false;
+	$result = $observed->observe($transport, $isolated);
+	checkMail($transport->calls === 1 && $isolated === ($scenario === 'isolated')
+		&& $result === ($scenario === 'success' ? 'transport' : 'failed'),
+		'ADR-08A strict Core outcome boundary '.$scenario);
+}
 echo $passed." mail adapter assertions passed (template/type/transport doubles; no SMTP).\n";

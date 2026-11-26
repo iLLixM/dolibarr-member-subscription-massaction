@@ -44,6 +44,17 @@ class MsmBookingService
 			throw new RuntimeException($state['reason'] ?: 'MSMTransactionUnknown');
 		}
 	}
+	/** ADR-08A: recheck the same connection and a fresh nonterminal context. */
+	public function requireIsolatedMailContinuation()
+	{
+		MsmFileBookingCheckpoint::requireRuntime();
+		$guard = $this->coreTransaction();
+		if ($this->coreTerminal || !$guard->nonterminalAcknowledged()) {
+			throw new RuntimeException('MSMTransactionUnknown');
+		}
+		$this->coreGuardedReadiness();
+		if (!$guard->nonterminalAcknowledged()) { throw new RuntimeException('MSMTransactionUnknown'); }
+	}
 	/** Every invoice factory receives the SAME already-selected active guard; metadata remains separate. */
 	protected function invoicing() { require_once __DIR__.'/invoice.class.php'; return new MsmInvoiceService($this->db, $this->databaseState, $this->activeTransaction, $this->coreCheckpoint); }
 	protected function member($id)

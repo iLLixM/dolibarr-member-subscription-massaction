@@ -186,16 +186,22 @@ class Cf05InvalidWrittenPdf extends MsmInvoicePdfService
 class Cf05FinanceMailSpy extends MsmSubscriptionMail
 {
 	public $calls=0; public $status='transport'; public $throws=false; public $loseCheckpointKey=null;
+	public $transportFailures=array(); public $members=array();
 	protected function evidenceProfile() {
 		global $conf;
 		return new Cf05QualifiedFinanceProfile($this->db,new SyntheticDatabaseState($this->db),(int)$conf->entity);
 	}
 	protected function permitted($user) { return true; }
 	protected function invoicePermitted($user) { return true; }
-	protected function sendInternal($member,array $row,$user,$selected,$invoice,&$afterEffect) {
+	protected function sendInternal($member,array $row,$user,$selected,$invoice,&$afterEffect,&$isolatedSmtpFailure=null) {
 		$this->calls++;
+		$this->members[] = $member->id;
 		$afterEffect=true;
 		if ($this->loseCheckpointKey !== null) { cf05LosePersistedCheckpoint($this->loseCheckpointKey); }
+		if (in_array($member->id, $this->transportFailures, true)) {
+			$isolatedSmtpFailure = true;
+			return 'failed';
+		}
 		if ($this->throws) { throw new RuntimeException('Synthetic uncertain SMTP after attempted effect'); }
 		return $selected?$this->status:'not_selected';
 	}
@@ -205,6 +211,44 @@ class Cf05ProductionEvidenceMailSpy extends Cf05FinanceMailSpy
 	protected function evidenceProfile() {
 		global $conf;
 		return new MsmTransactionProfile($this->db,new SyntheticDatabaseState($this->db),(int)$conf->entity);
+	}
+}
+/** Exercise the actual batch, one-shot and persistence boundaries for four members. */
+class Adr08aBookingSpy
+{
+	public $members = array();
+	public $contextFails = false;
+	private $key;
+	private $uncertain;
+	public function __construct($key, array $uncertain) { $this->key = $key; $this->uncertain = $uncertain; }
+	public function requireIsolatedMailContinuation()
+	{
+		if ($this->contextFails) { throw new RuntimeException('MSMTransactionUnknown'); }
+	}
+	public function book($id, $row, $options, $user, $overlap, $checkpoint)
+	{
+		$checkpoint->requireProcessing($id, $row['_profile'], $user, $row, $options);
+		if ($this->members) {
+			verify(session_start(), 'ADR-08A reopen before next booking');
+			foreach ($this->members as $prior) {
+				$stored = $_SESSION['msm_previews'][$this->key]['results'][$prior];
+				$mail = in_array($prior, $this->uncertain, true) ? 'unknown' : 'transport';
+				verify($stored['status'] === 'success' && $stored['mail'] === $mail
+					&& $stored['attachment_status'] === (!$options['invoice'] ? 'not_required' :
+						($mail === 'unknown' ? 'unknown' : 'verified_for_transport')),
+					'ADR-08A each truthful outcome was read back before next booking');
+			}
+			session_abort();
+		}
+		$this->members[] = $id;
+		$member = (object) array('id'=>$id,'entity'=>1,'typeid'=>1,'email'=>'synthetic@example.invalid');
+		$checkpoint->bindMailRecipient($id, $member, $row);
+		$result = array('status'=>'success','completion'=>'nonterminal_acknowledged','stop'=>false,
+			'mail'=>'not_selected','message'=>'MSMBooked','id'=>$id,'amount'=>120,'_member'=>$member);
+		if ($options['invoice']) {
+			$result['invoice'] = array('id'=>$id+10,'entity'=>1,'member_id'=>$id,'pdf'=>'pending');
+		}
+		return $result;
 	}
 }
 $cf05Tmp=sys_get_temp_dir().'/cf05-finance-'.bin2hex(random_bytes(12));
@@ -223,6 +267,68 @@ $conf->global->SYSLOG_FILE=$cf05Tmp.'/qualified.log';
 $conf->modules=array('member'=>1,'invoice'=>1,'societe'=>1,'syslog'=>1);
 $conf->loghandlers=array(new mod_syslog_file());
 try {
+	foreach (array('one_with_invoice', 'multiple_contribution_only', 'context_failure', 'checkpoint_failure',
+		'unqualified', 'contradictory') as $scenario) {
+		$key = str_repeat('b', 32);
+		$db = new Cf05FinanceDb();
+		$profile = new Cf05QualifiedFinanceProfile($db, new SyntheticDatabaseState($db), 1);
+		$db->family = 'mysql';
+		$db->profileRaw = json_encode(array('version'=>1,'family'=>'mysql','profile'=>'CoreGuarded',
+			'nonce'=>str_repeat('e',32)), JSON_THROW_ON_ERROR);
+		$current = $profile->current();
+		$user = new PreviewUser();
+		$binding = $profile->binding($current, $user, 5);
+		$options = array('invoice'=>$scenario !== 'multiple_contribution_only','autocreate'=>false,
+			'sendmail'=>true,'description'=>'Synthetic');
+		$ids = array(1,2,3,4);
+		$row = array('fingerprint'=>'original','errors'=>array(),'overlaps'=>array());
+		$state = array('phase'=>'confirm','revision'=>5,'owner'=>$user->id,'entity'=>1,'ids'=>$ids,
+			'profile'=>$binding,'options'=>$options,'rows'=>array_fill_keys($ids, $row),
+			'results'=>array_fill_keys($ids, array('status'=>'unknown')));
+		session_id('msmadr08a'.bin2hex(random_bytes(8)));
+		verify(session_start(), 'ADR-08A start original confirmation');
+		$_SESSION = array('msm_previews'=>array($key=>$state));
+		$checkpoint = new MsmFileBookingCheckpoint($key);
+		$state = msmConsumeConfirmation($state, array('action'=>'book','revision'=>'5'));
+		$_SESSION['msm_previews'][$key] = $state;
+		verify(session_write_close(), 'ADR-08A persist consumed confirmation');
+		$uncertain = $scenario === 'multiple_contribution_only' ? array(1,3) : array(1);
+		$service = new Adr08aBookingSpy($key, $uncertain);
+		$service->contextFails = $scenario === 'context_failure';
+		$mail = new Cf05FinanceMailSpy($db);
+		$mail->transportFailures = $uncertain;
+		if ($scenario === 'checkpoint_failure') { $mail->loseCheckpointKey = $key; }
+		if ($scenario === 'unqualified') { $mail->transportFailures = array(); $mail->throws = true; }
+		if ($scenario === 'contradictory') {
+			$mail = new class($db) extends Cf05FinanceMailSpy {
+				public function sendWithEvidence($member, array $row, $user, $selected, array $invoice = null, $checkpoint = null, $id = null)
+				{
+					parent::sendWithEvidence($member, $row, $user, $selected, $invoice, $checkpoint, $id);
+					return array('mail'=>'transport','attachment'=>'verified_for_transport','continuation'=>'isolated_smtp_failure');
+				}
+			};
+		}
+		$pdf = new Cf05FinancePdfSpy();
+		$done = msmProcessBooking($state,$service,$mail,$user,$checkpoint,$pdf);
+		$continues = in_array($scenario,array('one_with_invoice','multiple_contribution_only'),true);
+		$expected = $continues ? $ids : array(1);
+		verify($service->members === $expected && $mail->members === $expected, 'ADR-08A exactly one attempt per admitted member '.$scenario);
+		verify(empty($done['batch_stop']) === $continues, 'ADR-08A batch decision '.$scenario);
+		verify($done['results'][1]['status'] === 'success' && $done['results'][1]['mail'] === 'unknown'
+			&& $done['results'][1]['attachment_status'] === ($options['invoice'] ? 'unknown' : 'not_required'),
+			'ADR-08A DB and mail verdict remain independent '.$scenario);
+		if ($options['invoice']) {
+			verify($done['results'][1]['invoice']['pdf']['status'] === 'verified', 'ADR-08A PDF remains verified '.$scenario);
+		}
+		if (!$continues) {
+			verify($done['results'][2]['status'] === 'not_processed', 'ADR-08A no subsequent write '.$scenario);
+		}
+		verify(!empty($done['checkpoint_failed']) === ($scenario === 'checkpoint_failure'), 'ADR-08A E15 boundary '.$scenario);
+		fails(static function () use ($done) {
+			msmConsumeConfirmation($done, array('action'=>'book','revision'=>(string) $done['revision']));
+		}, 'MSMInvalidForm');
+	}
+
 	foreach (array(
 		array('name'=>'existing','autocreate'=>false,'mode'=>'','change'=>false,'expected'=>'success'),
 		array('name'=>'new','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success'),
