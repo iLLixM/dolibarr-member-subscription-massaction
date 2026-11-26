@@ -25,7 +25,7 @@ session_save_path($root);
 $key = str_repeat('c', 32); $user = (object) array('id' => 18);
 $features=array('booking'=>true,'invoice'=>true,'autocreate'=>true,'sendmail'=>true);
 $binding = array('family'=>'mysql','profile'=>'CoreGuarded','entity'=>1,'owner'=>18,
-	'revision'=>'known','confirmation_revision'=>4,'features'=>$features);
+	'revision'=>'known','confirmation_revision'=>5,'features'=>$features);
 $currentFinanceProfile=array('family'=>'mysql','profile'=>'CoreGuarded',
 	'revision'=>'known','features'=>$features,'reason'=>'');
 $rows = array(7 => array('start'=>123,'end'=>456,'amount'=>12.5,'description'=>'Synthetic contribution','fingerprint'=>'signed','errors'=>array(),'overlaps'=>array()));
@@ -64,6 +64,7 @@ try {
 	$original = $updated;
 	$original['phase'] = 'confirm';
 	$original['revision']--;
+	verifySession($original['profile']['confirmation_revision'] === $original['revision'], 'F51-02 original confirmation revision matches profile binding');
 	foreach (array('amount', 'options', 'profile', 'user') as $field) {
 		$testKey = bin2hex(random_bytes(16));
 		verifySession(session_start(), 'F45-02 open fresh confirmation '.$field);
@@ -72,6 +73,7 @@ try {
 		$_SESSION['msm_previews'][$testKey] = $updated;
 		verifySession(session_write_close(), 'F45-02 persist consumed original '.$field);
 		$before = file_get_contents($root.'/sess_'.$sessionid);
+		verifySession(is_string($before), 'F51-02 read original session bytes '.$field);
 		$actual = array($binding, $user, $confirmed, $opts);
 		switch ($field) {
 			case 'amount': $actual[2]['amount'] = 999; break;
@@ -84,8 +86,10 @@ try {
 			$testCheckpoint->requireProcessing(7, ...$actual);
 			$businessCalls++;
 		}, 'F45-02 first mismatched '.$field.' denied', 'MSMCoreGuardedSessionUnsupported');
+		$after = file_get_contents($root.'/sess_'.$sessionid);
+		verifySession(is_string($after), 'F51-02 read session bytes after refusal '.$field);
 		verifySession($businessCalls === 0 && session_status() === PHP_SESSION_NONE
-			&& file_get_contents($root.'/sess_'.$sessionid) === $before, 'F45-02 no admitted effect or state mutation '.$field);
+			&& $after === $before, 'F45-02 no admitted effect or state mutation '.$field);
 		$testCheckpoint->requireProcessing(7, $binding, $user, $confirmed, $opts);
 		verifySession(session_status() === PHP_SESSION_NONE, 'F45-02 original capability still admits exact input '.$field);
 	}
@@ -104,6 +108,7 @@ try {
 	denySession(static function()use($checkpoint,$binding,$user,$confirmed,$opts){$checkpoint->requireProcessing(7,$binding,$user,$confirmed,$opts);},'completed run denied');
 	// CF05: original CONFIRM → durable processing → one-shot finance → acknowledged
 	// NO_CHAIN result → independently checkpointed PDF and mail. No DB or SMTP.
+	$binding['confirmation_revision'] = 10; // Match the separate original finance confirmation below.
 	$financeKey = str_repeat('d',32);
 	$financeRow = $rows[7]; $financeRow['invoice']=array('create_customer'=>true,'customer_id'=>0);
 	$financeRow['autocreate']=true; $financeRows=array(7=>$financeRow);
