@@ -74,7 +74,7 @@ foreach (array(false, true) as $ambiguous) {
 	$done = msmProcessBooking($state, $service, $mail, new PreviewUser(), static function ($updated) use (&$saves) { $saves[] = $updated; }, $pdf);
 	verify($pdf->calls === 0 && $mail->calls === ($ambiguous ? 0 : 2), 'MySQL mail only after confirmed outer commit');
 	verify($done['results'][1]['status'] === ($ambiguous ? 'unknown' : 'success'), 'MySQL orchestration preserves unknown result');
-	if ($ambiguous) { verify($done['results'][2]['message'] === 'MSMBatchStopped' && count(array_keys($db->events, 'subscription', true)) === 1, 'unknown stops batch without retry or postcommit effects'); }
+	if ($ambiguous) { verify($done['batch_stop'] && $done['results'][2]['status'] === 'not_processed' && $done['results'][2]['message'] === 'MSMBatchStopped' && count(array_keys($db->events, 'subscription', true)) === 1, 'C04-04/CPC-02 unknown stops batch without retry or postcommit effects'); }
 }
 echo ($passed - $postBaseline)." post-commit assertions passed (synthetic checkpoints; no files, database or SMTP).\n";
 

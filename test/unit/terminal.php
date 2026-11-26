@@ -91,6 +91,70 @@ try {
 	$renderState['results'][2]['status'] = 'skipped';
 	verify(strpos(msmRenderBooking($renderState, $key), msmText('MSMStatus_skipped')) !== false, 'F27 historical skipped remains displayable');
 
+	// C04-04 / CPC-02: compare the final persisted business results, while
+	// only CoreGuarded receives the additional completion/rollback evidence.
+	foreach (array('MariaDBSnapshot', 'CoreGuarded', 'EnhancedMySQL') as $profile) {
+		foreach (array(1, 2, 4, null) as $stopAt) {
+			$ids = array(1, 2, 3, 4);
+			$rows = array_fill_keys($ids, $renderState['rows'][1]);
+			$rows[3]['overlaps'] = array(array('id' => 123));
+			$initial = array('phase' => 'confirm', 'revision' => 1, 'ids' => $ids, 'rows' => $rows,
+				'options' => array('invoice' => false, 'sendmail' => false), 'profile' => array('profile' => $profile));
+			$request = array('action' => 'book', 'revision' => '1');
+			$processing = msmConsumeConfirmation($initial, $request);
+			session_id('msmcpc'.bin2hex(random_bytes(8))); session_start();
+			$_SESSION = array('msm_previews' => array($key => $processing));
+			$save = new MsmFileBookingCheckpoint($key);
+			session_write_close();
+			$service = new class($stopAt, $profile) {
+				public $calls = array();
+				private $stopAt;
+				private $profile;
+				public function __construct($stopAt, $profile) { $this->stopAt = $stopAt; $this->profile = $profile; }
+				public function book($id, $row, $options, $user, $overlap)
+				{
+					$this->calls[] = $id;
+					$status = $id === $this->stopAt ? 'unknown' : ($id === 2 && $this->stopAt === null ? 'failed' : 'success');
+					$result = array('status' => $status, 'message' => 'Synthetic', 'id' => $status === 'success' ? $id : 0,
+						'amount' => $status === 'success' ? 12 : 0, 'mail' => 'not_selected', 'stop' => $status === 'unknown');
+					if ($this->profile === 'CoreGuarded' && $status !== 'unknown') {
+						$result['completion'] = 'nonterminal_acknowledged';
+						if ($status === 'failed') { $result['rollback'] = 'confirmed'; }
+					}
+					return $result;
+				}
+			};
+			$pdf = new TerminalEffectFence();
+			$mail = new class {
+				public $calls = array();
+				public function send($member, $row, $user, $selected, $invoice) { $this->calls[] = $selected; return 'not_selected'; }
+			};
+			$done = msmProcessBooking($processing, $service, $mail, new PreviewUser(), $save, $pdf);
+			$case = $profile.'/'.($stopAt ?? 'mixed');
+			$expected = array(
+				1 => array('unknown', 'not_processed', 'not_processed', 'not_processed'),
+				2 => array('success', 'unknown', 'not_processed', 'not_processed'),
+				4 => array('success', 'success', 'skipped', 'unknown'),
+				0 => array('success', 'failed', 'skipped', 'success'),
+			)[$stopAt ?? 0];
+			verify(array_column($done['results'], 'status') === $expected && !empty($done['batch_stop']) === ($stopAt !== null), 'CPC-02 outcomes and STOP '.$case);
+			verify($service->calls === ($stopAt === 1 ? array(1) : ($stopAt === 2 ? array(1, 2) : array(1, 2, 4)))
+				&& $pdf->calls === 0 && $mail->calls === array_fill(0, $profile === 'CoreGuarded' ? 0 : count(array_keys($expected, 'success')), false), 'CPC-02 no booking, PDF or mail after STOP '.$case);
+			$html = msmRenderBooking($done, $key);
+			$counts = array_count_values($expected);
+			$total = msmText('MSMResultTotals', $counts['success'] ?? 0, $counts['skipped'] ?? 0, $counts['failed'] ?? 0,
+				$counts['unknown'] ?? 0, price(12 * ($counts['success'] ?? 0)).' '.$conf->currency);
+			verify(strpos($html, $total) !== false
+				&& strpos($html, msmText('MSMNotProcessedTotal', $counts['not_processed'] ?? 0)) !== false
+				&& (strpos($html, msmText('MSMTerminalBatchStop')) !== false) === ($stopAt !== null), 'CPC-02 rendered counts, amount and STOP '.$case);
+			session_start();
+			$stored = $_SESSION['msm_previews'][$key];
+			session_write_close();
+			verify($stored === $done, 'CPC-02 persisted result reload '.$case);
+			fails(static function () use ($stored, $request) { msmConsumeConfirmation($stored, $request); }, 'MSMInvalidForm');
+		}
+	}
+
 	// No arbitrary save callback may follow a Core-Guarded completion.
 	$customCalls = 0;
 	fails(static function () use ($state,$spy,$effect,&$customCalls) { msmProcessBooking($state,$spy,$effect,new PreviewUser(),static function()use(&$customCalls){$customCalls++;}); }, 'MSMCoreGuardedSessionUnsupported');
