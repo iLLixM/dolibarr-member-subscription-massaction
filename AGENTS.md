@@ -1,6 +1,14 @@
 # Codex repository guidance
 
-## Current source of truth after PR #38 – 2026-11-24
+## Current source of truth — 2026-11-26 (PR #49 merged; PR #50 technical acceptance)
+
+- Current authority: [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22), [Issue #20](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/20), [current baseline](docs/current-development-baseline.md), [Owner Core parity](docs/owner-core-parity-2026-11-22.md), [environment matrix](docs/dolienv-environments.md) and [release gates](docs/release-qualification-v0.1.0.md). Current normative safeguards remain binding; dated status/authorization statements below are historical, not new instructions or permissions.
+- PR #49 squash `feeea580f0004a8b18ea2c423d2cd6e7c2c6c819`, sole parent `316e8a8d196fe908d11cf3d4409d0a5e541e6c01`, identical approved tree `798c7741c9b8f2d1a2e2c45f29e3c0df661f3520` to reviewed HEAD `35075c99edd714951ac8b2edff2b234ec21ec0f1`. ADR-08A / D-MAIL-01 integrated and bounded qualification CLOSED WITH DOCUMENTED LIMITATIONS; F49-01/02 independently closed. Preserve the narrow mail continuation exception, all remaining STOP and no-replay safeguards.
+- CPC-01 Variant A Owner accepted for v0.1.0; F38-01 binding, ADR-08B deferred. CPC-02 technical implementation ACCEPTED on `2ab934ce2ac26e7b356017d3473c587891548415`; local A/B/C qualification PASS within recorded scope on `042c917bd5d8844c33758f8c26170fd7eb7ecb87`. See [CPC-02 evidence](docs/test-coverage.md#cpc-02-cross-profile-batch-results). No real STOP/fault injection or Hosted D live CPC-02 tests. F50-01/04 documentation corrections implemented, independent follow-up and #50 Owner merge pending. F50-02/03 OPEN – NON-BLOCKING TEST HARDENING; plan separate test-only follow-up with F45-01/02 and F49-03. Do not repeat accepted real tests without a material gap or change-induced need.
+- CF03-NORMAL A–D PASS within respective source-bound matrices; Phase 5 and live security PARTIAL; real cross-entity BLOCKED. Per-case Owner GO, protected F32-MR-01 target-user preflight, fresh fixtures, backups, independent readbacks and coordinated B/C windows remain mandatory. A=MariaDBSnapshot; B=CoreGuarded; C=EnhancedMySQL; D=Hosted CoreGuarded. Preserve modified OD-P5-02, original evidence and privacy boundaries.
+- #40 Draft must be refreshed against final accepted source. CF05-07/CF03-RISK and final release gates OPEN; R0-04 execution blocked pending exact final ZIP; CF03-FAULT DEFERRED. Separate Owner Release GO required; release NO-GO. No new operational authorization.
+
+## Historical status checkpoint after PR #38 – 2026-11-24
 
 - **Phase 4 development is merged**: PR #38 squash commit `0998fbaf58155cca04d31ab99c6bb47420e53c72`, reviewed source `b15b93580f995fb05a696a125c2a5fd995dd4bb3`, identical tree. Green 9/21/Hosted=31/31 CI is **synthetic**, not real acceptance.
 - Current authority: [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22), [Owner Core parity](docs/owner-core-parity-2026-11-22.md), [current baseline](docs/current-development-baseline.md), [dolienv](docs/dolienv-environments.md) and [release gates](docs/release-qualification-v0.1.0.md). This section supersedes older dated future-work, default-deny or shared A/C-site assertions below; preserve those solely as historical evidence.
@@ -11,7 +19,7 @@
 - **Operational/release boundary:** Phase 5 PARTIAL; per-case Owner GO, protected target-user F32-MR-01 preflight, actual source/profile/role binding, fresh fixtures, controlled backups and independent readbacks required. Full CF03-NORMAL A–D, remaining A/C mail and D finance/PDF/mail, wider live security/configuration, CF05-07/CF03-RISK, R0-03, R0-04, R0-07 and separate Owner Release GO remain OPEN / NO-GO (R0-04 BLOCKED pending exact package qualification). Historical B02 mail/attachment and DOLIENV-ACC-01 UNKNOWN/STOP (latter rollback unconfirmed) unchanged; no replay/compensation. CF03-FAULT destructive tests DEFERRED. No new authorization.
 - Publish no private hosts, users, schemas, DB accounts, passwords, session material, local paths, dumps or raw evidence. Preserve requirements.csv original 71 IDs and historical audit records.
 
-- **Post-PR #45 current development:** merged `b026f1504db27308fc7326e2e88ec2e53b2f48d9`, reviewed `7e5f64d07ab3830ce355cd745782c4f0c2a955b0`, identical tree, 31/31 synthetic CI. #44 merged, #41–#43 closed superseded. PR #45 removes only the unnecessary directory-listing/readability prerequisite in `MsmFileBookingCheckpoint::requireSession()`. The PHP `files` handler, nonempty session ID, plain absolute existing writable directory, canonical binding and actual reopen/read/write/close/readback remain required. A known session file may be accessible even when the directory cannot be listed (e.g. owner mode `0300`). Preserve the original consumed confirmation, one-shot/processing/result persistence, owned guard and finance/post-COMMIT checks. Do not widen provider permissions to make a test pass. The six concrete Core/model/PDF file readability checks remain a separate contract. F45-01/02 remain open test precision; F45-03 remediation pending review/merge. #40 Draft lacks #45.
+- **Historical post-PR #45 development checkpoint:** merged `b026f1504db27308fc7326e2e88ec2e53b2f48d9`, reviewed `7e5f64d07ab3830ce355cd745782c4f0c2a955b0`, identical tree, 31/31 synthetic CI. #44 merged, #41–#43 closed superseded. PR #45 removes only the unnecessary directory-listing/readability prerequisite in `MsmFileBookingCheckpoint::requireSession()`. The PHP `files` handler, nonempty session ID, plain absolute existing writable directory, canonical binding and actual reopen/read/write/close/readback remain required. A known session file may be accessible even when the directory cannot be listed (e.g. owner mode `0300`). Preserve the original consumed confirmation, one-shot/processing/result persistence, owned guard and finance/post-COMMIT checks. Do not widen provider permissions to make a test pass. The six concrete Core/model/PDF file readability checks remain a separate contract. F45-01/02 remain open test precision; F45-03 remediation pending review/merge. #40 Draft lacks #45.
 
 ---
 
@@ -31,14 +39,14 @@
   applicable validation documents.
 - Do not create a parallel architecture, requirement matrix, test strategy, or evidence history.
 
-## Current environment naming (Owner update 2026-11-24)
+## Environment naming (binding Owner update 2026-11-24; dated evidence below is historical)
 
 - Follow [dolienv environments](docs/dolienv-environments.md): A MariaDBSnapshot,
   B CoreGuarded, C EnhancedMySQL, D hosted CoreGuarded. Older CF03 A/B labels and
   A/C shared-schema instructions remain historical; never merely swap letters in
   legacy tools/manifests. New B/C schemas are separate, but their server and local
   module source are shared; no parallel qualification is implied.
-- A/C bounded finance/PDF cases passed. B finance remains UNKNOWN/STOP at
+- Historical 2026-11-24 evidence: A/C bounded finance/PDF cases passed. B finance remains UNKNOWN/STOP at
   finance_precheck; D has read-only browser/hosting-CLI evidence only in the new
   setup campaign. Preserve no-retry and all existing profile safety contracts.
 - Publish no real hosting origin, private route/path, DB/account/login identity,
@@ -47,7 +55,7 @@
 
 ## Architecture and compatibility
 
-- Core-first strategy: Owner decisions ADR-01–ADR-12 in Issue #22 (2026-11-18)
+- Historical CF-00/01 implementation checkpoint (later activation and amendments above supersede feature-status statements; normative safeguards remain binding): Core-first strategy: Owner decisions ADR-01–ADR-12 in Issue #22 (2026-11-18)
   govern the new Core-Guarded design; see
   [ADR-0001](docs/adr/ADR-0001-core-first-transaction-profiles.md), its risk register
   and review handoff. CF-00 was independently and Owner-accepted on 2026-11-18,
