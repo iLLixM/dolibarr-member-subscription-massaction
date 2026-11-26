@@ -5,9 +5,7 @@
 the Owner accepts **Cross-Entity Variant B** for v0.1.0. The independent
 follow-up on `1009fe845134f5c1f872c64ed9f191c4970f8277` (2026-11-26) closed
 F52-04/P3 and confirmed the Owner decision and all seven R0-04 criteria:
-**INDEPENDENT DOCUMENTATION VERIFICATION COMPLETE**. Formal integration of
-PR #52 and actual compliance verification on the exact installed release
-package under R0-04 remain pending. This is a qualification scope decision.
+**INDEPENDENT DOCUMENTATION VERIFICATION COMPLETE**. PR #52 integrated the independently verified decision on 2026-11-26. Actual compliance verification on the exact installed release package under R0-04 remains pending. This is a qualification scope decision.
 Core-Parity Variant B remains the distinct runtime architecture policy.
 
  P5L-A-S05 (MariaDBSnapshot), P5L-B-S05 (CoreGuarded),
@@ -56,6 +54,4 @@ guarantee. Any intended installation outside these conditions needs separate
 qualification and Owner approval. No real cross-entity PASS is claimed.
 
 See [mandatory R0-04 verification](release-qualification-v0.1.0.md#r0-04-cross-entity-variant-b-compliance).
-The decision closes only the M3.2 scope choice. Formal CF05-07 Owner
-acceptance, integrated CF03-RISK Owner acceptance, M3.4, package qualification
-and separate Release GO remain pending.
+The M3.2 scope choice is complete with documented limitations. See the [M3.4 Owner decision](m34-integrated-owner-acceptance.md) for the separate CF05-07 and CF03-RISK decisions and formal development closure. Exact-package qualification, operational readiness, independent release review and separate Owner Release GO remain open.

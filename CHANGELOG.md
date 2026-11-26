@@ -2,7 +2,11 @@
 
 ## Unreleased – development completion and next release gates
 
-### 2026-11-26 – Integrated development review preparation
+### 2026-11-26 – Integrated development Owner acceptance
+
+- PR #52 integrated M3.1 and M3.2 on the independently approved tree, with all five independent findings closed. The Owner granted M3.4-A and M3.4-B with documented limitations. Formal development closure follows Owner integration of the independently approved closure documentation. Release v0.1.0 remains NO-GO. [M3.4 Owner decision](docs/m34-integrated-owner-acceptance.md)
+
+### 2026-11-26 – Historical integrated development review preparation (before PR #52 merge)
 
 - PR #51 integrated the independently accepted Pre-Release Test-Hardening package with documented limitations. See the [M3.1 review basis](docs/m31-integrated-development-qualification.md) for exact merge/CI provenance and consolidated CF05/CF03 evidence.
 - CF05-07 independent technical qualification and CF03-RISK independent assessment are complete; formal Owner acceptances remain pending. M3.2 Cross-Entity Variant B is Owner accepted; real cross-entity cases remain BLOCKED / NOT EXECUTED. Release v0.1.0 is NO-GO.
