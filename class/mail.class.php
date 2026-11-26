@@ -28,7 +28,7 @@ class MsmSubscriptionMail
 		$manager = new HookManager($this->db); $manager->initHooks(array('subscription'));
 		return $manager;
 	}
-	protected function deliver($member, array $row, $user)
+	protected function deliver($member, array $row, $user, &$isolatedSmtpFailure = null)
 	{
 		global $conf, $langs, $mysoc;
 		require_once DOL_DOCUMENT_ROOT.'/core/class/html.formmail.class.php';
@@ -56,13 +56,55 @@ class MsmSubscriptionMail
 		$subject = make_substitutions($subject, $substitutions, $outputlangs);
 		$message = make_substitutions($message, $substitutions, $outputlangs);
 		if (trim($message) === '') { return 'failed'; }
-		// Adherent::sendEmail keeps the Core sender, tracking and recipient semantics.
+		// Preserve member sender, tracking, attachment and Core recipient semantics.
 		$attachment = $row['_attachment'] ?? null;
 		$paths = $attachment === null ? array() : array($attachment['_path']);
 		$mimes = $attachment === null ? array() : array('application/pdf');
 		$names = $attachment === null ? array() : array($attachment['name']);
-		$result = $member->sendEmail($message, $subject, $paths, $mimes, $names, '', '', 0, $ishtml, '', "X-Dolibarr-Info: member subscription module\r\n");
+		$header = "X-Dolibarr-Info: member subscription module\r\n";
+		if ($isolatedSmtpFailure !== null && $this->canObserveStandardSmtp()) {
+			// Use the same Core constructor arguments and member substitutions as
+			// Adherent::sendEmail, and retain its SMTP object as the outcome witness.
+			require_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
+			$text = $member->makeSubstitution($message);
+			$subject = $member->makeSubstitution($subject);
+			$from = getDolGlobalString('ADHERENT_MAIL_FROM', $conf->email_from);
+			$mail = new CMailFile($subject, (string) $member->email, $from,
+				$ishtml ? dol_htmlentitiesbr($text) : $text, $paths, $mimes, $names,
+				'', '', 0, $ishtml, '', '', 'mem'.$member->id, $header);
+			return $this->sendObservedSmtp($mail, $isolatedSmtpFailure);
+		}
+		$result = $member->sendEmail($message, $subject, $paths, $mimes, $names, '', '', 0, $ishtml, '', $header);
 		return $result > 0 ? 'transport' : 'failed';
+	}
+	/** Give configured mail extensions their usual path; their failures remain unqualified. */
+	private function canObserveStandardSmtp()
+	{
+		global $conf, $hookmanager;
+		$mode = getDolGlobalString('MAIN_MAIL_SENDMODE_STANDARD');
+		$specific = $mode !== '' && $mode !== 'default';
+		if (!$specific) { $mode = getDolGlobalString('MAIN_MAIL_SENDMODE'); }
+		if ($mode !== 'smtps' || getDolGlobalString('MAIN_MAIL_SMTPS_AUTH_TYPE'.($specific ? '_STANDARD' : '')) === 'XOAUTH2'
+			|| !is_object($hookmanager) || get_class($hookmanager) !== 'HookManager' || !empty($hookmanager->hooks)) {
+			return false;
+		}
+		foreach (($conf->modules_parts['hooks'] ?? array()) as $module => $contexts) {
+			$contexts = is_array($contexts) ? $contexts : explode(':', $contexts);
+			if (isModEnabled($module) && array_intersect($contexts, array('all', 'subscription', 'mail'))) { return false; }
+		}
+		return true;
+	}
+	protected function sendObservedSmtp($mail, &$isolatedSmtpFailure)
+	{
+		$smtp = $mail->smtps;
+		$observable = $mail->sendmode === 'smtps' && is_object($smtp) && get_class($smtp) === 'SMTPs'
+			&& $smtp->getErrors() === '' && empty($mail->error);
+		if ($mail->sendfile()) { return 'transport'; }
+		// Only a new error from the same Core SMTP instance, propagated by
+		// CMailFile, proves entry into this isolated transport boundary.
+		$isolatedSmtpFailure = $observable && $mail->smtps === $smtp && $this->canObserveStandardSmtp()
+			&& $smtp->getErrors() !== '' && $mail->error === $smtp->getErrors();
+		return 'failed';
 	}
 	/** Only the original consumed transaction's one-shot checkpoint may
 	 * authorize a direct, standalone CoreGuarded evidence service call.
@@ -96,12 +138,13 @@ class MsmSubscriptionMail
 			$checkpoint->requireMailEvidence($id, $user, $invoice, $profile, $member, $row);
 		} catch (Throwable $e) {
 			// Denied/uncertain admission must never reach a hook or SMTP.
-			return array('mail' => 'denied', 'attachment' => $invoice === null ? 'not_required' : 'not_sent');
+			return array('mail' => 'denied', 'attachment' => $invoice === null ? 'not_required' : 'not_sent', 'continuation' => 'blocked');
 		}
 		// Preserve legacy send() return values while treating negative results
 		// after entering any hook or SMTP call as potentially effected.
 		$afterEffect = false;
-		$status = $this->sendInternal($member, $row, $user, $selected, $invoice, $afterEffect);
+		$isolatedSmtpFailure = false;
+		$status = $this->sendInternal($member, $row, $user, $selected, $invoice, $afterEffect, $isolatedSmtpFailure);
 		if ($afterEffect && !in_array($status, array('transport', 'hook'), true)) {
 			$status = 'unknown';
 		}
@@ -113,14 +156,16 @@ class MsmSubscriptionMail
 			elseif ($status === 'attachment_missing') { $attachment = 'missing'; }
 			elseif ($status === 'unknown') { $attachment = 'unknown'; }
 		}
-		return array('mail' => $status, 'attachment' => $attachment);
+		$delivery = array('mail' => $status, 'attachment' => $attachment);
+		if ($status === 'unknown' && $isolatedSmtpFailure) { $delivery['continuation'] = 'isolated_smtp_failure'; }
+		return $delivery;
 	}
 	public function send($member, array $row, $user, $selected, array $invoice = null)
 	{
 		$afterEffect = false;
 		return $this->sendInternal($member, $row, $user, $selected, $invoice, $afterEffect);
 	}
-	protected function sendInternal($member, array $row, $user, $selected, $invoice, &$afterEffect)
+	protected function sendInternal($member, array $row, $user, $selected, $invoice, &$afterEffect, &$isolatedSmtpFailure = null)
 	{
 		global $hookmanager, $langs;
 		if (!$selected) { return 'not_selected'; }
@@ -153,7 +198,7 @@ class MsmSubscriptionMail
 				catch (Throwable $e) { return 'attachment_missing'; }
 			}
 			if ($attachment !== null) { $row['_attachment'] = $attachment; }
-			return $this->deliver($object, $row, $user);
+			return $this->deliver($object, $row, $user, $isolatedSmtpFailure);
 		} catch (Throwable $e) { return 'unknown'; }
 		finally { $hookmanager = $previous; $langs = $previousLangs; }
 	}

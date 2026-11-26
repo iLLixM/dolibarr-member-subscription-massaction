@@ -67,11 +67,10 @@ function msmProcessBooking(array $state, $service, $mailer, $user, callable $sav
 		if (!($save instanceof MsmFileBookingCheckpoint)) { throw new RuntimeException('MSMCoreGuardedSessionUnsupported'); }
 		$save->requireBinding();
 	}
-	$stop = false;
 	foreach ($state['ids'] as $id) {
 		$row = $state['rows'][$id];
-		if ($stop || $row['errors'] || ($row['overlaps'] && empty($state['overlap'][$id]))) {
-			$state['results'][$id] = array('status' => 'skipped', 'message' => $stop ? 'MSMBatchStopped' : 'MSMNotConfirmed', 'id' => 0, 'amount' => 0, 'mail' => 'not_selected', 'stop' => false);
+		if ($row['errors'] || ($row['overlaps'] && empty($state['overlap'][$id]))) {
+			$state['results'][$id] = array('status' => 'skipped', 'message' => 'MSMNotConfirmed', 'id' => 0, 'amount' => 0, 'mail' => 'not_selected', 'stop' => false);
 			$save($state); continue;
 		}
 		$row['_profile'] = $state['profile'] ?? null;
@@ -90,21 +89,21 @@ function msmProcessBooking(array $state, $service, $mailer, $user, callable $sav
 				? 'not_processed' : 'not_required';
 		}
 		$member = $result['_member'] ?? null; unset($result['_member']);
-		if ($stop && $coreGuarded) {
+		if ($stop) {
 			$state['results'][$id] = $result;
-			if ($result['status'] === 'success') {
+			if ($coreGuarded && $result['status'] === 'success') {
 				$state['results'][$id]['mail'] = 'not_processed';
 				$state['results'][$id]['attachment_status'] = 'not_processed';
 				if (!empty($result['invoice'])) { $state['results'][$id]['invoice']['pdf'] = array('status' => 'not_processed', 'message' => 'MSMPdfNotProcessed'); }
 			}
 			msmStopUnprocessed($state, $id); $state['phase'] = 'done';
-			msmSaveBookingCheckpoint($state, $save, true);
+			msmSaveBookingCheckpoint($state, $save, $coreGuarded);
 			return $state; // Only the fixed DB-independent checkpoint may follow terminal completion.
 		}
-		if (!$stop && $result['status'] === 'success' && $state['options']['sendmail']) { $result['mail'] = 'unknown'; }
+		if ($result['status'] === 'success' && $state['options']['sendmail']) { $result['mail'] = 'unknown'; }
 		$state['results'][$id] = $result;
 		if (!msmSaveBookingCheckpoint($state, $save, $coreGuarded)) { msmStopUnprocessed($state, $id); return $state; } // No automatic rebook/resend.
-		if (!$stop && $result['status'] === 'success') {
+		if ($result['status'] === 'success') {
 			if (!empty($state['options']['invoice'])) {
 				$state['results'][$id]['invoice']['pdf'] = array('status' => 'unknown', 'message' => 'MSMPdfInterrupted');
 				if (!msmSaveBookingCheckpoint($state, $save, $coreGuarded)) { msmStopUnprocessed($state, $id); return $state; }
@@ -145,6 +144,7 @@ function msmProcessBooking(array $state, $service, $mailer, $user, callable $sav
 				}
 			}
 			$invoice = $state['results'][$id]['invoice'] ?? null;
+			$isolatedSmtpFailure = false; $mailAdmissionBlocked = false;
 			if ($coreGuarded) {
 				if (empty($state['options']['sendmail'])) {
 					$state['results'][$id]['mail'] = 'not_selected';
@@ -165,7 +165,8 @@ function msmProcessBooking(array $state, $service, $mailer, $user, callable $sav
 						if (!is_array($delivery)
 							|| !in_array($delivery['mail'] ?? '', array('transport', 'hook', 'failed', 'missing', 'disabled', 'denied', 'attachment_missing', 'unknown'), true)
 							|| !in_array($delivery['attachment'] ?? '', array('verified_for_transport', 'verified_before_hook', 'missing', 'not_sent', 'unknown', 'not_required'), true)
-							|| !msmValidMailAttachmentEvidence($delivery, $invoice !== null)) {
+							|| !msmValidMailAttachmentEvidence($delivery, $invoice !== null)
+							|| !msmValidMailContinuationEvidence($delivery)) {
 							throw new RuntimeException('MSMMailUnknown');
 						}
 					} catch (Throwable $e) {
@@ -173,20 +174,21 @@ function msmProcessBooking(array $state, $service, $mailer, $user, callable $sav
 						$delivery = array('mail' => 'unknown',
 							'attachment' => $invoice !== null ? 'unknown' : 'not_required');
 					}
+					$isolatedSmtpFailure = ($delivery['continuation'] ?? null) === 'isolated_smtp_failure';
+					$mailAdmissionBlocked = ($delivery['continuation'] ?? null) === 'blocked';
 					$state['results'][$id]['mail'] = $delivery['mail'];
 					$state['results'][$id]['attachment_status'] = $delivery['attachment'];
 				}
 			} else {
 				$state['results'][$id]['mail'] = $mailer->send($member, $row, $user, $state['options']['sendmail'], $invoice);
 			}
-			if ($coreGuarded && $state['results'][$id]['mail'] === 'unknown') {
-				// The external effect may have happened. Persist ambiguity and
-				// stop the remaining batch; never attempt an automatic resend.
+			if ($coreGuarded && ($mailAdmissionBlocked || ($state['results'][$id]['mail'] === 'unknown' && !$isolatedSmtpFailure))) {
+				// Stop on unqualified effects or failed admission; preserve evidence.
 				msmStopUnprocessed($state, $id); $state['phase'] = 'done';
 				msmSaveBookingCheckpoint($state, $save, true);
 				return $state;
 			}
-			if (!msmSaveBookingCheckpoint($state, $save, $coreGuarded)) {
+			if (!msmSaveBookingCheckpoint($state, $save, $coreGuarded, $isolatedSmtpFailure ? (int) $id : null)) {
 				if ($coreGuarded) {
 					// Transport may have occurred but its result could not be
 					// durably checkpointed; preserve DB and PDF status only.
@@ -194,6 +196,14 @@ function msmProcessBooking(array $state, $service, $mailer, $user, callable $sav
 					$state['results'][$id]['attachment_status'] = $invoice !== null ? 'unknown' : 'not_required';
 				}
 				msmStopUnprocessed($state, $id); return $state;
+			}
+			if ($isolatedSmtpFailure) {
+				try { $service->requireIsolatedMailContinuation(); }
+				catch (Throwable $e) {
+					msmStopUnprocessed($state, $id); $state['phase'] = 'done';
+					msmSaveBookingCheckpoint($state, $save, true);
+					return $state;
+				}
 			}
 		}
 	}
@@ -224,6 +234,13 @@ function msmValidMailAttachmentEvidence(array $delivery, $withInvoice)
 	);
 	return isset($allowed[$mail]) && $attachment === $allowed[$mail];
 }
+/** Only a qualified unknown SMTP outcome can authorize continuation. */
+function msmValidMailContinuationEvidence(array $delivery)
+{
+	if (!array_key_exists('continuation', $delivery)) { return true; }
+	return ($delivery['continuation'] === 'isolated_smtp_failure' && $delivery['mail'] === 'unknown')
+		|| ($delivery['continuation'] === 'blocked' && $delivery['mail'] === 'denied');
+}
 /** Mark only following selected slots, preserving the acknowledged current result. */
 function msmStopUnprocessed(array &$state, $current)
 {
@@ -235,10 +252,11 @@ function msmStopUnprocessed(array &$state, $current)
 	$state['batch_stop'] = true;
 }
 /** E15: failed persistence never changes an acknowledged DB result or permits retry. */
-function msmSaveBookingCheckpoint(array &$state, callable $save, $coreGuarded)
+function msmSaveBookingCheckpoint(array &$state, callable $save, $coreGuarded, $isolatedMailId = null)
 {
 	try {
-		if ($save($state) === false) { throw new RuntimeException('MSMSessionFailure'); }
+		$saved = $isolatedMailId === null ? $save($state) : $save($state, $isolatedMailId);
+		if ($saved === false) { throw new RuntimeException('MSMSessionFailure'); }
 		return true;
 	} catch (Throwable $e) {
 		if (!$coreGuarded) { throw $e; }

@@ -1,20 +1,68 @@
 # Reading the existing requirement matrix
 
+**2026-11-25 local Phase 5 delta:** See the [current A/B/C results and exact source](evidence/cf03/phase5-local-completion-2026-11-25.md). A and C mail/verified PDF attachments each passed 3/3 on `c2dc2cfdadf2c4def6bcd2f2ec20473cea3683b3`; B's earlier 3/3 remains on `ba5c9a3121754fcbd4259bb8906ad1dd17f1ce00`. These are capture-only outcomes, not external delivery or nine cases on a single source. Local CF03-NORMAL A/B/C: **PASS within the accepted case matrix**. At that checkpoint local CF03-SECURITY-BASELINE and local Phase 5 were **PARTIAL**; P5L-A/B/C-S05 real cross-entity qualification **BLOCKED** (no distinct authorized second business entity). The live Web aged-fixture expiry result does not establish natural elapsed-time expiry. Earlier results retain their exact source and scope. Further local tests are limited to outstanding cases and change-induced regression; do not repeat accepted cases without a concrete reason.
+
+**2026-11-25 Hosted D completion:** [Bounded development qualification and live-security evidence](evidence/cf03/phase5-hosted-d-2026-11-25.md). Earlier D contribution/session/replay PASS remains on `0adc259d4739b44f9b1fb3a49574d7e1c318132c`. The new cases on merged PR #46 `c2dc2cfdadf2c4def6bcd2f2ec20473cea3683b3` establish D-F01–F03 finance/third party and D-P01–P03 PDF 3/3 PASS; D-S01–S04 live role/CSRF/stale confirmation/batch-limit PASS; D-S05 natural one-hour expiry in the original authenticated session PASS (zero booking POSTs, 11 unchanged business tables); D-S07 bounded nonterminal completion/result reload PASS; D-AOFF PASS (automatic contribution Agenda event disabled, original setting restored). D-SMTP2: three successful SMTP handoffs and Owner-confirmed external test-mail receipts with matching PDF attachment hashes (one plus two members); original D-M01/M02 isolated no-relay capture remains historically BLOCKED, zero sends in those cases. Independent raw SMTP/MIME capture is not established by SMTP2, and SMTP acceptance alone is not delivery. Historical SMTP UNKNOWN/STOP remains unchanged despite later receipt confirmation. Hosted D CF03-NORMAL: **PASS within the approved development case matrix**. Live CF03-SECURITY-BASELINE: **PARTIAL**; D-S06 real cross-entity **BLOCKED** (no authorized second entity). ADR-08A delta and exact-release-ZIP R0-04 remain separate. Earlier dated evidence retains its actual source and scope. The independent documentation review accepted the reported evidence under modified OD-P5-02; it did not repeat real tests.
+
+## ADR-08A focused evidence
+
+Implementation source `1ac1a8f2dfd7384829fa5b85235f1e4884d689db`. The
+maildelivery and CF05 finance suites cover strict SMTP outcome attribution,
+four-member continuation, persisted UNKNOWN, one-shot effects and fail-closed
+contexts. Postcommit, file-session, invoice PDF and terminal tests retain their
+boundaries. The local PHP 8.2 / V24.0.3 full synthetic suite passed. Local real
+qualification **PASS in the following bounded scope**. Hosted D was outside
+this original local task; subsequent separate qualification is recorded in
+[Hosted D delta evidence](evidence/cf03/adr-08a-hosted-d-2026-11-26.md).
+
+| Case | Profile | Browser and local SMTP result |
+| --- | --- | --- |
+| ADR08A-B | CoreGuarded | Four fresh members in one confirmation. The sink consumed the first message through the DATA terminator and closed without its final acknowledgement. The member retained acknowledged business SUCCESS and verified PDF, with mail and attachment UNKNOWN. All three subsequent members completed with confirmed transport acceptance. Four local captures total. |
+| ADR08A-A | MariaDBSnapshot | Two fresh members in one confirmation, two acknowledged bookings, validated invoices, PDFs and local transport acceptances. |
+| ADR08A-C | EnhancedMySQL | Two fresh members in one confirmation, two acknowledged bookings, validated invoices, PDFs and local transport acceptances. |
+
+A/B/C ran serially on the exact behavioral commit above, Dolibarr 24.0.3 and
+PHP 8.2.35. Protected preflight, fresh synthetic fixtures and SHA-256-verified
+database/Documents backups preceded the windows. Each case independently
+reconciled 12 business tables; stored, authenticated and MIME-decoded PDFs
+matched by size and SHA-256. Each original result survived reload, the identical
+consumed POST produced no duplicate state or SMTP capture, and the temporary
+mail settings were restored. The original shared local source checkout was
+restored after the campaign. The sink did not relay. B withheld the final reply
+by closing the connection after the full message; timed-out delivery to an
+external server and destructive DB faults were outside this evidence. The
+reviewer receives these compact results under modified OD-P5-02.
+
+### Hosted D delta and remaining test hardening (2026-11-26)
+
+**2026-11-26 ADR-08A status:** ADR-08A technical implementation ACCEPTED on `8bc36c4d4aab423e644276999066339ec1a5fd3c` (independent review 2026-11-26); local controlled B and positive A/C evidence on `1ac1a8f2dfd7384829fa5b85235f1e4884d689db`; Hosted D delta PASS WITH DOCUMENTED LIMITATIONS on the reported integrated checkout `8bc36c4d4aab423e644276999066339ec1a5fd3c` (positive SMTP/replay and separate Owner-run natural-error observation). Formal development qualification CLOSED WITH DOCUMENTED LIMITATIONS; F49-01/P2 and F49-02/P3 independently closed before the verified #49 squash. F49-03/P3 INDEPENDENTLY CLOSED. No additional real tests required for this bounded acceptance. See [Hosted D delta evidence](evidence/cf03/adr-08a-hosted-d-2026-11-26.md). The [current development baseline](current-development-baseline.md) governs current qualification and supersedes earlier dated checkpoints.
+
+F49-03/P3 INDEPENDENTLY CLOSED. See the [individual test traceability](test-coverage.md#v010-pre-release-test-hardening).
+
 ## Updated evidence legend after PR #38 merge
 
-**Authoritative post-PR #38 state (2026-11-24):** [PR #38](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/38) was independently reviewed and **squash-merged** into `main` as `0998fbaf58155cca04d31ab99c6bb47420e53c72`; reviewed HEAD `b15b93580f995fb05a696a125c2a5fd995dd4bb3` has **identical Git tree** `a6e7256fb1572361c4dd4d850124ca7a6afff566`. The independent verdict was **APPROVED FOR DEVELOPMENT MERGE WITH DOCUMENTED LIMITATIONS**, with exact-source Standard 9/9 + Full 21/21 + Hosted 1/1 (**31/31**) synthetic CI PASS. Phase 4 development is merged; **Phase 5 real A–D integration, CF05-07, package, hosted and Owner release acceptance are NOT complete**. All older dated DRAFT/finance-default-deny/core-source-allowlist statements below are historical and not current requirements.
+**Historical Phase 4 checkpoint (2026-11-24):** [PR #38](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/38) was independently reviewed and **squash-merged** into `main` as `0998fbaf58155cca04d31ab99c6bb47420e53c72`; reviewed HEAD `b15b93580f995fb05a696a125c2a5fd995dd4bb3` has **identical Git tree** `a6e7256fb1572361c4dd4d850124ca7a6afff566`. The independent verdict was **APPROVED FOR DEVELOPMENT MERGE WITH DOCUMENTED LIMITATIONS**, with exact-source Standard 9/9 + Full 21/21 + Hosted 1/1 (**31/31**) synthetic CI PASS. Phase 4 development is merged; **Phase 5 real A–D integration, CF05-07, package, hosted and Owner release acceptance are NOT complete**. All older dated DRAFT/finance-default-deny/core-source-allowlist statements below are historical and not current requirements.
 
-**Independent disposition:** F38-01–06 `CLOSED`; F38-07–09 `SUPERSEDED BY OWNER VARIANT B` (not technically closed); F38-10–13 `INDEPENDENTLY CLOSED`; F38-14/P2 `INDEPENDENTLY CLOSED` (server-confirmed `manualend` restored only after fresh fingerprint revalidation); F36-01 historically closed. **Separate real incident:** `DOLIENV-ACC-01` in B remains `UNKNOWN/STOP`, diagnostic subscription #3 and rollback unconfirmed; lack of a persisted record does not prove rollback ACK. No replay/compensation. The corrected code has **not been retested in real B finance**.
+**Independent disposition:** F38-01–06 `CLOSED`; F38-07–09 `SUPERSEDED BY OWNER VARIANT B` (not technically closed); F38-10–13 `INDEPENDENTLY CLOSED`; F38-14/P2 `INDEPENDENTLY CLOSED` (server-confirmed `manualend` restored only after fresh fingerprint revalidation); F36-01 historically closed. **Separate real incident:** `DOLIENV-ACC-01` in B remains `UNKNOWN/STOP`, diagnostic subscription #3 and rollback unconfirmed; lack of a persisted record does not prove rollback ACK. No replay/compensation. New B01/B02 and B-mail cases on the later merged baseline have accepted positive finance outcomes; the historical incident is unchanged.
 
-**Evidence provenance:** F38-14 `manualend` test uses production Booking/Invoice orchestration and original local file-session capability with synthetic Core/DB guard; a pre-fix RED observation was reported by the implementer, while independent reviewer did not independently rerun the pre-fix failure or inspect private raw browser logs. The source change is independently closed but **not real Env B invoice accepted**. Prior 31/31 CI on exact reviewed tree is development proof; prior A/C bounded real tests ran on source `46f78d8...`. D remained read-only.
+**Evidence provenance:** F38-14 `manualend` test uses production Booking/Invoice orchestration and original local file-session capability with synthetic Core/DB guard; a pre-fix RED observation was reported by the implementer, while independent reviewer did not independently rerun the pre-fix failure or inspect private raw browser logs. The source change is independently closed; subsequent bounded B finance cases are accepted as Codex results. Prior 31/31 CI on exact reviewed tree is development proof; prior A/C bounded real tests ran on source `46f78d8...`. D was read-only in that earlier campaign; PR #45 D cases and the later #48 development cases remain separately source-bound. Hosted simulation CI (PHP 8.3 / Dolibarr 22.0.5) is synthetic and does not establish real Web PHP 8.4.28 or exact-package qualification.
 
-**Current dolienv topology:** A = local Dolibarr 24.0.3/PHP 8.2.35/MariaDB 10.11.19 `MariaDBSnapshot`; B = local Dolibarr 24.0.3/PHP 8.2.35/MySQL 8.4.13 `CoreGuarded`; C = same Dolibarr/PHP/MySQL versions `EnhancedMySQL`; D = hosted Dolibarr 22.0.5/MySQL 8.4.13/CLI PHP 8.3.37 `CoreGuarded`. A/B/C have separate schemas, webroots, accounts, sessions, document roots; B/C share MySQL server and local module source only. Legacy CF03 A/B labels and older shared A/C commands cannot be relabeled/reused. A/C limited invoice/PDF/R16/replay positive evidence was on prior HEAD `46f78d8...`; D has read-only hosted evidence; no exact-current-source full real finance qualification. [Canonical matrix](dolienv-environments.md).
+**Current dolienv topology:** A = local Dolibarr 24.0.3/PHP 8.2.35/MariaDB 10.11.19 `MariaDBSnapshot`; B = local Dolibarr 24.0.3/PHP 8.2.35/MySQL 8.4.13 `CoreGuarded`; C = same Dolibarr/PHP/MySQL versions `EnhancedMySQL`; D = hosted Dolibarr 22.0.5/MySQL 8.4.13/Web PHP 8.4.28 CGI/FastCGI and CLI PHP 8.3.37 `CoreGuarded`. A/B/C have separate schemas, webroots, accounts, sessions, document roots; B/C share MySQL server and local module source only. Legacy CF03 A/B labels and older shared A/C commands cannot be relabeled/reused. Earlier bounded real evidence on `46f78d8...` remains historical; the accepted local campaign ran on `ba5c9a3121754fcbd4259bb8906ad1dd17f1ce00`. D focused contribution/session/replay PASS on `0adc259d4739b44f9b1fb3a49574d7e1c318132c`; later D development cases PASS in the approved matrix on `c2dc2cfdadf2c4def6bcd2f2ec20473cea3683b3`. D live security remains PARTIAL; ADR-08A delta PASS with documented limitations; formal documentation follow-up closed by the verified #49 squash; exact-package qualification remains open. [Canonical matrix](dolienv-environments.md).
 
-**Operational/release boundary:** `F32-MR-01` protected private target-user launcher and read-only preflight, independently reconciled **new** one-shot A–D CF03-NORMAL cases (priority B finance, never replay old UNKNOWN), per-case Owner write GO, controlled snapshots/backups and restore readiness, actual module mail/verified attachments, `CF05-07` risk acceptance, `R0-03` exact v0.1.0 ZIP/SHA256, `R0-04` hosted D package/Web-FPM/business qualification, `R0-07` independent final acceptance and separate Owner Release GO remain **OPEN / NO-GO**. SMTP-capture probes are infrastructure-only, backup integrity is not restore, and CF03-FAULT destructive cases remain DEFERRED/NOT EXECUTED. No real writes authorized by this documentation.
+**Historical accepted Phase 5 checkpoint (2026-11-24; original source scope):** Owner-accepted local cases on `ba5c9a3121754fcbd4259bb8906ad1dd17f1ce00`: A/B/C protected readiness 21 checks PASS; B01/B02 and A02/C02 bounded finance/PDF PASS; additional non-mail 8/8 PASS (11 confirmations, 20 contributions, two invoices/PDFs, 18 Agenda pairs); B mail/verified attachment 3/3 PASS in two bulk confirmations, capture-only. Hosted D has a fresh independent checkout/dedicated schema (Dolibarr 22.0.5, Oracle MySQL 8.4.13, Web PHP 8.4.28 CGI/FastCGI, CLI PHP 8.3.37). On `0adc259d4739b44f9b1fb3a49574d7e1c318132c`, four role-dependent UI checks and two distinct contribution-only bookings PASS; focused follow-up persisted result after reload, rejected one consumed replay and separate hosting-local SQL readbacks confirmed unchanged member state after replay. Provider session defaults unchanged. That 24 November checkpoint did not cover D finance/PDF/mail; the later 25 November cases above do. Neither is exact-ZIP acceptance. Modified OD-P5-02 accepts authorized summaries within their recorded scope; no independent external reproduction claimed. See [local qualification register](evidence/cf03/phase5-local-qualification-2026-11-24.md) and [environment evidence](dolienv-environments.md).
+
+**Historical PR #45 checkpoint:** Development fix squash-merged as `b026f1504db27308fc7326e2e88ec2e53b2f48d9`; see [current baseline](current-development-baseline.md) for exact source/merge provenance and F45 follow-up.
+
+**Operational and release boundaries.** The [M3.4 Owner decision](m34-integrated-owner-acceptance.md) governs formal Phase 5 development closure. For any separately authorized future real case, per-case Owner GO, protected F32-MR-01 target-user preflight, actual source/profile/role binding, fresh fixtures, controlled backups, read-only baselines and independent after-state remain required. CF03-NORMAL A–D passes within the respective accepted source-bound development matrices, not one final source or release artifact. A/B/C mail/attachments 3/3 each are capture-only on their respective sources; D-SMTP2 3/3 is Owner-confirmed external receipt and verified attachment identity on `c2dc2cfdadf2c4def6bcd2f2ec20473cea3683b3`, not independent raw MIME or isolated no-relay capture. Live security/configuration remains PARTIAL: P5L-A/B/C-S05 and D-S06 real cross-entity BLOCKED / NOT EXECUTED under [accepted M3.2 scope](m31-cross-entity-owner-decision.md); synthetic entity coverage remains separate. Accepted cases need no blanket repetition, including the historical D-M01/M02 blocked capture campaign. [PR #48](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/48) documentation is independently accepted and squash-merged as `316e8a8d196fe908d11cf3d4409d0a5e541e6c01`. [ADR-08A / D-MAIL-01](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22) is technically accepted in [PR #49](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/49); local and Hosted D delta PASS within their separate evidence limits; formal documentation follow-up closed by the verified #49 squash. See [Hosted D delta evidence](evidence/cf03/adr-08a-hosted-d-2026-11-26.md). F38-02 retains historical closure; only mandatory batch termination solely for isolated mail transport uncertainty is partially superseded, with UNKNOWN/no-resend and all safety-critical STOP safeguards retained. No new behavior is attributed to earlier tested sources. Release qualification remains open. R0-04 requires the exact final ZIP, R0-05 requires separate operational readiness and operating-risk acceptance, and R0-07 and separate Owner Release GO remain mandatory. B02 mail/attachment, DOLIENV-ACC-01 (rollback unconfirmed), and historical D SMTP UNKNOWN/STOP remain unchanged; no replay, resend or compensation. CF03-FAULT destructive tests remain DEFERRED / NOT EXECUTED. No operational or release GO follows from documentation.
+
+
+**PR #45 evidence boundary:** [PR #45](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/45) squash-merged as `b026f1504db27308fc7326e2e88ec2e53b2f48d9`, parent `e57ee41248306797678f0c5ccd5251fd13474465`, identical tree `29873481b9d24aaf56836d46c934f710af24cecc` to independent review HEAD `7e5f64d07ab3830ce355cd745782c4f0c2a955b0`. Verdict: APPROVED FOR DEVELOPMENT MERGE WITH DOCUMENTED LIMITATIONS; exact-head [Standard 9/9](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/45501058019), [Full 21/21](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/45501057921), [Hosted 1/1](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/45501057914), 31/31 SUCCESS. D real implementation `0adc259d4739b44f9b1fb3a49574d7e1c318132c`; the next commit changed only four Markdown files. No real test is relabeled as a run on the squash commit. Implementer reported 96 file-session assertions and pre-fix RED/post-fix GREEN; reviewer confirmed CI/test delta but did not independently rerun RED/GREEN or real tests. PHP 8.4.28 Web is bounded real D evidence, not the PHP 8.3 CI lane. At the original #45 review F45-01/02 remained open: effective non-listability under an actual unprivileged runner and fresh original capabilities for targeted negatives. Both are now INDEPENDENTLY CLOSED by #51; see [individual test traceability](test-coverage.md#v010-pre-release-test-hardening). Preserve the productive checkpoint call and persisted result readback.
+
+**Requirements traceability:** `requirements.csv` retains all 71 original IDs, historical row fields and source evidence. Current overlay and qualification register govern newer scope/gaps; no claim that all historical rows now PASS.
 
 ---
 
-> **Archived date-bound content below:** previous sources/labels/admission claims reflect their original times; the post-PR38 section above governs current status.
+> **Archived date-bound content below:** previous sources/labels/admission claims reflect their original times; the Phase 5 section above and its linked register govern current status.
 
 > **Current environment convention — 2026-11-24:** dolienv **A = MariaDBSnapshot**,
 > **B = CoreGuarded**, **C = EnhancedMySQL**, **D = hosted CoreGuarded**.
@@ -50,13 +98,15 @@
 >
 > **STILL BINDING:** Massaction's per-member rights/entity, server-confirmed preview/fingerprint and user/profile revision, controlled original DoliDB Guard, effective transactional-table/engine checks, consumed one-shot session, confirmed nonterminal completion, durable post-COMMIT PDF/mail checkpoints, verified attachment/recipient identity, and `UNKNOWN/STOP` on uncertain completion or external effects with **no automatic booking/PDF/mail replay or foreign rollback**. No guarantee that Dolibarr Core SQL and filesystem are jointly atomic or that arbitrary custom extensions are benign. **F36-02/P2 = OWNER-ACCEPTED CORE RESIDUAL RISK** (conditional pre-outer-COMMIT `PROV` rename); it is not proven impossible or technically fixed. **F38-07/08/09 = SUPERSEDED BY OWNER ARCHITECTURE DECISION**, not historically falsified or independently technically CLOSED. F38-01..06 remain CLOSED per prior reviews and regressions. F36-01 remains historically CLOSED on the old default-deny branch, while its later Owner activation is binding.
 >
-> **EVIDENCE AND RELEASE:** Newly added `test/unit/cf05-core-parity.php`, positive/negative existing/new customer and contribution/mail orchestration, standard/custom model regression and 9-/21-/Hosted synthetic CI are development evidence, **not real A–D**. Real CF03-NORMAL A–D needs separately Owner-authorized cases, F32-MR-01 private launcher/read-only preflight, A/C serialized use, DB/invoice/PDF/file/SMTP evidence, CF05-07/Owner risk review, later exact-ZIP/hosted D and separate release GO. Purposefully destructive CF03-FAULT is DEFERRED. Earlier statements below that require Core source/trigger pinning or productive CoreGuarded default deny are preserved **only as dated history**, not current policy. [Current decision and finding map](owner-core-parity-2026-11-22.md).
+> **HISTORICAL PR #38 EVIDENCE PLAN (2026-11-24).** Newly added `test/unit/cf05-core-parity.php`, positive/negative existing/new customer and contribution/mail orchestration, standard/custom model regression and 9-/21-/Hosted synthetic CI are development evidence, **not real A–D**. Real CF03-NORMAL A–D needs separately Owner-authorized cases, F32-MR-01 private launcher/read-only preflight, A/C serialized use, DB/invoice/PDF/file/SMTP evidence, CF05-07/Owner risk review, later exact-ZIP/hosted D and separate release GO. Purposefully destructive CF03-FAULT is DEFERRED. Earlier statements below that require Core source/trigger pinning or productive CoreGuarded default deny are preserved **only as dated history**, not current policy. [Current decision and finding map](owner-core-parity-2026-11-22.md).
 
 
 **PR #38 CF05-06 corrective checkpoint — 2026-11-22 (DRAFT / NOT INDEPENDENTLY CLOSED):** The new server-owned `MsmCoreFinanceQualification` implements a bounded supported-configuration gate for the Owner-authorized CoreGuarded invoice/Third-Party/PDF/mail workflow. **15 exact pinned V22.0.0–V24.0.3 Core invoice source blobs** and version-matched standard Agenda/Logevents trigger blobs are checked against installed content before a CoreGuarded invoice's first outer BEGIN. Unknown/patched Core, enabled third-party or unqualified core triggers, Agenda automatic file copying or enabled unqualified invoice Logevents are rejected; an existing provisional `PROV` invoice file/directory is refused immediately before Core `Facture::validate()`. The original rights/confirmation/same guard/one-shot/postcommit/no-retry contracts remain in force. **The finance feature gate remains ON for supported qualified Core configurations; this is not a blanket re-lock.** **F38-04/P2:** five remaining Massaction/CSRF/Admin/Period/Preview UI security entry points added to Full+Hosted CI with broad class/lib/admin fallback and a missing-path negative check. **F36-02/P2 and F38-07/P2:** BOUNDED MITIGATION IMPLEMENTED / INDEPENDENT SOURCE REVIEW PENDING, **NOT CLOSED** and no real A–D DB/FS/SMTP qualification; custom trigger side effects and external filesystem races are not certified. See [the source-qualification report](cf05-06-standard-core-source-qualification.md). **No Owner operational GO or release GO.**
 
 
-## Updated CF05 / CF03 coverage interpretation (2026-11-21)
+<a id="updated-cf05--cf03-coverage-interpretation-2026-11-21"></a>
+
+## Historical CF05 / CF03 coverage interpretation (2026-11-21, before PR #38)
 
 The historic **71 Cxx requirement rows** in [requirements.csv](requirements.csv) preserve original requirements and their dated implementation/test mapping. They are **not a substitute for the new CF05-01..07 gates in [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22)**. During CF05 implementation, extend existing test IDs/evidence links without inventing a completed test status or renumbering the original requirements.
 
@@ -485,3 +535,72 @@ The W01 independent review at HEAD `7fc5898d57d7c6bba51cf7cb2c572c5dc3131217` ha
 New pure `test/unit/cf03-evidence.php` exercises immutable private 0700 hosted evidence directories, 0600 baseline files, ownership, SHA-256 integrity, no symlinks, invalid roots, unexpected files and no retry, without DB/HTTP. Extended `test/unit/cf03-lab.php` covers explicit invoice expected values, schema-column drift, hosted D evidence-root validation, permitted A–D and B/C scoped invoices with exact member/invoice Agenda actor/count matching, and fail-closed customer/currency/quantity checks. Both run in standard nine-profile and optional full 21-profile CI, plus the new focused PHP 8.3 / Dolibarr V22.0.5 workflow. Existing CI matrix remains nine jobs.
 
 The live read-only `tools/cf03-lab.php` now checks V22/V24 selected `information_schema.COLUMNS` fields with stable sorted hashes before baseline/verify, and includes `tools/cf03-evidence.lib.php` in source SHA-256 binding. B/C existing-customer invoice checks are narrowed to one linked validated invoice and one line with explicit known expected configuration. Enabled line-level `LINEBILL_INSERT` Agenda event attribution remains outside this witness and causes STOP. No creation of a customer, physical rollback event proof, active Enhanced observer identity, SMTP/PDF, live HTTP, ZIP-installation integrity or real fault test is claimed. See [W01 boundaries](cf03-w01-validation.md). All Issue #22 CF-03 completion gates remain open.
+
+## CPC-02 cross-profile batch results
+
+C04-04 is exercised through the common batch orchestrator and renderer. A
+confirmed operation is SUCCESS, a definite failure is FAILED, an ordinary
+business or admission exclusion is SKIPPED, an uncertain business outcome
+is UNKNOWN, and an operation prevented by STOP is NOT_PROCESSED. The final
+STOP flag is independent of the number of remaining selections. Only confirmed
+success contributes to the booked total. Stored historic results remain readable.
+
+Implementation source `042c917bd5d8844c33758f8c26170fd7eb7ecb87`.
+Synthetic tests use the original orchestrator, test doubles and real temporary
+PHP file sessions. They check all three profiles at first, intermediate and
+final STOP, genuine SKIPPED and isolated FAILED, effect boundaries, rendered
+totals, session reload and consumed-confirmation rejection. Existing E15,
+ADR-08A and F38-01 regression cases remain applicable. The status result
+does not imply equivalent transaction evidence across the profiles.
+
+**Local development qualification, 2026-11-26.** All three cases ran on
+`042c917bd5d8844c33758f8c26170fd7eb7ecb87`, Dolibarr 24.0.3 / PHP 8.2.35.
+Each used fresh synthetic fixtures, verified database/Documents backups
+(archive integrity; restore not tested), the protected target-user preflight
+and an authenticated browser. In each three-member batch, the two active
+members booked and the draft member was skipped. Invoice and mail were
+disabled for the run through the normal confirmation options.
+
+| Case | Profile / DB | Expected and verified | Outcome |
+| --- | --- | --- | --- |
+| CPC02-A | MariaDBSnapshot / MariaDB 10.11.19 | 2 SUCCESS, 1 SKIPPED, other outcomes zero, no STOP | PASS |
+| CPC02-B | CoreGuarded / Oracle MySQL 8.4.13 | Same totals with acknowledged nonterminal Core completion | PASS |
+| CPC02-C | EnhancedMySQL / Oracle MySQL 8.4.13 | 2 SUCCESS, 1 SKIPPED, other outcomes zero, no STOP | PASS |
+
+For each case the saved result was identical on reload, the original
+consumed confirmation could not book again, and a separate reader
+reconciled 24 business tables before booking, after booking and after replay.
+A protected runtime-user file-session readback confirmed all three final
+results separately. The A driver first stopped during local request
+serialization before submission. Independent SQL confirmed that the fixtures
+had zero subscriptions before the sole booking submission. An A post-run
+readback precondition was corrected and only the readback was resumed.
+B/C ran in separate serial windows. The original source checkout was
+restored. No mail, invoices, PDF or temporary application setting changes.
+
+Live safety-critical STOP was NOT EXECUTED. The scenarios that would exercise
+the changed STOP branch on real bookings require fault induction outside this
+non-destructive case catalog. First, intermediate and final STOP and
+checkpoint-failure evidence remain synthetic. Hosted D is outside the CPC-02
+live scope; Hosted CI is synthetic.
+
+## v0.1.0 pre-release test hardening
+
+[PR #51](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/51) squash `8ab803d135ac534dd2d08d28f47a8e427cd23302` matches approved HEAD `3d3cbda7e0ca46db1f2fe5651a273e7aeea4b4bf` (sole parent `f1cc6dc9ca8a274d8af8c324fe87310c84606471`, tree `cf2b1ffcf9f38baae8edf6b18e8f0b4d7348a771`). F45-01/02, F49-03, F50-02/03 and F51-01/02 are INDEPENDENTLY CLOSED. Pre-Release Test-Hardening is integrated and CLOSED WITH DOCUMENTED LIMITATIONS. The original technical review closed five findings on `500a7fe6ca5e59e2549d62af89fa62f017bfecf9`; final F51-01/02 closures and exact CI are recorded in the [M3.1 integrated review basis](m31-integrated-development-qualification.md).
+
+| Finding | Test and verified result | Evidence boundary |
+| --- | --- | --- |
+| F45-01/P3 | [coreguarded-session.php](../test/unit/coreguarded-session.php) actually denied `opendir()` on mode `0300`; the production file-session checkpoint wrote, closed, reopened and read back the known session file while the directory remained non-listable. PASS on PHP 8.2.35 under effective UID 1000. | Local unprivileged filesystem and PHP session runtime. Privileged execution cannot pass this proof. No provider configuration changed. |
+| F45-02/P3 | [coreguarded-session.php](../test/unit/coreguarded-session.php) rejected first-invocation amount, option, profile revision and user mismatches. Each case used a new original confirmation and untouched one-shot checkpoint; bytes and downstream effect count stayed unchanged. The same checkpoint accepted an exact-input control after refusal. PASS. | Synthetic confirmation through the actual file-session boundary; no business DML. Separate replay assertions remain. |
+| F49-03/P3 | [cf05-finance.php](../test/unit/cf05-finance.php) called the production continuation method and transaction guard with native/DB doubles. Qualified context passed; terminal, uncertain, changed and unobservable contexts refused. Opaque transport failure remained UNKNOWN/STOP. [maildelivery.php](../test/unit/maildelivery.php) checked XOAUTH2, a pre-existing CMailFile error, context precedence and hook registrations while retaining qualified SMTP evidence. [coreguarded-session.php](../test/unit/coreguarded-session.php) persisted a synthetic marker through the native files handler, then rejected the deliberately non-identical reopened state. A subsequent read proved the new bytes had been written. PASS. | Synthetic transport/DB and isolated real file I/O. The readback test supplies a serialization mismatch, not a live storage fault. Existing orchestrator E15 tests cover the refusal-to-continue path. |
+| F50-02/P3 | [terminal.php](../test/unit/terminal.php), executed by `postcommit.php`, rejected a false terminal-save acknowledgement in MariaDBSnapshot and EnhancedMySQL after the earlier success/PDF/mail were durably saved in a test session. Reopening returned the earlier snapshot without a persisted terminal result; replay was rejected and the effect trace ended at the failed save. PASS. | Synthetic profile/service/save responses with actual PHP file-session snapshots. No real DB or session storage outage. |
+| F50-03/P3 | [terminal.php](../test/unit/terminal.php) explicitly selected invoice and mail for both A/C profiles. Effect spies allowed the predecessor's PDF and mail only and rejected any attempt for the STOP member or follower, including a confirmed business success triggering STOP. PASS. | Synthetic selected effects and terminal outcomes. No PDF rendered or SMTP sent. |
+
+Original targeted results on `500a7fe6ca5e59e2549d62af89fa62f017bfecf9` (independently corroborated in CI): `coreguarded-session.php` 122 assertions;
+`maildelivery.php` 154; `cf05-finance.php` 449 and `terminal.php` 219
+against each pinned Core 22.0.5, 23.0.4 and 24.0.3.
+F51-02 test refinement on `3bea1dc755d6d3e08b84fb272c1c4ca77faec70e`: original confirmation revision matches the profile binding; separate finance fixture binding matches its own original revision; each negative case requires successful string-valued file reads before byte equality. Nine additional assertions, 131 session assertions confirmed by final exact-HEAD Standard/Full CI on the applicable lanes. Hosted simulation did not execute the standalone session suite. Original results above retain their source.
+
+The previously accepted A/B/C mixed runs remain on
+`042c917bd5d8844c33758f8c26170fd7eb7ecb87`. There is no new live
+qualification, Hosted D operation or release-package evidence in this follow-up.

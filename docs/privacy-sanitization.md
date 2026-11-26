@@ -2,7 +2,10 @@
 
 ## Current privacy and historical-evidence guidance (post PR #38 – 2026-11-24)
 
-The current source was independently reviewed and squash-merged as `0998fbaf58155cca04d31ab99c6bb47420e53c72`. Use the [new dolienv mapping](dolienv-environments.md) A MariaDB, B CoreGuarded MySQL, C EnhancedMySQL MySQL, D hosted; earlier A/C shared-schema and reversed A/B commands below are historical only. Continue to pseudonymize public current-tree docs; never publish private hostnames, URLs, account/database/login identities, paths, dumps, secrets or raw operator evidence. F32-MR-01 private target-user launcher and read-only preflight remain open; the original B UNKNOWN/STOP case is not eligible for retry. Nothing in this documentation authorizes real writes, deployment or release.
+The Phase 4 source was independently reviewed and squash-merged as `0998fbaf58155cca04d31ab99c6bb47420e53c72`; PR #45 merged as `b026f1504db27308fc7326e2e88ec2e53b2f48d9`. Use the [new dolienv mapping](dolienv-environments.md) A MariaDB, B CoreGuarded MySQL, C EnhancedMySQL MySQL, D hosted; earlier A/C shared-schema and reversed A/B commands below are historical only. Continue to pseudonymize public current-tree docs; never publish private hostnames, URLs, account/database/login identities, paths, dumps, secrets or raw operator evidence. F32-MR-01 private target-user launcher and read-only preflight remain open; the original B UNKNOWN/STOP case is not eligible for retry. Nothing in this documentation authorizes real writes, deployment or release.
+
+
+**Historical PR #45 checkpoint:** development squash `b026f1504db27308fc7326e2e88ec2e53b2f48d9`, reviewed tree identical; #44 consolidation completed and #41–#43 closed without merge as superseded. [Current baseline](current-development-baseline.md) governs source identity, F45-01/02 independently closed by PR #51, F45-03 independently closed by PR #46 and the remaining gates.
 
 ---
 
@@ -28,12 +31,17 @@ persistent list of private operator identifiers is retained in repository
 code, tests or CI configuration. Future changes must use operator-neutral
 placeholders rather than real local identities.
 
-`tools/cf03-lab.lib.php` obtains A/B identities and the approved C account from private
+**Historical launcher/topology example (not current environment bindings):**
+`tools/cf03-lab.lib.php` obtained A/B identities and the approved C account from private
 operator-only environment values. `CF03_EVIDENCE_ROOT` supplies the real A/B/C evidence
 parent outside Git. Secrets are **never** passed as command-line arguments; existing
 trusted Dolibarr `conf.php` supplies the actual DB password. Missing mandatory
-bindings STOP rather than guessing local paths or accounts. Existing A/C shared
-schema and different effective DB accounts remain binding; do not run them concurrently.
+bindings STOP rather than guessing local paths or accounts. The former A/C shared
+schema and distinct accounts belonged to that archived setup. Current A/B/C
+schemas, webroots, accounts, sessions and document roots are separate; B/C share
+the MySQL server and local source, so coordinate B/C windows. Follow the
+[current environment matrix](dolienv-environments.md) and protected target-user
+preflight; do not reuse the old launcher/commands blindly.
 
 The W01 evidence parent allows read/traverse access, but **group/other write bits
 are rejected**. A case directory remains owner-restricted 0700 and evidence files

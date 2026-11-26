@@ -1,6 +1,12 @@
 # CF05-06 – Bounded standard-Core source and filesystem qualification (PR #38)
 
-> **CURRENT BINDING OWNER DECISION — 2026-11-22 / PR #38, CORE PARITY + MASSACTION SAFETY (DRAFT, NOT YET INDEPENDENTLY REVIEWED).** The Owner expressly **supersedes the earlier CF05-06 exact-Core/trigger-blob allowlist and PROV-directory prohibition**. The module trusts Dolibarr's normal `Adherent::subscription()`, `Societe::create_from_member()`, `Facture::create()/addline()/validate()`, numbering/PDF models, enabled triggers/Agenda/Logevents and extension behavior as the Core single-member workflow does. **Full `CoreGuarded` invoice, conditional auto Third Party, post-COMMIT PDF and optional verified-attachment email stay enabled**, along with `EnhancedMySQL` and `MariaDBSnapshot`. Removed as normative admission checks: 15-version invoice source hashes, standard trigger hashes, prohibition of custom enabled triggers, Agenda file-copy/Logevents settings and `PROV` existence check. Do not rebuild those allowlists under F38-08/09. Core model lookup supports installed model roots without unsafe model-name paths.
+**Current navigation.** See the [M3.1 integrated review basis](m31-integrated-development-qualification.md). Dated default-deny, hash/trigger allowlists, PROV veto and old finance-unlock sequencing are archived. Owner Variant B is binding; prior real tests and residual F36-02 keep their documented scope.
+
+
+> **Historical record — current navigation after PR #45 (2026-11-24):** the dated statements, earlier PR status, old A/B/C mappings and original test identities below are retained as historical evidence, not present authorization or roadmap. PR #38 full finance implementation is merged; Owner Variant B supersedes former source/trigger allowlists, blanket PROV veto and default-deny. PR #44 consolidation and PR #45 session compatibility fix are merged. Local A/B/C bounded results, B mail and focused D contribution/session/replay are accepted within their recorded scope. Full A–D integration and release remain open / NO-GO. F36-02 remains Owner-accepted Core residual risk. See [current baseline](current-development-baseline.md), [binding Owner decision](owner-core-parity-2026-11-22.md) and [current environments](dolienv-environments.md). No old command or fixture is authorized by this record.
+
+
+> **BINDING OWNER DECISION — 2026-11-22 / PR #38, CORE PARITY + MASSACTION SAFETY.** The Owner expressly **supersedes the earlier CF05-06 exact-Core/trigger-blob allowlist and PROV-directory prohibition**. The module trusts Dolibarr's normal `Adherent::subscription()`, `Societe::create_from_member()`, `Facture::create()/addline()/validate()`, numbering/PDF models, enabled triggers/Agenda/Logevents and extension behavior as the Core single-member workflow does. **Full `CoreGuarded` invoice, conditional auto Third Party, post-COMMIT PDF and optional verified-attachment email stay enabled**, along with `EnhancedMySQL` and `MariaDBSnapshot`. Removed as normative admission checks: 15-version invoice source hashes, standard trigger hashes, prohibition of custom enabled triggers, Agenda file-copy/Logevents settings and `PROV` existence check. Do not rebuild those allowlists under F38-08/09. Core model lookup supports installed model roots without unsafe model-name paths.
 >
 > **STILL BINDING:** Massaction's per-member rights/entity, server-confirmed preview/fingerprint and user/profile revision, controlled original DoliDB Guard, effective transactional-table/engine checks, consumed one-shot session, confirmed nonterminal completion, durable post-COMMIT PDF/mail checkpoints, verified attachment/recipient identity, and `UNKNOWN/STOP` on uncertain completion or external effects with **no automatic booking/PDF/mail replay or foreign rollback**. No guarantee that Dolibarr Core SQL and filesystem are jointly atomic or that arbitrary custom extensions are benign. **F36-02/P2 = OWNER-ACCEPTED CORE RESIDUAL RISK** (conditional pre-outer-COMMIT `PROV` rename); it is not proven impossible or technically fixed. **F38-07/08/09 = SUPERSEDED BY OWNER ARCHITECTURE DECISION**, not historically falsified or independently technically CLOSED. F38-01..06 remain CLOSED per prior reviews and regressions. F36-01 remains historically CLOSED on the old default-deny branch, while its later Owner activation is binding.
 >
@@ -9,7 +15,9 @@
 
 **Date:** 2026-11-22. **Status:** SOURCE-LED BOUNDED MITIGATION IMPLEMENTED / OFFLINE TEST PENDING / INDEPENDENT FOLLOW-UP PENDING. **NOT** real A–D DB/FS/SMTP acceptance, not general third-party-module certification and **NOT** an unconditional F36-02 closure. [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22), ADR-06/11/12 and D-01/D-02 govern this report.
 
-## Owner product scope and actual admission
+<a id="owner-product-scope-and-actual-admission"></a>
+
+## Historical draft source-boundary implementation before final Owner Variant B
 
 The Owner requires **full** CoreGuarded, EnhancedMySQL and MariaDBSnapshot contribution/Third-Party/invoice/PDF/mail functionality. PR #38 retains `MsmTransactionProfile::coreGuardedFinanceQualified() === true` **for qualified configurations**. The runtime finance gate is not reclosed or substituted with an unreviewed test-only toggle. Instead the CoreGuarded Invoice service now checks a **supported Core-source/trigger/configuration boundary**:
 
@@ -41,7 +49,9 @@ Representative immutable Core references:
 | V23.0.4 | `cb82037066c1c71f7c867482e9e92975222dfc14` | [around L3978–4009](https://github.com/Dolibarr/dolibarr/blob/cb82037066c1c71f7c867482e9e92975222dfc14/htdocs/compta/facture/class/facture.class.php#L3978-L4009) |
 | V24.0.3 | `5c6c7ff6a5112413b1c27221c8d11750afad56f8` | [around L4043–4074](https://github.com/Dolibarr/dolibarr/blob/5c6c7ff6a5112413b1c27221c8d11750afad56f8/htdocs/compta/facture/class/facture.class.php#L4043-L4074) |
 
-## Explicitly supported trigger and configuration boundary
+<a id="explicitly-supported-trigger-and-configuration-boundary"></a>
+
+## Historical proposed trigger and configuration boundary
 
 Core's `CommonObject::call_trigger()` invokes `Interfaces::run_triggers()`, which enumerates `/core/triggers` and `$conf->modules_parts['triggers']` and runs enabled `interface_*_<module>_*.class.php` files. It does not certify the actions as DB-atomic, so merely checking the SQL tables is insufficient.
 
@@ -58,7 +68,9 @@ The **qualified** default standard scope is:
 
 **Known limits:** External processes can concurrently create files and unrecognized custom hooks can produce non-DB-atomic effects. No physical CoreGuarded transaction-event identity is asserted; ADR-12 weaker observability is unchanged. External file-creation races are **not** proven impossible by these checks; actual real file/trigger integration still must be tested. Therefore F36-02 and F38-07 are **MITIGATION IMPLEMENTED / INDEPENDENT REVIEW PENDING**, not independently CLOSED.
 
-## Additional read-only Core path evidence and open qualification
+<a id="additional-read-only-core-path-evidence-and-open-qualification"></a>
+
+## Historical read-only Core path evidence
 
 - `Facture::create()` uses nested Core BEGIN/COMMIT and optional `BILL_CREATE`; `addline()` is a nested Core operation; `validate()` invokes `BILL_VALIDATE` before the filesystem rename and nested Core COMMIT. Same original DoliDB remains required and engine/readback checks remain mandatory.
 - `Societe::create_from_member()` and optional `CONTACT_CREATE` are reachable for the new Third Party branch. The pinned standard Agenda trigger runs actioncomm persistence when configured. Full live ON/OFF postconditions, actual contact/Agenda triggered writes and filesystem outcomes are **NOT VERIFIED**.
@@ -66,7 +78,9 @@ The **qualified** default standard scope is:
 - The guard rejects unqualified active third-party triggers even if they happen not to touch invoices; support for an additional extension requires **source-based review and explicit additional configuration qualification**, rather than an arbitrary user-controlled whitelist switch.
 - No destructive CF03-FAULT real test, target DB write, actual SMTP send or exact packaged ZIP was executed in this CF05-06 step.
 
-## Offline negative tests and remaining gates
+<a id="offline-negative-tests-and-remaining-gates"></a>
+
+## Historical offline negative tests and then-remaining gates
 
 `test/unit/cf05-core-qualification.php` checks pinned source acceptance, unknown or modified source rejection, qualified standard trigger bytes, unqualified extension enabled/disabled behavior, Agenda file-copy and Logevents settings, valid missing-PROV path, unsafe existing PROV file/directory and invalid provisional references. All standard/full/hosted CI pipelines invoke it with their actual exact pinned Core checkout. **Offline CI passing is a development requirement and not real integration evidence.**
 

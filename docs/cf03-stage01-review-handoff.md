@@ -1,5 +1,8 @@
 # CF-03 – Stage 0/1 engineering status and review handoff
 
+> **Historical record — current navigation after PR #45 (2026-11-24):** the dated statements, earlier PR status, old A/B/C mappings and original test identities below are retained as historical evidence, not present authorization or roadmap. PR #38 full finance implementation is merged; Owner Variant B supersedes former source/trigger allowlists, blanket PROV veto and default-deny. PR #44 consolidation and PR #45 session compatibility fix are merged. Local A/B/C bounded results, B mail and focused D contribution/session/replay are accepted within their recorded scope. Full A–D integration and release remain open / NO-GO. F36-02 remains Owner-accepted Core residual risk. See [current baseline](current-development-baseline.md), [binding Owner decision](owner-core-parity-2026-11-22.md) and [current environments](dolienv-environments.md). No old command or fixture is authorized by this record.
+
+
 **Scope:** Preparation-only Draft PR for Issue #22. **Do not merge as the completed CF-03 qualification.** This submission implements the bound A-D environment contract, read-only witnesses and offline unit coverage, **not** real DB/HTTP/fault/ZIP/SMTP tests or new business code. Review current PR source HEAD, do not equate historical POS01-C, MDB-TEST-01 or I107 source with current CF-03 runtime proof.
 
 ## Decisions and scope

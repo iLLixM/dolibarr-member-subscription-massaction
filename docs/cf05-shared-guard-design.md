@@ -1,8 +1,14 @@
 # CF05-01/02 – Shared active transaction guard (implementation record)
 
+**Current navigation.** See the [M3.1 integrated review basis](m31-integrated-development-qualification.md). Dated default-deny, hash/trigger allowlists, PROV veto and old finance-unlock sequencing are archived. Owner Variant B is binding; prior real tests and residual F36-02 keep their documented scope.
+
+
 ## Current shared-guard integration after PR #38 (2026-11-24)
 
-This document retains PR #34's original guard-design provenance. The **same injected active Booking/Invoice Guard** is now exercised by merged Phase 4 Finance, not held behind the historically described CoreGuarded finance default-deny. Owner Variant B allows standard Core API/trigger/model execution; preserves same DoliDB identity, original consumed file-session, full confirmed finance row, ownership, completion and STOP. PR #38 merged as `0998fbaf58155cca04d31ab99c6bb47420e53c72` (reviewed `b15b93580f995fb05a696a125c2a5fd995dd4bb3`, tree identical). The new F38-14 `manualend` handoff was independently closed technically. **This does not qualify live Env B or D finance or release.** See [current baseline](current-development-baseline.md) and [dolienv](dolienv-environments.md).
+This document retains PR #34's original guard-design provenance. The **same injected active Booking/Invoice Guard** is now exercised by merged Phase 4 Finance, not held behind the historically described CoreGuarded finance default-deny. Owner Variant B allows standard Core API/trigger/model execution; preserves same DoliDB identity, original consumed file-session, full confirmed finance row, ownership, completion and STOP. PR #38 merged as `0998fbaf58155cca04d31ab99c6bb47420e53c72` (reviewed `b15b93580f995fb05a696a125c2a5fd995dd4bb3`, tree identical). The new F38-14 `manualend` handoff was independently closed technically. Later local B bounded finance/mail cases were accepted; D focused contribution/session/replay passed, not D finance or release. See [current baseline](current-development-baseline.md) and [dolienv](dolienv-environments.md).
+
+
+**Historical PR #45 checkpoint:** development squash `b026f1504db27308fc7326e2e88ec2e53b2f48d9`, reviewed tree identical; #44 consolidation completed and #41–#43 closed without merge as superseded. [Current baseline](current-development-baseline.md) governs source identity, F45-01/02 independently closed by PR #51, F45-03 independently closed by PR #46 and the remaining gates. PR #45 removes only the directory-listing/readability predicate of `MsmFileBookingCheckpoint::requireSession()`. The `files` handler, nonempty session ID, plain absolute existing writable directory and canonical binding remain required, together with actual reopen/read/write/close/readback. A known file can be accessible in a non-listable directory (e.g. owner mode `0300`). Original consumed one-shot, result persistence, same active owned guard and STOP remain intact. Do not broaden provider permissions or remove the six remaining concrete-file readability checks.
 
 ---
 
@@ -25,11 +31,11 @@ It intentionally has **no** `begin()`, `commit()`, `rollback()` or `completed()`
 
 `MsmDatabaseState` is **retained separately** in Booking and Invoice for DB-family discovery, existing `information_schema`/InnoDB engine verification, `MsmTransactionProfile` admission and read-only metadata. On restricted Oracle MySQL/CoreGuarded, using `MsmDatabaseState::family()` or `requireTransactionalTables()` requires only version/metadata/schema rights; it must never call `MsmDatabaseState::active()` or request Performance Schema permissions merely because a financial checkpoint exists.
 
-## Protected Core call sequence
+## Historical PR #34 protected Core call sequence
 
 The Invoice service receives both the *metadata observer* and the *active guard*, with database-identity checks on each. It uses the injected active guard's `active()` and `requireSupportedIsolation()` exclusively for owned-context validation:
 
-1. Direct service entry: authoritative feature/profile admission; CoreGuarded remains **feature-denied in production after PR #36** (finance business code merged; CF05-06/07 and Owner admission still pending). The implemented CoreGuarded invoice path additionally requires a CoreGuarded guard, not `MsmDatabaseState`.
+1. Direct service entry: authoritative feature/profile admission; CoreGuarded was **feature-denied at the historical PR #36 checkpoint** (finance business code merged; CF05-06/07 and Owner admission still pending). The implemented CoreGuarded invoice path additionally requires a CoreGuarded guard, not `MsmDatabaseState`.
 2. Active guard before customer processing and **immediately before and after** `Societe::create_from_member()`.
 3. Active guard before and after `Facture::create()`.
 4. Active guard before and after `Facture::addline()`.
@@ -40,7 +46,9 @@ An unknown/changed active guard at any boundary stops further business APIs. Fin
 
 Existing EnhancedMySQL event and MariaDB snapshot observers retain their own active and isolation behavior; there is no new P_S permission requirement in CoreGuarded. D-01 order (preflight → SET RR → immediate Core BEGIN → locks → post-lock metadata/readback) remains in Booking unchanged.
 
-## Explicit non-goals and remaining CF05 gates
+<a id="explicit-non-goals-and-remaining-cf05-gates"></a>
+
+## Historical PR #34 non-goals and then-remaining CF05 gates
 
 - **CF05-03:** full finance implementation merged in PR #36 but production CoreGuarded admission remains **default-denied**; distinct qualification and Owner approval remain.
 - **CF05-04:** finite typed pre-financial-Core business origin/owned-context rollback implemented in PR #36; unqualified Core customer/invoice/SQL failures still `UNKNOWN/STOP`.
