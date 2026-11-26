@@ -10,10 +10,12 @@ Preview, confirm and book member subscriptions in bulk from the Dolibarr Members
 
 ## Installation and configuration
 
-1. Import `module_membersubscriptionmassaction-0.1.0.zip` from **Setup → Modules/Applications → Deploy/install external module**. For manual installation, extract the top-level `membersubscriptionmassaction/` directory into the configured Dolibarr custom directory. Verify the package checksum against the checksum supplied with the download.
-2. Verify the target installation has no module-ID collision with `584620`. This ID is unreserved. Enable **Members** and **Member Subscription Massaction**.
-3. In the module setup, explicitly select a profile for the database and grant operators the appropriate Core rights for the selected actions. The module defaults to a 100-member batch limit and honors a lower Core mass-action limit.
-4. For invoices, enable and configure Third Parties and Customer Invoices, including numbering and an invoice PDF model. For confirmations, configure Core mail and a valid sender. Use only the intended recipients and validated configuration.
+1. Verify the SHA-256 checksum of the downloaded `module_membersubscriptionmassaction-0.1.0.zip` against the supplied `SHA256SUMS`. Proceed only if it matches.
+2. Verify the target installation has no module-ID collision with unreserved ID `584620`.
+3. Import the verified ZIP from **Setup → Modules/Applications → Deploy/install external module**. For manual installation, extract the top-level `membersubscriptionmassaction/` directory into the configured Dolibarr custom directory.
+4. Enable **Members** and **Member Subscription Massaction**.
+5. In the module setup, explicitly select a profile for the database and grant operators the appropriate Core rights for the selected actions. The module defaults to a 100-member batch limit and honors a lower Core mass-action limit.
+6. For invoices, enable and configure Third Parties and Customer Invoices, including numbering and an invoice PDF model. For confirmations, configure Core mail and a valid sender. Use only the intended recipients and validated configuration.
 
 | Profile | Database prerequisites |
 | --- | --- |
