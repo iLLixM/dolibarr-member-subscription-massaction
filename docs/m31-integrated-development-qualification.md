@@ -1,16 +1,8 @@
 # M3.1 — Integrated development qualification review basis
 
-**M3.1** — CHANGES REQUIRED BEFORE DOCUMENTATION MERGE at the original
-independent review and the first follow-up on `1009fe845134f5c1f872c64ed9f191c4970f8277`.
-F52-01/02/03 were partially resolved; F52-05/P3 was newly open. Their final
-corrective delta is implemented; independent delta review remains pending.
-The positive technical verdicts stand. CF05-07 is **INDEPENDENT TECHNICAL
-QUALIFICATION ACCEPTED WITH DOCUMENTED LIMITATIONS – FORMAL OWNER
-ACCEPTANCE PENDING**. CF03-RISK is **INDEPENDENT RESIDUAL RISK ASSESSMENT
-COMPLETE – OWNER ACCEPTANCE PENDING**. M3.2 Cross-Entity Variant B is
-**OWNER ACCEPTED WITH DOCUMENTED SCOPE LIMITATION**; F52-04 is independently
-closed, documentation verification complete and R0-04 compliance pending. Phase 5 remains
-PARTIAL; v0.1.0 remains NO-GO. [Canonical dispositions and status audit](m31-review-status-and-sweep.md)
+M3.1 is independently approved and integrated in PR #52. All five F52 findings are independently closed. The first corrective review on `1009fe845134f5c1f872c64ed9f191c4970f8277` had required changes before documentation merge. Its findings and the final approvals are retained in the [review register](m31-review-status-and-sweep.md).
+
+The independent CF05-07 technical verdict and the original CF03-RISK assessment remain the basis for both Owner acceptances with documented limitations. Formal closure takes effect upon Owner integration of the independently approved closure documentation. M3.2 is integrated with scope limitation, and its R0-04 compliance verification remains pending. See the [M3.4 Owner decision and closure rules](m34-integrated-owner-acceptance.md#9-canonical-status-and-transition-rules). Release v0.1.0 remains NO-GO.
 
 ## Source and PR #51 closure
 
@@ -45,7 +37,7 @@ The merged hardening tree adds no production behavior or live qualification.
 | CF05-06 — bound Core/configuration and side-effect risk | Owner Variant B adopts normal Core models/numbering, Agenda/Logevents, triggers and extensions with Massaction safeguards. F38-07/08/09 superseded by policy, not technically closed under the old criteria. Retain API/rights/confirmation/guard/engine checks. F36-02 pre-COMMIT PROV rename remains Owner-accepted Core residual risk. F38-10–14 independently closed. [Owner policy](owner-core-parity-2026-11-22.md) · [Source analysis](cf05-06-standard-core-source-qualification.md) · [Core parity tests](../test/unit/cf05-core-parity.php) | V22/V24 actual supported workflows below. V23 remains synthetic. No source/trigger SHA allowlists, blanket PROV veto or finance default deny. No claim of arbitrary-extension safety or filesystem rollback. |
 
 CF05-01–06 development implementation and prior scoped reviews are available.
-Independent CF05-07 technical qualification of the chain is accepted with documented limitations. Formal Owner acceptance remains separate. The
+Independent CF05-07 technical qualification and the separate Owner acceptance of the chain both carry documented limitations. See the [M3.4 Owner decision](m34-integrated-owner-acceptance.md). The
 [development baseline](current-development-baseline.md) contains prior review
 and squash provenance. [Issues #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22)
 and [#20](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/20)
@@ -109,7 +101,7 @@ evidence and risk totals exceed 71.
 | --- | --- |
 | Implementation | SATISFIED WITHIN SCOPE 71; GAP 0; NOT APPLICABLE 0; SUPERSEDED 0 |
 | Development Evidence | QUALIFIED WITHIN SCOPE 53; SYNTHETIC ONLY 62; TARGETED EVIDENCE OUTSTANDING 4; DEFERRED 13; BLOCKED 7 |
-| Residual Risk | NONE IDENTIFIED 51; OWNER ACCEPTED 13; OWNER DECISION REQUIRED 10 |
+| Residual Risk | NONE IDENTIFIED 51; OWNER ACCEPTED 20; OWNER DECISION REQUIRED 1 (C06-04 for novel extension effects only) |
 | Release Qualification | PENDING R0-04 64; OTHER APPLICABLE GATE 7; NOT APPLICABLE 0 |
 
 **Vocabulary.** Implementation satisfaction is bounded to active product scope.
@@ -122,8 +114,7 @@ TARGETED EVIDENCE OUTSTANDING depends on a materially different claimed
 configuration. DEFERRED preserves the real destructive-test classification.
 BLOCKED records unavailable real evidence. NONE IDENTIFIED is scoped to
 this assessment; OWNER ACCEPTED attaches only to cited decisions.
-OWNER DECISION REQUIRED means unresolved integrated or broader-scope
-disposition. Release labels describe later checks and keep prior development
+OWNER DECISION REQUIRED applies to the conditional C06-04 decision for novel extension effects. See the [M3.4 Owner decision](m34-integrated-owner-acceptance.md) for the ten exact risk replacements and the historical counts. Release labels describe later checks and keep prior development
 evidence valid. The 71 satisfied implementation dispositions include binding
 accepted deviations, specifically [Owner O7](phase4-invoice-architecture.md#o7--decided-retain-and-extend-the-session-results-page)
 for C07-04/05/07. For C07-03, [historical G4/M01](phase4-implementation-validation.md)
@@ -134,13 +125,13 @@ settings only; configured product/service, packaging/stock and broader tax
 cases remain conditional/unqualified. These evidence-precision corrections
 retain the same label assignments and the independently recalculated counts.
 
-| Outstanding item | IDs or boundary | Acceptance criterion |
+| Traceability item | IDs or boundary | Disposition or remaining criterion |
 | --- | --- | --- |
 | Product implementation | No new gap identified by the independent integrated review. | Preserve all 29 compared productive files and existing architecture. A new material finding requires its own review. |
 | Conditional targeted evidence | C04-02, C05-06, C06-04, C08-02 | Qualify only a materially different claimed extension or configured product/tax/stock path. No blanket A–D rerun is required. |
 | Blocked cross-entity evidence | C01-03/07, C03-06/07, C05-03/04, C06-05 | M3.2 resolves the scope choice. Keep the four real cases BLOCKED / NOT EXECUTED and verify all accepted single-entity conditions under R0-04. |
-| Integrated residual acceptance | C03-09/11, C04-03/05/06/07/08, C05-11, C06-04/08 | Separate Owner disposition under CF03-RISK and R0-05 where applicable. This does not reopen ADR-12, F36-02, CPC-01 or ADR-08A. A novel extension is in scope only after any required separate decision. |
-| Deferred faults and final artifact | CF03-FAULT and R0-04/R0-07 | Retain deferred real faults. Verify the exact package, intended configuration and [Variant B criteria](release-qualification-v0.1.0.md#r0-04-cross-entity-variant-b-compliance) in their own gate. |
+| Integrated residual acceptance | C03-09/11, C04-03/05/06/07/08, C05-11, C06-04/08 | The [M3.4 Owner decision](m34-integrated-owner-acceptance.md) governs the accepted groups. C06-04 remains conditional for novel extension effects. Preserve C04-07/08 release clauses and R0-05 where applicable. |
+| Deferred faults and final artifact | CF03-FAULT and R0-04/R0-05/R0-06/R0-07 | Retain deferred real faults. Verify the exact package, intended configuration and [Variant B criteria](release-qualification-v0.1.0.md#r0-04-cross-entity-variant-b-compliance) in their own gate. |
 
 ## Profile boundary and next acceptance
 
@@ -159,10 +150,9 @@ invoice attachment. Failed persistence prevents further effects. CPC-02
 standardizes the consequences of an already-decided STOP. It preserves the
 different triggers and ADR-08B remains deferred.
 
-| Next action | Acceptance criterion |
+| Milestone or gate | Disposition |
 | --- | --- |
-| M3.1 independent corrective follow-up | Verify F52-01/02/03/05 against the [final corrective sweep and verification](m31-review-status-and-sweep.md) and exact corrective tree/CI. Preserve independently closed F52-04. Documentation merge approval remains pending. |
-| CF05-07 | Preserve the independent technical acceptance with documented limitations. Formal Owner acceptance remains pending. |
-| CF03-RISK | Preserve the completed independent assessment. Obtain separate integrated Owner acceptance. |
-| M3.2 | Owner accepted Cross-Entity Variant B. Independent documentation verification complete, F52-04 independently closed. Formal integration and exact-package R0-04 compliance pending. No real cross-entity PASS. |
-| M3.4 and release | Separate acceptance steps. R0-04 exact package, R0-07 independent release review and separate Release GO remain open. |
+| M3.1 documentation / M3.3 review | Independently approved and integrated in PR #52; F52-01–05 independently closed. M3.3 independent review complete. |
+| CF05-07 and CF03-RISK | Both Owner accepted with documented limitations. Formal closure follows Owner integration of the independently approved closure documentation. |
+| M3.2 | Cross-Entity Variant B accepted with documented scope limitation, independently verified and integrated. All four real cases remain BLOCKED / NOT EXECUTED and actual R0-04 compliance remains pending. |
+| M3.4 and release | See the [M3.4 Owner decision and closure rules](m34-integrated-owner-acceptance.md#9-canonical-status-and-transition-rules). M4 final freeze follows formal M3 closure. R0-04, R0-05, R0-06, R0-07 and separate Owner Release GO remain open. |

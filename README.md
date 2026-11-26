@@ -2,12 +2,7 @@
 
 Process selected members' subscription contributions in one confirmed massaction, using the normal Dolibarr single-member business process with safeguards for bulk execution. Optional invoices, PDF documents and member emails are implemented across all three transaction profiles.
 
-**Development status (26 November 2026):** ADR-08A, CPC-02 and PR #51
-test-hardening are merged. CF05-07 independent technical qualification is
-accepted with documented limitations. CF03-RISK independent assessment is
-complete. Formal Owner acceptance for both remains pending. Phase 5 is PARTIAL
-and v0.1.0 remains NO-GO. Descriptor: `0.1.0-dev`.
-[Current status](docs/m31-review-status-and-sweep.md)
+**Development status (26 November 2026).** PR #52 integrated the M3.1 review and M3.2 scope decision. The Owner accepted CF05-07 and CF03-RISK with documented limitations. Formal Phase 5 development closure takes effect upon Owner integration of the independently approved closure documentation. CF03-NORMAL A–D passed within the recorded scope, live security remains PARTIAL, and v0.1.0 remains NO-GO. Descriptor `0.1.0-dev`. [M3.4 Owner decision](docs/m34-integrated-owner-acceptance.md)
 
 ## Intended v0.1.0 functionality
 
@@ -95,7 +90,7 @@ pre-release hardening. Live security remains PARTIAL; real cross-entity
 cases remain BLOCKED / NOT EXECUTED under accepted M3.2.
 
 Draft #40 requires a final source refresh and regenerated package identity.
-R0-04 exact-package qualification, R0-07 and separate Owner Release GO remain
+R0-04 exact-package qualification, R0-05 operational acceptance, R0-06, R0-07 and separate Owner Release GO remain
 open. CF03-FAULT destructive testing is deferred. Preserve historical
 UNKNOWN/STOP results and reconcile before any separate decision.
 **Release v0.1.0 remains NO-GO.**

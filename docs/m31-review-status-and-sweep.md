@@ -1,6 +1,12 @@
 # PR #52 corrective status register and sweep
 
-## Expected current status
+## Integrated status and review provenance
+
+PR #52's final independent verdict was **APPROVED FOR DOCUMENTATION MERGE**. F52-01/P2, F52-02/P2, F52-03/P3, F52-04/P3 and F52-05/P3 are independently closed. F52-04 was closed on the first corrective HEAD and reaffirmed on final HEAD. The verified squash, approved HEAD and PR CI integration have identical trees. Approved-HEAD PR CI was 31/31 and separate post-merge Standard push CI was 9/9. [Verified identities and runs](m34-integrated-owner-acceptance.md#1-decision-and-review-provenance)
+
+The Owner granted CF05-07 and CF03-RISK acceptance with documented limitations on 2026-11-26. Formal closure of M3, CF05-07, CF03-RISK and Phase 5 development qualification takes effect upon Owner integration of the independently approved closure documentation. M3.2 is integrated with scope limitation, and actual R0-04 compliance remains pending. [Canonical transition rules](m34-integrated-owner-acceptance.md#9-canonical-status-and-transition-rules)
+
+## Historical expected status before PR #52's final approval and squash (2026-11-26)
 
 This register applies to the corrective documentation reviewed against
 [PR #52](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/52)
@@ -9,7 +15,7 @@ original HEAD `c4ec6a02cda14a8aab0e253ff6485df9e2fced10`, tree
 `8ab803d135ac534dd2d08d28f47a8e427cd23302`. The independent integrated
 review dated 2026-11-26 and the subsequent Owner instruction govern the delta.
 
-| Gate | Binding current disposition |
+| Gate | Disposition at the recorded corrective handoff |
 | --- | --- |
 | PR #51 / Pre-Release Test-Hardening | MERGED, verified identical approved and squash tree. COMPLETE / CLOSED WITH DOCUMENTED LIMITATIONS. F45-01/02, F49-03, F50-02/03 and F51-01/02 INDEPENDENTLY CLOSED. |
 | M3.1 documentation | Original and first corrective follow-up verdict CHANGES REQUIRED BEFORE DOCUMENTATION MERGE. On `1009fe845134f5c1f872c64ed9f191c4970f8277`, F52-01/P2 and F52-02/P2 PARTIALLY RESOLVED (merge blockers), F52-03/P3 PARTIALLY RESOLVED, F52-04/P3 INDEPENDENTLY CLOSED, F52-05/P3 OPEN. F52-01/02/03/05 final corrections FIX IMPLEMENTED – INDEPENDENT DELTA REVIEW PENDING; F52-04 remains independently closed. |
@@ -76,6 +82,8 @@ All four were **FIX IMPLEMENTED – INDEPENDENT DELTA REVIEW PENDING** at that e
 
 ## Final focused corrective pass after independent follow-up (2026-11-26)
 
+The disposition below records the corrective handoff before final independent approval and squash.
+
 The independent follow-up on `1009fe845134f5c1f872c64ed9f191c4970f8277` / tree `62c92dd14d382e84dd19085fe82308b13e3a6b51` inspected all 28 documentation paths. It accepted the canonical profile matrix, four-dimensional requirements method and M3.2 scope. F52-01/02 remained partly resolved P2, F52-03 partly resolved P3, F52-05 was new P3; F52-04 independently closed. This focused correction addresses the specific remaining observations, not a new technical qualification. The initial sweep's assertions are not used as independent proof.
 
 | Finding / original location (reviewed HEAD) | Final correction and governing authority | Verification boundary |
@@ -92,3 +100,17 @@ The independent follow-up on `1009fe845134f5c1f872c64ed9f191c4970f8277` / tree `
 | F52-04 (closed): M3.2 | [Owner decision](m31-cross-entity-owner-decision.md), [R0-04 seven criteria](release-qualification-v0.1.0.md#r0-04-cross-entity-variant-b-compliance), current baseline and gate summaries record independent documentation verification complete. | All four cases BLOCKED / NOT EXECUTED; actual package compliance pending, no runtime veto. |
 
 The independent sweep's PASS results for other documents, including the two unchanged CF05-06 historical plans, remain applicable; this focused correction does not reopen them. The original 109 historical evidence/experiment files and the positive CF05-07 and CF03-RISK verdicts are preserved. F52-01/02/03/05: **FIX IMPLEMENTED – INDEPENDENT DELTA REVIEW PENDING**. F52-04: **INDEPENDENTLY CLOSED**. Formal M3.1 merge approval, integration, M3.4 Owner acceptances, actual R0-04 compliance and release gates remain pending. Phase 5 PARTIAL; release NO-GO.
+
+## M3.4 repository-wide status sweep (2026-11-26)
+
+The baseline scan covered all 245 tracked blobs. Case-insensitive searches for `CF05-07`, `CF03-RISK`, `M3.[1–4]`, Phase 5 (space or hyphen), `F52`, PR #52, #40, `R0-00`–`R0-09` and release NO-GO/freeze/pending wording identified 42 paths. A second pass reviewed the affected current tables, roadmap, acceptance wording and historical section labels. The [binding status transitions](m34-integrated-owner-acceptance.md#9-canonical-status-and-transition-rules) govern the result.
+
+| Disposition | Paths examined |
+| --- | --- |
+| Active wording or traceability corrected (18) | `AGENTS.md`, `CHANGELOG.md`, `README.md`, `docs/adr/ADR-0001-risk-register.md`, `docs/cf03-operator-runbook.md`, `docs/cf03-qualification-plan.md`, `docs/cf05-phase4-postcommit-offline-evidence.md`, `docs/current-development-baseline.md`, `docs/documentation-guide.md`, `docs/dolienv-environments.md`, `docs/m31-cross-entity-owner-decision.md`, `docs/m31-integrated-development-qualification.md`, `docs/m31-review-status-and-sweep.md`, `docs/porting-plan.md`, `docs/release-qualification-v0.1.0.md`, `docs/requirements.csv`, `docs/test-coverage.md`, `docs/test-strategy.md` |
+| Historical context or unaffected source reference retained (16) | `class/transactionprofile.class.php`, `docs/adr/ADR-0001-core-first-transaction-profiles.md`, `docs/adr/ADR-0001-review-handoff.md`, `docs/cf02-implementation-validation.md`, `docs/cf03-rb01-a-operator-runbook.md`, `docs/cf03-stage01-review-handoff.md`, `docs/cf03-w01-validation.md`, `docs/cf05-06-standard-core-qualification-plan.md`, `docs/cf05-06-standard-core-source-qualification.md`, `docs/cf05-core-parity-regression.md`, `docs/cf05-phase3-finance-admission.md`, `docs/cf05-shared-guard-design.md`, `docs/owner-core-parity-2026-11-22.md`, `docs/phase4-implementation-validation.md`, `docs/phase4-invoice-architecture.md`, `docs/phase4-invoice-implementation-plan.md` |
+| Archived evidence or experiment matches preserved (8) | `docs/evidence/cf03/adr-08a-hosted-d-2026-11-26.md`, `docs/evidence/cf03/phase5-hosted-d-2026-11-25.md`, `docs/evidence/cf03/phase5-local-completion-2026-11-25.md`, `docs/evidence/cf03/phase5-local-qualification-2026-11-24.md`, `docs/evidence/f27/core-path-source.json`, `experiments/ap3/MANIFEST.json`, `experiments/ap3/SHA256SUMS`, `experiments/d01/locks.php` |
+
+The corrections record #52's final independent approval and integration, both granted M3.4 decisions, and the condition for formal development closure. They replace earlier pending-Owner or pending-#52 wording in active summaries, checklists and roadmaps. The release map tracks R0-05 operational acceptance separately and retains the seven M3.2 checks under R0-04. The ten CSV replacements affect residual-risk dispositions only, with C06-04 conditional for novel extensions. The Owner record is the sole new file.
+
+The earlier independent verdict with “OWNER ACCEPTANCE PENDING”, interim F52 handoffs and source-bound Phase 5 snapshots remain as history. The 109 evidence and experiment blobs remain unchanged. The A–D NORMAL PASS, PARTIAL security, four blocked real cross-entity cases and deferred destructive faults retain their classifications. Modified OD-P5-02 and the profile-specific STOP matrix remain binding. Draft PR #40 and the separate release gates retain their own lifecycle.
