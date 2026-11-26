@@ -1,12 +1,15 @@
 # M3.1 — Integrated development qualification review basis
 
 **M3.1** — CHANGES REQUIRED BEFORE DOCUMENTATION MERGE at the original
-independent review. Corrective follow-up is pending independent delta review.
+independent review and the first follow-up on `1009fe845134f5c1f872c64ed9f191c4970f8277`.
+F52-01/02/03 were partially resolved; F52-05/P3 was newly open. Their final
+corrective delta is implemented; independent delta review remains pending.
 The positive technical verdicts stand. CF05-07 is **INDEPENDENT TECHNICAL
 QUALIFICATION ACCEPTED WITH DOCUMENTED LIMITATIONS – FORMAL OWNER
 ACCEPTANCE PENDING**. CF03-RISK is **INDEPENDENT RESIDUAL RISK ASSESSMENT
 COMPLETE – OWNER ACCEPTANCE PENDING**. M3.2 Cross-Entity Variant B is
-**OWNER ACCEPTED WITH DOCUMENTED SCOPE LIMITATION**. Phase 5 remains
+**OWNER ACCEPTED WITH DOCUMENTED SCOPE LIMITATION**; F52-04 is independently
+closed, documentation verification complete and R0-04 compliance pending. Phase 5 remains
 PARTIAL; v0.1.0 remains NO-GO. [Canonical dispositions and status audit](m31-review-status-and-sweep.md)
 
 ## Source and PR #51 closure
@@ -121,7 +124,15 @@ BLOCKED records unavailable real evidence. NONE IDENTIFIED is scoped to
 this assessment; OWNER ACCEPTED attaches only to cited decisions.
 OWNER DECISION REQUIRED means unresolved integrated or broader-scope
 disposition. Release labels describe later checks and keep prior development
-evidence valid.
+evidence valid. The 71 satisfied implementation dispositions include binding
+accepted deviations, specifically [Owner O7](phase4-invoice-architecture.md#o7--decided-retain-and-extend-the-session-results-page)
+for C07-04/05/07. For C07-03, [historical G4/M01](phase4-implementation-validation.md)
+qualifies only Owner-reported BFCache restoration/navigation in V22.0.5;
+final-submit loading/focus and duplicate-submit remain synthetic, not real
+V24 qualification. C08-02 qualified ordinary no-product/service-line VAT-zero
+settings only; configured product/service, packaging/stock and broader tax
+cases remain conditional/unqualified. These evidence-precision corrections
+retain the same label assignments and the independently recalculated counts.
 
 | Outstanding item | IDs or boundary | Acceptance criterion |
 | --- | --- | --- |
@@ -150,8 +161,8 @@ different triggers and ADR-08B remains deferred.
 
 | Next action | Acceptance criterion |
 | --- | --- |
-| M3.1 independent corrective follow-up | Check F52-01–04 against the [sweep and verification](m31-review-status-and-sweep.md) and exact corrective tree/CI. Documentation merge approval remains pending. |
+| M3.1 independent corrective follow-up | Verify F52-01/02/03/05 against the [final corrective sweep and verification](m31-review-status-and-sweep.md) and exact corrective tree/CI. Preserve independently closed F52-04. Documentation merge approval remains pending. |
 | CF05-07 | Preserve the independent technical acceptance with documented limitations. Formal Owner acceptance remains pending. |
 | CF03-RISK | Preserve the completed independent assessment. Obtain separate integrated Owner acceptance. |
-| M3.2 | Owner accepted Cross-Entity Variant B. Verify the operational documentation and later exact-package compliance. No real cross-entity PASS. |
+| M3.2 | Owner accepted Cross-Entity Variant B. Independent documentation verification complete, F52-04 independently closed. Formal integration and exact-package R0-04 compliance pending. No real cross-entity PASS. |
 | M3.4 and release | Separate acceptance steps. R0-04 exact package, R0-07 independent release review and separate Release GO remain open. |

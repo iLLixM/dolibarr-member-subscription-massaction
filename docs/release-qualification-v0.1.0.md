@@ -10,7 +10,7 @@
 
 **Merged pre-release hardening.** [PR #51](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/51) squash `8ab803d135ac534dd2d08d28f47a8e427cd23302` matches approved HEAD `3d3cbda7e0ca46db1f2fe5651a273e7aeea4b4bf` (sole parent `f1cc6dc9ca8a274d8af8c324fe87310c84606471`, tree `cf2b1ffcf9f38baae8edf6b18e8f0b4d7348a771`). F45-01/02, F49-03, F50-02/03 and F51-01/02 are INDEPENDENTLY CLOSED. Pre-Release Test-Hardening is integrated and CLOSED WITH DOCUMENTED LIMITATIONS. Evidence remains bounded to the reviewed synthetic suites and local file-session runtime.
 
-**M3.1:** Corrective documentation follow-up pending independent delta review. CF05-07 independently accepted with documented limitations, formal Owner acceptance pending. CF03-RISK independent assessment complete, integrated Owner acceptance pending. M3.2 Cross-Entity Variant B Owner accepted with documented scope limitation. Phase 5 PARTIAL; v0.1.0 NO-GO. See [canonical review status](m31-review-status-and-sweep.md).
+**M3.1:** Corrective documentation follow-up pending independent delta review. CF05-07 independently accepted with documented limitations, formal Owner acceptance pending. CF03-RISK independent assessment complete, integrated Owner acceptance pending. M3.2 Cross-Entity Variant B Owner accepted with documented scope limitation; F52-04 independently closed, independent documentation verification complete, R0-04 compliance pending. Phase 5 PARTIAL; v0.1.0 NO-GO. See [canonical review status](m31-review-status-and-sweep.md).
 
 **2026-11-25 local Phase 5 delta:** See the [current A/B/C results and exact source](evidence/cf03/phase5-local-completion-2026-11-25.md). A and C mail/verified PDF attachments each passed 3/3 on `c2dc2cfdadf2c4def6bcd2f2ec20473cea3683b3`; B's earlier 3/3 remains on `ba5c9a3121754fcbd4259bb8906ad1dd17f1ce00`. These are capture-only outcomes, not external delivery or nine cases on a single source. Local CF03-NORMAL A/B/C: **PASS within the accepted case matrix**. Local CF03-SECURITY-BASELINE and local Phase 5: **PARTIAL**; P5L-A/B/C-S05 real cross-entity qualification **BLOCKED** (no distinct authorized second business entity). The live Web aged-fixture expiry result does not establish natural elapsed-time expiry. Earlier results retain their exact source and scope. Further local tests are limited to outstanding cases and change-induced regression; do not repeat accepted cases without a concrete reason.
 
@@ -112,8 +112,9 @@ Real destructive tests remain deferred **without relaxing runtime safety**; the 
 
 M3.2 is **OWNER ACCEPTED WITH DOCUMENTED SCOPE LIMITATION** under the
 [operational decision](m31-cross-entity-owner-decision.md#qualified-deployment-conditions).
-Documentation verification and R0-04 compliance verification remain
-pending. On the exact release ZIP and intended operating configuration
+Independent documentation verification is complete (F52-04 independently
+closed in the 2026-11-26 follow-up on `1009fe845134f5c1f872c64ed9f191c4970f8277`).
+Formal integration of PR #52 and R0-04 compliance verification remain pending. On the exact release ZIP and intended operating configuration
 record a case-by-case verification of:
 
 1. One productive business entity with a valid positive active entity ID and the effective Core/module configuration.
@@ -143,6 +144,6 @@ in the corrective documentation delta.
 
 ## Operational constraints inherited by release
 
-A/C cannot be operated concurrently because they share schema/webroot and use separately selected DB profiles. For any further A/B/C CF03 witness runs, a private target-user-environment launcher passing mandatory `CF03_*` values must pass read-only preflight before a new real case. D needs explicit trusted evidence isolation outside HTTP aliases. Use distinct fresh one-shot test cases with prior Owner GO, and never retry consumed or unknown cases.
+Use the [current environment matrix](dolienv-environments.md): A=MariaDBSnapshot, B=CoreGuarded, C=EnhancedMySQL, D=Hosted CoreGuarded. A/B/C have separate schemas, webroots, accounts, sessions and document roots. B/C share the MySQL server and local module source and require coordinated operating windows. The former shared A/C topology applies only to archived cases/commands, which must not be relabeled or reused. For any further A/B/C CF03 witness runs, a private target-user-environment launcher passing mandatory `CF03_*` values must pass read-only preflight before a new real case. D needs explicit trusted evidence isolation outside HTTP aliases. Use distinct fresh one-shot test cases with prior Owner GO, and never retry consumed or unknown cases.
 
-No automatic retry, compensation, foreign rollback, journal, exactly-once guarantee or post-commit PDF/mail after unknown/terminal completion. Accept only configuration and Core/trigger paths shown to be qualified in new evidence. A release tag or package distribution requires a separate decision after all mandatory gates.
+No automatic retry, compensation, foreign rollback, resend or replay; no durable operations journal or exactly-once guarantee. Unknown database completion prohibits subsequent PDF, mail and member processing in every profile. CoreGuarded additionally suppresses further effects after acknowledged terminal completion. Following qualified nonterminal COMMIT, post-COMMIT continuation remains profile-specific under F38-01, CPC-01 Variant A and ADR-08A. CPC-02 harmonizes the consequences of a decided STOP, not its triggers. ADR-08B remains deferred. Follow the [canonical profile matrix](adr/ADR-0001-risk-register.md#profile-specific-observation-and-continuation) and qualify only the intended supported configuration. A release tag or package distribution requires a separate decision after all mandatory gates.

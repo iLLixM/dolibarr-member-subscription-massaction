@@ -2,9 +2,12 @@
 
 **OWNER ACCEPTED WITH DOCUMENTED SCOPE LIMITATION.** Following the
 [PR #52 independent review](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/52),
-the Owner accepts **Cross-Entity Variant B** for v0.1.0. Documentation
-verification and compliance verification on the exact installed release
-package under R0-04 are pending. This is a qualification scope decision.
+the Owner accepts **Cross-Entity Variant B** for v0.1.0. The independent
+follow-up on `1009fe845134f5c1f872c64ed9f191c4970f8277` (2026-11-26) closed
+F52-04/P3 and confirmed the Owner decision and all seven R0-04 criteria:
+**INDEPENDENT DOCUMENTATION VERIFICATION COMPLETE**. Formal integration of
+PR #52 and actual compliance verification on the exact installed release
+package under R0-04 remain pending. This is a qualification scope decision.
 Core-Parity Variant B remains the distinct runtime architecture policy.
 
  P5L-A-S05 (MariaDBSnapshot), P5L-B-S05 (CoreGuarded),

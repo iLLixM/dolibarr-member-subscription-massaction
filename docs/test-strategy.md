@@ -6,7 +6,7 @@
 
 **Merged pre-release hardening.** [PR #51](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/51) squash `8ab803d135ac534dd2d08d28f47a8e427cd23302` matches approved HEAD `3d3cbda7e0ca46db1f2fe5651a273e7aeea4b4bf` (sole parent `f1cc6dc9ca8a274d8af8c324fe87310c84606471`, tree `cf2b1ffcf9f38baae8edf6b18e8f0b4d7348a771`). F45-01/02, F49-03, F50-02/03 and F51-01/02 are INDEPENDENTLY CLOSED. Pre-Release Test-Hardening is integrated and CLOSED WITH DOCUMENTED LIMITATIONS. Evidence remains bounded to the reviewed synthetic suites and local file-session runtime.
 
-**M3.1:** Corrective documentation follow-up pending independent delta review. CF05-07 independently accepted with documented limitations, formal Owner acceptance pending. CF03-RISK independent assessment complete, integrated Owner acceptance pending. M3.2 Cross-Entity Variant B Owner accepted with documented scope limitation. Phase 5 PARTIAL; v0.1.0 NO-GO. See [canonical review status](m31-review-status-and-sweep.md).
+**M3.1:** Corrective documentation follow-up pending independent delta review. CF05-07 independently accepted with documented limitations, formal Owner acceptance pending. CF03-RISK independent assessment complete, integrated Owner acceptance pending. M3.2 Cross-Entity Variant B Owner accepted with documented scope limitation; F52-04 independently closed, independent documentation verification complete, R0-04 compliance pending. Phase 5 PARTIAL; v0.1.0 NO-GO. See [canonical review status](m31-review-status-and-sweep.md).
 
 
 

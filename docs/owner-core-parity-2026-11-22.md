@@ -67,7 +67,9 @@ Independent holistic PR #38 review on `859ea280b3b726870cdb7727af72c04514c26e5f`
 
 ## Finding disposition under the changed acceptance contract
 
-| Finding | Binding current treatment | Reason and proof boundary |
+**Historical original ratification table (2026-11-22):** The original F38-02 mandatory isolated-mail STOP wording and the old delivery gates below are preserved as dated dispositions; ADR-08A above partially supersedes that isolated-mail rule. For F38-01, CPC-01 Variant A, ADR-08A and CPC-02 see the [current profile matrix](adr/ADR-0001-risk-register.md#profile-specific-observation-and-continuation). F36-02 remains Owner-accepted residual risk, not an open source-pinning requirement.
+
+| Finding | Treatment at original ratification | Reason and proof boundary |
 | --- | --- | --- |
 | F38-01/P2 | CLOSED, regression retained | PDF after-effect ambiguity => UNKNOWN/STOP |
 | F38-02/P2 | CLOSED, regression retained | Hook/SMTP after-effect ambiguity => UNKNOWN/STOP |
@@ -84,6 +86,8 @@ Independent holistic PR #38 review on `859ea280b3b726870cdb7727af72c04514c26e5f`
 **Meaning of SUPERSEDED:** previous independent findings were justified by their previous *source-approval policy*; the new Owner removed the requirement, not the underlying potential Core side effects. Neither the old review nor synthetic green CI can be cited as a real production-transaction proof.
 
 ## Delivery and review gates
+
+**Historical delivery sequence at original ratification — not current instructions.** PR #38 and subsequent #45–#51 changes are merged; normal A–D development evidence is accepted in scope. A/C serialization here belongs to the old topology; use [current environment matrix](dolienv-environments.md) and coordinate B/C. Current gates: [M3.1](m31-integrated-development-qualification.md), M3.4 Owner acceptance, [release qualification](release-qualification-v0.1.0.md).
 
 - **PR #38 Development Merge** requires independent exact-HEAD holistic review of Core parity, correct deletion of the old source gate, sufficient massaction anti-replay/identity/transaction/side-effect controls, healthy standard/full/hosted CI and accurate current documentation. F36-02's accepted *Core-only* risk cannot by itself be treated as a source-pinning merge blocker. A new *module-introduced* error still blocks appropriately.
 - **Phase 5 real A–D:** case-specific Owner GO, supported private A/B/C launcher and read-only preflight, one-shot fresh test fixtures and A/C serialized operation, independently reconciled DB, customer, invoice, line, subscription, PDF/hash/path, verified attachment and SMTP effects. Investigate any changed Core or custom-module behavior observed in real tests.

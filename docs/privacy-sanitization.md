@@ -31,12 +31,17 @@ persistent list of private operator identifiers is retained in repository
 code, tests or CI configuration. Future changes must use operator-neutral
 placeholders rather than real local identities.
 
-`tools/cf03-lab.lib.php` obtains A/B identities and the approved C account from private
+**Historical launcher/topology example (not current environment bindings):**
+`tools/cf03-lab.lib.php` obtained A/B identities and the approved C account from private
 operator-only environment values. `CF03_EVIDENCE_ROOT` supplies the real A/B/C evidence
 parent outside Git. Secrets are **never** passed as command-line arguments; existing
 trusted Dolibarr `conf.php` supplies the actual DB password. Missing mandatory
-bindings STOP rather than guessing local paths or accounts. Existing A/C shared
-schema and different effective DB accounts remain binding; do not run them concurrently.
+bindings STOP rather than guessing local paths or accounts. The former A/C shared
+schema and distinct accounts belonged to that archived setup. Current A/B/C
+schemas, webroots, accounts, sessions and document roots are separate; B/C share
+the MySQL server and local source, so coordinate B/C windows. Follow the
+[current environment matrix](dolienv-environments.md) and protected target-user
+preflight; do not reuse the old launcher/commands blindly.
 
 The W01 evidence parent allows read/traverse access, but **group/other write bits
 are rejected**. A case directory remains owner-restricted 0700 and evidence files
