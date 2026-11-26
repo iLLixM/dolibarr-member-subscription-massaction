@@ -551,8 +551,33 @@ totals, session reload and consumed-confirmation rejection. Existing E15,
 ADR-08A and F38-01 regression cases remain applicable. The status result
 does not imply equivalent transaction evidence across the profiles.
 
-Local A/B/C development qualification status is recorded in the PR handoff.
-The live case is a standard mixed contribution batch with a genuinely
-ineligible synthetic member, result reload and replay refusal. Safety-critical
-STOP and checkpoint-failure assertions remain synthetic for this delta.
-Hosted D is outside this CPC-02 live scope; the Hosted CI job is synthetic.
+**Local development qualification, 2026-11-26.** All three cases ran on
+`042c917bd5d8844c33758f8c26170fd7eb7ecb87`, Dolibarr 24.0.3 / PHP 8.2.35.
+Each used fresh synthetic fixtures, verified database/Documents backups
+(archive integrity; restore not tested), the protected target-user preflight
+and an authenticated browser. In each three-member batch, the two active
+members booked and the draft member was skipped. Invoice and mail were
+disabled for the run through the normal confirmation options.
+
+| Case | Profile / DB | Expected and verified | Outcome |
+| --- | --- | --- | --- |
+| CPC02-A | MariaDBSnapshot / MariaDB 10.11.19 | 2 SUCCESS, 1 SKIPPED, other outcomes zero, no STOP | PASS |
+| CPC02-B | CoreGuarded / Oracle MySQL 8.4.13 | Same totals with acknowledged nonterminal Core completion | PASS |
+| CPC02-C | EnhancedMySQL / Oracle MySQL 8.4.13 | 2 SUCCESS, 1 SKIPPED, other outcomes zero, no STOP | PASS |
+
+For each case the saved result was identical on reload, the original
+consumed confirmation could not book again, and a separate reader
+reconciled 24 business tables before booking, after booking and after replay.
+A protected runtime-user file-session readback confirmed all three final
+results separately. The A driver first stopped during local request
+serialization before submission. Independent SQL confirmed that the fixtures
+had zero subscriptions before the sole booking submission. An A post-run
+readback precondition was corrected and only the readback was resumed.
+B/C ran in separate serial windows. The original source checkout was
+restored. No mail, invoices, PDF or temporary application setting changes.
+
+Live safety-critical STOP was NOT EXECUTED. The scenarios that would exercise
+the changed STOP branch on real bookings require fault induction outside this
+non-destructive case catalog. First, intermediate and final STOP and
+checkpoint-failure evidence remain synthetic. Hosted D is outside the CPC-02
+live scope; Hosted CI is synthetic.
