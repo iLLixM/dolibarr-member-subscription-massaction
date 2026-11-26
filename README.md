@@ -2,7 +2,12 @@
 
 Process selected members' subscription contributions in one confirmed massaction, using the normal Dolibarr single-member business process with safeguards for bulk execution. Optional invoices, PDF documents and member emails are implemented across all three transaction profiles.
 
-**Development status (24 November 2026):** Phase 4 implementation, #44 documentation consolidation and [#45 shared-hosting session fix](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/45) are merged. Phase 5 qualification is partial; **v0.1.0 is not released or production-qualified**. Development descriptor: `0.1.0-dev`. See [current development baseline](docs/current-development-baseline.md) and [release qualification](docs/release-qualification-v0.1.0.md).
+**Development status (26 November 2026):** ADR-08A, CPC-02 and PR #51
+test-hardening are merged. CF05-07 independent technical qualification is
+accepted with documented limitations. CF03-RISK independent assessment is
+complete. Formal Owner acceptance for both remains pending. Phase 5 is PARTIAL
+and v0.1.0 remains NO-GO. Descriptor: `0.1.0-dev`.
+[Current status](docs/m31-review-status-and-sweep.md)
 
 ## Intended v0.1.0 functionality
 
@@ -10,7 +15,7 @@ Process selected members' subscription contributions in one confirmed massaction
 - Book contributions with Core-controlled membership end (including R16 retention of a later end) and standard configured Agenda effects.
 - Optionally create and validate an invoice for a linked third party; create a third party from member data only when invoice creation and the corresponding option are selected and authorized. Verify invoice line, relation and persisted business values.
 - After suitable acknowledged nonterminal completion, generate the optional invoice PDF and send the optional configured member email, verifying the intended PDF attachment where required.
-- Report each member's booking, invoice, PDF, mail and attachment outcome separately. Stop on uncertainty, without automatic repeat or resend.
+- Report each member's booking, invoice, PDF, mail and attachment outcome separately. An UNKNOWN database outcome stops the batch. External effect handling depends on the selected profile.
 
 Not in scope: standalone third-party creation without invoice, automatic payment/bank booking, an additional module persistence journal, atomic processing of the entire batch, or common SQL/PDF/SMTP atomicity.
 
@@ -20,11 +25,14 @@ The same business functionality is implemented and enabled for all profiles, sub
 
 | Profile | Database / observation | Qualification boundary |
 | --- | --- | --- |
-| `CoreGuarded` | Oracle MySQL, original DoliDB connection/depth, SET RR → Core BEGIN, bounded ACK; no P_S event proof | B bounded finance/mail PASS; D focused contribution/session/replay PASS; D finance/PDF/mail OPEN |
-| `EnhancedMySQL` | Oracle MySQL, qualified Performance Schema events and privileges | C bounded finance/PDF and non-mail PASS; C mail and remaining cases OPEN |
-| `MariaDBSnapshot` | MariaDB, bounded snapshot, `@@in_transaction` and connection/depth | A bounded finance/PDF and non-mail PASS; A mail and remaining cases OPEN |
+| `CoreGuarded` | Oracle MySQL; bounded Core ownership, native connection, depth and ACK; no event continuity proof under ADR-12 | B/D bounded finance/PDF/mail within recorded sources. PDF UNKNOWN stops; ADR-08A is the narrow isolated SMTP UNKNOWN exception. |
+| `EnhancedMySQL` | Oracle MySQL; stronger sampled Performance Schema transaction-event and savepoint checks | C bounded finance/PDF/mail. Observation is neither continuous nor infallible. Existing A/C post-COMMIT behavior remains. |
+| `MariaDBSnapshot` | MariaDB; native connection and sampled depth/state including `@@in_transaction` | A bounded finance/PDF/mail. Same-connection replacement can escape snapshots; existing A/C effect behavior remains. |
 
-Equal business capability does not mean equal transaction observability. Do not silently downgrade an explicitly selected EnhancedMySQL profile.
+CPC-02 standardizes the reporting of an already-decided STOP, including
+NOT_PROCESSED followers and the explicit batch STOP flag. It leaves each
+profile's STOP triggers intact. Do not silently downgrade EnhancedMySQL.
+[Observation and continuation matrix](docs/adr/ADR-0001-risk-register.md#profile-specific-observation-and-continuation)
 
 ## Architecture and safety
 
@@ -32,7 +40,7 @@ Equal business capability does not mean equal transaction observability. Do not 
 
 Authenticated selection → fresh server-side preview → full confirmation and fingerprint/profile revision → original consumed one-shot file-session capability for CoreGuarded → one owned outer DoliDB transaction per member, same active guard for Booking and Invoice → contribution/optional third party and validated invoice via Core APIs and readbacks → suitable completion ACK → post-COMMIT PDF and optional verified recipient/attachment mail checkpoints → persisted individual results.
 
-`Adherent::subscription()`, `Societe::create_from_member()` and `Facture::create()/addline()/validate()` remain the business APIs. Rights/entity, confirmation freshness, transaction ownership, relevant engines/readbacks and replay fences apply before and throughout processing. Uncertain or terminal states prevent unsafe continuation. Do not infer a rollback from later SQL absence; do not retry uncertain operations or roll back a foreign transaction. Transport handoff is not guaranteed delivery. F36-02 is Owner-accepted Core filesystem residual risk (possible pre-outer-COMMIT PROV rename), not a guarantee of SQL/filesystem rollback.
+`Adherent::subscription()`, `Societe::create_from_member()` and `Facture::create()/addline()/validate()` remain the business APIs. Rights/entity, confirmation freshness, transaction ownership, relevant engines/readbacks and replay fences apply before and throughout processing. A confirmed business result remains distinct from PDF or mail uncertainty. CoreGuarded stops on unqualified mail uncertainty and on PDF UNKNOWN. ADR-08A permits only positively isolated standard SMTP UNKNOWN after nonterminal COMMIT, exact original-session readback and fresh context. A/C retain their existing handling and no unverified invoice attachment may be sent. Do not infer a rollback from later SQL absence; do not retry uncertain operations or roll back a foreign transaction. Transport handoff is not guaranteed delivery. F36-02 is Owner-accepted Core filesystem residual risk (possible pre-outer-COMMIT PROV rename), not a guarantee of SQL/filesystem rollback.
 
 **Shared hosting:** PR #45 removes only the unnecessary directory-listing/readability prerequisite in `MsmFileBookingCheckpoint::requireSession()`. The PHP `files` handler, nonempty session ID, plain absolute existing writable directory, canonical binding and actual reopen/read/write/close/readback remain required. A known session file may be accessible even when the directory cannot be listed (e.g. owner mode `0300`). Preserve the original consumed confirmation, one-shot/processing/result persistence, owned guard and finance/post-COMMIT checks. Do not widen provider permissions to make a test pass. The six concrete Core/model/PDF file readability checks remain a separate contract. See [design](docs/phase4-invoice-architecture.md), [transaction ADR](docs/adr/ADR-0001-core-first-transaction-profiles.md) and [risk register](docs/adr/ADR-0001-risk-register.md).
 
@@ -56,6 +64,19 @@ The descriptor's Core >=21 admission floor is not a claim of real compatibility 
 
 A/B/C are separate installations and schemas; B/C share server and local module source, not a schema. D has a separate checkout/database. [Current environments](docs/dolienv-environments.md) govern mapping; do not relabel historical tools.
 
+## Deployment qualification scope
+
+The Owner accepted Cross-Entity Variant B for v0.1.0. Qualification is
+limited to one productive business entity with a valid positive active
+entity ID, consistent member/type/customer/invoice/document context and
+effective Core/module rights. Entity 0 is not a substitute for scoped
+permission. MultiCompany and inter-entity business sharing require
+separate qualification and Owner approval. Legitimate non-business global
+configuration is permitted; extensions must preserve the qualified scope.
+Exact installed ZIP compliance remains pending R0-04. This operating
+scope adds no runtime veto. [Decision](docs/m31-cross-entity-owner-decision.md)
+· [R0-04 checks](docs/release-qualification-v0.1.0.md#r0-04-cross-entity-variant-b-compliance)
+
 ## Development setup (approved isolated environments only)
 
 No published v0.1.0 installation package is available from this baseline. For an explicitly approved isolated source installation, place or link the module root as `htdocs/custom/membersubscriptionmassaction`. Enable Members and this module, choose a compatible transaction profile, configure applicable user rights and batch limit. For invoice/PDF/mail use the appropriate Core customer, invoice, numbering, document and mail settings and permissions; use an isolated mail sink in tests.
@@ -70,8 +91,8 @@ CF03-NORMAL A–D passed within the respective accepted development matrices.
 The [M3.1 assessment](docs/m31-integrated-development-qualification.md) binds
 each campaign to its tested source and distinguishes real cases, local runtime
 checks and synthetic CI. PR #51 integrated the independently closed
-pre-release hardening. CF05-07 and CF03-RISK await independent review and Owner
-acceptance. Live security remains partial; real cross-entity cases are blocked.
+pre-release hardening. Live security remains PARTIAL; real cross-entity
+cases remain BLOCKED / NOT EXECUTED under accepted M3.2.
 
 Draft #40 requires a final source refresh and regenerated package identity.
 R0-04 exact-package qualification, R0-07 and separate Owner Release GO remain

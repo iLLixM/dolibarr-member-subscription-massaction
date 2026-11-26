@@ -15,7 +15,7 @@
 **Operational/release boundary:** Phase 5 PARTIAL; new cases require protected F32-MR-01 target-user preflight, actual source/profile/role binding, fresh fixtures, Owner GO, controlled backups and independent readbacks. Full CF03-NORMAL A–D, A/C mail, remaining D finance/PDF/mail/attachments, wider live safety/configuration, CF05-07/CF03-RISK, R0-03, exact hosted ZIP R0-04, R0-07 and separate Owner Release GO remain OPEN / NO-GO. R0-04 BLOCKED pending final package and its qualification. CF03-FAULT destructive tests DEFERRED. Historical B02 mail/attachment and DOLIENV-ACC-01 UNKNOWN/STOP (latter rollback unconfirmed) unchanged; no replay or compensation.
 
 
-**Post-PR #45:** development squash `b026f1504db27308fc7326e2e88ec2e53b2f48d9`, reviewed tree identical; #44 consolidation completed and #41–#43 closed without merge as superseded. [Current baseline](current-development-baseline.md) governs source identity, F45-01/02 open test precision, F45-03 documentation follow-up and remaining gates. The 71-ID requirements matrix and older CF02/CF03 handoffs, CF05-06 source qualification, Phase 4 validation remain historical records; use current baseline, environment register, test strategy/coverage and gate map for current state. Do not make a parallel requirement matrix.
+**Historical PR #45 checkpoint:** development squash `b026f1504db27308fc7326e2e88ec2e53b2f48d9`, reviewed tree identical; #44 consolidation completed and #41–#43 closed without merge as superseded. [Current baseline](current-development-baseline.md) governs source identity, F45-01/02 independently closed by PR #51, F45-03 independently closed by PR #46 and the remaining gates. The 71-ID requirements matrix and older CF02/CF03 handoffs, CF05-06 source qualification, Phase 4 validation remain historical records; use current baseline, environment register, test strategy/coverage and gate map for current state. Do not make a parallel requirement matrix.
 
 ---
 
@@ -41,7 +41,7 @@
 
 ## Read these first
 
-[M3.1 integrated review basis](m31-integrated-development-qualification.md) is the canonical integrated decision basis.
+[M3.1 integrated review basis](m31-integrated-development-qualification.md) is the canonical integrated decision basis. Read the [canonical review status](m31-review-status-and-sweep.md) and [M3.2 scope decision](m31-cross-entity-owner-decision.md) before using dated records.
 
 | Purpose | Primary document | Interpretation |
 | --- | --- | --- |

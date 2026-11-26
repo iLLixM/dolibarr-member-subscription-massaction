@@ -5,7 +5,7 @@
 ### 2026-11-26 – Integrated development review preparation
 
 - PR #51 integrated the independently accepted Pre-Release Test-Hardening package with documented limitations. See the [M3.1 review basis](docs/m31-integrated-development-qualification.md) for exact merge/CI provenance and consolidated CF05/CF03 evidence.
-- CF05-07 and CF03-RISK remain pending independent review and Owner acceptance. Real cross-entity qualification remains blocked. Release v0.1.0 is NO-GO.
+- CF05-07 independent technical qualification and CF03-RISK independent assessment are complete; formal Owner acceptances remain pending. M3.2 Cross-Entity Variant B is Owner accepted; real cross-entity cases remain BLOCKED / NOT EXECUTED. Release v0.1.0 is NO-GO.
 
 ### 2026-11-24 – Historical PR #45 shared-hosting compatibility and PR #44 documentation consolidation
 
@@ -13,7 +13,7 @@
 - PR #45 removes only the unnecessary directory-listing/readability prerequisite in `MsmFileBookingCheckpoint::requireSession()`. The PHP `files` handler, nonempty session ID, plain absolute existing writable directory, canonical binding and actual reopen/read/write/close/readback remain required. A known session file may be accessible even when the directory cannot be listed (e.g. owner mode `0300`). Preserve the original consumed confirmation, one-shot/processing/result persistence, owned guard and finance/post-COMMIT checks. Do not widen provider permissions to make a test pass. The six concrete Core/model/PDF file readability checks remain a separate contract.
 - Local accepted real cases on `ba5c9a3121754fcbd4259bb8906ad1dd17f1ce00`: protected readiness 21 checks, initial finance/PDF PASS within scope, additional non-mail 8/8 PASS, local B mail/verified attachments 3/3 PASS (capture only). Hosted D independent checkout and dedicated schema, Dolibarr 22.0.5, Oracle MySQL 8.4.13, Web PHP 8.4.28 CGI/FastCGI / CLI 8.3.37: four roles, two separate contribution-only cases, persisted result reload, consumed replay refusal and separate SQL readback PASS within scope on `0adc259d4739b44f9b1fb3a49574d7e1c318132c`. D finance/PDF/mail, broader live cases and exact ZIP OPEN; A/C mail OPEN. Modified OD-P5-02 accepts authorized summaries within scope, not independent external reproduction.
 - PR #44 merged; #41–#43 closed without merge as superseded. Historical source identities unchanged.
-- F45-01/02 open test precision; F45-03 documentation remediation awaits review/merge. Draft #40 requires #45 correction; Phase 5 PARTIAL / release NO-GO. See [current baseline](docs/current-development-baseline.md).
+- At this historical checkpoint F45-01/02 were open and F45-03 awaited review/merge. Subsequent closure is recorded in the current baseline. Draft #40 requires #45 correction; Phase 5 PARTIAL / release NO-GO. See [current baseline](docs/current-development-baseline.md).
 
 ### 2026-11-24 – Phase 5 bounded local qualification
 

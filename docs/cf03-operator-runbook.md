@@ -19,7 +19,7 @@ Current qualification status and applicable boundaries are recorded in the [M3.1
 **Historical operational/release snapshot (2026-11-24, current instructions in the linked M3.1 assessment):** Phase 5 PARTIAL; new cases require protected F32-MR-01 target-user preflight, actual source/profile/role binding, fresh fixtures, Owner GO, controlled backups and independent readbacks. Full CF03-NORMAL A–D, A/C mail, remaining D finance/PDF/mail/attachments, wider live safety/configuration, CF05-07/CF03-RISK, R0-03, exact hosted ZIP R0-04, R0-07 and separate Owner Release GO remain OPEN / NO-GO. R0-04 BLOCKED pending final package and its qualification. CF03-FAULT destructive tests DEFERRED. Historical B02 mail/attachment and DOLIENV-ACC-01 UNKNOWN/STOP (latter rollback unconfirmed) unchanged; no replay or compensation.
 
 
-**Historical PR #45 checkpoint:** development squash `b026f1504db27308fc7326e2e88ec2e53b2f48d9`, reviewed tree identical; #44 consolidation completed and #41–#43 closed without merge as superseded. [Current baseline](current-development-baseline.md) governs source identity, F45-01/02 open test precision, F45-03 documentation follow-up and remaining gates. PR #45 removes only the directory-listing/readability predicate of `MsmFileBookingCheckpoint::requireSession()`. The `files` handler, nonempty session ID, plain absolute existing writable directory and canonical binding remain required, together with actual reopen/read/write/close/readback. A known file can be accessible in a non-listable directory (e.g. owner mode `0300`). Original consumed one-shot, result persistence, same active owned guard and STOP remain intact. Do not broaden provider permissions or remove the six remaining concrete-file readability checks. Use actual Web CGI/FastCGI for HTTP/session admission and separate protected hosting-local CLI reader for before/after checks. The focused D PASS grants no authority for other cases or transport changes.
+**Historical PR #45 checkpoint:** development squash `b026f1504db27308fc7326e2e88ec2e53b2f48d9`, reviewed tree identical; #44 consolidation completed and #41–#43 closed without merge as superseded. [Current baseline](current-development-baseline.md) governs source identity, F45-01/02 independently closed by PR #51, F45-03 independently closed by PR #46 and the remaining gates. PR #45 removes only the directory-listing/readability predicate of `MsmFileBookingCheckpoint::requireSession()`. The `files` handler, nonempty session ID, plain absolute existing writable directory and canonical binding remain required, together with actual reopen/read/write/close/readback. A known file can be accessible in a non-listable directory (e.g. owner mode `0300`). Original consumed one-shot, result persistence, same active owned guard and STOP remain intact. Do not broaden provider permissions or remove the six remaining concrete-file readability checks. Use actual Web CGI/FastCGI for HTTP/session admission and separate protected hosting-local CLI reader for before/after checks. The focused D PASS grants no authority for other cases or transport changes.
 
 ---
 
@@ -45,6 +45,29 @@ Current qualification status and applicable boundaries are recorded in the [M3.1
 **This runbook is read-only.** The original statement that no live test had run is historical: **POS02-A1/A2 in environment A later completed TECHNICAL PASS** on source/test HEAD `e7b911b707508e439f9acbfad43f5fd55d34cc44` ([documentation](evidence/cf03/CF03-POS02-A1-A2-technischer-Abschlussbericht-2026-11-21.md)). **No additional real booking or invoice is authorized by this document**, and no application database user or transaction profile is changed by the provided commands. Only an authorized operator can operate the lab. Source attestation covers the bounded deterministic module production-PHP inventory and the selected version-specific Dolibarr Core runtime dependency manifest; preserve the reported hashes alongside the config fingerprint, without claiming a complete ZIP/Core-tree audit. Stage 2/3/4 business and controlled destructive cases require separately approved case-specific procedures.
 
 Tools: `tools/cf03-lab.php` and `tools/cf03-lab.lib.php`. They do **not** reuse or modify the historical POS01-A/B/C evidence. The standard CF-02 positive witness remains unchanged.
+
+## M3.2 operating scope and profile safeguards
+
+For v0.1.0 qualification use one business entity with a valid positive
+active ID, scoped effective Core/module rights and consistent objects,
+financial relationships and document roots. Entity 0 cannot substitute
+for authorization. Shared non-business definitions are permitted; verify
+that configured extensions introduce no inter-entity business sharing.
+MultiCompany and inter-entity business operations require separate
+qualification and Owner approval. This scope restriction adds no runtime
+entity veto. Record the [R0-04 compliance checks](release-qualification-v0.1.0.md#r0-04-cross-entity-variant-b-compliance)
+on the exact ZIP. The [M3.2 decision](m31-cross-entity-owner-decision.md)
+keeps the four real cross-entity cases BLOCKED / NOT EXECUTED.
+
+A uses sampled MariaDB connection and state/depth; B/D CoreGuarded uses
+bounded native connection/depth/ACK under ADR-12; C uses stronger sampled
+MySQL transaction-event checks. UNKNOWN DB outcome stops everywhere.
+CoreGuarded PDF UNKNOWN and unqualified mail uncertainty stop. ADR-08A
+requires positive isolated SMTP evidence, a durable original-session
+readback and fresh nonterminal admission. A/C keep existing post-COMMIT
+handling. CPC-02 makes an already-decided STOP explicit in batch results.
+Preserve existing no-retry/replay/resend/compensation restrictions.
+[Profile matrix](adr/ADR-0001-risk-register.md#profile-specific-observation-and-continuation)
 
 ## 0. Source and operator prerequisites
 

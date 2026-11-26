@@ -10,7 +10,7 @@
 
 **Merged pre-release hardening.** [PR #51](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/51) squash `8ab803d135ac534dd2d08d28f47a8e427cd23302` matches approved HEAD `3d3cbda7e0ca46db1f2fe5651a273e7aeea4b4bf` (sole parent `f1cc6dc9ca8a274d8af8c324fe87310c84606471`, tree `cf2b1ffcf9f38baae8edf6b18e8f0b4d7348a771`). F45-01/02, F49-03, F50-02/03 and F51-01/02 are INDEPENDENTLY CLOSED. Pre-Release Test-Hardening is integrated and CLOSED WITH DOCUMENTED LIMITATIONS. Evidence remains bounded to the reviewed synthetic suites and local file-session runtime.
 
-**M3.1:** PREPARATION COMPLETE – INDEPENDENT INTEGRATED REVIEW PENDING. CF05-07 and CF03-RISK remain pending independent review and Owner acceptance. Phase 5 PARTIAL; v0.1.0 NO-GO. See [M3.1 integrated review basis](m31-integrated-development-qualification.md).
+**M3.1:** Corrective documentation follow-up pending independent delta review. CF05-07 independently accepted with documented limitations, formal Owner acceptance pending. CF03-RISK independent assessment complete, integrated Owner acceptance pending. M3.2 Cross-Entity Variant B Owner accepted with documented scope limitation. Phase 5 PARTIAL; v0.1.0 NO-GO. See [canonical review status](m31-review-status-and-sweep.md).
 
 **2026-11-25 local Phase 5 delta:** See the [current A/B/C results and exact source](evidence/cf03/phase5-local-completion-2026-11-25.md). A and C mail/verified PDF attachments each passed 3/3 on `c2dc2cfdadf2c4def6bcd2f2ec20473cea3683b3`; B's earlier 3/3 remains on `ba5c9a3121754fcbd4259bb8906ad1dd17f1ce00`. These are capture-only outcomes, not external delivery or nine cases on a single source. Local CF03-NORMAL A/B/C: **PASS within the accepted case matrix**. Local CF03-SECURITY-BASELINE and local Phase 5: **PARTIAL**; P5L-A/B/C-S05 real cross-entity qualification **BLOCKED** (no distinct authorized second business entity). The live Web aged-fixture expiry result does not establish natural elapsed-time expiry. Earlier results retain their exact source and scope. Further local tests are limited to outstanding cases and change-induced regression; do not repeat accepted cases without a concrete reason.
 
@@ -30,7 +30,7 @@ Draft #40 must include the accepted change and refreshed exact-package identific
 
 **Historical accepted Phase 5 checkpoint (2026-11-24; original source scope):** Owner-accepted local cases on `ba5c9a3121754fcbd4259bb8906ad1dd17f1ce00`: A/B/C protected readiness 21 checks PASS; B01/B02 and A02/C02 bounded finance/PDF PASS; additional non-mail 8/8 PASS (11 confirmations, 20 contributions, two invoices/PDFs, 18 Agenda pairs); B mail/verified attachment 3/3 PASS in two bulk confirmations, capture-only. Hosted D has a fresh independent checkout/dedicated schema (Dolibarr 22.0.5, Oracle MySQL 8.4.13, Web PHP 8.4.28 CGI/FastCGI, CLI PHP 8.3.37). On `0adc259d4739b44f9b1fb3a49574d7e1c318132c`, four role-dependent UI checks and two distinct contribution-only bookings PASS; focused follow-up persisted result after reload, rejected one consumed replay and separate hosting-local SQL readbacks confirmed unchanged member state after replay. Provider session defaults unchanged. That 24 November checkpoint did not cover D finance/PDF/mail; the later 25 November cases above do. Neither is exact-ZIP acceptance. Modified OD-P5-02 accepts authorized summaries within their recorded scope; no independent external reproduction claimed. See [local qualification register](evidence/cf03/phase5-local-qualification-2026-11-24.md) and [environment evidence](dolienv-environments.md).
 
-**Post-PR #45:** Development fix squash-merged as `b026f1504db27308fc7326e2e88ec2e53b2f48d9`; see [current baseline](current-development-baseline.md) for exact source/merge provenance and F45 follow-up.
+**Historical PR #45 checkpoint:** Development fix squash-merged as `b026f1504db27308fc7326e2e88ec2e53b2f48d9`; see [current baseline](current-development-baseline.md) for exact source/merge provenance and F45 follow-up.
 
 **Operational/release boundary:** Phase 5 PARTIAL. Per-case Owner GO, protected F32-MR-01 target-user preflight, actual source/profile/role binding, fresh fixtures, controlled backups, read-only baselines and independent after-state remain required. CF03-NORMAL A–D passes within the respective accepted source-bound development matrices, not one final source or release artifact. A/B/C mail/attachments 3/3 each are capture-only on their respective sources; D-SMTP2 3/3 is Owner-confirmed external receipt and verified attachment identity on `c2dc2cfdadf2c4def6bcd2f2ec20473cea3683b3`, not independent raw MIME or isolated no-relay capture. Live security/configuration remains PARTIAL: P5L-A/B/C-S05 and D-S06 real cross-entity BLOCKED; synthetic entity coverage remains separate. Only outstanding or change-induced development qualification remains; do not blanket-repeat accepted cases or automatically repeat the historical D-M01/M02 blocked capture campaign. [PR #48](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/48) documentation is independently accepted and squash-merged as `316e8a8d196fe908d11cf3d4409d0a5e541e6c01`. [ADR-08A / D-MAIL-01](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22) is technically accepted in [PR #49](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/49); local and Hosted D delta PASS within their separate evidence limits; formal documentation follow-up closed by the verified #49 squash. See [Hosted D delta evidence](evidence/cf03/adr-08a-hosted-d-2026-11-26.md). F38-02 retains historical closure; only mandatory batch termination solely for isolated mail transport uncertainty is partially superseded, with UNKNOWN/no-resend and all safety-critical STOP safeguards retained. No new behavior is attributed to earlier tested sources. Full final A–D acceptance, CF05-07/CF03-RISK, R0-03 final ZIP, R0-04 exact-package integration (OPEN, execution blocked until final ZIP is available), R0-07 independent release review and separate Owner Release GO remain OPEN / NO-GO. B02 mail/attachment, DOLIENV-ACC-01 (rollback unconfirmed), and historical D SMTP UNKNOWN/STOP remain unchanged; no replay, resend or compensation. CF03-FAULT destructive tests remain DEFERRED / NOT EXECUTED. No operational or release GO follows from documentation.
 
@@ -59,7 +59,7 @@ Draft #40 must include the accepted change and refreshed exact-package identific
 | F50-03/P3 | INDEPENDENTLY CLOSED |
 | F51-01/P2 | INDEPENDENTLY CLOSED; sole original #51 merge blocker |
 | F51-02/P3 | INDEPENDENTLY CLOSED; non-blocking test precision refinement |
-| CF05-07 / CF03-RISK | OPEN; F36-02 Owner-accepted Core residual risk retained |
+| CF05-07 / CF03-RISK | Independent technical qualification accepted with documented limitations / independent residual assessment complete; both await formal Owner acceptance. F36-02 Owner-accepted residual retained. |
 | R0-01 compatibility/function scope | V22/V23/V24 target; V23 synthetic-only; final scope verification OPEN |
 | R0-02 identity/version | ID 584620 Owner-accepted unreserved; main 0.1.0-dev; final metadata OPEN |
 | R0-03 reproducible final ZIP | OPEN; #40 rehearsal lacks #45 correction |
@@ -97,16 +97,38 @@ One installable `v0.1.0` ZIP, without any release-candidate suffix in final pack
 | Gate | Evidence to be produced | Status |
 | --- | --- | --- |
 | CF05-01–06 | Merged and scoped development assessments recorded in the [M3.1 matrix](m31-integrated-development-qualification.md#cf05-0106-consolidated-implementation-assessment). Owner Variant B is binding; F36-02 stays accepted residual risk. | **DEVELOPMENT IMPLEMENTATION COMPLETE** |
-| CF05-07 | Independent integrated Core/transaction/security and source-bound evidence review; separate Owner disposition. | **PENDING REVIEW AND OWNER ACCEPTANCE** |
+| CF05-07 | Independent technical qualification accepted with documented limitations. | **FORMAL OWNER ACCEPTANCE PENDING** |
 | CF03-NORMAL | Accepted real development workflows by respective source and profile; no final-package qualification. | **PASS WITH DOCUMENTED LIMITS** |
-| CF03-SECURITY-BASELINE | Authenticated negatives and synthetic hardening retained; real cross-entity remains blocked pending the [Owner decision](m31-cross-entity-owner-decision.md). | **PARTIAL** |
-| CF03-RISK | Independent comparison of detectable/undetectable transaction outcomes, weaker CoreGuarded financial-object risk, environment/extension assumptions and **separate Owner acceptance** | **OPEN** |
+| CF03-SECURITY-BASELINE | Authenticated negatives and synthetic hardening retained; real cross-entity remains BLOCKED / NOT EXECUTED under the [accepted Owner scope](m31-cross-entity-owner-decision.md). | **PARTIAL** |
+| CF03-RISK | Independent residual risk assessment complete; profile-specific residual evidence retained. | **OWNER ACCEPTANCE PENDING** |
 | R0-03/new package | Fresh source-matched deterministic ZIP, manifest, checksum, sanitized deliverable and correct 0.1.0/version metadata | **OPEN; PR #19 bytes invalid for this baseline** |
-| R0-04 | Actual Dolibarr **D** restricted-hosted **exact ZIP** installation plus required package regression/functional security checks | **OPEN** |
+| R0-04 | Actual Dolibarr **D** restricted-hosted **exact ZIP** installation plus required package regression/functional security and [Variant B checks](#r0-04-cross-entity-variant-b-compliance) | **OPEN** |
 | R0-07 | Independent final release/artifact assessment followed by separate Owner release GO, tag/publication control | **OPEN** |
 | CF03-FAULT | Purposeful destructive real rollback, reconnection/lost ACK, hidden implicit completion, SQL faults, concurrency and destructive replay | **DEFERRED TO LATER ITERATION; OPEN/NOT EXECUTED, not release PASS** |
 
 Real destructive tests remain deferred **without relaxing runtime safety**; the release still requires synthetic security/transaction fault coverage and safe authenticated negative tests.
+
+## R0-04 Cross-Entity Variant B compliance
+
+M3.2 is **OWNER ACCEPTED WITH DOCUMENTED SCOPE LIMITATION** under the
+[operational decision](m31-cross-entity-owner-decision.md#qualified-deployment-conditions).
+Documentation verification and R0-04 compliance verification remain
+pending. On the exact release ZIP and intended operating configuration
+record a case-by-case verification of:
+
+1. One productive business entity with a valid positive active entity ID and the effective Core/module configuration.
+2. Absence of intended MultiCompany or inter-entity business sharing, including configured extensions. Identify any legitimate non-business global definitions separately.
+3. Scoped actors and effective Core/module rights; global administrator entity 0 is not a substitute.
+4. Consistent admitted member/type and customer/invoice entity relationships in that financial entity.
+5. Matching document roots and verified PDF/attachment identity in the entity context.
+6. Representative positive and negative authorization cases with bounded sanitized outcomes and no unauthorized effects.
+7. Exact source commit/tree, ZIP identity, environment, profile and sanitized evidence attribution.
+
+Any installation that cannot demonstrate these conditions cannot rely on
+Variant B. The four real cross-entity cases remain BLOCKED / NOT EXECUTED.
+These checks qualify the intended operating scope; they add no runtime veto
+and do not establish multi-tenant isolation. No package execution occurred
+in the corrective documentation delta.
 
 ## Reusable development-only and strictly historical evidence
 
