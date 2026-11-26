@@ -1,11 +1,14 @@
 # CF05 Phase 3 – CoreGuarded financial implementation record (admission default-denied)
 
+**Current navigation.** See the [M3.1 integrated review basis](m31-integrated-development-qualification.md). Dated default-deny, hash/trigger allowlists, PROV veto and old finance-unlock sequencing are archived. Owner Variant B is binding; prior real tests and residual F36-02 keep their documented scope.
+
+
 ## Current productive feature admission after PR #38 (2026-11-24)
 
 This file describes the historical Phase-3 PR #36 **default-deny** source and its independent F36-01 finding; those statements remain true **only of that earlier source**. Later Owner Variant B authorized and PR #38 **merged** full finance admission on `CoreGuarded` alongside `EnhancedMySQL` and `MariaDBSnapshot`, via squash `0998fbaf58155cca04d31ab99c6bb47420e53c72`. Do not reinstate historical Core source-hash/trigger/PROV qualification or conclude that current Finance is disabled. Massaction guard, original one-shot, confirmed full row and UNKNOWN/STOP remain. F36-02 is Owner-accepted **Core residual filesystem risk**, not technically closed. Phase 5 A–D and release remain separate NO-GO. See [current policy](owner-core-parity-2026-11-22.md).
 
 
-**Post-PR #45:** development squash `b026f1504db27308fc7326e2e88ec2e53b2f48d9`, reviewed tree identical; #44 consolidation completed and #41–#43 closed without merge as superseded. [Current baseline](current-development-baseline.md) governs source identity, F45-01/02 open test precision, F45-03 documentation follow-up and remaining gates.
+**Historical PR #45 checkpoint:** development squash `b026f1504db27308fc7326e2e88ec2e53b2f48d9`, reviewed tree identical; #44 consolidation completed and #41–#43 closed without merge as superseded. [Current baseline](current-development-baseline.md) governs source identity, F45-01/02 independently closed by PR #51, F45-03 independently closed by PR #46 and the remaining gates.
 
 ---
 
@@ -18,7 +21,7 @@ This file describes the historical Phase-3 PR #36 **default-deny** source and it
 > **EVIDENCE AND RELEASE:** Newly added `test/unit/cf05-core-parity.php`, positive/negative existing/new customer and contribution/mail orchestration, standard/custom model regression and 9-/21-/Hosted synthetic CI are development evidence, **not real A–D**. Real CF03-NORMAL A–D needs separately Owner-authorized cases, F32-MR-01 private launcher/read-only preflight, A/C serialized use, DB/invoice/PDF/file/SMTP evidence, CF05-07/Owner risk review, later exact-ZIP/hosted D and separate release GO. Purposefully destructive CF03-FAULT is DEFERRED. Earlier statements below that require Core source/trigger pinning or productive CoreGuarded default deny are preserved **only as dated history**, not current policy. [Current decision and finding map](owner-core-parity-2026-11-22.md).
 
 
-**Development status (2026-11-21): IMPLEMENTED / INDEPENDENTLY APPROVED FOR DEVELOPMENT MERGE / SQUASH-MERGED as `d0b15785c60b74aa7ad59a1c687db94193d159c6`; FINANCE ADMISSION DEFAULT-DENIED; F36-01/P1 CLOSED; F36-02/P2 OPEN / CF05-06 REQUIRED.** Binding product/architecture baseline: [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22), [ADR-0001](adr/ADR-0001-core-first-transaction-profiles.md) and its [risk register](adr/ADR-0001-risk-register.md). **No real finance test, release, deployment or Owner GO has been granted.**
+**Historical development status (2026-11-21, before #38): IMPLEMENTED / INDEPENDENTLY APPROVED FOR DEVELOPMENT MERGE / SQUASH-MERGED as `d0b15785c60b74aa7ad59a1c687db94193d159c6`; FINANCE ADMISSION DEFAULT-DENIED; F36-01/P1 CLOSED; F36-02/P2 OPEN / CF05-06 REQUIRED.** Binding product/architecture baseline: [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22), [ADR-0001](adr/ADR-0001-core-first-transaction-profiles.md) and its [risk register](adr/ADR-0001-risk-register.md). **No real finance test, release, deployment or Owner GO has been granted.**
 
 ## What changed
 
@@ -44,7 +47,9 @@ This file describes the historical Phase-3 PR #36 **default-deny** source and it
 
 New focused tests cover: **production-default-denied** CoreGuarded finance admission and rejected forged/mismatched profiles, Preview/Booking/Invoice direct service under fully authorized actors; a **test-only qualified profile subclass** then runs the end-to-end synthetic Booking→Invoice flow with existing/new Third Party, typed pre-Core business rejection, unqualified Core negative outcomes and post-commit PDF/mail. Other tests retain one-shot session, profile, rights, rollback and direct-service boundaries. These are **synthetic** tests. Independent review confirmed the exact source `33cb3da3b389f9df2870bc8c6223c86a959cb467` passed [CI 9/9](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44956004981) (9/9) and [Hosted CI 1/1](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44956004947) (1/1); selected logs include **101 CF01**, **303 Invoice**, and **78 CF05 synthetic assertions**. The resulting squash merge has the identical source tree. This is **not** real DB/HTTP/trigger/PDF/SMTP evidence.
 
-### F36-02/P2 — open CF05-06 standard-Core filesystem side effect
+<a id="f36-02p2--open-cf05-06-standard-core-filesystem-side-effect"></a>
+
+### Historical F36-02/P2 finding before Owner risk disposition
 
 Verified Dolibarr V22.0.5 and V24.0.3 `Facture::validate()` both contain a **conditional `PROV` directory rename** before their own nested Core transaction completes (V22 `htdocs/compta/facture/class/facture.class.php` around lines 3919–3949; V24 around lines 4044–4074). This filesystem action cannot be undone by an outer SQL rollback; **the actual fresh invoice/standard-trigger reachability has not yet been demonstrated**, so neither impact nor safety is assumed. **F36-02 remains OPEN / CF05-06 REQUIRED before any real financial admission**, with a bounded V22/V24 PROV/trigger/contact/Agenda/D-02 call-graph investigation, an explicit supported-configuration determination and technical mitigation if reachable. Do **not** compensate with automatic filesystem rename or unqualified Core rollback. Because F36-01 keeps the productive CoreGuarded finance path denied, the independent final review **explicitly accepted it as nonblocking for a development merge under the closed finance gate**, while maintaining **F36-02 OPEN / CF05-06 REQUIRED** before any actual finance admission.
 
