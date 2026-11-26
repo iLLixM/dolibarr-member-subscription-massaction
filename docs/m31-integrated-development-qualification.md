@@ -2,7 +2,7 @@
 
 M3.1 is independently approved and integrated in PR #52. All five F52 findings are independently closed. The first corrective review on `1009fe845134f5c1f872c64ed9f191c4970f8277` had required changes before documentation merge. Its findings and the final approvals are retained in the [review register](m31-review-status-and-sweep.md).
 
-The independent CF05-07 technical verdict and the original CF03-RISK assessment remain the basis for both Owner acceptances with documented limitations. Formal closure takes effect upon Owner integration of the independently approved closure documentation. M3.2 is integrated with scope limitation, and its R0-04 compliance verification remains pending. See the [M3.4 Owner decision and closure rules](m34-integrated-owner-acceptance.md#9-canonical-status-and-transition-rules). Release v0.1.0 remains NO-GO.
+The independent CF05-07 technical verdict and the original CF03-RISK assessment remain the basis for both Owner acceptances with documented limitations. The independently approved PR #53 squash completed formal development closure with documented limitations. M3.2 is integrated with scope limitation, and its R0-04 compliance verification remains pending. See the [M3.4 Owner decision and closure rules](m34-integrated-owner-acceptance.md#9-canonical-status-and-transition-rules). Release v0.1.0 remains NO-GO.
 
 ## Source and PR #51 closure
 
@@ -153,6 +153,6 @@ different triggers and ADR-08B remains deferred.
 | Milestone or gate | Disposition |
 | --- | --- |
 | M3.1 documentation / M3.3 review | Independently approved and integrated in PR #52; F52-01–05 independently closed. M3.3 independent review complete. |
-| CF05-07 and CF03-RISK | Both Owner accepted with documented limitations. Formal closure follows Owner integration of the independently approved closure documentation. |
+| CF05-07 and CF03-RISK | Both Owner accepted and formally closed with documented limitations by the independently approved PR #53 squash. |
 | M3.2 | Cross-Entity Variant B accepted with documented scope limitation, independently verified and integrated. All four real cases remain BLOCKED / NOT EXECUTED and actual R0-04 compliance remains pending. |
-| M3.4 and release | See the [M3.4 Owner decision and closure rules](m34-integrated-owner-acceptance.md#9-canonical-status-and-transition-rules). M4 final freeze follows formal M3 closure. R0-04, R0-05, R0-06, R0-07 and separate Owner Release GO remain open. |
+| M3.4 and release | M3.4 is integrated. [D-M4-01](release-qualification-v0.1.0.md#d-m4-01--distribution-and-release-procedure) governs package preparation in PR #40. R0-04, R0-05, R0-06, R0-07 and separate Owner Release GO remain open. |

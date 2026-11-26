@@ -7,7 +7,7 @@ import argparse
 import hashlib
 import io
 import json
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 import re
 import stat
 import subprocess
@@ -18,16 +18,45 @@ MODULE = "membersubscriptionmassaction"
 VERSION = "0.1.0"
 MODULE_ID = 584620
 DESCRIPTOR = "core/modules/modMemberSubscriptionMassaction.class.php"
+RUNTIME_FILES = (
+    "admin/setup.php",
+    "class/actions_membersubscriptionmassaction.class.php",
+    "class/activetransactionguard.class.php",
+    "class/booking.class.php",
+    "class/bookingmember.class.php",
+    "class/corecompatibility.class.php",
+    "class/coreguardedrightsdb.class.php",
+    "class/coreguardedtransaction.class.php",
+    "class/databasestate.class.php",
+    "class/filebookingcheckpoint.class.php",
+    "class/invoice.class.php",
+    "class/invoicepdf.class.php",
+    "class/invoiceprofile.class.php",
+    "class/mail.class.php",
+    "class/period.class.php",
+    "class/preview.class.php",
+    "class/transactionprofile.class.php",
+    "core/modules/modMemberSubscriptionMassaction.class.php",
+    "js/subscription.js",
+    "langs/de_DE/membersubscriptionmassaction.lang",
+    "langs/en_US/membersubscriptionmassaction.lang",
+    "lib/batch.lib.php",
+    "lib/booking.lib.php",
+    "lib/booking_renderer.lib.php",
+    "lib/membersubscriptionmassaction.lib.php",
+    "lib/preview.lib.php",
+    "lib/preview_renderer.lib.php",
+    "lib/profile.lib.php",
+    "subscription.php",
+)
 RELEASE_FILES = {
+    **{name: name for name in RUNTIME_FILES},
     "COPYING": "COPYING",
     "README.md": "docs/distribution/README.md",
     "composer.json": "composer.json",
-    "subscription.php": "subscription.php",
-    "admin/setup.php": "admin/setup.php",
-    DESCRIPTOR: DESCRIPTOR,
-    "js/subscription.js": "js/subscription.js",
-    **{f"langs/{lang}/{MODULE}.lang": f"langs/{lang}/{MODULE}.lang" for lang in ("de_DE", "en_US")},
 }
+NON_DISTRIBUTION_DIRECTORIES = {".github", "docs", "experiments", "test", "tools"}
+NON_DISTRIBUTION_FILES = {".gitattributes", ".gitignore", "AGENTS.md", "CHANGELOG.md", "CONTRIBUTING.md", "README.md"}
 
 
 def git(*args):
@@ -48,41 +77,36 @@ def build(revision):
             mode, kind, blob = metadata.decode().split()
             tree_entries[path.decode()] = (mode, kind, blob)
 
-    mapping = dict(RELEASE_FILES)
-    for name in tree_entries:
-        if re.fullmatch(r"(class|lib)/[a-z0-9_]+\.(class|lib)\.php", name):
-            mapping[name] = name
-    roots = {"admin", "class", "core", "js", "langs", "lib"}
-    omitted = {path for path in tree_entries if PurePosixPath(path).parts[0] in roots} - set(mapping.values())
-    if omitted:
-        raise ValueError(f"Unclassified runtime files: {sorted(omitted)}")
+    sources = set(RELEASE_FILES.values())
+    unexpected = {
+        name for name in tree_entries
+        if name not in sources
+        and ("/" not in name or name.split("/", 1)[0] not in NON_DISTRIBUTION_DIRECTORIES)
+        and name not in NON_DISTRIBUTION_FILES
+    }
+    if unexpected:
+        raise ValueError(f"Unclassified source files: {sorted(unexpected)}")
+    missing = sources - tree_entries.keys()
+    if missing:
+        raise ValueError(f"Missing distribution files: {sorted(missing)}")
 
     payload = {}
-    records = []
-    for destination, source in sorted(mapping.items()):
+    for destination, source in sorted(RELEASE_FILES.items()):
         mode, kind, blob = tree_entries[source]
         if kind != "blob" or mode not in {"100644", "100755"}:
-            raise ValueError(f"Runtime input is not a regular file: {source}")
-        data = git("cat-file", "blob", blob)
-        payload[destination] = data
-        records.append({"path": destination, "source": source, "bytes": len(data), "sha256": sha256(data)})
+            raise ValueError(f"Distribution input is not a regular file: {source}")
+        payload[destination] = git("cat-file", "blob", blob)
 
     composer = json.loads(payload["composer.json"])
     descriptor = payload[DESCRIPTOR]
     if (composer["version"] != VERSION or composer["license"] != "GPL-3.0-or-later"
-            or composer["require"]["php"] != ">=7.4"
-            or b"$this->version = '0.1.0';" not in descriptor
-            or b"$this->numero = 584620;" not in descriptor):
+            or composer["name"] != "illixm/dolibarr-member-subscription-massaction"
+            or composer["type"] != "dolibarr-module" or composer["require"]["php"] != ">=7.4"
+            or f"$this->version = '{VERSION}';".encode() not in descriptor
+            or f"$this->numero = {MODULE_ID};".encode() not in descriptor
+            or f"$this->rights_class = '{MODULE}';".encode() not in descriptor):
         raise ValueError("Release metadata differs")
 
-    manifest = {
-        "module": MODULE, "module_id": MODULE_ID, "version": VERSION,
-        "source_commit": head, "source_tree": tree,
-        "format": "ZIP_STORED, sorted paths, fixed timestamp, Unix regular files 0644",
-        "files": records,
-    }
-    manifest_bytes = (json.dumps(manifest, sort_keys=True, indent=2) + "\n").encode()
-    payload["PACKAGE-MANIFEST.json"] = manifest_bytes
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, "w", compression=zipfile.ZIP_STORED) as archive:
         for name, data in sorted(payload.items()):
@@ -98,7 +122,17 @@ def build(revision):
         for name, data in payload.items():
             if archive.read(f"{MODULE}/{name}") != data:
                 raise ValueError(f"Packaged data differs: {name}")
-    return zip_data, manifest_bytes
+    report = {
+        "source_commit": head,
+        "source_tree": tree,
+        "module": MODULE,
+        "module_id": MODULE_ID,
+        "version": VERSION,
+        "files": len(payload),
+        "zip_bytes": len(zip_data),
+        "zip_sha256": sha256(zip_data),
+    }
+    return zip_data, report
 
 
 def main():
@@ -108,15 +142,12 @@ def main():
     args = parser.parse_args()
     if not re.fullmatch(r"[0-9a-f]{40}", args.source):
         parser.error("Use an exact Git SHA")
-    archive, manifest = build(args.source)
+    archive, report = build(args.source)
     args.output.mkdir(mode=0o700)
     name = f"module_{MODULE}-{VERSION}.zip"
     (args.output / name).write_bytes(archive)
-    (args.output / "PACKAGE-MANIFEST.json").write_bytes(manifest)
-    (args.output / "SHA256SUMS").write_text(
-        f"{sha256(archive)}  {name}\n{sha256(manifest)}  PACKAGE-MANIFEST.json\n", encoding="ascii"
-    )
-    print(f"STRUCTURAL PASS {args.source} {sha256(archive)}")
+    (args.output / "SHA256SUMS").write_text(f"{report['zip_sha256']}  {name}\n", encoding="ascii")
+    print(json.dumps({"status": "STRUCTURAL PASS", "zip": name, **report}, sort_keys=True))
 
 
 if __name__ == "__main__":

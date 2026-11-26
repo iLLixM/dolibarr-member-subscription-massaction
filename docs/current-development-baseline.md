@@ -18,7 +18,7 @@ Owner disposition (2026-11-26): the originally authorized Hosted D delta was con
 
 **Merged pre-release hardening.** [PR #51](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/51) squash `8ab803d135ac534dd2d08d28f47a8e427cd23302` matches approved HEAD `3d3cbda7e0ca46db1f2fe5651a273e7aeea4b4bf` (sole parent `f1cc6dc9ca8a274d8af8c324fe87310c84606471`, tree `cf2b1ffcf9f38baae8edf6b18e8f0b4d7348a771`). F45-01/02, F49-03, F50-02/03 and F51-01/02 are INDEPENDENTLY CLOSED. Pre-Release Test-Hardening is integrated and CLOSED WITH DOCUMENTED LIMITATIONS. Evidence remains bounded to the reviewed synthetic suites and local file-session runtime.
 
-**Integrated development qualification (2026-11-26).** Current accepted main is PR #52 squash `a19d7459550b9aebcb0f551925d8dfd0825c5ebe`, tree `b70d60455d5c5bbc255ec0934ca26bdfa73037ce`. PR #52 integrated the independently approved M3.1 documentation and the independently verified M3.2 scope decision. All five F52 findings are independently closed. [Verified #52 provenance](m34-integrated-owner-acceptance.md#1-decision-and-review-provenance) The Owner accepted CF05-07 and CF03-RISK with documented limitations. Formal closure of M3, CF05-07, CF03-RISK and Phase 5 development qualification takes effect upon Owner integration of the independently approved closure documentation. See the [M3.4 Owner decision and closure rules](m34-integrated-owner-acceptance.md#9-canonical-status-and-transition-rules). Actual M3.2 compliance remains an R0-04 obligation. Release v0.1.0 is NO-GO.
+**Integrated development qualification (2026-11-26).** The Owner squash-merged independently approved PR #53 as `351b7d2177e8fc106049f4a9f6c3b0596839f9fe`. Its tree `056b70a264d6937fb365ab4b8b7b4632e35a4999` matches approved HEAD `67cb8d8f84e0c01875e92f516af1bf707feec8e8`. M3, CF05-07, CF03-RISK and Phase 5 development qualification are formally closed with documented limitations. CF03-NORMAL A–D remains source-bound PASS, live security remains PARTIAL, and the four cross-entity cases remain BLOCKED / NOT EXECUTED. Destructive real CF03-FAULT remains DEFERRED / NOT EXECUTED. The independent PR #53 review used the identical CI integration tree (31/31 jobs), and the [squash push](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/45871137608) passed 9/9 Standard jobs. [PR #53](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/53) · [M3.4 Owner decision](m34-integrated-owner-acceptance.md)
 
 ## Current authoritative development, architecture and release status
 
@@ -79,12 +79,12 @@ Owner disposition (2026-11-26): the originally authorized Hosted D delta was con
 | F51-01/P2 | INDEPENDENTLY CLOSED | Active status synchronization; focused documentation review. |
 | F51-02/P3 | INDEPENDENTLY CLOSED | Consistent original confirmation revision and successful string reads before byte equality; focused test review. |
 
-**Remaining milestone sequence.** The [M3.4 Owner decision](m34-integrated-owner-acceptance.md) defines the formal M3 closure criterion and the release boundary.
+**Remaining milestone sequence.** The [M3.4 Owner record](m34-integrated-owner-acceptance.md) governs development qualification. The subsequent [D-M4-01](release-qualification-v0.1.0.md#d-m4-01--distribution-and-release-procedure) amends its packaging roadmap.
 
-1. M1 implementation, M2 hardening and M3.3 independent integrated review are complete within their recorded scope. M3.1 and M3.2 are independently approved and integrated in PR #52. Verify the actual integration of the independently approved M3.4 closure documentation before recording formal M3 and Phase 5 development closure.
-2. M4 is next. Refresh Draft PR #40 against the final accepted baseline for R0-00/01/02, reproducible R0-03 and draft R0-06. The binding source and package freeze follows formal M3 closure. Settle source, merge, build and tag provenance before the freeze. The manifest embeds `source_commit` and `source_tree`, so a post-squash rebuild can change ZIP bytes despite identical trees.
-3. M5 requires targeted R0-04 exact-ZIP verification including all seven M3.2 criteria, separate R0-05 operational readiness and Owner operating-risk acceptance, and final R0-06 documentation. RC-01–11 allocation remains to be commissioned.
-4. M6 requires independent R0-07 assessment and separate Owner Release GO. M7 requires authorized R0-08 publication of the exact approved bytes and R0-09 verification of the published asset, manifest, tag and hash before applicable closure. Any changed bytes require renewed exact-artifact assessment.
+1. M4 prepares the R0-00–03 candidate and user documentation in Draft PR #40. Record the source commit, tree and exact ZIP checksum externally. The package is deterministic and omits embedded source metadata.
+2. M5 qualifies the exact ZIP and installed identity under R0-04, including all seven M3.2 criteria, obtains R0-05 operational readiness and operating-risk acceptance, and finalizes R0-06 against the observed package results. Targeted cases reuse applicable source-bound development evidence.
+3. M6 combines independent freeze verification with R0-07 final release review. The Owner grants separate explicit Release GO only after the applicable gates.
+4. M7 follows Release GO with manual Owner squash merge, integrated source verification and a build that reproduces the qualified SHA-256. Tag the integrated commit, publish the matching ZIP, then verify the published asset, checksum and tag before applicable closure.
 
 See [current release gates](release-qualification-v0.1.0.md).
 
@@ -259,7 +259,7 @@ A reviewer's earlier inability to access raw POS02 bytes and the Owner's later t
 | Order | Work package | Required output |
 | --- | --- | --- |
 | Integrated | CF05-01–06 and consolidated hardening | Full finance under Owner Variant B; see the [package assessment](m31-integrated-development-qualification.md#cf05-0106-consolidated-implementation-assessment) and verified #51 provenance. |
-| Owner accepted with documented limitations | CF05-07 / CF03-RISK | Formal development closure follows Owner integration of the independently approved closure documentation. See the [M3.4 Owner decision](m34-integrated-owner-acceptance.md). |
+| Closed with documented limitations | CF05-07 / CF03-RISK | PR #53 independently approved and integrated both Owner decisions. R0-05 remains a separate operational gate. |
 | Owner scope accepted and integrated | Real cross-entity cases | Under [Cross-Entity Variant B](m31-cross-entity-owner-decision.md), P5L-A/B/C-S05 and D-S06 stay BLOCKED / NOT EXECUTED. Verify all seven R0-04 compliance criteria. NORMAL A–D is source-bound PASS, security PARTIAL and destructive CF03-FAULT DEFERRED / NOT EXECUTED. |
 | Release gates open | Issue #20 and Draft PR #40 | Final source and exact ZIP, R0-04, separate R0-05, R0-06, R0-07 and separate Owner Release GO. See the [release gate map](release-qualification-v0.1.0.md). |
 

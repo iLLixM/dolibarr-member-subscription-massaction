@@ -15,7 +15,7 @@ class modMemberSubscriptionMassaction extends DolibarrModules
 	public function __construct($db)
 	{
 		$this->db = $db;
-		// Temporary, locally collision-checked ID. Reserve a public ID before release.
+		// Unreserved ID retained for v0.1.0. Verify collisions in the intended installation.
 		$this->numero = 584620;
 		$this->rights_class = 'membersubscriptionmassaction';
 		$this->family = 'crm';
