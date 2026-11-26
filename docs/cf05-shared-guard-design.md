@@ -1,5 +1,8 @@
 # CF05-01/02 – Shared active transaction guard (implementation record)
 
+**Current navigation.** See the [M3.1 integrated review basis](m31-integrated-development-qualification.md). Dated default-deny, hash/trigger allowlists, PROV veto and old finance-unlock sequencing are archived. Owner Variant B is binding; prior real tests and residual F36-02 keep their documented scope.
+
+
 ## Current shared-guard integration after PR #38 (2026-11-24)
 
 This document retains PR #34's original guard-design provenance. The **same injected active Booking/Invoice Guard** is now exercised by merged Phase 4 Finance, not held behind the historically described CoreGuarded finance default-deny. Owner Variant B allows standard Core API/trigger/model execution; preserves same DoliDB identity, original consumed file-session, full confirmed finance row, ownership, completion and STOP. PR #38 merged as `0998fbaf58155cca04d31ab99c6bb47420e53c72` (reviewed `b15b93580f995fb05a696a125c2a5fd995dd4bb3`, tree identical). The new F38-14 `manualend` handoff was independently closed technically. Later local B bounded finance/mail cases were accepted; D focused contribution/session/replay passed, not D finance or release. See [current baseline](current-development-baseline.md) and [dolienv](dolienv-environments.md).
@@ -43,7 +46,9 @@ An unknown/changed active guard at any boundary stops further business APIs. Fin
 
 Existing EnhancedMySQL event and MariaDB snapshot observers retain their own active and isolation behavior; there is no new P_S permission requirement in CoreGuarded. D-01 order (preflight → SET RR → immediate Core BEGIN → locks → post-lock metadata/readback) remains in Booking unchanged.
 
-## Explicit non-goals and remaining CF05 gates
+<a id="explicit-non-goals-and-remaining-cf05-gates"></a>
+
+## Historical PR #34 non-goals and then-remaining CF05 gates
 
 - **CF05-03:** full finance implementation merged in PR #36 but production CoreGuarded admission remains **default-denied**; distinct qualification and Owner approval remain.
 - **CF05-04:** finite typed pre-financial-Core business origin/owned-context rollback implemented in PR #36; unqualified Core customer/invoice/SQL failures still `UNKNOWN/STOP`.

@@ -8,7 +8,9 @@
 
 **Verified CPC-02 merge provenance.** [PR #50](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/50) squash `f1cc6dc9ca8a274d8af8c324fe87310c84606471`, sole parent `feeea580f0004a8b18ea2c423d2cd6e7c2c6c819`, identical tree `6167d85c7acb1973490d768a63ebe4edd2677b15` to approved HEAD `94c90b1dae9d9a104a0097427cd117374b496f61`. CPC-02 is integrated and development qualification is CLOSED WITH DOCUMENTED LIMITATIONS. F50-01/04 independently closed.
 
-**Pre-release hardening.** F45-01/02, F49-03 and F50-02/03: INDEPENDENTLY CLOSED. See [individual test traceability](test-coverage.md#v010-pre-release-test-hardening). Existing real evidence keeps its original source and scope. The independent review of PR #51 on `500a7fe6ca5e59e2549d62af89fa62f017bfecf9` closed F45-01, F45-02, F49-03, F50-02 and F50-03 (5/5). Technical qualification CLOSED WITH DOCUMENTED LIMITATIONS; original verdict CHANGES REQUIRED BEFORE DEVELOPMENT MERGE solely for F51-01/P2 documentation. F51-01/P2 and F51-02/P3 (optional test precision) FIX IMPLEMENTED – INDEPENDENT DELTA REVIEW PENDING. Formal work-package closure and Owner squash remain pending the focused follow-up and final exact-HEAD CI. No new real qualification or release authorization.
+**Merged pre-release hardening.** [PR #51](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/51) squash `8ab803d135ac534dd2d08d28f47a8e427cd23302` matches approved HEAD `3d3cbda7e0ca46db1f2fe5651a273e7aeea4b4bf` (sole parent `f1cc6dc9ca8a274d8af8c324fe87310c84606471`, tree `cf2b1ffcf9f38baae8edf6b18e8f0b4d7348a771`). F45-01/02, F49-03, F50-02/03 and F51-01/02 are INDEPENDENTLY CLOSED. Pre-Release Test-Hardening is integrated and CLOSED WITH DOCUMENTED LIMITATIONS. Evidence remains bounded to the reviewed synthetic suites and local file-session runtime.
+
+**M3.1:** PREPARATION COMPLETE – INDEPENDENT INTEGRATED REVIEW PENDING. CF05-07 and CF03-RISK remain pending independent review and Owner acceptance. Phase 5 PARTIAL; v0.1.0 NO-GO. See [M3.1 integrated review basis](m31-integrated-development-qualification.md).
 
 **2026-11-25 local Phase 5 delta:** See the [current A/B/C results and exact source](evidence/cf03/phase5-local-completion-2026-11-25.md). A and C mail/verified PDF attachments each passed 3/3 on `c2dc2cfdadf2c4def6bcd2f2ec20473cea3683b3`; B's earlier 3/3 remains on `ba5c9a3121754fcbd4259bb8906ad1dd17f1ce00`. These are capture-only outcomes, not external delivery or nine cases on a single source. Local CF03-NORMAL A/B/C: **PASS within the accepted case matrix**. Local CF03-SECURITY-BASELINE and local Phase 5: **PARTIAL**; P5L-A/B/C-S05 real cross-entity qualification **BLOCKED** (no distinct authorized second business entity). The live Web aged-fixture expiry result does not establish natural elapsed-time expiry. Earlier results retain their exact source and scope. Further local tests are limited to outstanding cases and change-induced regression; do not repeat accepted cases without a concrete reason.
 
@@ -55,8 +57,8 @@ Draft #40 must include the accepted change and refreshed exact-package identific
 | CPC-02 / PR #50 | Technical ACCEPTED; local A/B/C normal mixed qualification PASS on `042c917bd5d8844c33758f8c26170fd7eb7ecb87`; STOP synthetic only; integrated and development qualification CLOSED WITH DOCUMENTED LIMITATIONS; F50-01/04 independently closed; [source-bound CPC-02 evidence](test-coverage.md#cpc-02-cross-profile-batch-results); no real Hosted D CPC-02 campaign |
 | F50-02/P3 | INDEPENDENTLY CLOSED |
 | F50-03/P3 | INDEPENDENTLY CLOSED |
-| F51-01/P2 | FIX IMPLEMENTED – INDEPENDENT DELTA REVIEW PENDING; sole original #51 merge blocker |
-| F51-02/P3 | FIX IMPLEMENTED – INDEPENDENT DELTA REVIEW PENDING; non-blocking test precision refinement |
+| F51-01/P2 | INDEPENDENTLY CLOSED; sole original #51 merge blocker |
+| F51-02/P3 | INDEPENDENTLY CLOSED; non-blocking test precision refinement |
 | CF05-07 / CF03-RISK | OPEN; F36-02 Owner-accepted Core residual risk retained |
 | R0-01 compatibility/function scope | V22/V23/V24 target; V23 synthetic-only; final scope verification OPEN |
 | R0-02 identity/version | ID 584620 Owner-accepted unreserved; main 0.1.0-dev; final metadata OPEN |
@@ -94,12 +96,10 @@ One installable `v0.1.0` ZIP, without any release-candidate suffix in final pack
 
 | Gate | Evidence to be produced | Status |
 | --- | --- | --- |
-| CF05-01/02 | Shared active guard, same-instance Booking→Invoice dependency, Core-operation/readback checks, conservative rollback-stage negative tests and independent exact-head review | **DEVELOPMENT COMPLETE: PR #34 squash-merged; F34-01/02 CLOSED; 9/9 synthetic CI PASS. NOT full finance admission** |
-| CF05-03/04/05 – guarded financial **code** | Invoice/linked Third Party, bounded typed pre-finance errors, checkpointed PDF/mail, server-default-closed production financial admission | **DEVELOPMENT CODE COMPLETE:** PR #36 squash-merged; F36-01/P1 CLOSED; [standard CI 9/9 PASS](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44956004981) + [hosted PHP8.3/V22.0.5 CI 1/1 PASS](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44956004947); **operational CoreGuarded finance still OFF / NOT QUALIFIED** |
-| CF05-06 – supported Core/trigger/FS path | V22/V24 InnoDB, Core/Agenda/customer/contact/invoice/trigger and conditional PROV document-directory rename reachability/mitigation | **OPEN / F36-02/P2 NOT QUALIFIED**, blocking later finance activation |
-| CF05-07 – full qualification and Owner GO | Final independent exact-source safety/transaction review, real acceptance planning and a **separate** finance feature-admission change | **OPEN**, no finance GO |
-| CF03-NORMAL | New, individually Owner-authorized real success cases A–D across Agenda ON/OFF, invoice-existing/auto-Third-Party, line/validation/link, PDF, selected attachment/isolated SMTP, small successful batch and independent DB/FS/delivery reconciliation | **OPEN: not inherited from POS01/POS02** |
-| CF03-SECURITY-BASELINE | Retained negative/security/fault synthetic regression, authenticated safe replay/rights tests, **21-job PHP/Core CI**, profile/guard/NO_CHAIN/terminal STOP assertions, independent exact-HEAD code/evidence review | **OPEN for full-feature code** |
+| CF05-01–06 | Merged and scoped development assessments recorded in the [M3.1 matrix](m31-integrated-development-qualification.md#cf05-0106-consolidated-implementation-assessment). Owner Variant B is binding; F36-02 stays accepted residual risk. | **DEVELOPMENT IMPLEMENTATION COMPLETE** |
+| CF05-07 | Independent integrated Core/transaction/security and source-bound evidence review; separate Owner disposition. | **PENDING REVIEW AND OWNER ACCEPTANCE** |
+| CF03-NORMAL | Accepted real development workflows by respective source and profile; no final-package qualification. | **PASS WITH DOCUMENTED LIMITS** |
+| CF03-SECURITY-BASELINE | Authenticated negatives and synthetic hardening retained; real cross-entity remains blocked pending the [Owner decision](m31-cross-entity-owner-decision.md). | **PARTIAL** |
 | CF03-RISK | Independent comparison of detectable/undetectable transaction outcomes, weaker CoreGuarded financial-object risk, environment/extension assumptions and **separate Owner acceptance** | **OPEN** |
 | R0-03/new package | Fresh source-matched deterministic ZIP, manifest, checksum, sanitized deliverable and correct 0.1.0/version metadata | **OPEN; PR #19 bytes invalid for this baseline** |
 | R0-04 | Actual Dolibarr **D** restricted-hosted **exact ZIP** installation plus required package regression/functional security checks | **OPEN** |

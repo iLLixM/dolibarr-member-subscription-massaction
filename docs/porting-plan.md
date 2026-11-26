@@ -5,7 +5,7 @@
 The original Phase 1/3B porting analysis and 71-ID requirement matrix are **historical source-bound evidence**. The member contribution + optional Finance/Third Party/invoice/PDF/mail implementation for all three transaction profiles was **completed and squash-merged in PR #38** as `0998fbaf58155cca04d31ab99c6bb47420e53c72`; reviewed tree identical to `b15b93580f995fb05a696a125c2a5fd995dd4bb3`. Older descriptions of these features as future work are not current delivery status. [Current baseline](current-development-baseline.md) and [Owner Variant B](owner-core-parity-2026-11-22.md) govern. Local bounded A/B/C cases, B mail and focused D contribution/session/replay are accepted; remaining A/C mail, D finance/PDF/mail and full integration are OPEN, release NO-GO. Never re-run the historical Env B UNKNOWN operation.
 
 
-**Post-PR #45:** development squash `b026f1504db27308fc7326e2e88ec2e53b2f48d9`, reviewed tree identical; #44 consolidation completed and #41–#43 closed without merge as superseded. [Current baseline](current-development-baseline.md) governs source identity, F45-01/02 open test precision, F45-03 documentation follow-up and remaining gates.
+**Historical PR #45 checkpoint:** development squash `b026f1504db27308fc7326e2e88ec2e53b2f48d9`, reviewed tree identical; #44 consolidation completed and #41–#43 closed without merge as superseded. [Current baseline](current-development-baseline.md) governs source identity, F45-01/02 open test precision, F45-03 documentation follow-up and remaining gates.
 
 ---
 

@@ -2,7 +2,12 @@
 
 ## Unreleased – development completion and next release gates
 
-### 2026-11-24 – PR #45 shared-hosting compatibility and PR #44 documentation consolidation
+### 2026-11-26 – Integrated development review preparation
+
+- PR #51 integrated the independently accepted Pre-Release Test-Hardening package with documented limitations. See the [M3.1 review basis](docs/m31-integrated-development-qualification.md) for exact merge/CI provenance and consolidated CF05/CF03 evidence.
+- CF05-07 and CF03-RISK remain pending independent review and Owner acceptance. Real cross-entity qualification remains blocked. Release v0.1.0 is NO-GO.
+
+### 2026-11-24 – Historical PR #45 shared-hosting compatibility and PR #44 documentation consolidation
 
 - PR #45 squash-merged as `b026f1504db27308fc7326e2e88ec2e53b2f48d9`, tree-identical to reviewed `7e5f64d07ab3830ce355cd745782c4f0c2a955b0`; APPROVED FOR DEVELOPMENT MERGE WITH DOCUMENTED LIMITATIONS; 31/31 exact-head CI.
 - PR #45 removes only the unnecessary directory-listing/readability prerequisite in `MsmFileBookingCheckpoint::requireSession()`. The PHP `files` handler, nonempty session ID, plain absolute existing writable directory, canonical binding and actual reopen/read/write/close/readback remain required. A known session file may be accessible even when the directory cannot be listed (e.g. owner mode `0300`). Preserve the original consumed confirmation, one-shot/processing/result persistence, owned guard and finance/post-COMMIT checks. Do not widen provider permissions to make a test pass. The six concrete Core/model/PDF file readability checks remain a separate contract.
@@ -12,7 +17,7 @@
 
 ### 2026-11-24 – Phase 5 bounded local qualification
 
-**Current Phase 5:** Owner-accepted Codex outcomes on deployed `ba5c9a3121754fcbd4259bb8906ad1dd17f1ce00`: local A/B/C protected readiness 21 checks PASS; B01/B02 and A02/C02 bounded finance/PDF PASS; additional non-mail matrix 8/8 PASS; local B module mail/verified PDF attachments 3/3 PASS (two fresh bulk runs, local capture only). Historical B02 mail/attachment and DOLIENV-ACC-01 remain UNKNOWN/STOP, latter rollback unconfirmed. See [Phase 5 qualification register](docs/evidence/cf03/phase5-local-qualification-2026-11-24.md). These accepted summaries suffice under modified OD-P5-02; no external reproduction of raw artifacts is asserted.
+**Historical Phase 5 snapshot:** Owner-accepted Codex outcomes on deployed `ba5c9a3121754fcbd4259bb8906ad1dd17f1ce00`: local A/B/C protected readiness 21 checks PASS; B01/B02 and A02/C02 bounded finance/PDF PASS; additional non-mail matrix 8/8 PASS; local B module mail/verified PDF attachments 3/3 PASS (two fresh bulk runs, local capture only). Historical B02 mail/attachment and DOLIENV-ACC-01 remain UNKNOWN/STOP, latter rollback unconfirmed. See [Phase 5 qualification register](docs/evidence/cf03/phase5-local-qualification-2026-11-24.md). These accepted summaries suffice under modified OD-P5-02; no external reproduction of raw artifacts is asserted.
 
 **Operational/release boundary:** Local readiness accepted for the tested scope; new cases require protected preflight, current source/profile binding, fresh fixtures, Owner authorization, controlled backups and independent readbacks. Full CF03-NORMAL A–D, A/C mail, remaining live/configuration coverage, isolated Hosted D, CF05-07/CF03-RISK, final R0-03, R0-04, R0-07 and separate Owner Release GO remain OPEN / NO-GO. CF03-FAULT destructive tests remain deferred. Never replay historical UNKNOWN operations.
 

@@ -4,7 +4,9 @@
 
 **Verified CPC-02 merge provenance.** [PR #50](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/50) squash `f1cc6dc9ca8a274d8af8c324fe87310c84606471`, sole parent `feeea580f0004a8b18ea2c423d2cd6e7c2c6c819`, identical tree `6167d85c7acb1973490d768a63ebe4edd2677b15` to approved HEAD `94c90b1dae9d9a104a0097427cd117374b496f61`. CPC-02 is integrated and development qualification is CLOSED WITH DOCUMENTED LIMITATIONS. F50-01/04 independently closed.
 
-**Pre-release hardening.** F45-01/02, F49-03 and F50-02/03: INDEPENDENTLY CLOSED. See [individual test traceability](test-coverage.md#v010-pre-release-test-hardening). Existing real evidence keeps its original source and scope. The independent review of PR #51 on `500a7fe6ca5e59e2549d62af89fa62f017bfecf9` closed F45-01, F45-02, F49-03, F50-02 and F50-03 (5/5). Technical qualification CLOSED WITH DOCUMENTED LIMITATIONS; original verdict CHANGES REQUIRED BEFORE DEVELOPMENT MERGE solely for F51-01/P2 documentation. F51-01/P2 and F51-02/P3 (optional test precision) FIX IMPLEMENTED – INDEPENDENT DELTA REVIEW PENDING. Formal work-package closure and Owner squash remain pending the focused follow-up and final exact-HEAD CI. No new real qualification or release authorization.
+**Merged pre-release hardening.** [PR #51](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/51) squash `8ab803d135ac534dd2d08d28f47a8e427cd23302` matches approved HEAD `3d3cbda7e0ca46db1f2fe5651a273e7aeea4b4bf` (sole parent `f1cc6dc9ca8a274d8af8c324fe87310c84606471`, tree `cf2b1ffcf9f38baae8edf6b18e8f0b4d7348a771`). F45-01/02, F49-03, F50-02/03 and F51-01/02 are INDEPENDENTLY CLOSED. Pre-Release Test-Hardening is integrated and CLOSED WITH DOCUMENTED LIMITATIONS. Evidence remains bounded to the reviewed synthetic suites and local file-session runtime.
+
+**M3.1:** PREPARATION COMPLETE – INDEPENDENT INTEGRATED REVIEW PENDING. CF05-07 and CF03-RISK remain pending independent review and Owner acceptance. Phase 5 PARTIAL; v0.1.0 NO-GO. See [M3.1 integrated review basis](m31-integrated-development-qualification.md).
 
 
 

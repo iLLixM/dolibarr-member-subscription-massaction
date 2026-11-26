@@ -41,6 +41,8 @@
 
 ## Read these first
 
+[M3.1 integrated review basis](m31-integrated-development-qualification.md) is the canonical integrated decision basis.
+
 | Purpose | Primary document | Interpretation |
 | --- | --- | --- |
 | Current A–D deployment labels, setup/acceptance and confidentiality | [dolienv environments](dolienv-environments.md) | Dated 2026-11-24 canonical mapping; old CF03 commands/evidence retain original bindings |
@@ -49,11 +51,11 @@
 | Transaction design and accepted observation limits | [ADR-0001](adr/ADR-0001-core-first-transaction-profiles.md) | **2026-11-21 ADR-06/11 amendment first**; dated 2026-11-18 text retained as history |
 | Risks and owner acceptance | [ADR risk register](adr/ADR-0001-risk-register.md) | Current addendum plus historical technical R01–R15 |
 | CF03 one-shot witness and safe operating conditions | [CF03 qualification plan](cf03-qualification-plan.md) and [runbook](cf03-operator-runbook.md) | Current merged status + F32-MR-01 launcher restriction precede old commands |
-| Implemented guard/Invoice shared contract (CF05-01/02) | [CF05 shared guard design](cf05-shared-guard-design.md) and [PR #34](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/34) | **Implemented, independently reviewed, merged**; F34-01/02 CLOSED. CoreGuarded finance gates remain OFF; CF05-03..07 OPEN |
-| Phase-3 CoreGuarded finance implementation with closed productive admission | [Phase-3 implementation record](cf05-phase3-finance-admission.md) and [PR #36](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/36) | **MERGED**: F36-01/P1 CLOSED, F36-02/P2 OPEN; CoreGuarded invoice/autocreate/sendmail **default-denied**, positive finance tests synthetic only |
-| Next V22/V24 Core/trigger/filesystem qualification | [CF05-06 qualification plan](cf05-06-standard-core-qualification-plan.md) | Required before any financial feature admission, including F36-02 PROV filesystem path |
-| Implemented historical invoice/third-party source architecture | [Phase 4 invoice architecture](phase4-invoice-architecture.md) | Earlier B/C contracts and version-specific proof; newly shared guard is **not** complete multi-profile finance admission |
-| Testing | [Test strategy](test-strategy.md), [coverage legend](test-coverage.md), [requirements.csv](requirements.csv) | Original **71 Cxx rows** preserved; new CF05-01..07 / CF03 work tracked in Issue #22 until mapped in implementation |
+| Implemented guard/Invoice shared contract (CF05-01/02) | [CF05 shared guard design](cf05-shared-guard-design.md) and [PR #34](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/34) | **Implemented, independently reviewed, merged**; F34-01/02 CLOSED. Original guard merge predated #38; see M3.1 for current finance and CF05-07 |
+| Historical Phase-3 CoreGuarded finance checkpoint before PR #38 | [Phase-3 implementation record](cf05-phase3-finance-admission.md) and [PR #36](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/36) | F36-01 closed under the original policy. PR #38 superseded the default-deny policy; F36-02 remains Owner-accepted Core residual risk. |
+| Historical V22/V24 Core/trigger/filesystem qualification plan | [CF05-06 qualification plan](cf05-06-standard-core-qualification-plan.md) | Historical default-deny plan superseded by Owner Variant B; F36-02 remains accepted Core residual risk |
+| Implemented historical invoice/third-party source architecture | [Phase 4 invoice architecture](phase4-invoice-architecture.md) | Earlier B/C contracts and version-specific proof; current merged finance is assessed in M3.1 |
+| Testing | [Test strategy](test-strategy.md), [coverage legend](test-coverage.md), [requirements.csv](requirements.csv) | Original **71 Cxx rows** preserved; CF05/CF03 disposition and per-ID gap assessment are recorded in M3.1 and Issue #22 |
 | Release gates | [Issue #20](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/20), [release qualification](release-qualification-v0.1.0.md) | Historical #19 artifacts are not the future v0.1.0 ZIP |
 
 ## Historical / immutable evidence – retain but do not upgrade

@@ -66,11 +66,18 @@ Enabling/disabling, profile/settings changes and bookings are writes. New cases 
 
 ## Tests, evidence and remaining gates
 
-Local accepted real cases on `ba5c9a3121754fcbd4259bb8906ad1dd17f1ce00`: protected readiness 21 checks, initial finance/PDF PASS within scope, additional non-mail 8/8 PASS, local B mail/verified attachments 3/3 PASS (capture only). Hosted D independent checkout and dedicated schema, Dolibarr 22.0.5, Oracle MySQL 8.4.13, Web PHP 8.4.28 CGI/FastCGI / CLI 8.3.37: four roles, two separate contribution-only cases, persisted result reload, consumed replay refusal and separate SQL readback PASS within scope on `0adc259d4739b44f9b1fb3a49574d7e1c318132c`. D finance/PDF/mail, broader live cases and exact ZIP OPEN; A/C mail OPEN. Modified OD-P5-02 accepts authorized summaries within scope, not independent external reproduction.
+CF03-NORMAL A–D passed within the respective accepted development matrices.
+The [M3.1 assessment](docs/m31-integrated-development-qualification.md) binds
+each campaign to its tested source and distinguishes real cases, local runtime
+checks and synthetic CI. PR #51 integrated the independently closed
+pre-release hardening. CF05-07 and CF03-RISK await independent review and Owner
+acceptance. Live security remains partial; real cross-entity cases are blocked.
 
-- [PR #45](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/45) independent review on `7e5f64d07ab3830ce355cd745782c4f0c2a955b0`: APPROVED FOR DEVELOPMENT MERGE WITH DOCUMENTED LIMITATIONS; Standard 9/9, Full 21/21, Hosted 1/1 SUCCESS. Squash `b026f1504db27308fc7326e2e88ec2e53b2f48d9` is tree-identical. CI is synthetic; see [test strategy](docs/test-strategy.md), [coverage](docs/test-coverage.md). Standalone contracts: `php test/unit/run.php` and targeted runners.
-- F45-01/02 test precision remains open; F45-03 documentation remediation in this follow-up awaits review/merge. Draft #40 lacks #45 production correction and requires final source refresh and new package identity.
-- Release NO-GO: full CF03-NORMAL, CF05-07/CF03-RISK, R0-03 final ZIP/manifest/hash, R0-04 exact-package integration, R0-07 independent acceptance and separate Owner Release GO. CF03-FAULT destructive tests deferred. Historical B02 mail/attachment and DOLIENV-ACC-01 remain UNKNOWN/STOP; latter rollback unconfirmed. No replay/compensation.
+Draft #40 requires a final source refresh and regenerated package identity.
+R0-04 exact-package qualification, R0-07 and separate Owner Release GO remain
+open. CF03-FAULT destructive testing is deferred. Preserve historical
+UNKNOWN/STOP results and reconcile before any separate decision.
+**Release v0.1.0 remains NO-GO.**
 
 ## Documentation map
 

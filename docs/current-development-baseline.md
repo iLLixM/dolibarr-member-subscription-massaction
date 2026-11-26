@@ -16,7 +16,9 @@ Owner disposition (2026-11-26): the originally authorized Hosted D delta was con
 
 **Verified CPC-02 merge provenance.** [PR #50](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/50) squash `f1cc6dc9ca8a274d8af8c324fe87310c84606471`, sole parent `feeea580f0004a8b18ea2c423d2cd6e7c2c6c819`, identical tree `6167d85c7acb1973490d768a63ebe4edd2677b15` to approved HEAD `94c90b1dae9d9a104a0097427cd117374b496f61`. CPC-02 is integrated and development qualification is CLOSED WITH DOCUMENTED LIMITATIONS. F50-01/04 independently closed.
 
-**Pre-release hardening.** F45-01/02, F49-03 and F50-02/03: INDEPENDENTLY CLOSED. See [individual test traceability](test-coverage.md#v010-pre-release-test-hardening). Existing real evidence keeps its original source and scope. The independent review of PR #51 on `500a7fe6ca5e59e2549d62af89fa62f017bfecf9` closed F45-01, F45-02, F49-03, F50-02 and F50-03 (5/5). Technical qualification CLOSED WITH DOCUMENTED LIMITATIONS; original verdict CHANGES REQUIRED BEFORE DEVELOPMENT MERGE solely for F51-01/P2 documentation. F51-01/P2 and F51-02/P3 (optional test precision) FIX IMPLEMENTED – INDEPENDENT DELTA REVIEW PENDING. Formal work-package closure and Owner squash remain pending the focused follow-up and final exact-HEAD CI. No new real qualification or release authorization.
+**Merged pre-release hardening.** [PR #51](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/51) squash `8ab803d135ac534dd2d08d28f47a8e427cd23302` matches approved HEAD `3d3cbda7e0ca46db1f2fe5651a273e7aeea4b4bf` (sole parent `f1cc6dc9ca8a274d8af8c324fe87310c84606471`, tree `cf2b1ffcf9f38baae8edf6b18e8f0b4d7348a771`). F45-01/02, F49-03, F50-02/03 and F51-01/02 are INDEPENDENTLY CLOSED. Pre-Release Test-Hardening is integrated and CLOSED WITH DOCUMENTED LIMITATIONS. Evidence remains bounded to the reviewed synthetic suites and local file-session runtime.
+
+**M3.1:** PREPARATION COMPLETE – INDEPENDENT INTEGRATED REVIEW PENDING. CF05-07 and CF03-RISK remain pending independent review and Owner acceptance. Phase 5 PARTIAL; v0.1.0 NO-GO. See [M3.1 integrated review basis](m31-integrated-development-qualification.md).
 
 ## Current authoritative development, architecture and release status
 
@@ -74,8 +76,8 @@ Owner disposition (2026-11-26): the originally authorized Hosted D delta was con
 | F50-02/P3 | INDEPENDENTLY CLOSED | See [individual test traceability](test-coverage.md#v010-pre-release-test-hardening). |
 | F50-03/P3 | INDEPENDENTLY CLOSED | See [individual test traceability](test-coverage.md#v010-pre-release-test-hardening). |
 | F50-04/P3 | INDEPENDENTLY CLOSED | C04-04 source-bound real A/B/C traceability, historical limitations retained. |
-| F51-01/P2 | FIX IMPLEMENTED – INDEPENDENT DELTA REVIEW PENDING | Active status synchronization; focused documentation review. |
-| F51-02/P3 | FIX IMPLEMENTED – INDEPENDENT DELTA REVIEW PENDING | Consistent original confirmation revision and successful string reads before byte equality; focused test review. |
+| F51-01/P2 | INDEPENDENTLY CLOSED | Active status synchronization; focused documentation review. |
+| F51-02/P3 | INDEPENDENTLY CLOSED | Consistent original confirmation revision and successful string reads before byte equality; focused test review. |
 
 **Roadmap (recommended sequence; existing Owner gates remain binding):**
 
@@ -134,17 +136,21 @@ See [current release gates](release-qualification-v0.1.0.md).
 
 **Effective: 2026-11-21, after squash merges of PR #32, PR #33, PR #34, PR #35 and PR #36.** This document is a navigational consolidation of the **binding Owner strategy in [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22)** and the release decisions in [Issue #20](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/20). If a dated historical document disagrees, the newer Owner decision in Issue #22 controls *prospectively*. This is documentation, **not a change of architecture authority, feature flags or runtime code**.
 
-## Phase-4 draft: postcommit PDF/attachment/mail evidence, without finance activation
+<a id="phase-4-draft-postcommit-pdfattachmentmail-evidence-without-finance-activation"></a>
+
+## Historical Phase-4 draft before finance activation
 
 [PR #38](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/38) implements additional independent post-COMMIT **evidence channels** over the already merged Phase-3 finance code. For a suitably acknowledged nonterminal Core completion and durably re-read one-shot checkpoint only, the flow records (1) business/COMMIT completion, (2) PDF file result (verified/failed/unknown), (3) attachment verification (verified for standard transport / verified *before* hook takeover / missing / not sent / unknown), and (4) mail transport/hook result (transport not delivery / hook not delivery / failed / unknown). PDF/mail uncertainties stop subsequent CoreGuarded member execution without undoing a prior commit. The full 21-profile offline matrix is now triggered on PR changes to these security boundaries, in addition to the nine-job standard CI. **This remains DRAFT development, not merged**. An initial independent review on the original HEAD returned `CHANGES REQUIRED` for F38-01..05; focused corrective implementation and a new exact-head follow-up are pending. None of CF05-06/07/isolated real-test/Owner acceptance gates are changed; production finance remains **default denied**. See [Phase-4 evidence design](cf05-phase4-postcommit-offline-evidence.md).
 
-## What is implemented, what is intended
+<a id="what-is-implemented-what-is-intended"></a>
 
-**Current development state (post-PR #36):** CF05-01/02 shared active Booking→Invoice guard and the Phase-3 CoreGuarded invoice/Third Party/typed-error/checkpointed PDF/mail **business code are merged** (PR #34 and PR #36). PR #35 supplied the preceding documentation baseline. PR #36 independently closed **F36-01/P1** by making CoreGuarded finance **server-default-denied**; **F36-02/P2 remains OPEN / CF05-06 REQUIRED**, the conditional V22/V24 `Facture::validate()` `PROV` directory rename prior to outer COMMIT. Reviewed head `33cb3da3b389f9df2870bc8c6223c86a959cb467` shares the exact tree with squash `d0b15785c60b74aa7ad59a1c687db94193d159c6`; [CI 9/9](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44956004981) and [Hosted CI 1/1](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44956004947) SUCCESS, **synthetic only**. The complete CoreGuarded finance path is **NOT admitted** in production and no new full-feature A–D real integration or 21-job release evidence exists. EnhancedMySQL/MariaDBSnapshot retain their historical admitted scope without new full-workflow release acceptance.
+## Historical PR #36 code and feature-admission checkpoint
+
+**Historical development state (post-PR #36, before #38):** CF05-01/02 shared active Booking→Invoice guard and the Phase-3 CoreGuarded invoice/Third Party/typed-error/checkpointed PDF/mail **business code are merged** (PR #34 and PR #36). PR #35 supplied the preceding documentation baseline. PR #36 independently closed **F36-01/P1** by making CoreGuarded finance **server-default-denied**; **F36-02/P2 remains OPEN / CF05-06 REQUIRED**, the conditional V22/V24 `Facture::validate()` `PROV` directory rename prior to outer COMMIT. Reviewed head `33cb3da3b389f9df2870bc8c6223c86a959cb467` shares the exact tree with squash `d0b15785c60b74aa7ad59a1c687db94193d159c6`; [CI 9/9](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44956004981) and [Hosted CI 1/1](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44956004947) SUCCESS, **synthetic only**. The complete CoreGuarded finance path is **NOT admitted** in production and no new full-feature A–D real integration or 21-job release evidence exists. EnhancedMySQL/MariaDBSnapshot retain their historical admitted scope without new full-workflow release acceptance.
 
 **Release target v0.1.0:** full member bulk-subscription massaction with the **same business capability in CoreGuarded, EnhancedMySQL and MariaDBSnapshot**, under profile-specific observation strengths and exact qualifying environments.
 
-| Capability | Required v0.1.0 target (all three profiles) | Current code / admission boundary |
+| Capability | Required v0.1.0 target (all three profiles) | Historical PR #36 code / admission boundary |
 | --- | --- | --- |
 | Preview, eligibility, server-held confirmation and member selection | Required | Existing, read-only preview is not booking permission |
 | Contribution, member R16 end and configured standard Agenda | Required | CoreGuarded contribution-only development implementation; POS01-C/POS02-A1/A2 bounded real positives |
@@ -157,7 +163,9 @@ See [current release gates](release-qualification-v0.1.0.md).
 
 A one-member outer transaction does not make a whole batch atomic. An already committed member is not rolled back because a later member fails.
 
-## Current dolienv deployment and acceptance (2026-11-24)
+<a id="current-dolienv-deployment-and-acceptance-2026-11-24"></a>
+
+## Historical initial dolienv acceptance checkpoint (2026-11-24)
 
 Use the [canonical A–D matrix](dolienv-environments.md): A local MariaDBSnapshot,
 B local CoreGuarded, C local EnhancedMySQL, D hosted CoreGuarded. A/C bounded
@@ -203,7 +211,9 @@ These are **mandatory runtime contracts**, including during the deferred real fa
 - **ADR-11 (revised 2026-11-21):** full v0.1.0 requires focused CF05 PR(s), retained synthetic security/transaction regressions **including 21 PHP/Core jobs**, independently assessed real **normal/success** A–D workflows, exact-source independent code/security and operational risk review, real hosted D ZIP acceptance and separate release approval. **Real destructive/fault injections are moved to a later CF03-FAULT iteration** and stay OPEN / NOT EXECUTED; safe synthetic fault and authenticated negative tests remain release requirements.
 - **ADR-01–05, 07–10 and 12** remain binding. In particular CoreGuarded's weaker physical evidence is an explicit Owner-accepted residual, not a claim of equivalence or a waiver for known P0/P1 data-integrity issues.
 
-## CF05 Phase 3 – independently reviewed PR #36 development merge
+<a id="cf05-phase-3--independently-reviewed-pr-36-development-merge"></a>
+
+## Historical CF05 Phase 3 – independently reviewed PR #36 merge
 
 **Current development checkpoint (2026-11-21):** [PR #36](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/36) was **SQUASH-MERGED** on 2026-11-21 at 22:28:48 UTC as `d0b15785c60b74aa7ad59a1c687db94193d159c6`. Its reviewed HEAD `33cb3da3b389f9df2870bc8c6223c86a959cb467` and the merge have the **identical Git tree** `6cc4834b9fe5100aca99126885791b3aeff12fef`. The independent outcome was **`APPROVED FOR DEVELOPMENT MERGE`**, **F36-01/P1 CLOSED**, **F36-02/P2 OPEN / CF05-06 REQUIRED**, no new P0–P3. Exact source [CI 9/9](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44956004981) and [Hosted CI 1/1](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44956004947) **SUCCESS**, synthetic only. **Phase-3 finance/rollback/postcommit code is merged, but the production `CoreGuarded` `invoice`, `autocreate` and `sendmail` features remain server-default-denied**; ordinary contribution booking remains admitted. EnhancedMySQL/MariaDBSnapshot retain their pre-existing admission. CF05-06/07, real A–D full finance, 21-job release CI, new exact ZIP, hosted D and separate Owner full-finance/release GO remain OPEN.
 
@@ -212,7 +222,9 @@ These are **mandatory runtime contracts**, including during the deferred real fa
 - **Protected admission:** Product `MsmTransactionProfile::coreGuardedFinanceQualified()` returns `false`; no standard admin/HTTP/Preview or direct-service override exists. Finance-positive tests rely exclusively on named synthetic qualified-profile subclasses.
 - **Next step:** [CF05-06 V22/V24 standard-Core, InnoDB, Agenda, trigger and `PROV` filesystem qualification](cf05-06-standard-core-qualification-plan.md), followed by CF05-07 and separately reviewed future finance enablement. **CF05-03..07 Issue #22 acceptance checkboxes remain OPEN**, because code merge does not satisfy real operational admission/qualification.
 
-## CF05-01/02 merged implementation checkpoint
+<a id="cf05-0102-merged-implementation-checkpoint"></a>
+
+## Historical CF05-01/02 merge checkpoint
 
 - **[PR #34](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/34): SQUASH-MERGED** on 2026-11-21 as `dc7a172bfd476467d7980cbf16a2657cfc1e729c` into `main`. Independently reviewed source `11d7dd3cf4bdcf831aa87782b7466d2378fc733f`, base `d0d0fddd5797a1424eb004d541d8036511193ec6` after [PR #33](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/33). Five PR commits, eight changed files; this merge is the reviewed **CF05-01/02 development stage**, not CF05-03..07 or full v0.1.0 admission.
 - **Implemented:** `MsmActiveTransactionGuard` (`isFor`, `active`, `requireSupportedIsolation`) is implemented by `MsmCoreGuardedTransaction` and `MsmDatabaseState`; Booking passes **the same active instance and original DoliDB** into Invoice. The original `MsmDatabaseState` remains separate for DB-family/InnoDB metadata; there is **no second transaction manager or general Performance Schema requirement** for CoreGuarded. Active guard checks surround `Societe::create_from_member()`, `Facture::create()`, `Facture::addline()`, `Facture::validate()` and the individual customer/member/invoice readbacks.
@@ -246,20 +258,16 @@ A reviewer's earlier inability to access raw POS02 bytes and the Owner's later t
 
 | Order | Work package | Required output |
 | --- | --- | --- |
-| 1 – COMPLETE (dev) | **CF05-01/02** | **MERGED / independently approved** via PR #34: shared active guard and Core/readback checks. **Not** a finance or real-integration GO |
-| 2 – COMPLETE (dev code) | **CF05-03/04** | PR #36 merged invoice/Third-Party and typed pre-Core financial error logic; **production CoreGuarded finance remains default-denied** |
-| 3 – CF05-05 dev code merged; CF05-06 OPEN | **CF05-05/06** | Synthetic checkpointed PDF/mail code merged; **FIRST qualify** V22/V24 Core/trigger/engine/filesystem paths, F36-02 and any required mitigation/exclusion |
-| 4 – OPEN, test-only | **Isolated real-test admission** | **Only after CF05-06:** independently reviewed, narrowly bounded **test-only** CoreGuarded finance admission in an authorized isolated environment, with separate Owner case GO; **not a productive server-side unlock** |
-| 5 – OPEN | **CF03-NORMAL A–D** | **Before productive finance admission:** new authorized one-shot real success flows, existing/new Third Party, Agenda ON/OFF, invoice line/link/PDF/isolated SMTP, source-matched hosted D test ZIP and independently checked DB/file/delivery evidence |
-| 6 – OPEN | **CF03-SECURITY-BASELINE** | Retain negative/security/transaction/CAS/CSRF/replay/NO_CHAIN/terminal STOP regressions, safe authenticated negatives and the **21-job** PHP/Core release CI |
-| 7 – OPEN | **CF05-07 and Owner risk acceptance** | **After CF03-NORMAL A–D:** independent exact-source Core/transaction/security and observed-real-evidence review; explicit Owner full-finance risk acceptance |
-| 8 – OPEN | **Productive CoreGuarded finance admission** | **Only after the above gates:** separate reviewed Owner-authorized server admission change; reverify changed exact source and its security/real-evidence applicability. No admin/POST bypass |
-| 9 – OPEN | **Release / Issue #20** | Fresh v0.1.0 ZIP **without RC suffix**, source-matched manifest/checksum, **real D exact ZIP**/R0-04 integration, R0-07 independent review and **separate Owner release GO** |
+| Integrated | CF05-01–06 and consolidated hardening | Full finance under Owner Variant B; see the [package assessment](m31-integrated-development-qualification.md#cf05-0106-consolidated-implementation-assessment) and verified #51 provenance. |
+| Review pending | CF05-07 / CF03-RISK | M3.2–M3.4 are separate acceptance steps. Independent source/evidence and residual-risk decisions followed by separate Owner acceptance. |
+| Owner decision pending | Real cross-entity cases | P5L-A/B/C-S05 and D-S06 stay BLOCKED; see [decision paper](m31-cross-entity-owner-decision.md). Prior NORMAL A–D is accepted within source-bound matrices; security PARTIAL; destructive CF03-FAULT DEFERRED. |
+| Release gates open | Issue #20 and Draft #40 | Final scope and source, new exact ZIP, R0-04, CF05-07/CF03-RISK/R0-05, R0-07 and separate Owner Release GO. See the [release gate map](release-qualification-v0.1.0.md). |
 
-**F37-DOC-01 sequencing rule:** The development merge and an independently reviewed, Owner-limited **isolated testing admission** are distinct from the later **productive finance admission**. Real CF03-NORMAL A–D and final CF05-07/Owner acceptance must precede a productive CoreGuarded finance unlock. A new test-only admission design must not bypass the normal production default-deny gate or turn a test fixture into an ordinary runtime switch.
+Historical F37-DOC-01 isolated/default-deny sequencing predates Owner Variant B
+and PR #38 activation. Operational F32-MR-01, case-specific authorization,
+protected preflight and evidence safeguards still apply.
 
-**CF03-FAULT (deferred):** real destructive post-DML rollback, implicit end, lost ACK/connection, SQL 1568/1213/1205, nested-depth, concurrency, destructive replay/interruption and controlled PDF/SMTP fault campaigns are **OPEN/NOT EXECUTED**. They require later isolated harness review and case-specific Owner GO; this deferral never relaxes runtime safety or permits treating an UNKNOWN as success.
-
-[Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22) remains **OPEN** after the PR36 development merge. Historical [PR #19](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/19) closed **without merge**; its prepared ZIP/hash is not current release evidence. [Issue #20](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/20) contains dated pre-refresh wording; the revised 2026-11-21 Issue #22 scope takes precedence. The Owner retains the unreserved module ID `584620` for v0.1.0 and the Owner-confirmed V22/V23/V24 compatibility statement, without inventing real V23 test evidence.
-
-**No code admission, real business write, package or release is authorized by this documentation-only update.**
+Issues #22 and #20 remain OPEN. The historical PR #19 ZIP is outside the
+current evidence. Retain Owner-approved module ID `584620` and the
+V22/V23/V24 compatibility statement with its original scope (V23 synthetic).
+The M3.1 assessment authorizes no runtime, packaging or release change.

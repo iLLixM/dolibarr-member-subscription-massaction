@@ -1,5 +1,8 @@
 # CF05-06 – V22/V24 standard-Core, transaction and filesystem qualification plan
 
+**Current navigation.** See the [M3.1 integrated review basis](m31-integrated-development-qualification.md). Dated default-deny, hash/trigger allowlists, PROV veto and old finance-unlock sequencing are archived. Owner Variant B is binding; prior real tests and residual F36-02 keep their documented scope.
+
+
 > **Historical record — current navigation after PR #45 (2026-11-24):** the dated statements, earlier PR status, old A/B/C mappings and original test identities below are retained as historical evidence, not present authorization or roadmap. PR #38 full finance implementation is merged; Owner Variant B supersedes former source/trigger allowlists, blanket PROV veto and default-deny. PR #44 consolidation and PR #45 session compatibility fix are merged. Local A/B/C bounded results, B mail and focused D contribution/session/replay are accepted within their recorded scope. Full A–D integration and release remain open / NO-GO. F36-02 remains Owner-accepted Core residual risk. See [current baseline](current-development-baseline.md), [binding Owner decision](owner-core-parity-2026-11-22.md) and [current environments](dolienv-environments.md). No old command or fixture is authorized by this record.
 
 
@@ -17,14 +20,18 @@
 
 **Status: OPEN / NOT QUALIFIED / NOT A REAL-TEST OR FINANCE-ACTIVATION AUTHORIZATION (2026-11-21).** Binding references: [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22), [ADR-06/11 and D-01/D-02](adr/ADR-0001-core-first-transaction-profiles.md), the [risk register](adr/ADR-0001-risk-register.md) and the [Phase-3 implementation record](cf05-phase3-finance-admission.md). This is a source-led qualification work plan, not a new Owner architecture decision or proof of completed tests.
 
-## Current exact-source development baseline
+<a id="current-exact-source-development-baseline"></a>
+
+## Historical exact-source baseline before PR #38
 
 - [PR #36](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/36) was **SQUASH-MERGED** on 2026-11-21 into `main` as `d0b15785c60b74aa7ad59a1c687db94193d159c6`. The independently reviewed original HEAD `33cb3da3b389f9df2870bc8c6223c86a959cb467` and the squash merge have the **same Git tree** `6cc4834b9fe5100aca99126885791b3aeff12fef`.
 - Independent exact-HEAD final verdict: **`APPROVED FOR DEVELOPMENT MERGE`**; **F36-01/P1 CLOSED**, **F36-02/P2 OPEN / CF05-06 REQUIRED**, no new delta P0–P3. [Standard CI 9/9 SUCCESS](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44956004981) and [hosted PHP 8.3/V22.0.5 CI 1/1 SUCCESS](https://github.com/iLLixM/dolibarr-member-subscription-massaction/actions/runs/44956004947) are **synthetic** development evidence, with selected independently observed CF01 101, Invoice 303 and CF05 78 assertions.
 - **Operative CoreGuarded finance is not enabled.** `MsmTransactionProfile::coreGuardedFinanceQualified()` returns `false` in production. CoreGuarded `booking` contribution remains admitted; `invoice`, `autocreate`, `sendmail` remain server-default-denied through Preview/Booking/direct Invoice. Positive finance workflow tests use only isolated test-only qualified-profile subclasses. The historically admitted B/C finance paths are not requalified by these results.
 - No new exact-source real A/D invoice/customer/trigger/PDF/SMTP evidence, no actual Dolibarr-Core finance replay, 21-job release matrix or new exact v0.1.0 ZIP/hosted-D installation has been produced. The Owner has issued **no** separate finance-admission, real-witness or release GO.
 
-## F36-02/P2 – conditional provisional invoice directory rename
+<a id="f36-02p2--conditional-provisional-invoice-directory-rename"></a>
+
+## Historical F36-02/P2 source and pre-Variant-B plan
 
 **Verified Dolibarr source behavior:** `Facture::validate()` in **V22.0.5** (`htdocs/compta/facture/class/facture.class.php`, around lines **3918–3948**) and **V24.0.3** (around lines **4043–4073**) conditionally renames an existing provisional invoice document directory (`PROV...`) to a final-reference directory. The file operation occurs before the module's **outer** Booking DoliDB COMMIT and cannot be undone by SQL ROLLBACK.
 
@@ -45,7 +52,9 @@
 - **PDF/SMTP are not DB-atomic:** Require suitable acknowledged nonterminal completion (normally `NO_CHAIN`) plus independently re-read durable file-session result, single-effect handling, verified invoice PDF path/hash/attachment and actor/recipient checks. Terminal `CHAIN`/`RELEASE` or ambiguous completion prevents new SQL, PDF, mail and next-member work.
 - **No automatic physical-transaction or arbitrary-hook guarantee:** ADR-12's weaker CoreGuarded observability is a separate accepted architectural limit, not permission to ignore an actually reachable new file/trigger side effect.
 
-## Safe operator sequencing and release gates
+<a id="safe-operator-sequencing-and-release-gates"></a>
+
+## Historical operator sequencing before Owner Variant B
 
 **Without additional Owner case GO:** perform read-only pinned Core/implementation review, static dependency/call-graph analysis, read-only configuration/engine evidence where already authorized, safe isolated synthetic regressions and independent findings. This plan **does not authorize** production feature unlock, database writes, real invoice/Third-Party creation, SMTP delivery, grants/account changes, destructive fault injections or replay of used fixtures.
 

@@ -104,7 +104,9 @@ F49-03/P3 INDEPENDENTLY CLOSED. See the [individual test traceability](test-cove
 **PR #38 CF05-06 corrective checkpoint — 2026-11-22 (DRAFT / NOT INDEPENDENTLY CLOSED):** The new server-owned `MsmCoreFinanceQualification` implements a bounded supported-configuration gate for the Owner-authorized CoreGuarded invoice/Third-Party/PDF/mail workflow. **15 exact pinned V22.0.0–V24.0.3 Core invoice source blobs** and version-matched standard Agenda/Logevents trigger blobs are checked against installed content before a CoreGuarded invoice's first outer BEGIN. Unknown/patched Core, enabled third-party or unqualified core triggers, Agenda automatic file copying or enabled unqualified invoice Logevents are rejected; an existing provisional `PROV` invoice file/directory is refused immediately before Core `Facture::validate()`. The original rights/confirmation/same guard/one-shot/postcommit/no-retry contracts remain in force. **The finance feature gate remains ON for supported qualified Core configurations; this is not a blanket re-lock.** **F38-04/P2:** five remaining Massaction/CSRF/Admin/Period/Preview UI security entry points added to Full+Hosted CI with broad class/lib/admin fallback and a missing-path negative check. **F36-02/P2 and F38-07/P2:** BOUNDED MITIGATION IMPLEMENTED / INDEPENDENT SOURCE REVIEW PENDING, **NOT CLOSED** and no real A–D DB/FS/SMTP qualification; custom trigger side effects and external filesystem races are not certified. See [the source-qualification report](cf05-06-standard-core-source-qualification.md). **No Owner operational GO or release GO.**
 
 
-## Updated CF05 / CF03 coverage interpretation (2026-11-21)
+<a id="updated-cf05--cf03-coverage-interpretation-2026-11-21"></a>
+
+## Historical CF05 / CF03 coverage interpretation (2026-11-21, before PR #38)
 
 The historic **71 Cxx requirement rows** in [requirements.csv](requirements.csv) preserve original requirements and their dated implementation/test mapping. They are **not a substitute for the new CF05-01..07 gates in [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22)**. During CF05 implementation, extend existing test IDs/evidence links without inventing a completed test status or renumbering the original requirements.
 
@@ -584,7 +586,7 @@ live scope; Hosted CI is synthetic.
 
 ## v0.1.0 pre-release test hardening
 
-All five original dispositions are **INDEPENDENTLY CLOSED** on `500a7fe6ca5e59e2549d62af89fa62f017bfecf9`. The independent review of PR #51 on `500a7fe6ca5e59e2549d62af89fa62f017bfecf9` closed F45-01, F45-02, F49-03, F50-02 and F50-03 (5/5). Technical qualification CLOSED WITH DOCUMENTED LIMITATIONS; original verdict CHANGES REQUIRED BEFORE DEVELOPMENT MERGE solely for F51-01/P2 documentation. F51-01/P2 and F51-02/P3 (optional test precision) FIX IMPLEMENTED – INDEPENDENT DELTA REVIEW PENDING. Formal work-package closure and Owner squash remain pending the focused follow-up and final exact-HEAD CI. No new real qualification or release authorization.
+[PR #51](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/51) squash `8ab803d135ac534dd2d08d28f47a8e427cd23302` matches approved HEAD `3d3cbda7e0ca46db1f2fe5651a273e7aeea4b4bf` (sole parent `f1cc6dc9ca8a274d8af8c324fe87310c84606471`, tree `cf2b1ffcf9f38baae8edf6b18e8f0b4d7348a771`). F45-01/02, F49-03, F50-02/03 and F51-01/02 are INDEPENDENTLY CLOSED. Pre-Release Test-Hardening is integrated and CLOSED WITH DOCUMENTED LIMITATIONS. The original technical review closed five findings on `500a7fe6ca5e59e2549d62af89fa62f017bfecf9`; final F51-01/02 closures and exact CI are recorded in the [M3.1 integrated review basis](m31-integrated-development-qualification.md).
 
 | Finding | Test and verified result | Evidence boundary |
 | --- | --- | --- |
@@ -597,7 +599,7 @@ All five original dispositions are **INDEPENDENTLY CLOSED** on `500a7fe6ca5e59e2
 Original targeted results on `500a7fe6ca5e59e2549d62af89fa62f017bfecf9` (independently corroborated in CI): `coreguarded-session.php` 122 assertions;
 `maildelivery.php` 154; `cf05-finance.php` 449 and `terminal.php` 219
 against each pinned Core 22.0.5, 23.0.4 and 24.0.3.
-F51-02 test refinement on `3bea1dc755d6d3e08b84fb272c1c4ca77faec70e`: original confirmation revision matches the profile binding; separate finance fixture binding matches its own original revision; each negative case requires successful string-valued file reads before byte equality. Nine additional assertions (131 expected session assertions); final correction execution results must be verified against exact-HEAD CI. Original results above retain their source.
+F51-02 test refinement on `3bea1dc755d6d3e08b84fb272c1c4ca77faec70e`: original confirmation revision matches the profile binding; separate finance fixture binding matches its own original revision; each negative case requires successful string-valued file reads before byte equality. Nine additional assertions, 131 session assertions confirmed by final exact-HEAD Standard/Full CI on the applicable lanes. Hosted simulation did not execute the standalone session suite. Original results above retain their source.
 
 The previously accepted A/B/C mixed runs remain on
 `042c917bd5d8844c33758f8c26170fd7eb7ecb87`. There is no new live
