@@ -43,6 +43,7 @@ class BookingDatabase extends PreviewDatabase
 class BookingMemberDouble extends Adherent
 {
 	public $msmEndUpdate = 1; public $msmCoreEnd; public $mode = ''; public $arguments;
+	public $subscriptionId = 9;
 	public function subscription($date, $amount, $accountid = 0, $operation = '', $label = '', $num_chq = '', $emetteur_nom = '', $emetteur_banque = '', $datesubend = 0, $fk_type = null, $ref_ext = '')
 	{
 		$this->arguments = func_get_args(); $this->db->events[] = 'subscription';
@@ -56,7 +57,7 @@ class BookingMemberDouble extends Adherent
 		if ($this->mode === 'wrong_observed') { $this->msmCoreEnd = '2041-01-01 00:00:00'; }
 		if ($this->mode === 'depth') { $this->db->transaction_opened = 0; $this->db->active = false; }
 		if ($this->mode === 'fail') { return -1; }
-		return 9;
+		return $this->subscriptionId;
 	}
 }
 class BookingPreviewDouble

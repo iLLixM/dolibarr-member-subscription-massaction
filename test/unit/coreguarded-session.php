@@ -131,10 +131,45 @@ try {
 	denySession(static function()use($financeCheckpoint,$recipient,$financeRow){
 		$financeCheckpoint->bindMailRecipient(7,$recipient,$financeRow);
 	},'F38-03 recipient identity seal cannot be overwritten');
+	// F40-M5-01: an option permits creation; the confirmed row may reuse a customer.
+	foreach (array(array(false,false,true), array(true,true,true), array(true,false,true), array(false,true,false)) as $scenario) {
+		list($batchAllowsCreate, $rowPlansCreate, $admit) = $scenario;
+		$label = sprintf('F40-M5-01 finance batch=%d row=%d', $batchAllowsCreate, $rowPlansCreate);
+		$testKey = bin2hex(random_bytes(16));
+		$testRow = $financeRow;
+		$testRow['autocreate'] = $rowPlansCreate;
+		$testRow['invoice'] = array('create_customer'=>$rowPlansCreate, 'customer_id'=>$rowPlansCreate ? 0 : 4);
+		$testOptions = $financeOpts;
+		$testOptions['autocreate'] = $batchAllowsCreate;
+		verifySession(session_start(), $label.' open confirmation');
+		$_SESSION['msm_previews'][$testKey] = array('owner'=>18,'entity'=>1,'phase'=>'confirm','revision'=>10,
+			'profile'=>$binding,'ids'=>array(7),'options'=>$testOptions,'rows'=>array(7=>$testRow),
+			'results'=>array(7=>array('status'=>'unknown','stop'=>false)));
+		$testCheckpoint = new MsmFileBookingCheckpoint($testKey);
+		verifySession(session_write_close(), $label.' persist confirmation');
+		verifySession(session_start(), $label.' reopen to consume');
+		$_SESSION['msm_previews'][$testKey]['phase'] = 'processing';
+		$_SESSION['msm_previews'][$testKey]['revision']++;
+		verifySession(session_write_close(), $label.' persist consumption');
+		$testCheckpoint->requireProcessing(7, $binding, $user, $testRow, $testOptions);
+		if ($admit) {
+			try {
+				$testCheckpoint->requireFinanceContinuation(7, $testRow, $user);
+			} catch (RuntimeException $e) {
+				throw new RuntimeException($label.' valid plan rejected: '.$e->getMessage(), 0, $e);
+			}
+			verifySession(true, $label.' admitted');
+		} else {
+			denySession(static function () use ($testCheckpoint, $testRow, $user) {
+				$testCheckpoint->requireFinanceContinuation(7, $testRow, $user);
+			}, $label.' unauthorized creation denied', 'MSMCoreGuardedSessionUnsupported');
+		}
+	}
 	// F38-10: each negative is the FIRST finance invocation on an original,
 	// independently consumed capability. An unchanged fingerprint cannot mask
 	// altered actual fee, dates, description, invoice plan or profile carrier.
-	foreach (array('amount', 'start', 'end', 'description', 'invoice', '_profile', 'extra') as $field) {
+	foreach (array('amount', 'start', 'end', 'description', 'autocreate', 'invoice', 'create_customer', 'invoice_plan',
+		'_profile', 'extra', 'foreign_member', 'foreign_owner', 'foreign_profile', 'foreign_session') as $field) {
 		$testKey=bin2hex(random_bytes(16));
 		verifySession(session_start(), 'F38-10 fresh confirmation '.$field);
 		$_SESSION['msm_previews'][$testKey]=array('owner'=>18,'entity'=>1,
@@ -149,20 +184,35 @@ try {
 		verifySession(session_write_close(), 'F38-10 persist consumed '.$field);
 		$testCheckpoint->requireProcessing(7,$binding,$user,$financeExpected,$financeOpts);
 		$changedRow=$financeRow;
+		$attemptMember = 7; $attemptUser = $user;
 		switch ($field) {
 			case 'amount': $changedRow['amount']=999; break;
 			case 'start': $changedRow['start']=999; break;
 			case 'end': $changedRow['end']=999; break;
 			case 'description': $changedRow['description']='altered'; break;
+			case 'autocreate': $changedRow['autocreate']=false; break;
 			case 'invoice': $changedRow['invoice']['customer_id']=99; break;
+			case 'create_customer': $changedRow['invoice']['create_customer']=false; break;
+			case 'invoice_plan': $changedRow['invoice']['pdf_model']='altered'; break;
 			case '_profile': $changedRow['_profile']=$binding; $changedRow['_profile']['owner']=99; break;
 			case 'extra': $changedRow['extra']='injected'; break;
+			case 'foreign_member': $attemptMember=8; break;
+			case 'foreign_owner': $attemptUser=(object) array('id'=>99); break;
+			case 'foreign_profile':
+				$changedRow['_profile']=$binding; $changedRow['_profile']['profile']='EnhancedMySQL'; break;
+			case 'foreign_session': session_id('other'.bin2hex(random_bytes(12))); break;
 		}
 		verifySession($changedRow['fingerprint']===$financeRow['fingerprint'],
 			'F38-10 original fingerprint retained '.$field);
-		denySession(static function()use($testCheckpoint,$changedRow,$user){
-			$testCheckpoint->requireFinanceContinuation(7,$changedRow,$user);
-		},'F38-10 first altered direct finance attempt denied '.$field);
+		try {
+			denySession(static function () use ($testCheckpoint, $changedRow, $attemptMember, $attemptUser) {
+				$testCheckpoint->requireFinanceContinuation($attemptMember, $changedRow, $attemptUser);
+			}, 'F38-10 first altered direct finance attempt denied '.$field);
+		} finally {
+			if ($field === 'foreign_session') { session_id($sessionid); }
+		}
+		$testCheckpoint->requireFinanceContinuation(7, $financeRow, $user);
+		verifySession(true, 'F38-10 exact row still admitted after refusal '.$field);
 	}
 	// Matching optional profile carrier is permitted, but never authorizes replay.
 	$financeWithProfile=$financeRow; $financeWithProfile['_profile']=$binding;

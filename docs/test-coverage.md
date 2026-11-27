@@ -4,6 +4,15 @@
 
 **2026-11-25 Hosted D completion:** [Bounded development qualification and live-security evidence](evidence/cf03/phase5-hosted-d-2026-11-25.md). Earlier D contribution/session/replay PASS remains on `0adc259d4739b44f9b1fb3a49574d7e1c318132c`. The new cases on merged PR #46 `c2dc2cfdadf2c4def6bcd2f2ec20473cea3683b3` establish D-F01–F03 finance/third party and D-P01–P03 PDF 3/3 PASS; D-S01–S04 live role/CSRF/stale confirmation/batch-limit PASS; D-S05 natural one-hour expiry in the original authenticated session PASS (zero booking POSTs, 11 unchanged business tables); D-S07 bounded nonterminal completion/result reload PASS; D-AOFF PASS (automatic contribution Agenda event disabled, original setting restored). D-SMTP2: three successful SMTP handoffs and Owner-confirmed external test-mail receipts with matching PDF attachment hashes (one plus two members); original D-M01/M02 isolated no-relay capture remains historically BLOCKED, zero sends in those cases. Independent raw SMTP/MIME capture is not established by SMTP2, and SMTP acceptance alone is not delivery. Historical SMTP UNKNOWN/STOP remains unchanged despite later receipt confirmation. Hosted D CF03-NORMAL: **PASS within the approved development case matrix**. Live CF03-SECURITY-BASELINE: **PARTIAL**; D-S06 real cross-entity **BLOCKED** (no authorized second entity). ADR-08A delta and exact-release-ZIP R0-04 remain separate. Earlier dated evidence retains its actual source and scope. The independent documentation review accepted the reported evidence under modified OD-P5-02; it did not repeat real tests.
 
+## F40-M5-01/P1 CoreGuarded finance checkpoint
+
+The batch option permits third-party creation when needed. The confirmed row determines whether to reuse a linked customer or create one. The finance checkpoint requires batch permission for a row that plans creation. The full confirmed row, fingerprint, actor, profile and one-shot session binding still govern admission.
+
+- `test/unit/coreguarded-session.php` covers all four batch-permission and row-plan combinations on independently consumed confirmations. The valid permission-on and row-plan-off case fails on the preceding checkpoint. Fresh finance attempts also cover changed row or invoice details, foreign bindings and unavailable or already used capabilities.
+- `test/unit/cf05-finance.php` covers existing customers with the option off and on, permitted creation and both mixed-batch orders through production preview, confirmation consumption, booking, invoice and checkpoint logic with synthetic Core adapters. Each mixed case verifies two acknowledged contributions and invoices, one correctly linked new customer, checkpointed PDF and mail results, and consumed-confirmation rejection.
+
+This is synthetic regression coverage. The exact-package results from the preceding ZIP remain attributed to that ZIP. Real requalification of the corrected package, independent assessment and R0-04 remain open. See [PR #40](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/40).
+
 ## ADR-08A focused evidence
 
 Implementation source `1ac1a8f2dfd7384829fa5b85235f1e4884d689db`. The

@@ -10,6 +10,7 @@ require __DIR__.'/coreguarded.php'; // Reuse the native-boundary DB fixture; inv
 require __DIR__.'/invoice.php';
 require_once __DIR__.'/../../class/invoicepdf.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/modules/syslog/mod_syslog_file.php';
+require_once DOL_DOCUMENT_ROOT.'/core/lib/security.lib.php';
 $cf05Base = $passed;
 
 class Cf05FinanceDb extends InvoiceDatabaseDouble
@@ -39,13 +40,14 @@ class Cf05FinanceGuard extends MsmCoreGuardedTransaction
 	private $ended = false;
 	public function __construct($db) { parent::__construct($db); $this->fixtureDb=$db; }
 	public function beforeBegin() {
-		if ($this->attempted || $this->fixtureDb->transaction_opened !== 0) {
+		if (($this->attempted && !$this->ended) || $this->fixtureDb->transaction_opened !== 0) {
 			return array('state'=>MsmDatabaseState::UNKNOWN,'fresh'=>false,'owned'=>false);
 		}
 		return array('state'=>MsmDatabaseState::IDLE,'fresh'=>true,'owned'=>false);
 	}
 	public function begin() {
 		$this->attempted=true;
+		$this->ended=false;
 		return $this->fixtureDb->begin();
 	}
 	public function beginAttempted() { return $this->attempted; }
@@ -100,10 +102,79 @@ class Cf05FinanceBooking extends BookingServiceDouble
 		$guard->setAccessible(true);
 		$checkpoint=new ReflectionProperty(MsmBookingService::class,'coreCheckpoint');
 		$checkpoint->setAccessible(true);
-		return new Cf05FinanceInvoice($this->profileDb,$this->databaseState,
-			$guard->getValue($this),$checkpoint->getValue($this));
+		return $this->makeInvoice($guard->getValue($this),$checkpoint->getValue($this));
+	}
+	protected function makeInvoice($guard, $checkpoint)
+	{
+		return new Cf05FinanceInvoice($this->profileDb, $this->databaseState, $guard, $checkpoint);
 	}
 }
+/** Shared DB double for a mixed batch, recording only outer commits. */
+class Cf05MixedFinanceDb extends Cf05FinanceDb
+{
+	public $memberCustomers = array(1 => 4, 2 => 0);
+	public $committed = array();
+
+	public function query($sql)
+	{
+		if (preg_match('/^SELECT fk_soc FROM test_adherent WHERE rowid = ([12]) FOR UPDATE$/D', $sql, $match)) {
+			$this->customerId = $this->memberCustomers[(int) $match[1]];
+		}
+		if (preg_match('/^SELECT rowid(?:, dateadh, datef)? FROM test_subscription WHERE fk_adherent = [12] AND /', $sql)) {
+			return (object) array('rows'=>array());
+		}
+		return parent::query($sql);
+	}
+
+	public function commit()
+	{
+		$outer = $this->transaction_opened === 1;
+		$ack = parent::commit();
+		if ($outer && $ack === 1) {
+			$this->committed[] = array(
+				'member' => $this->saved->fk_adherent,
+				'customer' => $this->invoice->fk_soc,
+				'validated' => $this->invoice->fk_statut === 1,
+				'linked' => $this->link,
+			);
+		}
+		return $ack;
+	}
+}
+
+class Cf05MixedFinanceBooking extends Cf05FinanceBooking
+{
+	public $members = array();
+
+	protected function member($id) { return $this->object = $this->members[$id]; }
+
+	public function preview($member)
+	{
+		$reader = new F3812PreviewMember();
+		foreach (array('id', 'typeid', 'socid', 'entity', 'email', 'morphy', 'company') as $field) {
+			$reader->$field = $member->$field;
+		}
+		$preview = new TaxPreflightPreview($this->profileDb, $reader);
+		$preview->type = (object) array('duration'=>'1y','label'=>'Synthetic type','amount'=>'24.5','status'=>1,'subscription'=>1);
+		return $preview;
+	}
+
+	protected function makeInvoice($guard, $checkpoint)
+	{
+		return new class($this->profileDb, $this->databaseState, $guard, $checkpoint) extends Cf05FinanceInvoice {
+			protected function invoice()
+			{
+				$member = $this->db->saved->fk_adherent;
+				$invoice = parent::invoice();
+				$invoice->invoiceId = 41 + $member;
+				$invoice->ref = 'INV-SYNTHETIC-'.$member;
+				$invoice->linkedSubscription = 8 + $member;
+				return $invoice;
+			}
+		};
+	}
+}
+
 /** F38-10: mutate the finance row only after Booking confirmed and posted the
  * subscription. Invoice admission must reject before any invoice Core API.
  */
@@ -259,6 +330,7 @@ $cf05OldSessionPath=session_save_path();
 $cf05OldCookies=ini_get('session.use_cookies');
 $cf05OldLimiter=session_cache_limiter();
 $cf05OriginalConf=clone $conf;
+$cf05OriginalHookManager=$hookmanager;
 if (session_status()===PHP_SESSION_ACTIVE) { session_write_close(); }
 ini_set('session.use_cookies','0');
 session_cache_limiter('');
@@ -381,6 +453,8 @@ try {
 
 	foreach (array(
 		array('name'=>'existing','autocreate'=>false,'mode'=>'','change'=>false,'expected'=>'success'),
+		array('name'=>'existing_with_batch_permission','autocreate'=>false,'batch_autocreate'=>true,
+			'mode'=>'','change'=>false,'expected'=>'success'),
 		array('name'=>'new','autocreate'=>true,'mode'=>'','change'=>false,'expected'=>'success'),
 		array('name'=>'contribution_mail_success','autocreate'=>false,'mode'=>'','change'=>false,
 			'expected'=>'success','no_invoice'=>true),
@@ -431,7 +505,7 @@ try {
 		// fingerprint. The in-transaction preview service returns no such key.
 		$row['manualend']=$case['name']==='existing';
 		$user=new PreviewUser();
-		$options=array('invoice'=>empty($case['no_invoice']),'autocreate'=>$case['autocreate'],
+		$options=array('invoice'=>empty($case['no_invoice']),'autocreate'=>$case['batch_autocreate'] ?? $case['autocreate'],
 			'sendmail'=>true,'description'=>'Synthetic fee');
 		$qualifiedProfile=new Cf05QualifiedFinanceProfile($db,new SyntheticDatabaseState($db),1);
 		$binding=$qualifiedProfile->binding($qualifiedProfile->current(),$user,0);
@@ -584,6 +658,86 @@ try {
 			@unlink($file); @rmdir($pdfRoot.'/INV-SYNTHETIC'); @rmdir($pdfRoot);
 		}
 	}
+
+	// F40-M5-01: run the real per-member preview, confirmation consumption,
+	// Booking and Invoice checkpoint with distinct records on one DB double.
+	foreach (array(array(1,2), array(2,1)) as $order) {
+		$label = 'F40-M5-01 mixed batch '.implode(',', $order);
+		$db = new Cf05MixedFinanceDb();
+		$hookmanager = null; // Core constructs an empty manager for the synthetic site.
+		$db->family = 'mysql';
+		$db->profileRaw = json_encode(array('version'=>1,'family'=>'mysql','profile'=>'CoreGuarded','nonce'=>str_repeat('b',32)));
+		$flow = new Cf05MixedFinanceBooking($db);
+		$user = new PreviewUser();
+		$options = array('invoice'=>true,'autocreate'=>true,'sendmail'=>true,'description'=>'Synthetic fee');
+		$profile = new MsmTransactionProfile($db, $flow->observer(), 1);
+		$revision = 5;
+		$binding = $profile->binding($profile->current(), $user, $revision);
+		$rows = array();
+		foreach ($order as $id) {
+			$member = new BookingMemberDouble($db);
+			$member->id = $id;
+			$member->entity = 1;
+			$member->typeid = 1;
+			$member->socid = $db->memberCustomers[$id];
+			$member->morphy = 'phy';
+			$member->firstname = 'Synthetic';
+			$member->lastname = 'Member';
+			$member->email = 'member@example.invalid';
+			$member->subscriptionId = 8 + $id;
+			$flow->members[$id] = $member;
+			$row = $flow->preview($member)->previewSubscriptionWithOptions($user, stamp('2026-10-10'),
+				true, true, null, true, $options['description']);
+			verify(!$row['errors'] && $row['autocreate'] === ($id === 2)
+				&& $row['invoice']['create_customer'] === ($id === 2)
+				&& $row['invoice']['customer_id'] === $db->memberCustomers[$id], $label.' confirmed plan '.$id);
+			$row['manualend'] = false;
+			$rows[$id] = $row;
+		}
+
+		$key = bin2hex(random_bytes(16));
+		session_id('cf05mixed'.bin2hex(random_bytes(8)));
+		verify(session_start(), $label.' original file session');
+		$state = array('phase'=>'confirm','revision'=>$revision,'owner'=>$user->id,'entity'=>1,
+			'ids'=>$order,'profile'=>$binding,'options'=>$options,'rows'=>$rows);
+		$_SESSION = array('msm_previews'=>array($key=>$state));
+		$checkpoint = new MsmFileBookingCheckpoint($key);
+		$post = array('action'=>'book','revision'=>(string) $revision);
+		$state = msmConsumeConfirmation($state, $post);
+		$_SESSION['msm_previews'][$key] = $state;
+		verify(session_write_close(), $label.' durable confirmation consumption');
+
+		$pdf = new Cf05FinancePdfSpy();
+		$mail = new Cf05FinanceMailSpy($db);
+		$done = msmProcessBooking($state, $flow, $mail, $user, $checkpoint, $pdf);
+		verify($done['phase'] === 'done' && empty($done['batch_stop']) && empty($done['checkpoint_failed']),
+			$label.' completes both members');
+		foreach ($order as $index => $id) {
+			$customer = $id === 1 ? 4 : 5;
+			$result = $done['results'][$id];
+			verify($result['status'] === 'success' && $result['id'] === 8 + $id
+				&& $result['completion'] === 'nonterminal_acknowledged', $label.' contribution and completion '.$id);
+			verify($result['invoice']['id'] === 41 + $id && $result['invoice']['member_id'] === $id
+				&& $result['invoice']['subscription_id'] === 8 + $id && $result['invoice']['customer_id'] === $customer
+				&& $result['invoice']['customer_created'] === ($id === 2) && $flow->members[$id]->socid === $customer
+				&& $db->committed[$index] === array('member'=>$id,'customer'=>$customer,'validated'=>true,'linked'=>true),
+				$label.' persisted invoice and linked customer '.$id);
+			verify($result['invoice']['pdf']['status'] === 'verified' && $result['mail'] === 'transport'
+				&& $result['attachment_status'] === 'verified_for_transport', $label.' post-commit effects '.$id);
+		}
+		verify(count($db->committed) === 2 && $db->transaction_opened === 0
+			&& count(array_keys($db->events, 'subscription', true)) === 2
+			&& !in_array('rollback', $db->events, true), $label.' exactly two committed contributions');
+		$effects = array_count_values($db->calls);
+		verify(count($effects) === 4 && ($effects['customer-create'] ?? 0) === 1
+			&& ($effects['invoice-create'] ?? 0) === 2 && ($effects['invoice-line'] ?? 0) === 2
+			&& ($effects['invoice-validate'] ?? 0) === 2, $label.' exactly two invoices and one customer');
+		verify($pdf->calls === 2 && $mail->members === $order, $label.' each admitted post-commit effect executed once');
+		verify(session_start(), $label.' reopen persisted results');
+		verify($_SESSION['msm_previews'][$key] === $done, $label.' complete result readback');
+		verify(session_write_close(), $label.' close persisted results');
+		fails(static function () use ($done, $post) { msmConsumeConfirmation($done, $post); }, 'MSMInvalidForm');
+	}
 } finally {
 	if (session_status()===PHP_SESSION_ACTIVE) { session_abort(); }
 	foreach (glob($cf05Tmp.'/sess_*') ?: array() as $file) { @unlink($file); }
@@ -592,6 +746,7 @@ try {
 	ini_set('session.use_cookies',(string)$cf05OldCookies);
 	session_cache_limiter($cf05OldLimiter);
 	$conf=$cf05OriginalConf;
+	$hookmanager=$cf05OriginalHookManager;
 }
 echo ($passed-$cf05Base)." CF05 guarded CoreGuarded financial orchestration assertions PASS (synthetic only; no real DB/HTTP/PDF/SMTP).\n";
 ob_end_flush();

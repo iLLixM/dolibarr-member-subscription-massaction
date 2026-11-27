@@ -30,6 +30,7 @@ class InvoiceDatabaseDouble extends BookingDatabase
 class InvoiceObjectDouble
 {
 	private $db; public $ref = 'INV-SYNTHETIC';
+	public $invoiceId = 42; public $linkedSubscription = 9;
 	public function __construct($db) { $this->db = $db; }
 	public function create($user)
 	{
@@ -38,8 +39,8 @@ class InvoiceObjectDouble
 		$this->db->invoice = (object) array('entity' => $this->entity, 'fk_soc' => $this->socid, 'type' => $this->type, 'fk_statut' => 0, 'paye' => 0, 'total_ttc' => 0, 'ref' => $this->ref,
 			'datef' => $this->db->idate($this->date), 'fk_cond_reglement' => $this->cond_reglement_id, 'fk_mode_reglement' => $this->mode_reglement_id,
 			'fk_account' => $this->fk_account, 'multicurrency_code' => $this->multicurrency_code);
-		$this->db->link = $this->linked_objects === array('subscription' => 9);
-		return 42;
+		$this->db->link = $this->linked_objects === array('subscription' => $this->linkedSubscription);
+		return $this->invoiceId;
 	}
 	public function addline(...$args)
 	{
