@@ -79,11 +79,11 @@ cd dolibarr-member-subscription-massaction
 python3 tools/build-release.py
 ```
 
-The builder uses committed files at `HEAD`. For a release, download the published ZIP, check out its local release tag before building, or pass that tag to the builder with `python3 tools/build-release.py TAG`. The builder checks a versioned tag against the module metadata when you pass the tag explicitly. Builds from development commits may contain unreleased changes.
+The builder uses committed files at `HEAD`. For a release, download the published ZIP, check out its local release tag before building, or pass that tag to the builder with `python3 tools/build-release.py TAG`. The builder checks explicitly selected versioned tags against the module metadata, including versions ending in `-dev` or `-beta`. Builds from development commits may contain unreleased changes.
 
-The default output is `build-output/<module-version>/<full-source-commit-sha>/` under the repository root. Git ignores this directory. Each build creates a new directory with a versioned module ZIP and `SHA256SUMS`. The JSON report on standard output includes the exact source and output path. From that directory, run `sha256sum -c SHA256SUMS` before installing the ZIP.
+The default output is `build-output/<module-version>/<full-source-commit-sha>/` under the repository root. Git ignores this directory. The builder creates the directory when needed and replaces the versioned module ZIP and `SHA256SUMS` on subsequent builds in the same directory. The JSON report on standard output includes the exact source and output path. From that directory, run `sha256sum -c SHA256SUMS` before installing the ZIP.
 
-Use `--output-dir ../msm-build` for a custom output directory. Its parent must exist, and the output directory itself must be new. You can also pass an exact local commit as the source. The builder leaves the checkout unchanged and reads only local Git data.
+Use `--output-dir ../msm-build` for a custom output directory. Its parent must exist. Other files in the output directory stay in place. You can also pass an exact local commit as the source. The builder leaves the checkout unchanged and reads only local Git data.
 
 Install the generated module ZIP using the steps above. GitHub's automatically generated **Source code** archives are repository snapshots and cannot be installed as Dolibarr modules.
 

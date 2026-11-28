@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import stat
 import subprocess
 import zipfile
@@ -213,12 +214,46 @@ def build(revision):
     return zip_data, report
 
 
+def write_artifacts(output, name, archive, digest):
+    output.mkdir(mode=0o700, exist_ok=True)
+    staging = output / ".build-release-staging"
+    # A shared output directory can only have one active writer.
+    staging.mkdir(mode=0o700)
+    try:
+        zip_target = output / name
+        sums_target = output / "SHA256SUMS"
+        for target in (zip_target, sums_target):
+            if target.exists() and not (target.is_file() or target.is_symlink()):
+                raise OSError(f"Output path is not a file: {target}")
+
+        staged_zip = staging / name
+        staged_sums = staging / "SHA256SUMS"
+        staged_zip.write_bytes(archive)
+        staged_sums.write_text(f"{digest}  {name}\n", encoding="ascii")
+
+        previous_zip = staging / "previous.zip"
+        had_zip = zip_target.exists() or zip_target.is_symlink()
+        if had_zip:
+            shutil.copy2(zip_target, previous_zip, follow_symlinks=False)
+        staged_zip.replace(zip_target)
+        try:
+            staged_sums.replace(sums_target)
+        except OSError:
+            if had_zip:
+                previous_zip.replace(zip_target)
+            else:
+                zip_target.unlink()
+            raise
+    finally:
+        shutil.rmtree(staging)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("source", nargs="?", default="HEAD", help="Local Git commit or tag (default: HEAD)")
-    parser.add_argument("output", nargs="?", type=Path, help="New output directory (positional form)")
+    parser.add_argument("output", nargs="?", type=Path, help="Output directory (replaces existing build files)")
     parser.add_argument(
-        "-o", "--output-dir", type=Path, help="New output directory (default: build-output/<version>/<commit>/)"
+        "-o", "--output-dir", type=Path, help="Output directory (default: build-output/<version>/<commit>/)"
     )
     args = parser.parse_args()
     if args.output is not None and args.output_dir is not None:
@@ -229,10 +264,8 @@ def main():
         if output is None:
             output = ROOT / "build-output" / report["version"] / report["source_commit"]
             output.parent.mkdir(parents=True, exist_ok=True)
-        output.mkdir(mode=0o700)
         name = f"module_{MODULE}-{report['version']}.zip"
-        (output / name).write_bytes(archive)
-        (output / "SHA256SUMS").write_text(f"{report['zip_sha256']}  {name}\n", encoding="ascii")
+        write_artifacts(output, name, archive, report["zip_sha256"])
     except subprocess.CalledProcessError:
         parser.exit(1, "Build failed: unable to read the requested local Git source\n")
     except (OSError, ValueError) as error:

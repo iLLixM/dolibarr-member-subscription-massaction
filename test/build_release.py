@@ -12,6 +12,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 from zipfile import ZipFile
 
 
@@ -99,32 +100,72 @@ class BuildReleaseTest(unittest.TestCase):
         explicit, repeated = self.build(self.source, "repeat")
         self.assertEqual(Path(explicit["output_dir"]), self.workspace / "repeat")
         self.assertEqual(package.read_bytes(), repeated.read_bytes())
-        custom, _ = self.build("--output-dir", "custom")
+        custom, custom_package = self.build("--output-dir", "custom")
         self.assertEqual(custom["source_commit"], self.source)
-        self.assertNotEqual(self.run_builder().returncode, 0)
-        self.assertEqual(package.read_bytes(), repeated.read_bytes())
+        for prior, args in ((package, ()), (repeated, (self.source, "repeat"))):
+            with self.subTest(output=prior.parent):
+                prior.write_bytes(b"old zip")
+                (prior.parent / "SHA256SUMS").write_text("old checksum")
+                notes = prior.parent / "notes.txt"
+                notes.write_text("keep")
+                _, rebuilt = self.build(*args)
+                self.assertEqual(rebuilt, prior)
+                self.assertEqual(rebuilt.read_bytes(), custom_package.read_bytes())
+                self.assertEqual(notes.read_text(), "keep")
         self.assertEqual(self.git("rev-parse", "HEAD"), self.source)
 
     def test_future_metadata_and_local_tags(self):
-        future = "2.3.4-rc.1"
-        self.assertNotEqual(self.version, future)
-        descriptor = self.descriptor.replace(f"'{self.version}'", f"'{future}'", 1)
-        descriptor = re.sub(r"\$this->phpmin\s*=.*?;", "$this->phpmin = array(8, 1, 2);", descriptor)
-        metadata = json.loads(self.composer)
-        metadata["version"] = future
-        metadata["require"]["php"] = ">=8.1.2"
-        source = self.set_metadata(descriptor, json.dumps(metadata))
-        self.git("tag", "-a", f"v{future}", "-m", "Fixture release", source)
+        for future in ("2.3.4-dev", "2.3.4-beta", "2.3.4-rc.1"):
+            with self.subTest(version=future):
+                self.assertNotEqual(self.version, future)
+                descriptor = self.descriptor.replace(f"'{self.version}'", f"'{future}'", 1)
+                descriptor = re.sub(r"\$this->phpmin\s*=.*?;", "$this->phpmin = array(8, 1, 2);", descriptor)
+                metadata = json.loads(self.composer)
+                metadata["version"] = future
+                metadata["require"]["php"] = ">=8.1.2"
+                source = self.set_metadata(descriptor, json.dumps(metadata))
+                self.git("tag", "-a", f"v{future}", "-m", "Fixture release", source)
+                report, package = self.build(f"refs/tags/v{future}")
+                self.assertEqual(report["source_commit"], source)
+                self.assertEqual(report["version"], future)
+                self.assertEqual(package.parent, self.repo / "build-output" / future / source)
+                self.assertEqual(package.name, f"module_{MODULE}-{future}.zip")
         self.git("tag", "v9.9.9", source)
         self.git("tag", "v02.3.4", source)
-        report, package = self.build(f"refs/tags/v{future}")
-        self.assertEqual(report["source_commit"], source)
-        self.assertEqual(report["version"], future)
-        self.assertEqual(package, self.repo / "build-output" / future / source / f"module_{MODULE}-{future}.zip")
         prior, _ = self.build(self.source, "--output-dir", "earlier")
         self.assertEqual(prior["version"], self.version)
         self.reject("v9.9.9", "Release tag and module version must match")
         self.reject("v02.3.4", "Release tag and module version must match")
+
+    def test_conflicting_artifact_path_leaves_existing_zip(self):
+        _, package = self.build()
+        package.write_bytes(b"keep zip")
+        checksum = package.parent / "SHA256SUMS"
+        checksum.unlink()
+        checksum.mkdir()
+        result = self.run_builder()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Output path is not a file", result.stderr)
+        self.assertEqual(package.read_bytes(), b"keep zip")
+        self.assertTrue(checksum.is_dir())
+
+    def test_checksum_replace_failure_restores_previous_build(self):
+        _, package = self.build()
+        original_bytes = package.read_bytes()
+        checksum = package.parent / "SHA256SUMS"
+        original_checksum = checksum.read_bytes()
+        replace = Path.replace
+
+        def fail_checksum(source, destination):
+            if destination == checksum:
+                raise OSError("Synthetic checksum replacement failure")
+            return replace(source, destination)
+
+        with patch.object(Path, "replace", fail_checksum):
+            with self.assertRaisesRegex(OSError, "checksum replacement failure"):
+                PACKAGING["write_artifacts"](package.parent, package.name, b"new zip", "new digest")
+        self.assertEqual(package.read_bytes(), original_bytes)
+        self.assertEqual(checksum.read_bytes(), original_checksum)
 
     def test_invalid_metadata_writes_no_artifacts(self):
         invalid_version = self.descriptor.replace(f"'{self.version}'", "'../escape'", 1)
