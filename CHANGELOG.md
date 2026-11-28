@@ -3,7 +3,7 @@
 ## v0.1.0 – release preparation
 
 - Initial release scope: bulk member subscriptions, optional invoices and conditional linked third-party creation, PDF and confirmation mail for MariaDBSnapshot, CoreGuarded and EnhancedMySQL. Booking and subsequent effects have separate outcomes.
-- PR #53 integrated the Owner decisions and closed development qualification within the documented limits. Draft PR #40 prepares the deterministic distribution under [D-M4-01](docs/release-qualification-v0.1.0.md#d-m4-01--distribution-and-release-procedure). R0-04, R0-05, final R0-06, R0-07 and Owner Release GO remain open. See the [packaged user guide and release notes](docs/distribution/README.md).
+- PR #53 integrated the Owner decisions and closed development qualification within the documented limits. Draft PR #40 prepares the deterministic distribution under [D-M4-01](docs/release-qualification-v0.1.0.md#d-m4-01--distribution-and-release-procedure). R0-04, R0-05, final R0-06, R0-07 and Owner Release GO remain open. See the [user guide](README.md).
 
 ## Historical development checkpoints
 

@@ -1,106 +1,92 @@
 # Member Subscription Massaction for Dolibarr
 
-Process selected members' subscription contributions in one confirmed massaction, using the normal Dolibarr single-member business process with safeguards for bulk execution. Optional invoices, PDF documents and member emails are implemented across all three transaction profiles.
+Manage and book membership contributions for multiple members in a single workflow directly from the Dolibarr Members list.
 
-**Development and release status (26 November 2026).** PR #53 integrated the M3.4 decisions. Phase 5 development qualification is closed with documented limitations. Draft PR #40 prepares the v0.1.0 package under [D-M4-01](docs/release-qualification-v0.1.0.md#d-m4-01--distribution-and-release-procedure). Exact-package and operational qualification are separate release gates. **Release v0.1.0 remains NO-GO.**
+The module reduces repetitive manual work by combining subscription preview, confirmation, booking, optional invoicing, PDF generation, and email communication. It integrates with Dolibarr's standard business processes without modifying the Dolibarr Core.
 
-## Intended v0.1.0 functionality
+The interface is available in German and English. All three transaction profiles support the same business workflow when their runtime requirements are met.
 
-- Select eligible members in the Members list; preview subscription periods, amounts, overlap and effective options. Default batch limit 100, administrator-configurable. Confirm the actual server-held plans.
-- Book contributions with Core-controlled membership end (including R16 retention of a later end) and standard configured Agenda effects.
-- Optionally create and validate an invoice for a linked third party; create a third party from member data only when invoice creation and the corresponding option are selected and authorized. Verify invoice line, relation and persisted business values.
-- After suitable acknowledged nonterminal completion, generate the optional invoice PDF and send the optional configured member email, verifying the intended PDF attachment where required.
-- Report each member's booking, invoice, PDF, mail and attachment outcome separately. An UNKNOWN database outcome stops the batch. External effect handling depends on the selected profile.
+Visit [GitHub Releases](https://github.com/iLLixM/dolibarr-member-subscription-massaction/releases) for available installation packages, or build an installation ZIP directly from source.
 
-Not in scope: standalone third-party creation without invoice, automatic payment/bank booking, an additional module persistence journal, atomic processing of the entire batch, or common SQL/PDF/SMTP atomicity.
+## What it does
 
-### Transaction profiles
+- Select members and preview their contribution amounts, membership periods, and any overlaps before confirming. Approve each overlapping period individually. Dolibarr applies its normal membership end-date rules, including retaining a later end date when applicable, and records configured Agenda events.
+- Optionally create and validate a customer invoice. Reuse the linked third party, or allow the module to create and link one from member data when invoicing requires it and the operator has permission.
+- Generate invoice PDFs after confirmed booking. Send optional confirmation emails with or without an invoice. When both options are selected, the email requires a verified invoice PDF attachment.
+- See separate booking, invoice, PDF, email, and attachment outcomes for each member, with links to saved contributions and invoices. The default batch limit is 100 members. Administrators can configure it, and a lower Dolibarr mass-action limit takes precedence.
 
-The same business functionality is implemented and enabled for all profiles, subject to each profile's own runtime admission and observation contract.
+## Compatibility
 
-| Profile | Database / observation | Qualification boundary |
+| Component | Requirements and coverage |
+| --- | --- |
+| Dolibarr | Target versions: 22, 23 and 24. Real integration has been verified in selected Dolibarr 22 and 24 environments. Dolibarr 23 is covered by synthetic tests. |
+| Minimum Dolibarr version | 21 — technical admission only, not qualified compatibility. |
+| PHP | 7.4 or later, subject to the requirements of the installed Dolibarr version. |
+| Oracle MySQL | 8.4 or later. |
+| MariaDB | 10.11 or later. |
+| Database driver and storage engine | mysqli and InnoDB for affected tables. |
+| PostgreSQL | Not supported. |
+
+Choose the transaction profile that matches your database system and hosting capabilities.
+
+| Profile | Database | Requirements |
 | --- | --- | --- |
-| `CoreGuarded` | Oracle MySQL; bounded Core ownership, native connection, depth and ACK; no event continuity proof under ADR-12 | B/D bounded finance/PDF/mail within recorded sources. PDF UNKNOWN stops; ADR-08A is the narrow isolated SMTP UNKNOWN exception. |
-| `EnhancedMySQL` | Oracle MySQL; stronger sampled Performance Schema transaction-event and savepoint checks | C bounded finance/PDF/mail. Observation is neither continuous nor infallible. Existing A/C post-COMMIT behavior remains. |
-| `MariaDBSnapshot` | MariaDB; native connection and sampled depth/state including `@@in_transaction` | A bounded finance/PDF/mail. Same-connection replacement can escape snapshots; existing A/C effect behavior remains. |
+| `CoreGuarded` | Oracle MySQL | Suitable for environments without Performance Schema access, including restricted hosting. Requires supported PHP file sessions in a writable local directory, standard Dolibarr file-only logging, and the ability to set the next transaction to `REPEATABLE READ`. |
+| `EnhancedMySQL` | Oracle MySQL | Requires enabled Performance Schema transaction instrumentation, corresponding read permissions and REPEATABLE READ transaction isolation. |
+| `MariaDBSnapshot` | MariaDB | Uses sampled connection and transaction state to provide transaction safeguards. |
 
-CPC-02 standardizes the reporting of an already-decided STOP, including
-NOT_PROCESSED followers and the explicit batch STOP flag. It leaves each
-profile's STOP triggers intact. Do not silently downgrade EnhancedMySQL.
-[Observation and continuation matrix](docs/adr/ADR-0001-risk-register.md#profile-specific-observation-and-continuation)
+Compatibility and qualification details for individual releases are available in the corresponding release and project documentation.
 
-## Architecture and safety
+## Transaction safety
 
-**Binding strategy:** [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22) and [Owner Variant B](docs/owner-core-parity-2026-11-22.md): Dolibarr Core parity plus Massaction-specific safeguards. Use ordinary Core APIs, configured numbering/document models, Agenda, Logevents, triggers and extensions. No Core modifications, additional source/trigger hash allowlist, blanket PROV veto or blanket CoreGuarded finance denial.
+Each member's financial operations run in a separate guarded database transaction. Each profile checks the database state using the capabilities of its platform. Uncertain database completion stops further bookings.
 
-Authenticated selection → fresh server-side preview → full confirmation and fingerprint/profile revision → original consumed one-shot file-session capability for CoreGuarded → one owned outer DoliDB transaction per member, same active guard for Booking and Invoice → contribution/optional third party and validated invoice via Core APIs and readbacks → suitable completion ACK → post-COMMIT PDF and optional verified recipient/attachment mail checkpoints → persisted individual results.
+PDF generation and email are separate effects after booking. A confirmed booking remains saved if either outcome is uncertain. A database rollback may leave filesystem changes, including moves of provisional invoice directories. Mail transport acceptance does not establish delivery.
 
-`Adherent::subscription()`, `Societe::create_from_member()` and `Facture::create()/addline()/validate()` remain the business APIs. Rights/entity, confirmation freshness, transaction ownership, relevant engines/readbacks and replay fences apply before and throughout processing. A confirmed business result remains distinct from PDF or mail uncertainty. CoreGuarded stops on unqualified mail uncertainty and on PDF UNKNOWN. ADR-08A permits only positively isolated standard SMTP UNKNOWN after nonterminal COMMIT, exact original-session readback and fresh context. A/C retain their existing handling and no unverified invoice attachment may be sent. Do not infer a rollback from later SQL absence; do not retry uncertain operations or roll back a foreign transaction. Transport handoff is not guaranteed delivery. F36-02 is Owner-accepted Core filesystem residual risk (possible pre-outer-COMMIT PROV rename), not a guarantee of SQL/filesystem rollback.
+CoreGuarded stops after terminal database completion or an uncertain PDF outcome. Continuation after an uncertain email outcome is only permitted for a positively isolated SMTP failure when all required safeguards remain satisfied.
 
-**Shared hosting:** PR #45 removes only the unnecessary directory-listing/readability prerequisite in `MsmFileBookingCheckpoint::requireSession()`. The PHP `files` handler, nonempty session ID, plain absolute existing writable directory, canonical binding and actual reopen/read/write/close/readback remain required. A known session file may be accessible even when the directory cannot be listed (e.g. owner mode `0300`). Preserve the original consumed confirmation, one-shot/processing/result persistence, owned guard and finance/post-COMMIT checks. Do not widen provider permissions to make a test pass. The six concrete Core/model/PDF file readability checks remain a separate contract. See [design](docs/phase4-invoice-architecture.md), [transaction ADR](docs/adr/ADR-0001-core-first-transaction-profiles.md) and [risk register](docs/adr/ADR-0001-risk-register.md).
+For technical details, see the [transaction architecture](https://github.com/iLLixM/dolibarr-member-subscription-massaction/blob/main/docs/adr/ADR-0001-core-first-transaction-profiles.md).
 
-## Supported platforms and qualification
+## Install and configure
 
-| Item | Intended release scope / current evidence |
-| --- | --- |
-| Dolibarr | Owner-confirmed V22/V23/V24 target; V23 synthetic coverage only, no real V23 integration campaign claimed |
-| PHP | Syntax minimum 7.4, subject to Core requirements; CI PHP 7.4/8.2 plus targeted PHP 8.3/V22 lane; focused D real Web evidence PHP 8.4.28, not general PHP 8.4 CI |
-| Database | Oracle MySQL >=8.4 (Enhanced requires qualified P_S instrumentation/rights), MariaDB >=10.11; direct mysqli and relevant InnoDB tables; PostgreSQL not supported |
-| Module ID | `584620`, unreserved community ID retained by Owner under [Issue #20](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/20); not a permanent upstream assignment |
+1. Verify the SHA-256 of the installation ZIP against its `SHA256SUMS`, then check your Dolibarr installation for a collision with the unreserved module ID `584620`.
+2. Import the verified ZIP via **Setup → Modules/Applications → Deploy/install external module**. For a manual installation, extract the archive’s `membersubscriptionmassaction/` directory into your configured Dolibarr custom modules directory.
+3. Enable **Members** and **Member Subscription Massaction**. Open the module setup and select the matching transaction profile.
+4. Use internal Dolibarr accounts with permission to read members and create subscriptions. Grant the applicable third-party and invoice permissions for invoicing, including creation, validation, and sending where required by the selected options and Dolibarr’s permission settings.
+5. For invoicing, enable **Third Parties** and **Customer Invoices**, configure invoice numbering and a PDF model, and ensure Dolibarr can write to its document storage. For email, configure Dolibarr’s mail transport and a valid sender, and verify the intended recipients.
 
-The descriptor's Core >=21 admission floor is not a claim of real compatibility with every version.
+## Book subscriptions
 
-| dolienv | Core / runtime / profile |
-| --- | --- |
-| A | V24.0.3, PHP 8.2.35, MariaDB 10.11.19, MariaDBSnapshot |
-| B | V24.0.3, PHP 8.2.35, Oracle MySQL 8.4.13, CoreGuarded |
-| C | V24.0.3, PHP 8.2.35, Oracle MySQL 8.4.13, EnhancedMySQL |
-| D | V22.0.5, Web PHP 8.4.28 CGI/FastCGI, CLI 8.3.37, Oracle MySQL 8.4.13, CoreGuarded |
+1. Open **Members**, select eligible members, and choose **Create member subscriptions (bulk)**.
+2. Review the read-only preview. Check dates, amounts, and invoice, customer-creation, and email options. Confirm each intended overlap. Unchecked overlaps are skipped.
+3. Confirm the run once and review the per-member results.
 
-A/B/C are separate installations and schemas; B/C share server and local module source, not a schema. D has a separate checkout/database. [Current environments](docs/dolienv-environments.md) govern mapping; do not relabel historical tools.
+**Successful** means the contribution was saved with confirmed completion. **Skipped** includes the reason, such as an unchecked overlap. **Failed** indicates a definite failure, and **Unknown** indicates an outcome that could not be confirmed. A stopped batch preserves the results already reached. **Not processed** identifies members it never reached.
 
-## Deployment qualification scope
+## Operating limits
 
-The Owner accepted Cross-Entity Variant B for v0.1.0. Qualification is
-limited to one productive business entity with a valid positive active
-entity ID, consistent member/type/customer/invoice/document context and
-effective Core/module rights. Entity 0 is not a substitute for scoped
-permission. MultiCompany and inter-entity business sharing require
-separate qualification and Owner approval. Legitimate non-business global
-configuration is permitted; extensions must preserve the qualified scope.
-Exact installed ZIP compliance remains pending R0-04. This operating
-scope adds no runtime veto. [Decision](docs/m31-cross-entity-owner-decision.md)
-· [R0-04 checks](docs/release-qualification-v0.1.0.md#r0-04-cross-entity-variant-b-compliance)
+Use this version with a single active Dolibarr business entity and consistent member, customer, invoice, and document access. MultiCompany and cross-entity business sharing are outside the qualified scope. The module creates neither standalone third parties nor payments or bank entries.
 
-## Development setup (approved isolated environments only)
+For an **Unknown** result or unexpected stop, check saved contributions, membership dates, invoices, documents, and mail evidence before taking further action. The module performs no automatic retries, resends, or compensation.
 
-No published v0.1.0 installation package is available from this baseline. For an explicitly approved isolated source installation, place or link the module root as `htdocs/custom/membersubscriptionmassaction`. Enable Members and this module, choose a compatible transaction profile, configure applicable user rights and batch limit. For invoice/PDF/mail use the appropriate Core customer, invoice, numbering, document and mail settings and permissions; use an isolated mail sink in tests.
+## Build the installation ZIP
 
-Open the Members list, select eligible members, choose the bulk subscription action, inspect Preview, then confirm only intended options. Review persisted per-member Results; reloading a result is not a new booking. If UNKNOWN/STOP occurs, preserve it and reconcile independently under operator rules rather than resubmitting.
+You need **Git** and **Python 3**. Clone the repository and run the builder from the checkout.
 
-Enabling/disabling, profile/settings changes and bookings are writes. New cases require Owner authorization, fresh fixtures, protected target-user F32-MR-01 preflight, actual source/profile/role binding, backup integrity and independent readbacks. See [operator runbook](docs/cf03-operator-runbook.md).
+```bash
+git clone https://github.com/iLLixM/dolibarr-member-subscription-massaction.git
+cd dolibarr-member-subscription-massaction
+python3 tools/build-release.py
+```
 
-## Tests, evidence and remaining gates
+The builder uses committed files at `HEAD`. For a release, download the published ZIP, check out its local release tag before building, or pass that tag to the builder with `python3 tools/build-release.py TAG`. The builder checks explicitly selected versioned tags against the module metadata, including versions ending in `-dev` or `-beta`. Builds from development commits may contain unreleased changes.
 
-CF03-NORMAL A–D passed within the respective accepted development matrices.
-The [M3.1 assessment](docs/m31-integrated-development-qualification.md) binds
-each campaign to its tested source and distinguishes real cases, local runtime
-checks and synthetic CI. PR #51 integrated the independently closed
-pre-release hardening. Live security remains PARTIAL; real cross-entity
-cases remain BLOCKED / NOT EXECUTED under accepted M3.2.
+The default output is `build-output/<module-version>/<full-source-commit-sha>/` under the repository root. Git ignores this directory. The builder creates the directory when needed and replaces the versioned module ZIP and `SHA256SUMS` on subsequent builds in the same directory. The JSON report on standard output includes the exact source and output path. From that directory, run `sha256sum -c SHA256SUMS` before installing the ZIP.
 
-Draft PR #40 records the package source and ZIP checksum. R0-04 exact-package qualification, R0-05 operational acceptance, final R0-06, R0-07 and separate Owner Release GO remain open. CF03-FAULT destructive testing is deferred. Preserve historical
-UNKNOWN/STOP results and reconcile before any separate decision.
-**Release v0.1.0 remains NO-GO.**
+Use `--output-dir ../msm-build` for a custom output directory. Its parent must exist. Other files in the output directory stay in place. You can also pass an exact local commit as the source. The builder leaves the checkout unchanged and reads only local Git data.
 
-## Documentation map
+Install the generated module ZIP using the steps above. GitHub's automatically generated **Source code** archives are repository snapshots and cannot be installed as Dolibarr modules.
 
-| Need | Read |
-| --- | --- |
-| Current development and roadmap | [Development baseline](docs/current-development-baseline.md), [Issue #22](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/22) |
-| Product/architecture decisions | [Owner Variant B](docs/owner-core-parity-2026-11-22.md), [Phase 4 design](docs/phase4-invoice-architecture.md), [transaction ADR](docs/adr/ADR-0001-core-first-transaction-profiles.md), [shared guard](docs/cf05-shared-guard-design.md) |
-| Environments and evidence | [dolienv](docs/dolienv-environments.md), [Phase 5 register](docs/evidence/cf03/phase5-local-qualification-2026-11-24.md), [CF03 plan](docs/cf03-qualification-plan.md) |
-| Tests and release | [Test strategy](docs/test-strategy.md), [coverage](docs/test-coverage.md), [release gates](docs/release-qualification-v0.1.0.md), [Issue #20](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/20) |
-| Contributing and history | [Contributing](CONTRIBUTING.md), [AGENTS](AGENTS.md), [documentation guide](docs/documentation-guide.md), [71-ID requirements matrix](docs/requirements.csv), [CHANGELOG](CHANGELOG.md) |
+## License and documentation
 
-Earlier validation and requirement rows retain their original scope and sources, not current deployment authorization. Origin: module-owned composition based on [Dolibarr PR #42620](https://github.com/Dolibarr/dolibarr/pull/42620). License GPL-3.0-or-later; see [COPYING](COPYING).
+Licensed under GPL-3.0-or-later. See [COPYING](COPYING), the [documentation guide](https://github.com/iLLixM/dolibarr-member-subscription-massaction/blob/main/docs/documentation-guide.md) or [Contributing](https://github.com/iLLixM/dolibarr-member-subscription-massaction/blob/main/CONTRIBUTING.md).
