@@ -37,6 +37,18 @@ Choose the transaction profile that matches your database system and hosting cap
 
 Compatibility and qualification details for individual releases are available in the corresponding release and project documentation.
 
+## Transaction safety
+
+The module processes each member's financial operations within an individually guarded database transaction.
+
+Database-specific transaction monitoring helps detect unexpected transaction states and prevents further bookings when database completion is uncertain.
+
+All three transaction profiles support the same business functionality while using monitoring mechanisms appropriate to their database system and hosting capabilities.
+
+Database transactions, PDF generation and email delivery are handled as separate effects. Uncertain outcomes require reconciliation rather than automatic retries.
+
+For technical details, see the [transaction architecture](docs/adr/ADR-0001-core-first-transaction-profiles.md).
+
 ## Install and configure
 
 1. Verify the SHA-256 of the installation ZIP against its `SHA256SUMS`, then check your Dolibarr installation for a collision with the unreserved module ID `584620`.
