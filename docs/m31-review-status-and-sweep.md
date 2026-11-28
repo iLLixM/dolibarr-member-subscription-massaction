@@ -4,7 +4,7 @@
 
 PR #52's final independent verdict was **APPROVED FOR DOCUMENTATION MERGE**. F52-01/P2, F52-02/P2, F52-03/P3, F52-04/P3 and F52-05/P3 are independently closed. F52-04 was closed on the first corrective HEAD and reaffirmed on final HEAD. The verified squash, approved HEAD and PR CI integration have identical trees. Approved-HEAD PR CI was 31/31 and separate post-merge Standard push CI was 9/9. [Verified identities and runs](m34-integrated-owner-acceptance.md#1-decision-and-review-provenance)
 
-The Owner granted CF05-07 and CF03-RISK acceptance with documented limitations on 2026-11-26. Formal closure of M3, CF05-07, CF03-RISK and Phase 5 development qualification takes effect upon Owner integration of the independently approved closure documentation. M3.2 is integrated with scope limitation, and actual R0-04 compliance remains pending. [Canonical transition rules](m34-integrated-owner-acceptance.md#9-canonical-status-and-transition-rules)
+The Owner granted CF05-07 and CF03-RISK acceptance with documented limitations on 2026-11-26. The independently approved, tree-identical PR #53 squash on 2026-11-26 formally closed M3, CF05-07, CF03-RISK and Phase 5 development qualification with documented limitations. M3.2 is integrated with scope limitation, and actual R0-04 compliance remains pending. [Canonical transition rules](m34-integrated-owner-acceptance.md#9-canonical-status-and-transition-rules)
 
 ## Historical expected status before PR #52's final approval and squash (2026-11-26)
 

@@ -1,8 +1,13 @@
 # Changelog
 
-## Unreleased – development completion and next release gates
+## v0.1.0 – release preparation
 
-### 2026-11-26 – Integrated development Owner acceptance
+- Initial release scope: bulk member subscriptions, optional invoices and conditional linked third-party creation, PDF and confirmation mail for MariaDBSnapshot, CoreGuarded and EnhancedMySQL. Booking and subsequent effects have separate outcomes.
+- PR #53 integrated the Owner decisions and closed development qualification within the documented limits. Draft PR #40 prepares the deterministic distribution under [D-M4-01](docs/release-qualification-v0.1.0.md#d-m4-01--distribution-and-release-procedure). R0-04, R0-05, final R0-06, R0-07 and Owner Release GO remain open. See the [packaged user guide and release notes](docs/distribution/README.md).
+
+## Historical development checkpoints
+
+### 2026-11-26 – Integrated Owner acceptance before PR #53 merge
 
 - PR #52 integrated M3.1 and M3.2 on the independently approved tree, with all five independent findings closed. The Owner granted M3.4-A and M3.4-B with documented limitations. Formal development closure follows Owner integration of the independently approved closure documentation. Release v0.1.0 remains NO-GO. [M3.4 Owner decision](docs/m34-integrated-owner-acceptance.md)
 

@@ -2,7 +2,7 @@
 
 Process selected members' subscription contributions in one confirmed massaction, using the normal Dolibarr single-member business process with safeguards for bulk execution. Optional invoices, PDF documents and member emails are implemented across all three transaction profiles.
 
-**Development status (26 November 2026).** PR #52 integrated the M3.1 review and M3.2 scope decision. The Owner accepted CF05-07 and CF03-RISK with documented limitations. Formal Phase 5 development closure takes effect upon Owner integration of the independently approved closure documentation. CF03-NORMAL A–D passed within the recorded scope, live security remains PARTIAL, and v0.1.0 remains NO-GO. Descriptor `0.1.0-dev`. [M3.4 Owner decision](docs/m34-integrated-owner-acceptance.md)
+**Development and release status (26 November 2026).** PR #53 integrated the M3.4 decisions. Phase 5 development qualification is closed with documented limitations. Draft PR #40 prepares the v0.1.0 package under [D-M4-01](docs/release-qualification-v0.1.0.md#d-m4-01--distribution-and-release-procedure). Exact-package and operational qualification are separate release gates. **Release v0.1.0 remains NO-GO.**
 
 ## Intended v0.1.0 functionality
 
@@ -89,9 +89,7 @@ checks and synthetic CI. PR #51 integrated the independently closed
 pre-release hardening. Live security remains PARTIAL; real cross-entity
 cases remain BLOCKED / NOT EXECUTED under accepted M3.2.
 
-Draft #40 requires a final source refresh and regenerated package identity.
-R0-04 exact-package qualification, R0-05 operational acceptance, R0-06, R0-07 and separate Owner Release GO remain
-open. CF03-FAULT destructive testing is deferred. Preserve historical
+Draft PR #40 records the package source and ZIP checksum. R0-04 exact-package qualification, R0-05 operational acceptance, final R0-06, R0-07 and separate Owner Release GO remain open. CF03-FAULT destructive testing is deferred. Preserve historical
 UNKNOWN/STOP results and reconcile before any separate decision.
 **Release v0.1.0 remains NO-GO.**
 

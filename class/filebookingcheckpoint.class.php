@@ -159,7 +159,8 @@ final class MsmFileBookingCheckpoint
 			|| !is_string($origin['rows'][$id]['fingerprint'] ?? null)
 			|| !hash_equals($origin['rows'][$id]['fingerprint'], (string) ($row['fingerprint'] ?? ''))
 			|| empty($row['invoice'])
-			|| !empty($row['autocreate']) !== !empty($origin['options']['autocreate'])) {
+			// Batch permission is required only when this confirmed row plans creation.
+			|| (!empty($row['autocreate']) && empty($origin['options']['autocreate']))) {
 			throw new RuntimeException('MSMCoreGuardedSessionUnsupported');
 		}
 		$this->financeAttempted[$id] = true; // Never another Invoice attempt.

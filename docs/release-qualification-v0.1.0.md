@@ -10,7 +10,7 @@
 
 **Merged pre-release hardening.** [PR #51](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/51) squash `8ab803d135ac534dd2d08d28f47a8e427cd23302` matches approved HEAD `3d3cbda7e0ca46db1f2fe5651a273e7aeea4b4bf` (sole parent `f1cc6dc9ca8a274d8af8c324fe87310c84606471`, tree `cf2b1ffcf9f38baae8edf6b18e8f0b4d7348a771`). F45-01/02, F49-03, F50-02/03 and F51-01/02 are INDEPENDENTLY CLOSED. Pre-Release Test-Hardening is integrated and CLOSED WITH DOCUMENTED LIMITATIONS. Evidence remains bounded to the reviewed synthetic suites and local file-session runtime.
 
-**Integrated development qualification (2026-11-26).** PR #52 independently approved and integrated M3.1 and the M3.2 scope decision, with F52-01–05 independently closed. The Owner accepted CF05-07 and CF03-RISK with documented limitations. Formal closure of M3, CF05-07, CF03-RISK and Phase 5 development qualification takes effect upon Owner integration of the independently approved closure documentation. See the [M3.4 Owner decision and closure rules](m34-integrated-owner-acceptance.md#9-canonical-status-and-transition-rules). Actual M3.2 compliance remains an R0-04 obligation. Release v0.1.0 is NO-GO.
+**Accepted development baseline (2026-11-26).** PR #53 independently approved and integrated M3.4 at squash `351b7d2177e8fc106049f4a9f6c3b0596839f9fe`, tree `056b70a264d6937fb365ab4b8b7b4632e35a4999`, identical to approved HEAD `67cb8d8f84e0c01875e92f516af1bf707feec8e8`. M3, CF05-07, CF03-RISK and Phase 5 development qualification are formally closed with documented limitations. CF03-SECURITY-BASELINE stays PARTIAL. Cross-entity remains BLOCKED / NOT EXECUTED and the destructive CF03-FAULT cases remain DEFERRED / NOT EXECUTED. [PR #53](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/53) · [Owner record](m34-integrated-owner-acceptance.md)
 
 **2026-11-25 local Phase 5 delta:** See the [current A/B/C results and exact source](evidence/cf03/phase5-local-completion-2026-11-25.md). A and C mail/verified PDF attachments each passed 3/3 on `c2dc2cfdadf2c4def6bcd2f2ec20473cea3683b3`; B's earlier 3/3 remains on `ba5c9a3121754fcbd4259bb8906ad1dd17f1ce00`. These are capture-only outcomes, not external delivery or nine cases on a single source. Local CF03-NORMAL A/B/C: **PASS within the accepted case matrix**. At that checkpoint local CF03-SECURITY-BASELINE and local Phase 5 were **PARTIAL**; P5L-A/B/C-S05 real cross-entity qualification **BLOCKED** (no distinct authorized second business entity). The live Web aged-fixture expiry result does not establish natural elapsed-time expiry. Earlier results retain their exact source and scope. Further local tests are limited to outstanding cases and change-induced regression; do not repeat accepted cases without a concrete reason.
 
@@ -18,7 +18,16 @@
 
 **2026-11-26 ADR-08A status:** ADR-08A technical implementation ACCEPTED on `8bc36c4d4aab423e644276999066339ec1a5fd3c` (independent review 2026-11-26); local controlled B and positive A/C evidence on `1ac1a8f2dfd7384829fa5b85235f1e4884d689db`; Hosted D delta PASS WITH DOCUMENTED LIMITATIONS on the reported integrated checkout `8bc36c4d4aab423e644276999066339ec1a5fd3c` (positive SMTP/replay and separate Owner-run natural-error observation). Formal development qualification CLOSED WITH DOCUMENTED LIMITATIONS; F49-01/P2 and F49-02/P3 independently closed before the verified #49 squash. F49-03/P3 INDEPENDENTLY CLOSED. No additional real tests required for this bounded acceptance. See [Hosted D delta evidence](evidence/cf03/adr-08a-hosted-d-2026-11-26.md). The [current development baseline](current-development-baseline.md) governs current qualification and supersedes earlier dated checkpoints.
 
-Under M4, refresh Draft PR #40 against the final accepted source and update exact-package identification for R0-03/04. The binding final freeze follows formal M3 closure. R0-05 operational readiness, R0-06, R0-07 and separate Owner Release GO remain open.
+## D-M4-01 — Distribution and release procedure
+
+The Product Owner approved this packaging procedure on 2026-11-26 for the freely distributed v0.1.0. It amends the packaging roadmap in the [preserved M3.4 decision](m34-integrated-owner-acceptance.md#10-remaining-roadmap-and-release-boundary). All accepted scope, evidence limitations and runtime safeguards continue to apply. **Release v0.1.0 remains NO-GO pending explicit Owner Release GO.**
+
+1. **M4 — Prepare.** Refresh [Draft PR #40](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/40) against accepted main, finalize R0-00–03 and prepare R0-06. Build `module_membersubscriptionmassaction-0.1.0.zip` from an exact committed source using the controlled in-script file selection. Verify repeatability, extracted bytes and applicable Dolibarr packaging rules. The ZIP contains the standard module root and no embedded package manifest or generated revision metadata. Record source commit, tree, ZIP size and SHA-256 in PR #40. Supply `SHA256SUMS` externally. The build report also records source and package identity. An internal file manifest is optional.
+2. **M5 — Qualify.** Obtain Owner authorization for the exact source and checksum. Install and qualify those exact ZIP bytes under R0-04, including installed identity, ID collision check and all seven M3.2 criteria. Complete R0-05 operational readiness and Owner operating-risk acceptance, and final R0-06 documentation. Reuse applicable development evidence for targeted scope. RC-01–11 case allocation remains to be commissioned.
+3. **M6 — Review and decide.** Combine independent freeze verification with the single R0-07 final release review. Retain the separate explicit Owner Release GO.
+4. **M7 — Integrate and publish only after GO.** The Owner manually squash-merges PR #40. Verify the integrated source and that the builder on the integrated commit reproduces the qualified ZIP SHA-256. Create tag `v0.1.0` on that integrated commit and publish the identical ZIP and checksum. Under R0-09 verify the published asset, checksum and tag before any applicable issue closure. Changed ZIP bytes require renewed exact-package assessment before publication.
+
+Build with `python3 tools/build-release.py <source-commit-sha> <new-output-directory>`. The ZIP uses sorted paths, a fixed timestamp and file mode, and stored entries. Identical packaged content and build parameters reproduce the same bytes across source identities. The [distribution README](distribution/README.md) is installed as `README.md` inside the package. [Dolibarr packaging rules](https://wiki.dolibarr.org/index.php/Modules_-_Packaging_rules_and_Dolistore_validation_rules)
 
 ## Authoritative release gate map after PR #38
 
@@ -59,20 +68,20 @@ Under M4, refresh Draft PR #40 against the final accepted source and update exac
 | F50-03/P3 | INDEPENDENTLY CLOSED |
 | F51-01/P2 | INDEPENDENTLY CLOSED; sole original #51 merge blocker |
 | F51-02/P3 | INDEPENDENTLY CLOSED; non-blocking test precision refinement |
-| CF05-07 / CF03-RISK | The independent verdicts and F36-02 disposition are retained. Both gates were Owner accepted with documented limitations. Formal development closure follows Owner integration of the independently approved closure documentation. See the [M3.4 Owner decision](m34-integrated-owner-acceptance.md). |
-| R0-00 release baseline | OPEN; binding final source and package freeze follows formal M3 closure |
-| R0-01 compatibility/function scope | V22/V23/V24 target; V23 synthetic-only; final scope verification OPEN |
-| R0-02 identity/version | ID 584620 Owner-accepted unreserved; main 0.1.0-dev; final metadata OPEN |
-| R0-03 reproducible final ZIP | OPEN; Draft PR #40 rehearsal requires refresh against the final accepted source |
-| R0-04 exact package integration | OPEN; execution BLOCKED pending final ZIP; exact package qualification separate from accepted development checkout results |
+| CF05-07 / CF03-RISK | CLOSED WITH DOCUMENTED LIMITATIONS after independent approval and Owner integration of PR #53. The independent verdicts and the F36-02 disposition are retained. |
+| R0-00 release baseline | M4: exact accepted development and candidate identity in PR #40. Independent freeze verification is part of R0-07. |
+| R0-01 compatibility/function scope | M4: V22/V23/V24 scope documented. V23 synthetic only, V21 technical admission only. Installed-package verification remains R0-04. |
+| R0-02 identity/version | M4: `membersubscriptionmassaction`, version `0.1.0`, GPL-3.0-or-later and unreserved ID `584620`. Installed identity and collision verification are R0-04 obligations. |
+| R0-03 reproducible ZIP | M4: deterministic content-based ZIP and external SHA-256. The exact package verification is recorded in PR #40. |
+| R0-04 exact package integration | OPEN; M5 needs Owner authorization bound to the exact ZIP. Installed identity, scope and package behavior require actual verification. |
 | R0-05 operational readiness/risk | OPEN; verify deployment suitability, usable reconciliation and recovery, responsibilities, backup arrangements and obtain separate Owner operating-risk acceptance |
 | R0-06 documentation/release notes | OPEN; finalize against actual artifact/R0-04 |
-| R0-07 independent release review | OPEN; separate Owner Release GO required |
+| R0-07 independent release review | OPEN; one consolidated final review including freeze verification. Separate Owner Release GO required. |
 | R0-08 merge/tag/publication | NOT STARTED; no release GO |
 | R0-09 post-release verification/closure | NOT STARTED |
 | CF03-FAULT | DEFERRED / NOT EXECUTED |
 
-**Package identity:** Draft [PR #40](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/40) historical candidate `b19fbe7a80a97a45e8fa5d8aa96cecf5bcf4fa0d`, two reported byte-identical builds and 31/31 synthetic CI, lacks #45 production correction. Incorporate merged #45 and subsequent applicable changes; compare payload/source to accepted evidence, assess affected qualification, regenerate ZIP and manifest hashes. Manifest embeds source commit/tree: even a tree-identical squash may change package bytes. Plan merge/tag/build identity so published bytes equal the qualified artifact, otherwise reassess affected gates before approval. RC-01–RC-11 in [Issue #20](https://github.com/iLLixM/dolibarr-member-subscription-massaction/issues/20) remain applicable to full Variant B scope. [Local register](evidence/cf03/phase5-local-qualification-2026-11-24.md) preserves historical candidate digest. No new package generated.
+**Historical package rehearsals.** PR #19 closed without merge. The original PR #40 rehearsal at `b19fbe7a80a97a45e8fa5d8aa96cecf5bcf4fa0d` had ZIP SHA-256 `8dce6219baff656edbca48f0fe3d969eaf9f2aa801eacbc11426c0097253a37e` and bounded structural evidence. It predates the PR #45 correction and the content-based builder. Neither historical hash identifies the M4 artifact. Current package identity is recorded in [PR #40](https://github.com/iLLixM/dolibarr-member-subscription-massaction/pull/40).
 
 ---
 
@@ -98,11 +107,11 @@ One installable `v0.1.0` ZIP, without any release-candidate suffix in final pack
 | Gate | Evidence to be produced | Status |
 | --- | --- | --- |
 | CF05-01–06 | Merged and scoped development assessments recorded in the [M3.1 matrix](m31-integrated-development-qualification.md#cf05-0106-consolidated-implementation-assessment). Owner Variant B is binding; F36-02 stays accepted residual risk. | **DEVELOPMENT IMPLEMENTATION COMPLETE** |
-| CF05-07 | Independent technical qualification and separate Owner acceptance with documented limitations. | **OWNER ACCEPTED. FORMAL CLOSURE ON APPROVED INTEGRATION.** |
+| CF05-07 | Independent technical qualification and Owner acceptance integrated through PR #53. | **CLOSED WITH DOCUMENTED LIMITATIONS** |
 | CF03-NORMAL | Accepted real development workflows by respective source and profile; no final-package qualification. | **PASS WITH DOCUMENTED LIMITS** |
 | CF03-SECURITY-BASELINE | Authenticated negatives and synthetic hardening retained; real cross-entity remains BLOCKED / NOT EXECUTED under the [accepted Owner scope](m31-cross-entity-owner-decision.md). | **PARTIAL** |
-| CF03-RISK | Independent assessment complete and integrated technical residual risk Owner accepted with documented limitations. R0-05 operating-risk acceptance stays open. | **OWNER ACCEPTED. FORMAL CLOSURE ON APPROVED INTEGRATION.** |
-| R0-03/new package | Fresh source-matched deterministic ZIP, manifest, checksum, sanitized deliverable and correct 0.1.0/version metadata | **OPEN; PR #19 bytes invalid for this baseline** |
+| CF03-RISK | Independent assessment and Owner acceptance integrated through PR #53. R0-05 operating-risk acceptance stays open. | **CLOSED WITH DOCUMENTED LIMITATIONS** |
+| R0-03/new package | Deterministic ZIP with final metadata and external SHA-256 under D-M4-01 | **STRUCTURAL VERIFICATION IN PR #40** |
 | R0-04 | Actual Dolibarr **D** restricted-hosted **exact ZIP** installation plus required package regression/functional security and [Variant B checks](#r0-04-cross-entity-variant-b-compliance) | **OPEN** |
 | R0-05 | Operational readiness, usable reconciliation and recovery arrangements and separate Owner operating-risk acceptance | **OPEN** |
 | R0-06 | Final documentation and release notes tied to actual package qualification | **OPEN** |
