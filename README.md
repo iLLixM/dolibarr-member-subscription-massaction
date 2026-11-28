@@ -4,16 +4,16 @@ Manage and book membership contributions for multiple members in a single workfl
 
 The module reduces repetitive manual work by combining subscription preview, confirmation, booking, optional invoicing, PDF generation, and email communication. It integrates with Dolibarr's standard business processes without modifying the Dolibarr Core.
 
-The full business workflow is available across all three supported transaction profiles, subject to their respective runtime requirements.
+The interface is available in German and English. All three transaction profiles support the same business workflow when their runtime requirements are met.
 
 Visit [GitHub Releases](https://github.com/iLLixM/dolibarr-member-subscription-massaction/releases) for available installation packages, or build an installation ZIP directly from source.
 
 ## What it does
 
-- Select members and preview their contribution amounts, membership periods, and any overlaps before confirming. Dolibarr applies its normal membership end-date rules, including retaining a later end date when applicable, and records configured Agenda events.
+- Select members and preview their contribution amounts, membership periods, and any overlaps before confirming. Approve each overlapping period individually. Dolibarr applies its normal membership end-date rules, including retaining a later end date when applicable, and records configured Agenda events.
 - Optionally create and validate a customer invoice. Reuse the linked third party, or allow the module to create and link one from member data when invoicing requires it and the operator has permission.
-- Generate invoice PDFs after confirmed database completion. Send optional confirmation emails through Dolibarr and attach the invoice PDF only after verifying the file.
-- Report each member’s booking, invoice, PDF, email, and attachment outcomes separately. The default batch limit is 100 members. Administrators can configure it, and a lower Dolibarr mass-action limit takes precedence.
+- Generate invoice PDFs after confirmed booking. Send optional confirmation emails with or without an invoice. When both options are selected, the email requires a verified invoice PDF attachment.
+- See separate booking, invoice, PDF, email, and attachment outcomes for each member, with links to saved contributions and invoices. The default batch limit is 100 members. Administrators can configure it, and a lower Dolibarr mass-action limit takes precedence.
 
 ## Compatibility
 
@@ -31,7 +31,7 @@ Choose the transaction profile that matches your database system and hosting cap
 
 | Profile | Database | Requirements |
 | --- | --- | --- |
-| `CoreGuarded` | Oracle MySQL | Suitable for environments without Performance Schema access, including restricted hosting. Requires supported PHP file sessions, Dolibarr file logging and REPEATABLE READ transaction isolation. |
+| `CoreGuarded` | Oracle MySQL | Suitable for environments without Performance Schema access, including restricted hosting. Requires supported PHP file sessions in a writable local directory, standard Dolibarr file-only logging, and the ability to set the next transaction to `REPEATABLE READ`. |
 | `EnhancedMySQL` | Oracle MySQL | Requires enabled Performance Schema transaction instrumentation, corresponding read permissions and REPEATABLE READ transaction isolation. |
 | `MariaDBSnapshot` | MariaDB | Uses sampled connection and transaction state to provide transaction safeguards. |
 
@@ -39,15 +39,13 @@ Compatibility and qualification details for individual releases are available in
 
 ## Transaction safety
 
-The module processes each member's financial operations within an individually guarded database transaction.
+Each member's financial operations run in a separate guarded database transaction. Each profile checks the database state using the capabilities of its platform. Uncertain database completion stops further bookings.
 
-Database-specific transaction monitoring helps detect unexpected transaction states and prevents further bookings when database completion is uncertain.
+PDF generation and email are separate effects after booking. A confirmed booking remains saved if either outcome is uncertain. A database rollback may leave filesystem changes, including moves of provisional invoice directories. Mail transport acceptance does not establish delivery.
 
-All three transaction profiles support the same business functionality while using monitoring mechanisms appropriate to their database system and hosting capabilities.
+CoreGuarded can stop after a terminal database completion or an uncertain PDF outcome. It continues after uncertain mail only when the transport problem can be isolated and the checkpoint remains valid.
 
-Database transactions, PDF generation and email delivery are handled as separate effects. Uncertain outcomes require reconciliation rather than automatic retries.
-
-For technical details, see the [transaction architecture](docs/adr/ADR-0001-core-first-transaction-profiles.md).
+For technical details, see the [transaction architecture](https://github.com/iLLixM/dolibarr-member-subscription-massaction/blob/main/docs/adr/ADR-0001-core-first-transaction-profiles.md).
 
 ## Install and configure
 
@@ -60,64 +58,35 @@ For technical details, see the [transaction architecture](docs/adr/ADR-0001-core
 ## Book subscriptions
 
 1. Open **Members**, select eligible members, and choose **Create member subscriptions (bulk)**.
-2. Review the read-only preview. Check dates, amounts, and invoice, customer-creation, and email options. Review and confirm each intended overlap.
-3. Confirm the run once and review the per-member results. If the batch stops, members marked **Not processed** were never reached.
+2. Review the read-only preview. Check dates, amounts, and invoice, customer-creation, and email options. Confirm each intended overlap. Unchecked overlaps are skipped.
+3. Confirm the run once and review the per-member results.
+
+**Successful** means the contribution was saved with confirmed completion. **Skipped** includes the reason, such as an unchecked overlap. **Failed** indicates a definite failure, and **Unknown** indicates an outcome that could not be confirmed. A stopped batch preserves the results already reached. **Not processed** identifies members it never reached.
 
 ## Operating limits
 
 Use this version with a single active Dolibarr business entity and consistent member, customer, invoice, and document access. MultiCompany and cross-entity business sharing are outside the qualified scope. The module creates neither standalone third parties nor payments or bank entries.
 
-Each member has a separate database transaction. PDF generation and email are separate effects. If the database outcome becomes uncertain, the module stops the batch. Later PDF or mail uncertainty follows the selected profile’s safeguards. For example, `CoreGuarded` stops on an uncertain PDF outcome and continues after uncertain mail only when it can establish that the problem is isolated. A transport handoff records acceptance by the mail transport. Delivery still needs to be checked separately.
-
-If a result is **Unknown** or the run stops unexpectedly, check saved contributions, membership dates, invoices, documents, and mail evidence before taking further action. The module performs no automatic retries, resends, or compensation. A database rollback may leave filesystem effects, such as changes to provisional invoice folders.
+For an **Unknown** result or unexpected stop, check saved contributions, membership dates, invoices, documents, and mail evidence before taking further action. The module performs no automatic retries, resends, or compensation.
 
 ## Build the installation ZIP
 
-The module includes a deterministic build script for creating an installable Dolibarr package from committed source code.
-
-### Requirements
-
-- Git
-- Python 3
-
-### Build
-
-Clone the repository:
+You need **Git** and **Python 3**. Clone the repository and run the builder from the checkout.
 
 ```bash
 git clone https://github.com/iLLixM/dolibarr-member-subscription-massaction.git
 cd dolibarr-member-subscription-massaction
+python3 tools/build-release.py
 ```
 
-To build a specific release, check out its corresponding Git tag before proceeding. Available release versions can be found on [GitHub Releases](https://github.com/iLLixM/dolibarr-member-subscription-massaction/releases).
+The builder uses committed files at `HEAD`. For a release, download the published ZIP, check out its local release tag before building, or pass that tag to the builder with `python3 tools/build-release.py TAG`. The builder checks a versioned tag against the module metadata when you pass the tag explicitly. Builds from development commits may contain unreleased changes.
 
-Build the currently checked-out source:
+The default output is `build-output/<module-version>/<full-source-commit-sha>/` under the repository root. Git ignores this directory. Each build creates a new directory with a versioned module ZIP and `SHA256SUMS`. The JSON report on standard output includes the exact source and output path. From that directory, run `sha256sum -c SHA256SUMS` before installing the ZIP.
 
-```bash
-python3 tools/build-release.py "$(git rev-parse HEAD)" ../msm-build
-```
+Use `--output-dir ../msm-build` for a custom output directory. Its parent must exist, and the output directory itself must be new. You can also pass an exact local commit as the source. The builder leaves the checkout unchanged and reads only local Git data.
 
-The output directory must not already exist. It will contain:
-
-- The installable module ZIP, named according to the module version.
-- `SHA256SUMS`, containing the package checksum.
-
-The build script also writes a JSON build report to standard output.
-
-Verify the package checksum:
-
-```bash
-(cd ../msm-build && sha256sum -c SHA256SUMS)
-```
-
-The builder uses committed Git contents and does not include uncommitted working-tree changes, development tests or internal documentation.
-
-For production installations, prefer a published release or a package built from its corresponding release tag. Builds from the development branch may contain unreleased changes.
-
-Install the generated ZIP using Dolibarr's external module installation function.
-
-GitHub's automatically generated source code archives are repository snapshots, not installable Dolibarr module packages.
+Install the generated module ZIP using the steps above. GitHub's automatically generated **Source code** archives are repository snapshots and cannot be installed as Dolibarr modules.
 
 ## License and documentation
 
-Licensed under GPL-3.0-or-later. See [COPYING](COPYING), the [installation and operating guide](docs/distribution/README.md), the [documentation guide](docs/documentation-guide.md), and [Contributing](CONTRIBUTING.md).
+Licensed under GPL-3.0-or-later. See [COPYING](COPYING), the [documentation guide](https://github.com/iLLixM/dolibarr-member-subscription-massaction/blob/main/docs/documentation-guide.md) or [Contributing](https://github.com/iLLixM/dolibarr-member-subscription-massaction/blob/main/CONTRIBUTING.md).
