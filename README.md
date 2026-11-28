@@ -43,7 +43,7 @@ Each member's financial operations run in a separate guarded database transactio
 
 PDF generation and email are separate effects after booking. A confirmed booking remains saved if either outcome is uncertain. A database rollback may leave filesystem changes, including moves of provisional invoice directories. Mail transport acceptance does not establish delivery.
 
-CoreGuarded can stop after a terminal database completion or an uncertain PDF outcome. It continues after uncertain mail only when the transport problem can be isolated and the checkpoint remains valid.
+CoreGuarded stops after terminal database completion or an uncertain PDF outcome. Continuation after an uncertain email outcome is only permitted for a positively isolated SMTP failure when all required safeguards remain satisfied.
 
 For technical details, see the [transaction architecture](https://github.com/iLLixM/dolibarr-member-subscription-massaction/blob/main/docs/adr/ADR-0001-core-first-transaction-profiles.md).
 
