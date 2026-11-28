@@ -1,8 +1,12 @@
 # Member Subscription Massaction for Dolibarr
 
-Book membership contributions for several members in one run from the Dolibarr Members list. Preview dates, amounts, and options together, then use Dolibarr’s standard booking, invoicing, and document workflows for each member.
+Manage and book membership contributions for multiple members in a single workflow directly from the Dolibarr Members list.
 
-Version 0.1.0 implements the workflow below across all three transaction profiles, subject to their prerequisites. Check [GitHub Releases](https://github.com/iLLixM/dolibarr-member-subscription-massaction/releases) for published installation packages, or build the ZIP from source using the instructions below.
+The module reduces repetitive manual work by combining subscription preview, confirmation, booking, optional invoicing, PDF generation, and email communication. It integrates with Dolibarr's standard business processes without modifying the Dolibarr Core.
+
+The full business workflow is available across all three supported transaction profiles, subject to their respective runtime requirements.
+
+Visit [GitHub Releases](https://github.com/iLLixM/dolibarr-member-subscription-massaction/releases) for available installation packages, or build an installation ZIP directly from source.
 
 ## What it does
 
@@ -15,17 +19,23 @@ Version 0.1.0 implements the workflow below across all three transaction profile
 
 | Component | Requirements and coverage |
 | --- | --- |
-| Dolibarr | Versions 22, 23, and 24 are the compatibility targets. Real installations were qualified on **22.0.5** and **24.0.3** in specific configurations. Version 23 has synthetic test coverage only. Version 21.0.0 is the technical minimum enforced by the module descriptor and is outside release qualification. |
-| PHP | **7.4 or later** for the module. Meet the requirements of your installed Dolibarr version as well. |
-| Database | **Oracle MySQL 8.4 or later** or **MariaDB 10.11 or later**, using PHP’s `mysqli` driver and InnoDB for the affected tables. |
+| Dolibarr | Target versions: 22, 23 and 24. Real integration has been verified in selected Dolibarr 22 and 24 environments. Dolibarr 23 is covered by synthetic tests. |
+| Minimum Dolibarr version | 21 — technical admission only, not qualified compatibility. |
+| PHP | 7.4 or later, subject to the requirements of the installed Dolibarr version. |
+| Oracle MySQL | 8.4 or later. |
+| MariaDB | 10.11 or later. |
+| Database driver and storage engine | mysqli and InnoDB for affected tables. |
+| PostgreSQL | Not supported. |
 
-Select the transaction profile that matches your database and hosting capabilities.
+Choose the transaction profile that matches your database system and hosting capabilities.
 
-| Profile | Database | Profile prerequisites and checks |
+| Profile | Database | Requirements |
 | --- | --- | --- |
-| `CoreGuarded` | Oracle MySQL | Uses Dolibarr’s transaction checks without Performance Schema access. Requires a supported PHP file-session checkpoint using a writable local directory, Dolibarr’s standard file-only logging, and a connection that allows setting the next transaction to `REPEATABLE READ`. |
-| `EnhancedMySQL` | Oracle MySQL | Requires enabled Performance Schema transaction instrumentation and read access to the relevant transaction event data. Checks that the active transaction uses `REPEATABLE READ`. |
-| `MariaDBSnapshot` | MariaDB | Requires access to connection and transaction state. Checks snapshots of that state at defined points during booking. |
+| `CoreGuarded` | Oracle MySQL | Suitable for environments without Performance Schema access, including restricted hosting. Requires supported PHP file sessions, Dolibarr file logging and REPEATABLE READ transaction isolation. |
+| `EnhancedMySQL` | Oracle MySQL | Requires enabled Performance Schema transaction instrumentation, corresponding read permissions and REPEATABLE READ transaction isolation. |
+| `MariaDBSnapshot` | MariaDB | Uses sampled connection and transaction state to provide transaction safeguards. |
+
+Compatibility and qualification details for individual releases are available in the corresponding release and project documentation.
 
 ## Install and configure
 
@@ -51,20 +61,50 @@ If a result is **Unknown** or the run stops unexpectedly, check saved contributi
 
 ## Build the installation ZIP
 
-You need **Git** and **Python 3**. Check out the version tag or exact commit you want to reproduce. This example uses the v0.1.0 source commit.
+The module includes a deterministic build script for creating an installable Dolibarr package from committed source code.
+
+### Requirements
+
+- Git
+- Python 3
+
+### Build
+
+Clone the repository:
 
 ```bash
 git clone https://github.com/iLLixM/dolibarr-member-subscription-massaction.git
 cd dolibarr-member-subscription-massaction
-git checkout --detach 8841d87e5198a2aced42b3caaac69b7c60138a14
+```
 
+To build a specific release, check out its corresponding Git tag before proceeding. Available release versions can be found on [GitHub Releases](https://github.com/iLLixM/dolibarr-member-subscription-massaction/releases).
+
+Build the currently checked-out source:
+
+```bash
 python3 tools/build-release.py "$(git rev-parse HEAD)" ../msm-build
+```
+
+The output directory must not already exist. It will contain:
+
+- The installable module ZIP, named according to the module version.
+- `SHA256SUMS`, containing the package checksum.
+
+The build script also writes a JSON build report to standard output.
+
+Verify the package checksum:
+
+```bash
 (cd ../msm-build && sha256sum -c SHA256SUMS)
 ```
 
-The builder reads committed Git blobs and ignores uncommitted working-tree changes. The output directory must be new, with an existing parent directory. It contains `module_membersubscriptionmassaction-0.1.0.zip` and `SHA256SUMS`. The builder writes the JSON build report to standard output.
+The builder uses committed Git contents and does not include uncommitted working-tree changes, development tests or internal documentation.
 
-Install the verified module ZIP using the steps above. GitHub’s automatically generated **Source code** archives are repository snapshots and cannot be used as the installable Dolibarr module package.
+For production installations, prefer a published release or a package built from its corresponding release tag. Builds from the development branch may contain unreleased changes.
+
+Install the generated ZIP using Dolibarr's external module installation function.
+
+GitHub's automatically generated source code archives are repository snapshots, not installable Dolibarr module packages.
 
 ## License and documentation
 
